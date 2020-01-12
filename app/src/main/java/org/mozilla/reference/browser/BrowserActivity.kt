@@ -8,6 +8,7 @@ import android.content.Context
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import mozilla.components.browser.session.Session

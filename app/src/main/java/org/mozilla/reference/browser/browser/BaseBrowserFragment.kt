@@ -20,7 +20,6 @@ import mozilla.components.feature.downloads.manager.FetchDownloadManager
 import mozilla.components.feature.findinpage.view.FindInPageView
 import mozilla.components.feature.prompts.PromptFeature
 import mozilla.components.feature.session.FullScreenFeature
-import mozilla.components.feature.session.SessionFeature
 import mozilla.components.feature.session.SwipeRefreshFeature
 import mozilla.components.feature.tabs.WindowFeature
 import mozilla.components.feature.sitepermissions.SitePermissionsFeature
@@ -45,7 +44,7 @@ import org.mozilla.reference.browser.pip.PictureInPictureIntegration
  */
 @Suppress("TooManyFunctions")
 abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler {
-    private val sessionFeature = ViewBoundFeatureWrapper<SessionFeature>()
+    private val sessionFeature = ViewBoundFeatureWrapper<QwantSessionFeature>()
     private val toolbarIntegration = ViewBoundFeatureWrapper<ToolbarIntegration>()
     private val contextMenuIntegration = ViewBoundFeatureWrapper<ContextMenuIntegration>()
     private val downloadsFeature = ViewBoundFeatureWrapper<DownloadsFeature>()
@@ -81,9 +80,10 @@ abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler {
         val prefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
 
         sessionFeature.set(
-            feature = SessionFeature(
+            feature = QwantSessionFeature(
                 requireComponents.core.sessionManager,
                 requireComponents.useCases.sessionUseCases,
+                requireComponents.useCases.tabsUseCases,
                 engineView,
                 sessionId),
             owner = this,
@@ -93,7 +93,7 @@ abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler {
             feature = ToolbarIntegration(
                 requireContext(),
                 toolbar,
-                // requireComponents.core.historyStorage,
+                requireComponents.core.historyStorage,
                 requireComponents.core.sessionManager,
                 requireComponents.useCases.sessionUseCases,
                 requireComponents.useCases.tabsUseCases,

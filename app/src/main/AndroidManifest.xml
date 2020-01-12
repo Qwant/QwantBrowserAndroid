@@ -123,7 +123,38 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:scheme="https" />
             </intent-filter>
+
+            <intent-filter> <!-- TODO test this ! -->
+                <action android:name="android.intent.action.ASSIST"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+
+            <intent-filter> <!-- TODO test this ! -->
+                <action android:name="android.intent.action.WEB_SEARCH"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
         </activity>
+
+        <activity
+            android:name="org.mozilla.reference.browser.assist.Assist"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:windowSoftInputMode="stateAlwaysVisible"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+            android:launchMode="singleTask">
+            <intent-filter>
+                <action android:name="android.intent.action.ASSIST" />
+                <action android:name="android.intent.action.SEARCH" />
+                <!-- <action android:name="android.intent.action.VOICE_ASSIST" /> -->
+            </intent-filter>
+        </activity>
+
+        <receiver android:name="org.mozilla.reference.browser.assist.WidgetProvider" >
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/assist_config" />
+        </receiver>
 
         <service
             android:name=".customtabs.CustomTabsService"

@@ -164,4 +164,11 @@
     <string name="addon_permissions_dialog_add">Add</string>
     <string name="addon_permissions_dialog_cancel">Cancel</string>
 
+
+    <string name="assist_recent_search">RECENT SEARCHES</string>
+    <string name="assist_on_this_device">ON THIS DEVICE</string>
+    <string name="assist_clear_history">Delete</string>
+    <string name="assist_clipboard">CLIPBOARD</string>
+
+    <string name="qwant_widget_text">What are you looking for ?</string>
 </resources>

@@ -9,7 +9,6 @@ import android.os.Bundle
 import android.view.View
 import kotlinx.android.synthetic.main.fragment_browser.*
 import kotlinx.android.synthetic.main.fragment_browser.view.*
-import kotlinx.android.synthetic.main.fragment_tabstray.view.*
 import mozilla.components.browser.search.SearchEngineParser
 import mozilla.components.feature.awesomebar.AwesomeBarFeature
 import mozilla.components.feature.session.ThumbnailsFeature
@@ -40,6 +39,10 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
         val parser = SearchEngineParser()
         val searchEngine = parser.load("qwant", input)
 
+        if (requireContext().components.core.sessionManager.sessions.isEmpty()) {
+            requireContext().components.useCases.tabsUseCases.addTab.invoke("https://www.qwant.com/", selectTab = true) // TODO move to variable
+        }
+
         AwesomeBarFeature(awesomeBar, toolbar, engineView)
             .addSearchProvider(
                 searchEngine,
@@ -49,9 +52,9 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
             .addSessionProvider(
                 requireComponents.core.sessionManager,
                 requireComponents.useCases.tabsUseCases.selectTab)
-            /* .addHistoryProvider(
+            .addHistoryProvider(
                 requireComponents.core.historyStorage,
-                requireComponents.useCases.sessionUseCases.loadUrl) */
+                requireComponents.useCases.sessionUseCases.loadUrl)
             .addClipboardProvider(requireContext(), requireComponents.useCases.sessionUseCases.loadUrl)
 
         TabsToolbarFeature(
@@ -76,6 +79,8 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
             owner = this,
             view = view
         )
+
+
     }
 
     private fun showTabs() {

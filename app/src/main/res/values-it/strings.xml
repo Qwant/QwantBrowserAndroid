@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="assist_recent_search">RICERCHE RECENTI</string>
+    <string name="assist_on_this_device">SU QUESTO DISPOSITIVO</string>
+    <string name="assist_clear_history">Eliminare</string>
+    <string name="assist_clipboard">APPUNTI</string>
+</resources>

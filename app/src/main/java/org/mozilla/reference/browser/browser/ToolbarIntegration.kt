@@ -34,7 +34,7 @@ import org.mozilla.reference.browser.settings.SettingsActivity
 class ToolbarIntegration(
     context: Context,
     toolbar: BrowserToolbar,
-    // historyStorage: HistoryStorage,
+    historyStorage: HistoryStorage,
     sessionManager: SessionManager,
     sessionUseCases: SessionUseCases,
     tabsUseCases: TabsUseCases,
@@ -129,7 +129,7 @@ class ToolbarIntegration(
         toolbar.edit.hint = context.getString(R.string.toolbar_hint)
 
         ToolbarAutocompleteFeature(toolbar).apply {
-            // addHistoryStorageProvider(historyStorage)
+            addHistoryStorageProvider(historyStorage)
             addDomainProvider(shippedDomainsProvider)
         }
 

@@ -28,6 +28,7 @@ import mozilla.components.feature.webnotifications.WebNotificationFeature
 import org.mozilla.reference.browser.AppRequestInterceptor
 import org.mozilla.reference.browser.BrowserActivity
 import org.mozilla.reference.browser.EngineProvider
+import org.mozilla.reference.browser.storage.History
 import org.mozilla.reference.browser.ext.getPreferenceKey
 import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.R.string.pref_key_remote_debugging
@@ -51,8 +52,8 @@ class Core(private val context: Context) {
         val defaultSettings = DefaultSettings(
             requestInterceptor = AppRequestInterceptor(context),
             remoteDebuggingEnabled = prefs.getBoolean(context.getPreferenceKey(pref_key_remote_debugging), false),
-            trackingProtectionPolicy = createTrackingProtectionPolicy(prefs)// ,
-            // historyTrackingDelegate = HistoryDelegate(historyStorage)
+            trackingProtectionPolicy = createTrackingProtectionPolicy(prefs),
+            historyTrackingDelegate = HistoryDelegate(historyStorage)
         )
         EngineProvider.createEngine(context, defaultSettings)
     }
@@ -101,7 +102,7 @@ class Core(private val context: Context) {
             // media in web content is playing.
             MediaFeature(context).enable()
 
-            WebNotificationFeature(context, engine, icons, R.drawable.ic_notification,
+            WebNotificationFeature(context, engine, icons, R.drawable.notification_icon,
                 BrowserActivity::class.java)
         }
     }
@@ -115,7 +116,7 @@ class Core(private val context: Context) {
      * The storage component to persist browsing history (with the exception of
      * private sessions).
      */
-    // val historyStorage by lazy { PlacesHistoryStorage(context) }
+    val historyStorage by lazy { History() }
 
     /**
      * Icons component for loading, caching and processing website icons.

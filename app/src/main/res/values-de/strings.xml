@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="assist_recent_search">Retzte Suchläufe</string>
+    <string name="assist_on_this_device">auf diesem gerät</string>
+    <string name="assist_clear_history">Löschen</string>
+    <string name="assist_clipboard">Zwischenablage</string>
+</resources>

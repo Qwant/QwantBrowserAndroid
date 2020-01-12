@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="assist_recent_search">RECHERCHE RECENTES</string>
+    <string name="assist_on_this_device">SUR CET APPAREIL</string>
+    <string name="assist_clear_history">Effacer</string>
+    <string name="assist_clipboard">PRESSE PAPIER</string>
+</resources>
