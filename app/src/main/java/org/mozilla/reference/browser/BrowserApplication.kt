@@ -5,7 +5,6 @@
 package org.mozilla.reference.browser
 
 import android.app.Application
-import mozilla.components.concept.push.PushProcessor
 import mozilla.components.browser.session.Session
 import mozilla.components.support.base.log.Log
 import mozilla.components.support.base.log.sink.AndroidLogSink
@@ -14,15 +13,12 @@ import mozilla.components.support.ktx.android.content.runOnlyInMainProcess
 import mozilla.components.support.rustlog.RustLog
 import mozilla.components.support.rusthttp.RustHttpConfig
 import mozilla.components.support.webextensions.WebExtensionSupport
-import org.mozilla.reference.browser.ext.isCrashReportActive
 
 open class BrowserApplication : Application() {
     val components by lazy { Components(this) }
 
     override fun onCreate() {
         super.onCreate()
-
-        setupCrashReporting(this)
 
         RustHttpConfig.setClient(lazy { components.core.client })
         setupLogging()
@@ -53,13 +49,6 @@ open class BrowserApplication : Application() {
                 selected?.let { components.useCases.tabsUseCases.selectTab(it) }
             }
         )
-
-        components.analytics.initializeGlean()
-        components.analytics.initializeExperiments()
-
-        components.backgroundServices.pushFeature?.let {
-            PushProcessor.install(it)
-        }
     }
 
     override fun onTrimMemory(level: Int) {
@@ -68,23 +57,10 @@ open class BrowserApplication : Application() {
             components.core.sessionManager.onLowMemory()
         }
     }
-
-    companion object {
-        const val NON_FATAL_CRASH_BROADCAST = "org.mozilla.reference.browser"
-    }
 }
 
 private fun setupLogging() {
     // We want the log messages of all builds to go to Android logcat
     Log.addSink(AndroidLogSink())
     RustLog.enable()
-}
-
-private fun setupCrashReporting(application: BrowserApplication) {
-    if (isCrashReportActive) {
-        application
-            .components
-            .analytics
-            .crashReporter.install(application)
-    }
 }

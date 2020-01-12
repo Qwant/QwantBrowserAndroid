@@ -11,7 +11,6 @@ import mozilla.components.browser.icons.BrowserIcons
 import mozilla.components.browser.session.SessionManager
 import mozilla.components.browser.session.storage.SessionStorage
 import mozilla.components.browser.state.store.BrowserStore
-import mozilla.components.browser.storage.sync.PlacesHistoryStorage
 import mozilla.components.concept.engine.DefaultSettings
 import mozilla.components.concept.engine.Engine
 import mozilla.components.concept.engine.EngineSession.TrackingProtectionPolicy
@@ -52,9 +51,8 @@ class Core(private val context: Context) {
         val defaultSettings = DefaultSettings(
             requestInterceptor = AppRequestInterceptor(context),
             remoteDebuggingEnabled = prefs.getBoolean(context.getPreferenceKey(pref_key_remote_debugging), false),
-            testingModeEnabled = prefs.getBoolean(context.getPreferenceKey(R.string.pref_key_testing_mode), false),
-            trackingProtectionPolicy = createTrackingProtectionPolicy(prefs),
-            historyTrackingDelegate = HistoryDelegate(historyStorage)
+            trackingProtectionPolicy = createTrackingProtectionPolicy(prefs)// ,
+            // historyTrackingDelegate = HistoryDelegate(historyStorage)
         )
         EngineProvider.createEngine(context, defaultSettings)
     }
@@ -117,7 +115,7 @@ class Core(private val context: Context) {
      * The storage component to persist browsing history (with the exception of
      * private sessions).
      */
-    val historyStorage by lazy { PlacesHistoryStorage(context) }
+    // val historyStorage by lazy { PlacesHistoryStorage(context) }
 
     /**
      * Icons component for loading, caching and processing website icons.

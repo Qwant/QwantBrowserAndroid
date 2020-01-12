@@ -22,12 +22,12 @@ import mozilla.components.feature.tabs.TabsUseCases
  * modules and can be triggered by UI interactions.
  */
 class UseCases(
-    private val context: Context,
-    private val sessionManager: SessionManager,
-    private val store: BrowserStore,
-    private val engineSettings: Settings,
-    private val searchEngineManager: SearchEngineManager,
-    private val client: Client
+        private val context: Context,
+        private val sessionManager: SessionManager,
+        private val store: BrowserStore,
+        private val engineSettings: Settings,
+        private val searchEngineManager: SearchEngineManager,
+        private val client: Client
 ) {
     /**
      * Use cases that provide engine interactions for a given browser session.

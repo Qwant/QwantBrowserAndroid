@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:background="@color/dark"
+    android:layout_height="56dp">
+
+    <ImageButton
+        android:id="@+id/qwantbar_button_home"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:src="@drawable/mozac_ic_globe" />
+
+    <ImageButton
+        android:id="@+id/qwantbar_button_bookmarks"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:src="@drawable/mozac_ic_pin_filled" />
+
+    <ImageButton
+        android:id="@+id/qwantbar_button_search"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:src="@drawable/mozac_ic_search" />
+
+    <ImageButton
+        android:id="@+id/qwantbar_button_tabs"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:src="@drawable/mozac_ic_tab" />
+
+    <ImageButton
+        android:id="@+id/qwantbar_button_more"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:src="@drawable/mozac_ic_menu" />
+</LinearLayout>

@@ -31,9 +31,7 @@ class AppRequestInterceptor(private val context: Context) : RequestInterceptor {
             }
 
             else -> {
-                context.components.services.accountsAuthFeature.interceptor.onLoadRequest(
-                    engineSession, uri, hasUserGesture, isSameDomain
-                ) ?: context.components.services.appLinksInterceptor.onLoadRequest(
+                context.components.services.appLinksInterceptor.onLoadRequest(
                     engineSession, uri, hasUserGesture, isSameDomain
                 )
             }

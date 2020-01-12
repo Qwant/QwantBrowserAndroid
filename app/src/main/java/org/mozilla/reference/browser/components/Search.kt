@@ -19,6 +19,11 @@ class Search(private val context: Context) {
      */
     val searchEngineManager by lazy {
         SearchEngineManager().apply {
+            this.getSearchEngines(context).forEach { // TODO: replace this with list.json method and provide plugin xml definition
+                if (it.identifier == "qwant") {
+                    this.defaultSearchEngine = it
+                }
+            }
             GlobalScope.launch {
                 loadAsync(context).await()
             }

@@ -4,44 +4,54 @@
 
 package org.mozilla.reference.browser.browser
 
+import android.content.res.Resources
 import android.os.Bundle
 import android.view.View
 import kotlinx.android.synthetic.main.fragment_browser.*
 import kotlinx.android.synthetic.main.fragment_browser.view.*
+import kotlinx.android.synthetic.main.fragment_tabstray.view.*
+import mozilla.components.browser.search.SearchEngineParser
 import mozilla.components.feature.awesomebar.AwesomeBarFeature
 import mozilla.components.feature.session.ThumbnailsFeature
 import mozilla.components.feature.tabs.toolbar.TabsToolbarFeature
 import mozilla.components.feature.toolbar.WebExtensionToolbarFeature
 import mozilla.components.support.base.feature.UserInteractionHandler
 import mozilla.components.support.base.feature.ViewBoundFeatureWrapper
+import mozilla.components.support.ktx.android.util.dpToPx
 import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.ext.components
 import org.mozilla.reference.browser.ext.requireComponents
 import org.mozilla.reference.browser.tabs.TabsTrayFragment
+
 
 /**
  * Fragment used for browsing the web within the main app.
  */
 class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
     private val thumbnailsFeature = ViewBoundFeatureWrapper<ThumbnailsFeature>()
-    private val readerViewFeature = ViewBoundFeatureWrapper<ReaderViewIntegration>()
     private val webExtToolbarFeature = ViewBoundFeatureWrapper<WebExtensionToolbarFeature>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        engineView.setVerticalClipping(56.dpToPx(Resources.getSystem().displayMetrics))
+
+        val input = requireContext().assets.open("opensearch_qwant.xml")
+        val parser = SearchEngineParser()
+        val searchEngine = parser.load("qwant", input)
+
         AwesomeBarFeature(awesomeBar, toolbar, engineView)
             .addSearchProvider(
-                requireContext(),
-                requireComponents.search.searchEngineManager,
+                searchEngine,
                 requireComponents.useCases.searchUseCases.defaultSearch,
-                requireComponents.core.client)
+                requireComponents.core.client
+            )
             .addSessionProvider(
                 requireComponents.core.sessionManager,
                 requireComponents.useCases.tabsUseCases.selectTab)
-            .addHistoryProvider(
+            /* .addHistoryProvider(
                 requireComponents.core.historyStorage,
-                requireComponents.useCases.sessionUseCases.loadUrl)
+                requireComponents.useCases.sessionUseCases.loadUrl) */
             .addClipboardProvider(requireContext(), requireComponents.useCases.sessionUseCases.loadUrl)
 
         TabsToolbarFeature(
@@ -58,19 +68,6 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
                 view = view
         )
 
-        readerViewFeature.set(
-            feature = ReaderViewIntegration(
-                requireContext(),
-                requireComponents.core.engine,
-                requireComponents.core.sessionManager,
-                view.toolbar,
-                view.readerViewBar,
-                view.readerViewAppearanceButton
-            ),
-            owner = this,
-            view = view
-        )
-
         webExtToolbarFeature.set(
             feature = WebExtensionToolbarFeature(
                 view.toolbar,
@@ -82,16 +79,11 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
     }
 
     private fun showTabs() {
-        // For now we are performing manual fragment transactions here. Once we can use the new
-        // navigation support library we may want to pass navigation graphs around.
         activity?.supportFragmentManager?.beginTransaction()?.apply {
             replace(R.id.container, TabsTrayFragment())
             commit()
         }
     }
-
-    override fun onBackPressed(): Boolean =
-        readerViewFeature.onBackPressed() || super.onBackPressed()
 
     companion object {
         fun create(sessionId: String? = null) = BrowserFragment().apply {

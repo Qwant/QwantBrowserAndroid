@@ -34,7 +34,7 @@ import org.mozilla.reference.browser.settings.SettingsActivity
 class ToolbarIntegration(
     context: Context,
     toolbar: BrowserToolbar,
-    historyStorage: HistoryStorage,
+    // historyStorage: HistoryStorage,
     sessionManager: SessionManager,
     sessionUseCases: SessionUseCases,
     tabsUseCases: TabsUseCases,
@@ -107,13 +107,9 @@ class ToolbarIntegration(
                 context.startActivity(intent)
             },
 
-            SimpleBrowserMenuItem("Report issue") {
-                tabsUseCases.addTab.invoke(
-                    "https://github.com/mozilla-mobile/reference-browser/issues/new")
-            },
-
             SimpleBrowserMenuItem("Settings") {
-                openSettingsActivity(context)
+                val intent = Intent(context, SettingsActivity::class.java)
+                context.startActivity(intent)
             }
         )
     }
@@ -126,13 +122,14 @@ class ToolbarIntegration(
             DisplayToolbar.Indicators.TRACKING_PROTECTION
         )
         toolbar.display.displayIndicatorSeparator = true
+
         toolbar.display.menuBuilder = menuBuilder
 
         toolbar.display.hint = context.getString(R.string.toolbar_hint)
         toolbar.edit.hint = context.getString(R.string.toolbar_hint)
 
         ToolbarAutocompleteFeature(toolbar).apply {
-            addHistoryStorageProvider(historyStorage)
+            // addHistoryStorageProvider(historyStorage)
             addDomainProvider(shippedDomainsProvider)
         }
 
@@ -157,10 +154,5 @@ class ToolbarIntegration(
 
     override fun onBackPressed(): Boolean {
         return toolbarFeature.onBackPressed()
-    }
-
-    private fun openSettingsActivity(context: Context) {
-        val intent = Intent(context, SettingsActivity::class.java)
-        context.startActivity(intent)
     }
 }

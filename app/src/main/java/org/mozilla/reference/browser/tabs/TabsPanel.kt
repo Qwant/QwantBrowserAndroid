@@ -42,8 +42,8 @@ class TabsPanel @JvmOverloads constructor(
             when (it.itemId) {
                 R.id.newTab -> {
                     when (isPrivateTray) {
-                        true -> tabsUseCases.addPrivateTab.invoke("about:privatebrowsing", selectTab = true)
-                        false -> tabsUseCases.addTab.invoke("about:blank", selectTab = true)
+                        true -> tabsUseCases.addPrivateTab.invoke("https://www.qwant.com/", selectTab = true) // TODO move to variable
+                        false -> tabsUseCases.addTab.invoke("https://www.qwant.com/", selectTab = true)
                     }
                     closeTabsTray?.invoke()
                 }

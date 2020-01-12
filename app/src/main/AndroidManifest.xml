@@ -17,8 +17,8 @@
     <application
         android:allowBackup="true"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:icon="@mipmap/ic_qwant_launcher"
+        android:roundIcon="@mipmap/ic_qwant_launcher_round"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
@@ -72,6 +72,12 @@
             android:parentActivityName=".addons.AddonsActivity"
             android:exported="false"
             android:theme="@style/Theme.AppCompat.Light" />
+
+        <activity
+            android:name=".settings.SettingsActivity"
+            android:label="@string/settings"
+            android:theme="@style/AppTheme"
+            android:parentActivityName=".BrowserActivity" />
 
         <activity
             android:name=".addons.PermissionsDetailsActivity"
@@ -129,27 +135,6 @@
         </service>
 
         <service android:name=".downloads.DownloadService" />
-
-        <activity
-          android:name=".settings.SettingsActivity"
-          android:label="@string/settings"
-          android:theme="@style/AppTheme"
-          android:parentActivityName=".BrowserActivity" />
-
-        <service
-            android:name=".push.FirebasePush"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT" />
-            </intent-filter>
-        </service>
-
-        <meta-data
-            android:name="firebase_messaging_auto_init_enabled"
-            android:value="false" />
-        <meta-data
-            android:name="firebase_analytics_collection_enabled"
-            android:value="false" />
     </application>
 
 </manifest>

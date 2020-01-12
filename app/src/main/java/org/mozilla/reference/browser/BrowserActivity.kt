@@ -6,8 +6,6 @@ package org.mozilla.reference.browser
 
 import android.content.Context
 import android.os.Bundle
-import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.snackbar.Snackbar.LENGTH_LONG
 import androidx.appcompat.app.AppCompatActivity
 import android.util.AttributeSet
 import android.view.View
@@ -17,21 +15,16 @@ import mozilla.components.browser.tabstray.BrowserTabsTray
 import mozilla.components.concept.engine.EngineView
 import mozilla.components.concept.tabstray.TabsTray
 import mozilla.components.feature.intent.ext.EXTRA_SESSION_ID
-import mozilla.components.lib.crash.Crash
 import mozilla.components.support.base.feature.UserInteractionHandler
 import mozilla.components.support.utils.SafeIntent
 import org.mozilla.reference.browser.browser.BrowserFragment
-import org.mozilla.reference.browser.browser.CrashIntegration
 import org.mozilla.reference.browser.ext.components
-import org.mozilla.reference.browser.ext.isCrashReportActive
 import org.mozilla.reference.browser.tabs.TabsTouchHelper
 
 /**
  * Activity that holds the [BrowserFragment].
  */
 open class BrowserActivity : AppCompatActivity() {
-
-    private lateinit var crashIntegration: CrashIntegration
 
     private val sessionId: String?
         get() = SafeIntent(intent).getStringExtra(EXTRA_SESSION_ID)
@@ -52,15 +45,6 @@ open class BrowserActivity : AppCompatActivity() {
                 commit()
             }
         }
-
-        if (isCrashReportActive) {
-            crashIntegration = CrashIntegration(this, components.analytics.crashReporter) { crash ->
-                onNonFatalCrash(crash)
-            }
-            lifecycle.addObserver(crashIntegration)
-        }
-
-        NotificationManager.checkAndNotifyPolicy(this)
     }
 
     override fun onBackPressed() {
@@ -118,11 +102,4 @@ open class BrowserActivity : AppCompatActivity() {
             }
             else -> super.onCreateView(parent, name, context, attrs)
         }
-
-    private fun onNonFatalCrash(crash: Crash) {
-        Snackbar.make(findViewById(android.R.id.content), R.string.crash_report_non_fatal_message, LENGTH_LONG)
-            .setAction(R.string.crash_report_non_fatal_action) {
-                crashIntegration.sendCrashReport(crash)
-            }.show()
-    }
 }

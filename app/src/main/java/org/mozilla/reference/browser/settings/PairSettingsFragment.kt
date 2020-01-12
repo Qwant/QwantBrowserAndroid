@@ -32,12 +32,7 @@ class PairSettingsFragment : Fragment(), UserInteractionHandler {
                 onNeedToRequestPermissions = { permissions ->
                     requestPermissions(permissions, REQUEST_CODE_CAMERA_PERMISSIONS)
                 },
-                onScanResult = { pairingUrl ->
-                    requireComponents.services.accountsAuthFeature.beginPairingAuthentication(
-                        requireContext(), pairingUrl
-                    )
-                    activity?.finish()
-                }
+                onScanResult = { activity?.finish() }
             ),
             owner = this,
             view = view

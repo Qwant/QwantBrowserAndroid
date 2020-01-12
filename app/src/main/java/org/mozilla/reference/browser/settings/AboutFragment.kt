@@ -22,7 +22,6 @@ import androidx.core.text.HtmlCompat.FROM_HTML_SEPARATOR_LINE_BREAK_LIST_ITEM
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.fragment_about.*
 import mozilla.components.Build
-import org.mozilla.geckoview.BuildConfig.MOZ_APP_BUILDID
 import org.mozilla.geckoview.BuildConfig.MOZ_APP_VERSION
 import org.mozilla.reference.browser.R
 
@@ -40,10 +39,10 @@ class AboutFragment : Fragment() {
 
         val aboutText = try {
             val packageInfo = requireContext().packageManager.getPackageInfo(requireContext().packageName, 0)
-            val geckoVersion = PackageInfoCompat.getLongVersionCode(packageInfo).toString() + " GV: " +
-                MOZ_APP_VERSION + "-" + MOZ_APP_BUILDID
+            val geckoVersion = PackageInfoCompat.getLongVersionCode(packageInfo).toString() + " - Gecko: " +
+                MOZ_APP_VERSION
             String.format(
-                "%s (Build #%s)\n",
+                "%s (Build %s)",
                 packageInfo.versionName,
                 geckoVersion
             )
@@ -52,11 +51,9 @@ class AboutFragment : Fragment() {
         }
 
         val versionInfo = String.format(
-            "%s \uD83D\uDCE6: %s, %s\n\uD83D\uDEA2: %s",
+            "%s\ngit hash: %s",
             aboutText,
-            Build.version,
-            Build.gitHash,
-            Build.applicationServicesVersion
+            Build.gitHash
         )
         val content = HtmlCompat.fromHtml(
             resources.getString(R.string.about_content, appName),

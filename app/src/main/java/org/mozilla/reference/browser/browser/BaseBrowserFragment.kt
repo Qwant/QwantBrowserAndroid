@@ -93,7 +93,7 @@ abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler {
             feature = ToolbarIntegration(
                 requireContext(),
                 toolbar,
-                requireComponents.core.historyStorage,
+                // requireComponents.core.historyStorage,
                 requireComponents.core.sessionManager,
                 requireComponents.useCases.sessionUseCases,
                 requireComponents.useCases.tabsUseCases,
