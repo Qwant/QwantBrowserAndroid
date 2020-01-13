@@ -6,7 +6,9 @@ package org.mozilla.reference.browser.browser
 
 import android.content.res.Resources
 import android.os.Bundle
+import android.util.Log
 import android.view.View
+import kotlinx.android.synthetic.main.component_qwantbar.*
 import kotlinx.android.synthetic.main.fragment_browser.*
 import kotlinx.android.synthetic.main.fragment_browser.view.*
 import mozilla.components.browser.search.SearchEngineParser
@@ -20,6 +22,7 @@ import mozilla.components.support.ktx.android.util.dpToPx
 import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.ext.components
 import org.mozilla.reference.browser.ext.requireComponents
+import org.mozilla.reference.browser.storage.BookmarksFragment
 import org.mozilla.reference.browser.tabs.TabsTrayFragment
 
 
@@ -47,8 +50,7 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
             .addSearchProvider(
                 searchEngine,
                 requireComponents.useCases.searchUseCases.defaultSearch,
-                requireComponents.core.client
-            )
+                requireComponents.core.client)
             .addSessionProvider(
                 requireComponents.core.sessionManager,
                 requireComponents.useCases.tabsUseCases.selectTab)
@@ -57,11 +59,12 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
                 requireComponents.useCases.sessionUseCases.loadUrl)
             .addClipboardProvider(requireContext(), requireComponents.useCases.sessionUseCases.loadUrl)
 
-        TabsToolbarFeature(
+        /* TabsToolbarFeature(
             toolbar = toolbar,
             sessionId = sessionId,
             sessionManager = requireComponents.core.sessionManager,
-            showTabs = ::showTabs)
+            showTabs = ::showTabs) */
+        qwantbar.onTabsClicked(::showTabs)
 
         thumbnailsFeature.set(
                 feature = ThumbnailsFeature(requireContext(),
@@ -79,8 +82,6 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
             owner = this,
             view = view
         )
-
-
     }
 
     private fun showTabs() {

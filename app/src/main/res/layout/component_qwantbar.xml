@@ -19,19 +19,11 @@
         android:layout_weight="1"
         android:src="@drawable/mozac_ic_pin_filled" />
 
-    <ImageButton
-        android:id="@+id/qwantbar_button_search"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:src="@drawable/mozac_ic_search" />
-
-    <ImageButton
+    <mozilla.components.ui.tabcounter.TabCounter
         android:id="@+id/qwantbar_button_tabs"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:src="@drawable/mozac_ic_tab" />
+        android:layout_weight="1" />
 
     <ImageButton
         android:id="@+id/qwantbar_button_more"

@@ -171,4 +171,6 @@
     <string name="assist_clipboard">CLIPBOARD</string>
 
     <string name="qwant_widget_text">What are you looking for ?</string>
+
+    <string name="bookmarks">Bookmarks</string>
 </resources>

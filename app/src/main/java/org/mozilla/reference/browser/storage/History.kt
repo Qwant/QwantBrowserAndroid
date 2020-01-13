@@ -1,14 +1,10 @@
 package org.mozilla.reference.browser.storage
 
-import android.content.Context
 import android.util.Log
-import android.view.View
 import androidx.annotation.VisibleForTesting
 import mozilla.components.concept.storage.*
 import mozilla.components.support.utils.StorageUtils.levenshteinDistance
 import mozilla.components.support.utils.segmentAwareDomainMatch
-import org.mozilla.reference.browser.assist.HistoryAdapter
-import java.io.*
 import java.util.*
 
 data class Visit(val timestamp: Long, val type: VisitType)
@@ -16,14 +12,19 @@ data class Visit(val timestamp: Long, val type: VisitType)
 const val AUTOCOMPLETE_SOURCE_NAME = "history"
 
 class History : HistoryStorage {
+
     @VisibleForTesting
     internal var pages: HashMap<String, MutableList<Visit>> = linkedMapOf()
     @VisibleForTesting
-    internal val pageMeta: HashMap<String, PageObservation> = hashMapOf()
+    internal var pageMeta: HashMap<String, PageObservation> = hashMapOf()
 
     override suspend fun recordVisit(uri: String, visit: PageVisit) {
         val now = System.currentTimeMillis()
         if (visit.redirectSource != RedirectSource.NOT_A_SOURCE) {
+            return
+        }
+
+        if (uri.contains("https://www.qwant.com")) {
             return
         }
 
@@ -62,6 +63,7 @@ class History : HistoryStorage {
             end: Long,
             excludeTypes: List<VisitType>
     ): List<VisitInfo> = synchronized(pages + pageMeta) {
+
         val visits = mutableListOf<VisitInfo>()
 
         pages.forEach {
@@ -157,46 +159,5 @@ class History : HistoryStorage {
 
     override fun cleanup() {
         // GC will take care of our internal data structures, so there's nothing to do here.
-    }
-
-    fun write_on_disk() {
-        /* try {
-            val file_output_stream: FileOutputStream = this.assist_activity.getApplicationContext().openFileOutput(HistoryAdapter.QWANT_HISTORY_FILENAME, Context.MODE_PRIVATE)
-            val object_output_stream = ObjectOutputStream(file_output_stream)
-            object_output_stream.writeObject(history_data)
-            object_output_stream.flush()
-            object_output_stream.close()
-            file_output_stream.close()
-        } catch (e: Exception) {
-            Log.e(HistoryAdapter.LOGTAG, "Failed to save history: " + e.message)
-            e.printStackTrace()
-        } */
-    }
-
-    fun read_from_disk() {
-        /* try {
-            val file_input_stream: FileInputStream = this.assist_activity.getApplicationContext().openFileInput(HistoryAdapter.QWANT_HISTORY_FILENAME)
-            val object_input_stream = ObjectInputStream(file_input_stream)
-            history_data = object_input_stream.readObject() as ArrayList<String?>
-            object_input_stream.close()
-            file_input_stream.close()
-            // QWANT_MAX_HISTORY may change from one release to another, so this apply it on already saved history
-            if (history_data.size > HistoryAdapter.QWANT_MAX_HISTORY) {
-                history_data = ArrayList<String>(history_data.subList(0, HistoryAdapter.QWANT_MAX_HISTORY - 1))
-            }
-            this.notifyDataSetChanged()
-            if (!history_data.isEmpty() && this.history_layout.getVisibility() == View.GONE) {
-                this.history_layout.setVisibility(View.VISIBLE)
-            }
-        } catch (e: IOException) {
-            Log.e(HistoryAdapter.LOGTAG, "Failed reading history file: IO exception: " + e.message)
-            e.printStackTrace()
-        } catch (e: ClassNotFoundException) {
-            Log.e(HistoryAdapter.LOGTAG, "Failed reading history file: Class not found: " + e.message)
-            e.printStackTrace()
-        } catch (e: Exception) {
-            Log.e(HistoryAdapter.LOGTAG, "Failed reading history file: " + e.message)
-            e.printStackTrace()
-        } */
     }
 }

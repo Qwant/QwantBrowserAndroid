@@ -4,7 +4,10 @@
 
 package org.mozilla.reference.browser
 
+import android.app.Activity
 import android.app.Application
+import android.os.Bundle
+import androidx.annotation.Nullable
 import mozilla.components.browser.session.Session
 import mozilla.components.support.base.log.Log
 import mozilla.components.support.base.log.sink.AndroidLogSink
@@ -13,12 +16,18 @@ import mozilla.components.support.ktx.android.content.runOnlyInMainProcess
 import mozilla.components.support.rustlog.RustLog
 import mozilla.components.support.rusthttp.RustHttpConfig
 import mozilla.components.support.webextensions.WebExtensionSupport
+import org.mozilla.reference.browser.ext.application
 
-open class BrowserApplication : Application() {
+open class BrowserApplication : Application(), Application.ActivityLifecycleCallbacks {
     val components by lazy { Components(this) }
 
+    var currentActivity: Activity? = null
+
     override fun onCreate() {
+
         super.onCreate()
+
+        application.registerActivityLifecycleCallbacks(this)
 
         RustHttpConfig.setClient(lazy { components.core.client })
         setupLogging()
@@ -57,6 +66,14 @@ open class BrowserApplication : Application() {
             components.core.sessionManager.onLowMemory()
         }
     }
+
+    override fun onActivityResumed(activity: Activity?) { this.currentActivity = activity }
+    override fun onActivityStarted(activity: Activity?) { this.currentActivity = activity }
+    override fun onActivityCreated(activity: Activity?, savedInstanceState: Bundle?) { this.currentActivity = activity }
+    override fun onActivityPaused(activity: Activity?) { }
+    override fun onActivityDestroyed(activity: Activity?) { }
+    override fun onActivitySaveInstanceState(activity: Activity?, outState: Bundle?) { }
+    override fun onActivityStopped(activity: Activity?) { }
 }
 
 private fun setupLogging() {
