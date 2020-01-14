@@ -15,8 +15,6 @@
         android:id="@+id/swipeRefresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="56dp"
-        android:layout_marginBottom="56dp"
         app:layout_behavior="org.mozilla.reference.browser.layout.EngineViewTopBehavior">
         <mozilla.components.concept.engine.EngineView
             android:id="@+id/engineView"
@@ -53,17 +51,11 @@
     <mozilla.components.browser.toolbar.BrowserToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
+        android:layout_height="0dp"
         android:layout_gravity="top"
         android:background="@color/toolbarBackgroundColor"
         mozac:browserToolbarTrackingProtectionAndSecurityIndicatorSeparatorColor="@color/photonWhite"
         mozac:browserToolbarSuggestionForegroundColor="@color/toolbarSuggestionForeground"
         mozac:browserToolbarSuggestionBackgroundColor="@color/toolbarSuggestionBackground" />
-
-    <org.mozilla.reference.browser.layout.QwantBar
-        android:id="@+id/qwantbar"
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:layout_gravity="bottom"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

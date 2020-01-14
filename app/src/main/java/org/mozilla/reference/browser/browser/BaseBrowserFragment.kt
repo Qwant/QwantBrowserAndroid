@@ -5,6 +5,7 @@
 package org.mozilla.reference.browser.browser
 
 import android.content.Intent
+import android.content.res.Resources
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,6 +13,7 @@ import android.view.ViewGroup
 import androidx.annotation.CallSuper
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_browser.*
 import kotlinx.android.synthetic.main.fragment_browser.view.*
 import mozilla.components.feature.app.links.AppLinksFeature
@@ -26,6 +28,7 @@ import mozilla.components.feature.sitepermissions.SitePermissionsFeature
 import mozilla.components.support.base.feature.PermissionsFeature
 import mozilla.components.support.base.feature.UserInteractionHandler
 import mozilla.components.support.base.feature.ViewBoundFeatureWrapper
+import mozilla.components.support.ktx.android.util.dpToPx
 import mozilla.components.support.ktx.android.view.enterToImmersiveMode
 import mozilla.components.support.ktx.android.view.exitImmersiveModeIfNeeded
 import org.mozilla.reference.browser.AppPermissionCodes.REQUEST_CODE_APP_PERMISSIONS
@@ -214,11 +217,13 @@ abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler {
 
     private fun fullScreenChanged(enabled: Boolean) {
         if (enabled) {
-            activity?.enterToImmersiveMode()
-            toolbar.visibility = View.GONE
+            val toolbarParams = toolbar.layoutParams
+            toolbarParams.height = 0
+            toolbar.layoutParams = toolbarParams
         } else {
-            activity?.exitImmersiveModeIfNeeded()
-            toolbar.visibility = View.VISIBLE
+            val toolbarParams = toolbar.layoutParams
+            toolbarParams.height = 56.dpToPx(Resources.getSystem().displayMetrics)
+            toolbar.layoutParams = toolbarParams
         }
     }
 

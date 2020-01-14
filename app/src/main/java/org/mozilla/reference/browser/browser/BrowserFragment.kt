@@ -4,26 +4,18 @@
 
 package org.mozilla.reference.browser.browser
 
-import android.content.res.Resources
 import android.os.Bundle
-import android.util.Log
 import android.view.View
-import kotlinx.android.synthetic.main.component_qwantbar.*
 import kotlinx.android.synthetic.main.fragment_browser.*
 import kotlinx.android.synthetic.main.fragment_browser.view.*
 import mozilla.components.browser.search.SearchEngineParser
 import mozilla.components.feature.awesomebar.AwesomeBarFeature
 import mozilla.components.feature.session.ThumbnailsFeature
-import mozilla.components.feature.tabs.toolbar.TabsToolbarFeature
 import mozilla.components.feature.toolbar.WebExtensionToolbarFeature
 import mozilla.components.support.base.feature.UserInteractionHandler
 import mozilla.components.support.base.feature.ViewBoundFeatureWrapper
-import mozilla.components.support.ktx.android.util.dpToPx
-import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.ext.components
 import org.mozilla.reference.browser.ext.requireComponents
-import org.mozilla.reference.browser.storage.BookmarksFragment
-import org.mozilla.reference.browser.tabs.TabsTrayFragment
 
 
 /**
@@ -32,15 +24,18 @@ import org.mozilla.reference.browser.tabs.TabsTrayFragment
 class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
     private val thumbnailsFeature = ViewBoundFeatureWrapper<ThumbnailsFeature>()
     private val webExtToolbarFeature = ViewBoundFeatureWrapper<WebExtensionToolbarFeature>()
+    private var toolbarSessionObserver: ToolbarSessionObserver? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        engineView.setVerticalClipping(56.dpToPx(Resources.getSystem().displayMetrics))
+        // engineView.setVerticalClipping(56.dpToPx(Resources.getSystem().displayMetrics)) // Qwant bar size
+        toolbarSessionObserver = ToolbarSessionObserver(requireContext().components.core.sessionManager, toolbar)
+        requireContext().components.core.sessionManager.register(this.toolbarSessionObserver!!)
 
-        val input = requireContext().assets.open("opensearch_qwant.xml")
-        val parser = SearchEngineParser()
-        val searchEngine = parser.load("qwant", input)
+        val seInput = requireContext().assets.open("opensearch_qwant.xml")
+        val seParser = SearchEngineParser()
+        val searchEngine = seParser.load("qwant", seInput)
 
         if (requireContext().components.core.sessionManager.sessions.isEmpty()) {
             requireContext().components.useCases.tabsUseCases.addTab.invoke("https://www.qwant.com/", selectTab = true) // TODO move to variable
@@ -59,13 +54,6 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
                 requireComponents.useCases.sessionUseCases.loadUrl)
             .addClipboardProvider(requireContext(), requireComponents.useCases.sessionUseCases.loadUrl)
 
-        /* TabsToolbarFeature(
-            toolbar = toolbar,
-            sessionId = sessionId,
-            sessionManager = requireComponents.core.sessionManager,
-            showTabs = ::showTabs) */
-        qwantbar.onTabsClicked(::showTabs)
-
         thumbnailsFeature.set(
                 feature = ThumbnailsFeature(requireContext(),
                         engineView,
@@ -82,13 +70,6 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
             owner = this,
             view = view
         )
-    }
-
-    private fun showTabs() {
-        activity?.supportFragmentManager?.beginTransaction()?.apply {
-            replace(R.id.container, TabsTrayFragment())
-            commit()
-        }
     }
 
     companion object {

@@ -8,11 +8,11 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Resources
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
-import androidx.annotation.NonNull
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import mozilla.components.concept.engine.EngineView
+import mozilla.components.support.ktx.android.util.dpToPx
 import mozilla.components.support.ktx.android.view.findViewInHierarchy
 
 /**
@@ -47,20 +47,15 @@ class EngineViewTopBehavior(
         return super.layoutDependsOn(parent, child, dependency)
     }
 
-    /* override fun onDependentViewChanged(parent: CoordinatorLayout, child: View, dependency: View): Boolean {
-        val params = child.layoutParams as CoordinatorLayout.LayoutParams
-        params.setMargins(0, dependency.translationY.toInt() + 56.toDp(), 0, 0)
-        child.layoutParams = params
-        return true
-    } */
-
     /**
      * Apply vertical clipping to [EngineView]. This requires [EngineViewBottomBehavior] to be set
      * in/on the [EngineView] or its parent. Must be a direct descending child of [CoordinatorLayout].
      */
-    /* override fun onDependentViewChanged(parent: CoordinatorLayout, child: View, dependency: View): Boolean {
-        val engineView = child.findViewInHierarchy { it is EngineView } as EngineView?
-        engineView?.setVerticalClipping(-56)
-        return true
-    } */
+    override fun onDependentViewChanged(parent: CoordinatorLayout, child: View, dependency: View): Boolean {
+        if (dependency::class.java.simpleName == "BrowserToolbar") {
+            child.setPadding(0, dependency.layoutParams.height, 0, 0)
+            return true
+        }
+        return false
+    }
 }

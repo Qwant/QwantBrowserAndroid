@@ -8,9 +8,9 @@ import android.content.Context
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
+import kotlinx.android.synthetic.main.activity_main.*
 import mozilla.components.browser.session.Session
 import mozilla.components.browser.tabstray.BrowserTabsTray
 import mozilla.components.concept.engine.EngineView
@@ -20,7 +20,9 @@ import mozilla.components.support.base.feature.UserInteractionHandler
 import mozilla.components.support.utils.SafeIntent
 import org.mozilla.reference.browser.browser.BrowserFragment
 import org.mozilla.reference.browser.ext.components
+import org.mozilla.reference.browser.storage.BookmarksFragment
 import org.mozilla.reference.browser.tabs.TabsTouchHelper
+import org.mozilla.reference.browser.tabs.TabsTrayFragment
 
 /**
  * Activity that holds the [BrowserFragment].
@@ -40,12 +42,17 @@ open class BrowserActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction().apply {
                 replace(R.id.container, createBrowserFragment(sessionId))
                 commit()
             }
         }
+
+        qwantbar.onTabsClicked(::showTabs)
+        qwantbar.onBookmarksClicked(::showBookmarks)
+        qwantbar.onHomeClicked(::showHome)
     }
 
     override fun onBackPressed() {
@@ -103,4 +110,27 @@ open class BrowserActivity : AppCompatActivity() {
             }
             else -> super.onCreateView(parent, name, context, attrs)
         }
+
+
+    private fun showTabs() {
+        this.supportFragmentManager.beginTransaction().apply {
+            replace(R.id.container, TabsTrayFragment())
+            commit()
+        }
+    }
+
+    private fun showBookmarks() {
+        this.supportFragmentManager.beginTransaction().apply {
+            replace(R.id.container, BookmarksFragment())
+            commit()
+        }
+    }
+
+    private fun showHome() {
+        components.useCases.sessionUseCases.loadUrl("http://www.qwant.com/")
+        this.supportFragmentManager.beginTransaction().apply {
+            replace(R.id.container, BrowserFragment.create())
+            commit()
+        }
+    }
 }

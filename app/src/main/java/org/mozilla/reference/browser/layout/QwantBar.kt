@@ -1,7 +1,6 @@
 package org.mozilla.reference.browser.layout
 
 import android.content.Context
-import android.content.Intent
 import android.util.AttributeSet
 import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
@@ -12,7 +11,6 @@ import mozilla.components.browser.session.SessionManager
 import mozilla.components.ui.tabcounter.TabCounter
 import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.ext.application
-import org.mozilla.reference.browser.storage.BookmarksActivity
 import java.lang.ref.WeakReference
 
 class QwantBar @JvmOverloads constructor(
@@ -22,6 +20,8 @@ class QwantBar @JvmOverloads constructor(
     private var reference: WeakReference<TabCounter> = WeakReference<TabCounter>(null)
     private val sessionManager: SessionManager = context.applicationContext.application.components.core.sessionManager
     private val tabCallbacks: MutableList<() -> Unit> = mutableListOf()
+    private val bookmarksCallbacks: MutableList<() -> Unit> = mutableListOf()
+    private val homeCallbacks: MutableList<() -> Unit> = mutableListOf()
 
     private val sessionManagerObserver = object : SessionManager.Observer {
         override fun onSessionAdded(session: Session) { updateTabCount() }
@@ -35,9 +35,6 @@ class QwantBar @JvmOverloads constructor(
 
         sessionManager.register(sessionManagerObserver, view = this)
 
-        qwantbar_button_bookmarks.setOnClickListener { showBookmarks() }
-        qwantbar_button_home.setOnClickListener { openHomepage() }
-
         reference = WeakReference(qwantbar_button_tabs)
         qwantbar_button_tabs.setCount(sessionManager.sessions.size)
         qwantbar_button_tabs.setOnClickListener {
@@ -45,10 +42,21 @@ class QwantBar @JvmOverloads constructor(
             this.emitOnTabsClicked()
         }
         qwantbar_button_tabs.contentDescription = context.getString(R.string.mozac_feature_tabs_toolbar_tabs_button)
+
+        qwantbar_button_bookmarks.setOnClickListener { this.emitOnBookmarksClicked() }
+        qwantbar_button_home.setOnClickListener { this.emitOnHomeClicked() }
     }
 
     fun onTabsClicked(callback: () -> Unit) {
         tabCallbacks.add(callback)
+    }
+
+    fun onBookmarksClicked(callback: () -> Unit) {
+        bookmarksCallbacks.add(callback)
+    }
+
+    fun onHomeClicked(callback: () -> Unit) {
+        homeCallbacks.add(callback)
     }
 
     private fun emitOnTabsClicked() {
@@ -57,13 +65,16 @@ class QwantBar @JvmOverloads constructor(
         }
     }
 
-    private fun showBookmarks() {
-        val intent = Intent(context, BookmarksActivity::class.java)
-        context.startActivity(intent)
+    private fun emitOnBookmarksClicked() {
+        bookmarksCallbacks.forEach {
+            it.invoke()
+        }
     }
 
-    private fun openHomepage() {
-        context.application.components.useCases.sessionUseCases.loadUrl("http://www.qwant.com/")
+    private fun emitOnHomeClicked() {
+        homeCallbacks.forEach {
+            it.invoke()
+        }
     }
 
     private fun updateTabCount() {

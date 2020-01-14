@@ -2,14 +2,15 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:background="@color/dark"
-    android:layout_height="56dp">
+    android:layout_height="match_parent"
+    android:background="@color/dark">
 
     <ImageButton
         android:id="@+id/qwantbar_button_home"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
+        android:background="@android:color/transparent"
         android:src="@drawable/mozac_ic_globe" />
 
     <ImageButton
@@ -17,6 +18,7 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
+        android:background="@android:color/transparent"
         android:src="@drawable/mozac_ic_pin_filled" />
 
     <mozilla.components.ui.tabcounter.TabCounter
@@ -30,5 +32,6 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
+        android:background="@android:color/transparent"
         android:src="@drawable/mozac_ic_menu" />
 </LinearLayout>
