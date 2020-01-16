@@ -19,5 +19,6 @@
         android:id="@+id/qwantbar"
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:layout_gravity="bottom" />
+        android:layout_gravity="bottom"
+        android:elevation="40dp"/>
 </LinearLayout>

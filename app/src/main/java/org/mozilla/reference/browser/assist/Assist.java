@@ -343,7 +343,7 @@ public class Assist extends Activity {
         if (query.length() > 0) {
             // home_layout.requestFocus(); // While webview is loading. Webview take focus after load
             home_layout.setVisibility(View.INVISIBLE);
-            webview.loadUrl("https://www.qwant.com/?client=qwantbrowser&widget=1&q=" + query);
+            webview.loadUrl(getString(R.string.homepage) + "&q=" + query);
             // Force hide keyboard
             InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(search_text.getWindowToken(), 0);

@@ -16,7 +16,9 @@ import org.mozilla.reference.browser.browser.BrowserFragment
 /**
  * A fragment for displaying the tabs tray.
  */
-class BookmarksFragment : Fragment(), UserInteractionHandler {
+class BookmarksFragment(
+        val bookmarksClosedCallback: (() -> Unit)? = null
+) : Fragment(), UserInteractionHandler {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         inflater.inflate(R.layout.fragment_bookmarks, container, false)
 
@@ -30,5 +32,6 @@ class BookmarksFragment : Fragment(), UserInteractionHandler {
             replace(R.id.container, BrowserFragment.create())
             commit()
         }
+        bookmarksClosedCallback?.invoke()
     }
 }

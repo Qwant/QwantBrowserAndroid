@@ -3,35 +3,128 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/dark">
+    android:background="@color/photonWhite">
 
-    <ImageButton
-        android:id="@+id/qwantbar_button_home"
+    <LinearLayout
+        android:id="@+id/qwantbar_layout_home"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:background="@android:color/transparent"
-        android:src="@drawable/mozac_ic_globe" />
+        android:gravity="center"
+        android:orientation="vertical">
 
-    <ImageButton
-        android:id="@+id/qwantbar_button_bookmarks"
+        <ImageView
+            android:id="@+id/qwantbar_button_home"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:src="@drawable/ic_search"
+            android:contentDescription="@string/menu_search" />
+
+        <TextView
+            android:id="@+id/qwantbar_text_home"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/menu_search"
+            android:textColor="@color/menu_items" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/qwantbar_layout_back"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:background="@android:color/transparent"
-        android:src="@drawable/mozac_ic_pin_filled" />
+        android:visibility="gone"
+        android:gravity="center"
+        android:orientation="vertical">
 
-    <mozilla.components.ui.tabcounter.TabCounter
-        android:id="@+id/qwantbar_button_tabs"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1" />
+        <ImageView
+            android:id="@+id/qwantbar_button_back"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:src="@drawable/ic_back"
+            android:contentDescription="@string/menu_back" />
 
-    <ImageButton
-        android:id="@+id/qwantbar_button_more"
+        <TextView
+            android:id="@+id/qwantbar_text_back"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/menu_back"
+            android:textColor="@color/menu_items" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/qwantbar_layout_bookmarks"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:background="@android:color/transparent"
-        android:src="@drawable/mozac_ic_menu" />
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/qwantbar_button_bookmarks"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:src="@drawable/ic_bookmark"
+            android:contentDescription="@string/menu_bookmarks" />
+
+        <TextView
+            android:id="@+id/qwantbar_text_bookmarks"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/menu_bookmarks"
+            android:textColor="@color/menu_items" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/qwantbar_layout_tabs"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <mozilla.components.ui.tabcounter.TabCounter
+            android:id="@+id/qwantbar_button_tabs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/qwantbar_text_tabs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/menu_tabs"
+            android:textColor="@color/menu_items" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/qwantbar_layout_menu"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <org.mozilla.reference.browser.layout.QwantMenuButton
+            android:id="@+id/qwantbar_button_menu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent" />
+
+        <TextView
+            android:id="@+id/qwantbar_text_menu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/menu_more"
+            android:textColor="@color/menu_items" />
+    </LinearLayout>
+
+
 </LinearLayout>

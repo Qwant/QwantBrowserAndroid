@@ -31,19 +31,20 @@ class TabsPanel @JvmOverloads constructor(
     private var closeTabsTray: (() -> Unit)? = null
 
     init {
-        navigationContentDescription = "back"
+        /* navigationContentDescription = "back"
         setNavigationIcon(R.drawable.mozac_ic_back)
         setNavigationOnClickListener {
             closeTabsTray?.invoke()
-        }
+        } */
+
         inflateMenu(R.menu.tabstray_menu)
         setOnMenuItemClickListener {
             val tabsUseCases = components.useCases.tabsUseCases
             when (it.itemId) {
                 R.id.newTab -> {
                     when (isPrivateTray) {
-                        true -> tabsUseCases.addPrivateTab.invoke("https://www.qwant.com/", selectTab = true) // TODO move to variable
-                        false -> tabsUseCases.addTab.invoke("https://www.qwant.com/", selectTab = true)
+                        true -> tabsUseCases.addPrivateTab.invoke(context.getString(R.string.homepage), selectTab = true) // TODO move to variable
+                        false -> tabsUseCases.addTab.invoke(context.getString(R.string.homepage), selectTab = true)
                     }
                     closeTabsTray?.invoke()
                 }

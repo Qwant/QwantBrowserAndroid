@@ -123,7 +123,7 @@ class ToolbarIntegration(
         )
         toolbar.display.displayIndicatorSeparator = true
 
-        toolbar.display.menuBuilder = menuBuilder
+        // toolbar.display.menuBuilder = menuBuilder // TODO remove this to remove top menu
 
         toolbar.display.hint = context.getString(R.string.toolbar_hint)
         toolbar.edit.hint = context.getString(R.string.toolbar_hint)

@@ -14,6 +14,7 @@ import mozilla.components.feature.session.ThumbnailsFeature
 import mozilla.components.feature.toolbar.WebExtensionToolbarFeature
 import mozilla.components.support.base.feature.UserInteractionHandler
 import mozilla.components.support.base.feature.ViewBoundFeatureWrapper
+import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.ext.components
 import org.mozilla.reference.browser.ext.requireComponents
 
@@ -38,7 +39,7 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
         val searchEngine = seParser.load("qwant", seInput)
 
         if (requireContext().components.core.sessionManager.sessions.isEmpty()) {
-            requireContext().components.useCases.tabsUseCases.addTab.invoke("https://www.qwant.com/", selectTab = true) // TODO move to variable
+            requireContext().components.useCases.tabsUseCases.addTab.invoke(getString(R.string.homepage), selectTab = true) // TODO move to variable
         }
 
         AwesomeBarFeature(awesomeBar, toolbar, engineView)

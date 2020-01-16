@@ -91,12 +91,6 @@
             android:exported="false"
             android:theme="@style/Theme.AppCompat.Light" />
 
-        <activity
-            android:name=".storage.BookmarksActivity"
-            android:label="@string/bookmarks"
-            android:theme="@style/AppTheme"
-            android:parentActivityName=".BrowserActivity" />
-
         <activity android:name=".IntentReceiverActivity">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />

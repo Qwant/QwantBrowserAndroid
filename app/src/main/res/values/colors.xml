@@ -16,6 +16,10 @@
 
     <color name="icons">#ffffffff</color>
 
+
+    <color name="menu_items">#5c6f84</color>
+    <color name="menu_items_selected">#4ba2ea</color>
+
     <!-- Overriding color of tab counter icon in toolbar -->
-    <color name="mozac_ui_tabcounter_default_tint" tools:ignore="UnusedResources">@color/icons</color>
+    <color name="mozac_ui_tabcounter_default_tint" tools:ignore="UnusedResources">@color/menu_items</color>
 </resources>

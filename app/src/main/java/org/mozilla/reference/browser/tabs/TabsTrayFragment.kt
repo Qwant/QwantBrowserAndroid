@@ -20,7 +20,9 @@ import org.mozilla.reference.browser.ext.requireComponents
 /**
  * A fragment for displaying the tabs tray.
  */
-class TabsTrayFragment : Fragment(), UserInteractionHandler {
+class TabsTrayFragment(
+        val tabsClosedCallback: (() -> Unit)? = null
+) : Fragment(), UserInteractionHandler {
     private var tabsFeature: TabsFeature? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
@@ -60,5 +62,6 @@ class TabsTrayFragment : Fragment(), UserInteractionHandler {
             replace(R.id.container, BrowserFragment.create())
             commit()
         }
+        tabsClosedCallback?.invoke()
     }
 }

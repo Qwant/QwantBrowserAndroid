@@ -19,7 +19,9 @@ import mozilla.components.feature.intent.ext.EXTRA_SESSION_ID
 import mozilla.components.support.base.feature.UserInteractionHandler
 import mozilla.components.support.utils.SafeIntent
 import org.mozilla.reference.browser.browser.BrowserFragment
+import org.mozilla.reference.browser.browser.QwantBarSessionObserver
 import org.mozilla.reference.browser.ext.components
+import org.mozilla.reference.browser.layout.QwantBar
 import org.mozilla.reference.browser.storage.BookmarksFragment
 import org.mozilla.reference.browser.tabs.TabsTouchHelper
 import org.mozilla.reference.browser.tabs.TabsTrayFragment
@@ -29,6 +31,7 @@ import org.mozilla.reference.browser.tabs.TabsTrayFragment
  */
 open class BrowserActivity : AppCompatActivity() {
 
+    private var qwantbarSessionObserver: QwantBarSessionObserver? = null
     private val sessionId: String?
         get() = SafeIntent(intent).getStringExtra(EXTRA_SESSION_ID)
 
@@ -53,6 +56,10 @@ open class BrowserActivity : AppCompatActivity() {
         qwantbar.onTabsClicked(::showTabs)
         qwantbar.onBookmarksClicked(::showBookmarks)
         qwantbar.onHomeClicked(::showHome)
+        qwantbar.onBackClicked(::onBackPressed)
+
+        qwantbarSessionObserver = QwantBarSessionObserver(components.core.sessionManager, qwantbar)
+        components.core.sessionManager.register(this.qwantbarSessionObserver!!)
     }
 
     override fun onBackPressed() {
@@ -114,23 +121,50 @@ open class BrowserActivity : AppCompatActivity() {
 
     private fun showTabs() {
         this.supportFragmentManager.beginTransaction().apply {
-            replace(R.id.container, TabsTrayFragment())
+            replace(R.id.container, TabsTrayFragment(::bookmarksOrTabsClosed))
             commit()
         }
+        qwantbar.setHighlight(QwantBar.QwantBarSelection.TABS)
+        qwantbar.setLeftButton(QwantBar.LeftButtonType.BACK)
     }
 
     private fun showBookmarks() {
         this.supportFragmentManager.beginTransaction().apply {
-            replace(R.id.container, BookmarksFragment())
+            replace(R.id.container, BookmarksFragment(::bookmarksOrTabsClosed))
             commit()
         }
+        qwantbar.setHighlight(QwantBar.QwantBarSelection.BOOKMARKS)
+        qwantbar.setLeftButton(QwantBar.LeftButtonType.BACK)
     }
 
     private fun showHome() {
-        components.useCases.sessionUseCases.loadUrl("http://www.qwant.com/")
+        val session: Session? = components.core.sessionManager.selectedSession
+        if (session == null || session.url != getString(R.string.homepage)) {
+            var alreadyThere = false
+            components.core.sessionManager.sessions.forEach {
+                if (it.url == getString(R.string.homepage)) {
+                    components.core.sessionManager.select(it)
+                    alreadyThere = true
+                }
+            }
+            if (!alreadyThere)
+                components.useCases.sessionUseCases.loadUrl(getString(R.string.homepage))
+        }
         this.supportFragmentManager.beginTransaction().apply {
             replace(R.id.container, BrowserFragment.create())
             commit()
         }
+        qwantbar.setHighlight(QwantBar.QwantBarSelection.SEARCH)
+        qwantbar.setLeftButton(QwantBar.LeftButtonType.HOME)
+    }
+
+    private fun bookmarksOrTabsClosed() {
+        val session: Session? = components.core.sessionManager.selectedSession
+        if (session != null && session.url.contains("https://www.qwant.com")) {
+            qwantbar.setHighlight(QwantBar.QwantBarSelection.SEARCH)
+        } else {
+            qwantbar.setHighlight(QwantBar.QwantBarSelection.NONE)
+        }
+        qwantbar.setLeftButton(QwantBar.LeftButtonType.HOME)
     }
 }
