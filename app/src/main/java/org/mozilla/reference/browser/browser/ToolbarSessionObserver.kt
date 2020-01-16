@@ -24,20 +24,10 @@ class ToolbarSessionObserver(
             val toolbarParams = toolbar.layoutParams
             toolbarParams.height = 0
             toolbar.layoutParams = toolbarParams
-
-            /* val qwantBarSize = 56.dpToPx(Resources.getSystem().displayMetrics)
-            val qwantBarParams = qwantBar.layoutParams
-            qwantBarParams.height = qwantBarSize
-            qwantBar.layoutParams = qwantBarParams */
         } else {
             val toolbarParams = toolbar.layoutParams
             toolbarParams.height = 56.dpToPx(Resources.getSystem().displayMetrics)
             toolbar.layoutParams = toolbarParams
-
-            /* val qwantBarSize = 36.dpToPx(Resources.getSystem().displayMetrics)
-            val qwantBarParams = qwantBar.layoutParams
-            qwantBarParams.height = qwantBarSize
-            qwantBar.layoutParams = qwantBarParams */
         }
     }
 

@@ -13,8 +13,6 @@ class QwantBarSessionObserver(
         private val sessionManager: SessionManager,
         private val qwantbar: View
 ) : SessionManager.Observer, Session.Observer {
-    private var layoutHome : View = qwantbar.findViewById(R.id.qwantbar_layout_home)
-    private var layoutBack : View = qwantbar.findViewById(R.id.qwantbar_layout_back)
     private var textviewHome : View = qwantbar.findViewById(R.id.qwantbar_text_home)
     private var textviewBookmarks : View = qwantbar.findViewById(R.id.qwantbar_text_bookmarks)
     private var textviewTabs : View = qwantbar.findViewById(R.id.qwantbar_text_tabs)
@@ -111,5 +109,9 @@ class QwantBarSessionObserver(
 
     override fun onLaunchIntentRequest(session: Session, url: String, appIntent: Intent?) {
         checkSession(url)
+    }
+
+    override fun onFullScreenChanged(session: Session, enabled: Boolean) {
+        qwantbar.visibility = if (enabled) View.GONE else View.VISIBLE
     }
 }

@@ -1,7 +1,107 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 <resources>
+    <string name="app_name">Qwant Browser</string>
+
+    <!-- Menu option on the toolbar to open a new tab-->
+    <string name="menu_action_add_tab">Neuer Tab</string>
+
+    <!-- Menu option on the toolbar to close all tabs-->
+    <string name="menu_action_close_tabs">Alle Tabs schließen</string>
+    <string name="menu_action_close_tabs_private">Private Tabs schließen</string>
+
+    <!-- Preference for settings related to changing the default browser -->
+    <string name="preferences_make_default_browser">Als Standardbrowser festlegen</string>
+
+    <!-- Preference enabling remote debugging -->
+    <string name="preferences_remote_debugging">Remote-Debugging über USB</string>
+
+    <!-- Preference for enabling tracking protection in normal mode -->
+    <string name="preferences_tracking_protection_normal">Im normalen Surfmodus aktivieren</string>
+
+    <!-- Preference for enabling tracking protection in private mode -->
+    <string name="preferences_tracking_protection_private">Im privaten Surfmodus aktivieren</string>
+
+    <!-- Preference about page -->
+    <string name="preferences_about_page">Über den Qwant Browser</string>
+
+    <!-- Preference for open links in apps -->
+    <string name="open_links_in_apps">Links in Apps öffnen</string>
+
+    <!-- Preference category for developer tools -->
+    <string name="developer_tools_category">Entwicklerwerkzeuge</string>
+
+    <!-- Preference category for Qwant about/legal etc. -->
+    <string name="qwant_category">Qwant</string>
+
+    <!-- Preference category for tracking protection -->
+    <string name="tracker_category">Tracking-Schutz</string>
+
+    <!-- Menu option on the toolbar that takes you to settings page-->
+    <string name="settings">Einstellungen</string>
+
+    <string name="privacy">Datenschutz</string>
+
+    <string name="privacy_settings">Datenschutzeinstellungen</string>
+
+    <string name="preferences_privacy_summary">Tracking-Schutz, Datenkontrolle</string>
+
+    <!-- Private Browsing -->
+    <string name="private_browsing_title">Privates Surfen</string>
+    <string name="private_browsing_body"><![CDATA[
+<h1>Privates Surfen</h1>
+<p>Wenn Sie in einem privaten Fenster surfen, speichert der Referenzbrowser Folgendes nicht:</p>
+<ul class="two-column">
+    <li>Besuchte Seiten</li>
+    <li>Suchanfragen</li>
+    <li>Cookies</li>
+    <li>Temporäre Dateien</li>
+</ul>
+<p>Privates Surfen sorgt nicht dafür, dass Sie anonym im Internet unterwegs sind. Ihr Arbeitgeber oder Internetanbieter kann nach wie vor sehen, welche Seiten Sie besuchen.</p>
+     ]]></string>
+
+    <string name="default_notification_channel">Browser</string>
+
+    <!-- About content -->
+    <string name="about_content"><![CDATA[
+<p>%1$s gibt Ihnen die Kontrolle.</p>
+<p>Von Mozilla-Komponenten betrieben.<br/>
+    ]]></string>
+
+    <string name="menu_share_with">Teilen mit…</string>
+
+    <string name="toast_copied">Kopiert!</string>
+
+    <!-- Addons -->
+    <string name="addon_permissions_dialog_add">Hinzufügen</string>
+    <string name="addon_permissions_dialog_cancel">Abbrechen</string>
+
     <string name="assist_recent_search">Retzte Suchläufe</string>
     <string name="assist_on_this_device">auf diesem gerät</string>
     <string name="assist_clear_history">Löschen</string>
     <string name="assist_clipboard">Zwischenablage</string>
+
+    <string name="qwant_widget_text">Wonach suchen Sie?</string>
+
+    <string name="bookmarks">Lesezeichen</string>
+
+    <string name="homepage">https://www.qwant.com/?client=brz-huawei</string>
+
+
+    <string name="menu_search">Suche</string>
+    <string name="menu_bookmarks">Lesezeichen</string>
+    <string name="menu_tabs">Tabs</string>
+    <string name="menu_more">Mehr</string>
+
+    <!-- Text shown in the toolbar if it is empty -->
+    <string name="toolbar_hint">@string/qwant_widget_text</string>
 </resources>
+
+
+
+
+
+
+

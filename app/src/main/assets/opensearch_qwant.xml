@@ -11,9 +11,9 @@
 		<Param name="q" value="{searchTerms}"/>
 		<Param name="client" value="ff_android"/>
 	</Url>
-	<Url type="text/html" method="GET" template="https://www.qwant.com/">
+	<Url type="text/html" method="GET" template="https://www.qwant.com/?client=brz-huawei">
 		<Param name="q" value="{searchTerms}"/>
 		<Param name="client" value="ff_android"/>
 	</Url>
-	<SearchForm>https://www.qwant.com/</SearchForm>
+	<SearchForm>https://www.qwant.com/?client=brz-huawei</SearchForm>
 </SearchPlugin>
