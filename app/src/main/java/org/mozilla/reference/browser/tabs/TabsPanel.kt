@@ -106,8 +106,9 @@ class TabsPanel @JvmOverloads constructor(
         this.tabsFeature = tabsFeature
         this.closeTabsTray = closeTabsTray
 
-        // initial opening of tabs tray should show regular tabs.
-        button.isChecked = true
+        val currentSession = context.components.core.sessionManager.selectedSession
+        button.isChecked = (currentSession == null || !currentSession.private)
+        privateButton.isChecked = (currentSession != null && currentSession.private)
     }
 
     private fun Resources.getThemedDrawable(@DrawableRes resId: Int) = getDrawable(resId, context.theme)

@@ -3,6 +3,7 @@ package org.mozilla.reference.browser.layout
 import android.content.Context
 import android.content.Intent
 import android.util.AttributeSet
+import android.util.Log
 import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
 import android.view.View
@@ -53,6 +54,8 @@ class QwantBar @JvmOverloads constructor(
     private var tabButtonBox: ImageView? = null
     private var tabButtonBar: ImageView? = null
     private var tabButtonText: TextView? = null
+
+    private var current_privacy_enabled = false
 
     private val menuToolbar by lazy {
         val forward = BrowserMenuItemToolbar.Button(
@@ -192,6 +195,13 @@ class QwantBar @JvmOverloads constructor(
         tabButtonBar?.setImageDrawable(DrawableUtils.loadAndTintDrawable(context, R.drawable.mozac_ui_tabcounter_bar, tabColor))
         tabButtonText?.setTextColor(tabColor)
         qwantbar_text_tabs.setTextColor(if (selection == QwantBarSelection.TABS) colorSelected else colorDefault)
+    }
+
+    fun setPrivacyMode(enabled: Boolean) {
+        if (enabled != current_privacy_enabled) {
+            qwantbar_container.setBackgroundColor(resources.getColor(if (enabled) R.color.photonOrange50 else R.color.photonWhite))
+            current_privacy_enabled = enabled
+        }
     }
 
     private fun emitOnTabsClicked() {

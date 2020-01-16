@@ -8,10 +8,11 @@ import mozilla.components.browser.session.Session
 import mozilla.components.browser.session.SessionManager
 import mozilla.components.support.ktx.android.util.dpToPx
 import org.mozilla.reference.browser.R
+import org.mozilla.reference.browser.layout.QwantBar
 
 class QwantBarSessionObserver(
         private val sessionManager: SessionManager,
-        private val qwantbar: View
+        private val qwantbar: QwantBar
 ) : SessionManager.Observer, Session.Observer {
     private var textviewHome : View = qwantbar.findViewById(R.id.qwantbar_text_home)
     private var textviewBookmarks : View = qwantbar.findViewById(R.id.qwantbar_text_bookmarks)
@@ -81,6 +82,7 @@ class QwantBarSessionObserver(
 
     private fun checkSession(session: Session) {
         checkSession(session.url)
+        qwantbar.setPrivacyMode(session.private)
     }
 
     private fun checkSession() {

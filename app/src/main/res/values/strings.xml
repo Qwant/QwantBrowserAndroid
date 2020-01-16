@@ -97,6 +97,8 @@
     <string name="menu_more">More</string>
     <string name="menu_back">Back</string>
 
+    <string name="bookmarks_empty_1">To add pages to your bookmarks, click on the icon</string>
+    <string name="bookmarks_empty_2">in the bottom menu bar</string>
 
     <!-- Text shown in the toolbar if it is empty -->
     <string name="toolbar_hint">@string/qwant_widget_text</string>

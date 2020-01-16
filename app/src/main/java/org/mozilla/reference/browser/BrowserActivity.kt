@@ -6,9 +6,11 @@ package org.mozilla.reference.browser
 
 import android.content.Context
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
+import android.os.PersistableBundle
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.activity_main.*
 import mozilla.components.browser.session.Session
@@ -18,11 +20,13 @@ import mozilla.components.concept.tabstray.TabsTray
 import mozilla.components.feature.intent.ext.EXTRA_SESSION_ID
 import mozilla.components.support.base.feature.UserInteractionHandler
 import mozilla.components.support.utils.SafeIntent
+import org.mozilla.reference.browser.assist.Assist
 import org.mozilla.reference.browser.browser.BrowserFragment
 import org.mozilla.reference.browser.browser.QwantBarSessionObserver
 import org.mozilla.reference.browser.ext.components
 import org.mozilla.reference.browser.layout.QwantBar
 import org.mozilla.reference.browser.storage.BookmarksFragment
+import org.mozilla.reference.browser.storage.BookmarksStorage
 import org.mozilla.reference.browser.tabs.TabsTouchHelper
 import org.mozilla.reference.browser.tabs.TabsTrayFragment
 
@@ -30,7 +34,7 @@ import org.mozilla.reference.browser.tabs.TabsTrayFragment
  * Activity that holds the [BrowserFragment].
  */
 open class BrowserActivity : AppCompatActivity() {
-
+    private var bookmarksStorage: BookmarksStorage? = null
     private var qwantbarSessionObserver: QwantBarSessionObserver? = null
     private val sessionId: String?
         get() = SafeIntent(intent).getStringExtra(EXTRA_SESSION_ID)
@@ -60,6 +64,9 @@ open class BrowserActivity : AppCompatActivity() {
 
         qwantbarSessionObserver = QwantBarSessionObserver(components.core.sessionManager, qwantbar)
         components.core.sessionManager.register(this.qwantbarSessionObserver!!)
+
+        bookmarksStorage = BookmarksStorage(applicationContext)
+        bookmarksStorage?.restore()
     }
 
     override fun onBackPressed() {
@@ -130,7 +137,7 @@ open class BrowserActivity : AppCompatActivity() {
 
     private fun showBookmarks() {
         this.supportFragmentManager.beginTransaction().apply {
-            replace(R.id.container, BookmarksFragment(::bookmarksOrTabsClosed))
+            replace(R.id.container, BookmarksFragment(bookmarksStorage!!, ::bookmarksOrTabsClosed))
             commit()
         }
         qwantbar.setHighlight(QwantBar.QwantBarSelection.BOOKMARKS)
@@ -166,5 +173,17 @@ open class BrowserActivity : AppCompatActivity() {
             qwantbar.setHighlight(QwantBar.QwantBarSelection.NONE)
         }
         qwantbar.setLeftButton(QwantBar.LeftButtonType.HOME)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        Log.d("QWANT_BROWSER", "on save instance")
+        super.onSaveInstanceState(outState)
+        this.bookmarksStorage?.persist()
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
+        Log.d("QWANT_BROWSER", "on restore instance")
+        super.onRestoreInstanceState(savedInstanceState)
+        this.bookmarksStorage?.restore()
     }
 }

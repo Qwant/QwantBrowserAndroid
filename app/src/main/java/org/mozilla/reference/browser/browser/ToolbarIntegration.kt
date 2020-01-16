@@ -37,7 +37,6 @@ class ToolbarIntegration(
     historyStorage: HistoryStorage,
     sessionManager: SessionManager,
     sessionUseCases: SessionUseCases,
-    tabsUseCases: TabsUseCases,
     webAppUseCases: WebAppUseCases,
     sessionId: String? = null
 ) : LifecycleAwareFeature, UserInteractionHandler {
