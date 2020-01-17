@@ -167,8 +167,12 @@ class QwantBar @JvmOverloads constructor(
         qwantbar_button_menu.menuBuilder = menuBuilder
 
         val session = sessionManager.selectedSession
-        if (session != null && session.url == context.getString(R.string.homepage)) {
+
+        if (session == null || session.url == context.getString(R.string.homepage)) {
             this.setHighlight(QwantBarSelection.SEARCH)
+        }
+
+        if (session == null || session.url.contains("https://www.qwant.com")) {
             this.setBookmarkButton(BookmarkButtonType.OPEN)
         } else {
             this.setBookmarkButton(BookmarkButtonType.SESSION)

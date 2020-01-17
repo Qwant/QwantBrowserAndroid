@@ -171,7 +171,7 @@ open class BrowserActivity : AppCompatActivity() {
 
     private fun bookmarksOrTabsClosed() {
         val session: Session? = components.core.sessionManager.selectedSession
-        if (session != null && session.url.contains("https://www.qwant.com")) {
+        if (session == null || session.url.contains("https://www.qwant.com")) {
             qwantbar.setHighlight(QwantBar.QwantBarSelection.SEARCH)
         } else {
             qwantbar.setHighlight(QwantBar.QwantBarSelection.NONE)
