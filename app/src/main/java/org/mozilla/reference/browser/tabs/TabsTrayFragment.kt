@@ -59,7 +59,7 @@ class TabsTrayFragment(
 
     private fun closeTabsTray() {
         activity?.supportFragmentManager?.beginTransaction()?.apply {
-            replace(R.id.container, BrowserFragment.create())
+            replace(R.id.container, BrowserFragment.create(), "BROWSER_FRAGMENT")
             commit()
         }
         tabsClosedCallback?.invoke()

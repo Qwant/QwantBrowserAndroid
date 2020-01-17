@@ -73,43 +73,43 @@ class ToolbarIntegration(
     private val menuItems: List<BrowserMenuItem> by lazy {
         listOf(
             menuToolbar,
-            SimpleBrowserMenuItem("Share") {
-                val url = sessionManager.selectedSession?.url ?: ""
-                context.share(url)
-            }.apply {
-                visible = { sessionManager.selectedSession != null }
-            },
+                SimpleBrowserMenuItem(context.getString(R.string.context_menu_share)) {
+                    val url = sessionManager.selectedSession?.url ?: ""
+                    context.share(url)
+                }.apply {
+                    visible = { sessionManager.selectedSession != null }
+                },
 
-            BrowserMenuSwitch("Request desktop site", {
-                sessionManager.selectedSessionOrThrow.desktopMode
-            }) { checked ->
-                sessionUseCases.requestDesktopSite.invoke(checked)
-            }.apply {
-                visible = { sessionManager.selectedSession != null }
-            },
+                BrowserMenuSwitch(context.getString(R.string.context_menu_request_desktop), {
+                    sessionManager.selectedSessionOrThrow.desktopMode
+                }) { checked ->
+                    sessionUseCases.requestDesktopSite.invoke(checked)
+                }.apply {
+                    visible = { sessionManager.selectedSession != null }
+                },
 
-            SimpleBrowserMenuItem("Add to homescreen") {
-                MainScope().launch { webAppUseCases.addToHomescreen() }
-            }.apply {
-                visible = { webAppUseCases.isPinningSupported() }
-            },
+                SimpleBrowserMenuItem(context.getString(R.string.context_menu_add_homescreen)) {
+                    MainScope().launch { webAppUseCases.addToHomescreen() }
+                }.apply {
+                    visible = { webAppUseCases.isPinningSupported() }
+                },
 
-            SimpleBrowserMenuItem("Find in Page") {
-                FindInPageIntegration.launch?.invoke()
-            }.apply {
-                visible = { sessionManager.selectedSession != null }
-            },
+                SimpleBrowserMenuItem(context.getString(R.string.context_menu_find)) {
+                    FindInPageIntegration.launch?.invoke()
+                }.apply {
+                    visible = { sessionManager.selectedSession != null }
+                },
 
-            SimpleBrowserMenuItem("Add-ons") {
-                val intent = Intent(context, AddonsActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                context.startActivity(intent)
-            },
+                SimpleBrowserMenuItem(context.getString(R.string.context_menu_addons)) {
+                    val intent = Intent(context, AddonsActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    context.startActivity(intent)
+                },
 
-            SimpleBrowserMenuItem("Settings") {
-                val intent = Intent(context, SettingsActivity::class.java)
-                context.startActivity(intent)
-            }
+                SimpleBrowserMenuItem(context.getString(R.string.settings)) {
+                    val intent = Intent(context, SettingsActivity::class.java)
+                    context.startActivity(intent)
+                }
         )
     }
 
@@ -122,7 +122,7 @@ class ToolbarIntegration(
         )
         toolbar.display.displayIndicatorSeparator = true
 
-        // toolbar.display.menuBuilder = menuBuilder // TODO remove this to remove top menu
+        toolbar.display.menuBuilder = menuBuilder // TODO remove this to remove top menu
 
         toolbar.display.hint = context.getString(R.string.toolbar_hint)
         toolbar.edit.hint = context.getString(R.string.toolbar_hint)

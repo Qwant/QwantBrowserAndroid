@@ -144,11 +144,13 @@
         android:gravity="center"
         android:orientation="vertical">
 
-        <org.mozilla.reference.browser.layout.QwantMenuButton
+        <ImageView
             android:id="@+id/qwantbar_button_menu"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@android:color/transparent" />
+            android:background="@android:color/transparent"
+            android:src="@drawable/ic_menu"
+            android:contentDescription="@string/menu_bookmarks" />
 
         <TextView
             android:id="@+id/qwantbar_text_menu"

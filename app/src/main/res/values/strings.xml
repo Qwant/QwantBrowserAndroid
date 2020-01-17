@@ -114,6 +114,8 @@
     <string name="preferences_license">License (MPL 2.0)</string>
     <string name="license_url">https://www.mozilla.org/en-US/MPL/2.0/</string>
 
+    <string name="settings_page">https://www.qwant.com/settings</string>
+
     <!-- Text shown in the toolbar if it is empty -->
     <string name="toolbar_hint">@string/qwant_widget_text</string>
     <string name="pref_key_privacy_policy" translatable="false">pref_key_privacy_policy</string>

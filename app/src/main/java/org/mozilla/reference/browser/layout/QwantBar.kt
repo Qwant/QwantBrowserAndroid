@@ -37,7 +37,7 @@ class QwantBar @JvmOverloads constructor(
         context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0, defStyleRes: Int = 0
 ) : LinearLayout(context, attrs, defStyleAttr, defStyleRes) {
     enum class QwantBarSelection {
-        NONE, SEARCH, BOOKMARKS, TABS
+        NONE, SEARCH, BOOKMARKS, TABS, MORE
     }
 
     private var reference: WeakReference<TabCounter> = WeakReference<TabCounter>(null)
@@ -52,6 +52,7 @@ class QwantBar @JvmOverloads constructor(
     private val deleteBookmarksCallbacks: MutableList<() -> Unit> = mutableListOf()
     private val homeCallbacks: MutableList<() -> Unit> = mutableListOf()
     private val backCallbacks: MutableList<() -> Unit> = mutableListOf()
+    private val menuCallbacks: MutableList<() -> Unit> = mutableListOf()
 
     private var tabButtonBox: ImageView? = null
     private var tabButtonBar: ImageView? = null
@@ -163,12 +164,13 @@ class QwantBar @JvmOverloads constructor(
         qwantbar_layout_bookmarks.setOnClickListener { this.emitOnBookmarksClicked() }
         qwantbar_layout_bookmarks_add.setOnClickListener { this.emitOnAddBookmarksClicked() }
         qwantbar_layout_bookmarks_delete.setOnClickListener { this.emitOnDeleteBookmarksClicked() }
-
-        qwantbar_button_menu.menuBuilder = menuBuilder
+        qwantbar_layout_menu.setOnClickListener { this.emitOnMenuClicked() }
+        // qwantbar_button_menu.menuBuilder = menuBuilder
 
         val session = sessionManager.selectedSession
-
-        if (session == null || session.url == context.getString(R.string.homepage)) {
+        if (session != null && session.url == context.getString(R.string.settings_page)) {
+            this.setHighlight(QwantBarSelection.MORE)
+        } else if (session == null || session.url == context.getString(R.string.homepage)) {
             this.setHighlight(QwantBarSelection.SEARCH)
         }
 
@@ -207,6 +209,10 @@ class QwantBar @JvmOverloads constructor(
         backCallbacks.add(callback)
     }
 
+    fun onMenuClicked(callback: () -> Unit) {
+        menuCallbacks.add(callback)
+    }
+
     private var currentSelection: QwantBarSelection = QwantBarSelection.SEARCH
 
     fun setHighlight(selection: QwantBarSelection) {
@@ -224,14 +230,16 @@ class QwantBar @JvmOverloads constructor(
         qwantbar_button_bookmarks_add.setImageResource(this.getIcon(QwantBarIcons.BOOKMARKS_ADD, false))
         qwantbar_button_bookmarks_delete.setImageResource(this.getIcon(QwantBarIcons.BOOKMARKS_DELETE, false))
 
+        qwantbar_button_menu.setImageResource(this.getIcon(QwantBarIcons.MORE, (selection == QwantBarSelection.MORE)))
+        qwantbar_text_menu.setTextColor(if (selection == QwantBarSelection.MORE) colorSelected else colorDefault)
+        /* qwantbar_button_menu.setColorFilter(colorDefault)
+        qwantbar_text_menu.setTextColor(colorDefault) */
+
         val tabColor = if (selection == QwantBarSelection.TABS) colorSelected else colorDefault
         tabButtonBox?.setImageDrawable(DrawableUtils.loadAndTintDrawable(context, R.drawable.mozac_ui_tabcounter_box, tabColor))
         tabButtonBar?.setImageDrawable(DrawableUtils.loadAndTintDrawable(context, R.drawable.mozac_ui_tabcounter_bar, tabColor))
         tabButtonText?.setTextColor(tabColor)
         qwantbar_text_tabs.setTextColor(if (selection == QwantBarSelection.TABS) colorSelected else colorDefault)
-
-        qwantbar_button_menu.setColorFilter(colorDefault)
-        qwantbar_text_menu.setTextColor(colorDefault)
 
         qwantbar_button_back.setImageResource(this.getIcon(QwantBarIcons.BACK, false))
         qwantbar_text_back.setTextColor(colorDefault)
@@ -283,8 +291,9 @@ class QwantBar @JvmOverloads constructor(
                 else R.drawable.ic_del_bookmark
             }
             QwantBarIcons.MORE -> {
-                // No selected state
-                if (currentPrivacyEnabled && selected) R.drawable.ic_menu_privacy
+                if (currentPrivacyEnabled && selected) R.drawable.ic_menu_privacy_selected
+                else if (currentPrivacyEnabled && !selected) R.drawable.ic_menu_privacy
+                else if (!currentPrivacyEnabled && selected) R.drawable.ic_menu_selected
                 else R.drawable.ic_menu
             }
         }
@@ -334,6 +343,12 @@ class QwantBar @JvmOverloads constructor(
 
     private fun emitOnBackClicked() {
         backCallbacks.forEach {
+            it.invoke()
+        }
+    }
+
+    private fun emitOnMenuClicked() {
+        menuCallbacks.forEach {
             it.invoke()
         }
     }

@@ -64,6 +64,7 @@ open class BrowserActivity : AppCompatActivity() {
         qwantbar.onBookmarksClicked(::showBookmarks)
         qwantbar.onHomeClicked(::showHome)
         qwantbar.onBackClicked(::onBackPressed)
+        qwantbar.onMenuClicked(::showSettings)
 
         qwantbarSessionObserver = QwantBarSessionObserver(components.core.sessionManager, qwantbar, bookmarksStorage!!)
         components.core.sessionManager.register(this.qwantbarSessionObserver!!)
@@ -147,6 +148,25 @@ open class BrowserActivity : AppCompatActivity() {
         qwantbar.setLeftButton(QwantBar.LeftButtonType.BACK)
     }
 
+    private fun showBrowserFragment() {
+        var browserFragment = this.supportFragmentManager.findFragmentByTag("BROWSER_FRAGMENT")
+        if (browserFragment != null && browserFragment.isVisible) {
+            Log.d("QWANT_TEST", "already on fragment")
+        } else {
+            Log.d("QWANT_TEST", "fragment not there")
+            if (browserFragment == null) {
+                Log.d("QWANT_TEST", "and not existing")
+                browserFragment = BrowserFragment.create()
+            } else {
+                Log.d("QWANT_TEST", "but existing")
+            }
+            this.supportFragmentManager.beginTransaction().apply {
+                replace(R.id.container, browserFragment, "BROWSER_FRAGMENT")
+                commit()
+            }
+        }
+    }
+
     private fun showHome() {
         val session: Session? = components.core.sessionManager.selectedSession
         if (session == null || session.url != getString(R.string.homepage)) {
@@ -160,11 +180,32 @@ open class BrowserActivity : AppCompatActivity() {
             if (!alreadyThere)
                 components.useCases.sessionUseCases.loadUrl(getString(R.string.homepage))
         }
-        this.supportFragmentManager.beginTransaction().apply {
-            replace(R.id.container, BrowserFragment.create())
-            commit()
-        }
+
+        this.showBrowserFragment()
+
         qwantbar.setHighlight(QwantBar.QwantBarSelection.SEARCH)
+        qwantbar.setLeftButton(QwantBar.LeftButtonType.HOME)
+        qwantbar.setBookmarkButton(QwantBar.BookmarkButtonType.OPEN)
+    }
+
+    private fun showSettings() {
+       /* val session: Session? = components.core.sessionManager.selectedSession
+        if (session == null || session.url != getString(R.string.settings_page)) {
+            var alreadyThere = false
+            components.core.sessionManager.sessions.forEach {
+                if (it.url == getString(R.string.settings_page)) {
+                    components.core.sessionManager.select(it)
+                    alreadyThere = true
+                }
+            }
+            if (!alreadyThere)
+                components.useCases.sessionUseCases.loadUrl(getString(R.string.settings_page))
+        } */ // TODO Put that back, but block user non settings
+        components.useCases.sessionUseCases.loadUrl(getString(R.string.settings_page))
+        
+        this.showBrowserFragment()
+
+        qwantbar.setHighlight(QwantBar.QwantBarSelection.MORE)
         qwantbar.setLeftButton(QwantBar.LeftButtonType.HOME)
         qwantbar.setBookmarkButton(QwantBar.BookmarkButtonType.OPEN)
     }
