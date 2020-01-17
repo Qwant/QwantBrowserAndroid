@@ -3,7 +3,6 @@ package org.mozilla.reference.browser.layout
 import android.content.Context
 import android.content.Intent
 import android.util.AttributeSet
-import android.util.Log
 import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
 import android.view.View
@@ -11,7 +10,6 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import kotlinx.android.synthetic.main.activity_main.view.*
 import kotlinx.android.synthetic.main.component_qwantbar.view.*
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -32,6 +30,7 @@ import org.mozilla.reference.browser.browser.FindInPageIntegration
 import org.mozilla.reference.browser.ext.application
 import org.mozilla.reference.browser.ext.share
 import org.mozilla.reference.browser.settings.SettingsActivity
+import org.mozilla.reference.browser.storage.BookmarksStorage
 import java.lang.ref.WeakReference
 
 class QwantBar @JvmOverloads constructor(
@@ -45,9 +44,12 @@ class QwantBar @JvmOverloads constructor(
     private val sessionManager: SessionManager = context.applicationContext.application.components.core.sessionManager
     private val sessionUseCases: SessionUseCases = context.applicationContext.application.components.useCases.sessionUseCases
     private val webAppUseCases: WebAppUseCases = context.applicationContext.application.components.useCases.webAppUseCases
+    private var bookmarksStorage: BookmarksStorage? = null
 
     private val tabCallbacks: MutableList<() -> Unit> = mutableListOf()
     private val bookmarksCallbacks: MutableList<() -> Unit> = mutableListOf()
+    private val addBookmarksCallbacks: MutableList<() -> Unit> = mutableListOf()
+    private val deleteBookmarksCallbacks: MutableList<() -> Unit> = mutableListOf()
     private val homeCallbacks: MutableList<() -> Unit> = mutableListOf()
     private val backCallbacks: MutableList<() -> Unit> = mutableListOf()
 
@@ -55,7 +57,7 @@ class QwantBar @JvmOverloads constructor(
     private var tabButtonBar: ImageView? = null
     private var tabButtonText: TextView? = null
 
-    private var current_privacy_enabled = false
+    private var currentPrivacyEnabled = false
 
     private val menuToolbar by lazy {
         val forward = BrowserMenuItemToolbar.Button(
@@ -152,16 +154,25 @@ class QwantBar @JvmOverloads constructor(
         }
         qwantbar_button_tabs.contentDescription = context.getString(R.string.mozac_feature_tabs_toolbar_tabs_button)
 
-        qwantbar_layout_bookmarks.setOnClickListener { this.emitOnBookmarksClicked() }
         qwantbar_layout_home.setOnClickListener { this.emitOnHomeClicked() }
         qwantbar_layout_back.setOnClickListener { this.emitOnBackClicked() }
+        qwantbar_layout_bookmarks.setOnClickListener { this.emitOnBookmarksClicked() }
+        qwantbar_layout_bookmarks_add.setOnClickListener { this.emitOnAddBookmarksClicked() }
+        qwantbar_layout_bookmarks_delete.setOnClickListener { this.emitOnDeleteBookmarksClicked() }
 
         qwantbar_button_menu.menuBuilder = menuBuilder
 
         val session = sessionManager.selectedSession
         if (session != null && session.url == context.getString(R.string.homepage)) {
             this.setHighlight(QwantBarSelection.SEARCH)
+            this.setBookmarkButton(BookmarkButtonType.OPEN)
+        } else {
+            this.setBookmarkButton(BookmarkButtonType.SESSION)
         }
+    }
+
+    fun setBookmarkStorage(storage: BookmarksStorage) {
+        this.bookmarksStorage = storage
     }
 
     fun onTabsClicked(callback: () -> Unit) {
@@ -170,6 +181,14 @@ class QwantBar @JvmOverloads constructor(
 
     fun onBookmarksClicked(callback: () -> Unit) {
         bookmarksCallbacks.add(callback)
+    }
+
+    fun onAddBookmarkClicked(callback: () -> Unit) {
+        addBookmarksCallbacks.add(callback)
+    }
+
+    fun onDeleteBookmarkClicked(callback: () -> Unit) {
+        deleteBookmarksCallbacks.add(callback)
     }
 
     fun onHomeClicked(callback: () -> Unit) {
@@ -198,9 +217,9 @@ class QwantBar @JvmOverloads constructor(
     }
 
     fun setPrivacyMode(enabled: Boolean) {
-        if (enabled != current_privacy_enabled) {
+        if (enabled != currentPrivacyEnabled) {
             qwantbar_container.setBackgroundColor(resources.getColor(if (enabled) R.color.photonOrange50 else R.color.photonWhite))
-            current_privacy_enabled = enabled
+            currentPrivacyEnabled = enabled
         }
     }
 
@@ -212,6 +231,22 @@ class QwantBar @JvmOverloads constructor(
 
     private fun emitOnBookmarksClicked() {
         bookmarksCallbacks.forEach {
+            it.invoke()
+        }
+    }
+
+    private fun emitOnAddBookmarksClicked() {
+        bookmarksStorage?.addBookmark(sessionManager.selectedSession)
+        this.setBookmarkButton(BookmarkButtonType.DELETE)
+        addBookmarksCallbacks.forEach {
+            it.invoke()
+        }
+    }
+
+    private fun emitOnDeleteBookmarksClicked() {
+        bookmarksStorage?.deleteBookmark(sessionManager.selectedSession)
+        this.setBookmarkButton(BookmarkButtonType.ADD)
+        deleteBookmarksCallbacks.forEach {
             it.invoke()
         }
     }
@@ -239,5 +274,34 @@ class QwantBar @JvmOverloads constructor(
     fun setLeftButton(type: LeftButtonType) {
         qwantbar_layout_home.visibility = if (type == LeftButtonType.HOME) View.VISIBLE else View.GONE
         qwantbar_layout_back.visibility = if (type == LeftButtonType.BACK) View.VISIBLE else View.GONE
+    }
+
+    enum class BookmarkButtonType {
+        OPEN, ADD, DELETE, SESSION
+    }
+
+    private var currentBookmarkType = BookmarkButtonType.OPEN
+
+    fun setBookmarkButton(type: BookmarkButtonType) {
+        currentBookmarkType = type
+        if (type == BookmarkButtonType.SESSION) {
+            qwantbar_layout_bookmarks.visibility = View.GONE
+            val session = sessionManager.selectedSession
+            if (session != null && this.bookmarksStorage != null && this.bookmarksStorage!!.contains(session.url)) {
+                qwantbar_layout_bookmarks_add.visibility = View.GONE
+                qwantbar_layout_bookmarks_delete.visibility = View.VISIBLE
+            } else {
+                qwantbar_layout_bookmarks_add.visibility = View.VISIBLE
+                qwantbar_layout_bookmarks_delete.visibility = View.GONE
+            }
+        } else {
+            qwantbar_layout_bookmarks.visibility = if (type == BookmarkButtonType.OPEN) View.VISIBLE else View.GONE
+            qwantbar_layout_bookmarks_add.visibility = if (type == BookmarkButtonType.ADD) View.VISIBLE else View.GONE
+            qwantbar_layout_bookmarks_delete.visibility = if (type == BookmarkButtonType.DELETE) View.VISIBLE else View.GONE
+        }
+    }
+
+    fun getBookmarkButtonType(): BookmarkButtonType {
+        return currentBookmarkType
     }
 }

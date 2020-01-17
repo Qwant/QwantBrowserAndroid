@@ -30,7 +30,8 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // engineView.setVerticalClipping(56.dpToPx(Resources.getSystem().displayMetrics)) // Qwant bar size
+        requireContext().components.core.engine.settings.userAgentString += " QwantMobile/4.0"
+
         toolbarSessionObserver = ToolbarSessionObserver(requireContext().components.core.sessionManager, toolbar)
         requireContext().components.core.sessionManager.register(this.toolbarSessionObserver!!)
 

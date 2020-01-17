@@ -90,7 +90,6 @@
 
     <string name="homepage">https://www.qwant.com/?client=brz-huawei</string>
 
-
     <string name="menu_search">Search</string>
     <string name="menu_bookmarks">Bookmarks</string>
     <string name="menu_tabs">Tabs</string>
@@ -99,6 +98,9 @@
 
     <string name="bookmarks_empty_1">To add pages to your bookmarks, click on the icon</string>
     <string name="bookmarks_empty_2">in the bottom menu bar</string>
+
+    <string name="bookmarks_delete">Delete bookmark</string>
+    <string name="bookmarks_add">Add bookmark</string>
 
     <!-- Text shown in the toolbar if it is empty -->
     <string name="toolbar_hint">@string/qwant_widget_text</string>

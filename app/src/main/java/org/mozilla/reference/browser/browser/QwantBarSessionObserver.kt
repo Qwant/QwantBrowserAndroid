@@ -2,31 +2,34 @@ package org.mozilla.reference.browser.browser
 
 import android.content.Intent
 import android.content.res.Resources
-import android.util.Log
 import android.view.View
 import mozilla.components.browser.session.Session
 import mozilla.components.browser.session.SessionManager
 import mozilla.components.support.ktx.android.util.dpToPx
 import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.layout.QwantBar
+import org.mozilla.reference.browser.storage.BookmarksStorage
 
 class QwantBarSessionObserver(
         private val sessionManager: SessionManager,
-        private val qwantbar: QwantBar
+        private val qwantbar: QwantBar,
+        private val bookmarksStorage: BookmarksStorage
 ) : SessionManager.Observer, Session.Observer {
     private var textviewHome : View = qwantbar.findViewById(R.id.qwantbar_text_home)
     private var textviewBookmarks : View = qwantbar.findViewById(R.id.qwantbar_text_bookmarks)
     private var textviewTabs : View = qwantbar.findViewById(R.id.qwantbar_text_tabs)
     private var textviewMenu : View = qwantbar.findViewById(R.id.qwantbar_text_menu)
     private var textviewBack : View = qwantbar.findViewById(R.id.qwantbar_text_back)
+    private var layoutBookmarks : View = qwantbar.findViewById(R.id.qwantbar_layout_bookmarks)
+    private var layoutBookmarksAdd : View = qwantbar.findViewById(R.id.qwantbar_layout_bookmarks_add)
+    private var layoutBookmarksDelete : View = qwantbar.findViewById(R.id.qwantbar_layout_bookmarks_delete)
 
-    private var currentMode: QwantBarMode? = null
+    private var currentMode: QwantBarMode = QwantBarMode.HOME
 
     init {
         sessionManager.sessions.forEach {
             it.register(this)
         }
-        currentMode = QwantBarMode.HOME
         checkSession()
     }
 
@@ -39,6 +42,17 @@ class QwantBarSessionObserver(
             setupHomeBar()
         } else {
             setupNavigationBar()
+            checkBookmarks(url)
+        }
+    }
+
+    private fun checkBookmarks(url: String) {
+        if (qwantbar.getBookmarkButtonType() == QwantBar.BookmarkButtonType.SESSION) {
+            if (bookmarksStorage.contains(url)) {
+                qwantbar.setBookmarkButton(QwantBar.BookmarkButtonType.DELETE)
+            } else {
+                qwantbar.setBookmarkButton(QwantBar.BookmarkButtonType.ADD)
+            }
         }
     }
 
@@ -68,6 +82,7 @@ class QwantBarSessionObserver(
         if (currentMode != QwantBarMode.HOME) {
             this.setBarHeight(56)
             this.showButtonsTexts()
+            qwantbar.setBookmarkButton(QwantBar.BookmarkButtonType.OPEN)
             currentMode = QwantBarMode.HOME
         }
     }
@@ -76,6 +91,7 @@ class QwantBarSessionObserver(
         if (currentMode != QwantBarMode.NAVIGATION) {
             this.setBarHeight(36)
             this.hideButtonsTexts()
+            qwantbar.setBookmarkButton(QwantBar.BookmarkButtonType.SESSION)
             currentMode = QwantBarMode.NAVIGATION
         }
     }

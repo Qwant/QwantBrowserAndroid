@@ -49,7 +49,6 @@ open class BrowserActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction().apply {
                 replace(R.id.container, createBrowserFragment(sessionId))
@@ -57,16 +56,18 @@ open class BrowserActivity : AppCompatActivity() {
             }
         }
 
+        bookmarksStorage = BookmarksStorage(applicationContext)
+        bookmarksStorage!!.restore()
+
+        qwantbar.setBookmarkStorage(bookmarksStorage!!)
         qwantbar.onTabsClicked(::showTabs)
         qwantbar.onBookmarksClicked(::showBookmarks)
         qwantbar.onHomeClicked(::showHome)
         qwantbar.onBackClicked(::onBackPressed)
 
-        qwantbarSessionObserver = QwantBarSessionObserver(components.core.sessionManager, qwantbar)
+        qwantbarSessionObserver = QwantBarSessionObserver(components.core.sessionManager, qwantbar, bookmarksStorage!!)
         components.core.sessionManager.register(this.qwantbarSessionObserver!!)
 
-        bookmarksStorage = BookmarksStorage(applicationContext)
-        bookmarksStorage?.restore()
     }
 
     override fun onBackPressed() {
@@ -131,6 +132,7 @@ open class BrowserActivity : AppCompatActivity() {
             replace(R.id.container, TabsTrayFragment(::bookmarksOrTabsClosed))
             commit()
         }
+        qwantbar.setBookmarkButton(QwantBar.BookmarkButtonType.OPEN)
         qwantbar.setHighlight(QwantBar.QwantBarSelection.TABS)
         qwantbar.setLeftButton(QwantBar.LeftButtonType.BACK)
     }
@@ -140,6 +142,7 @@ open class BrowserActivity : AppCompatActivity() {
             replace(R.id.container, BookmarksFragment(bookmarksStorage!!, ::bookmarksOrTabsClosed))
             commit()
         }
+        qwantbar.setBookmarkButton(QwantBar.BookmarkButtonType.OPEN)
         qwantbar.setHighlight(QwantBar.QwantBarSelection.BOOKMARKS)
         qwantbar.setLeftButton(QwantBar.LeftButtonType.BACK)
     }
@@ -163,6 +166,7 @@ open class BrowserActivity : AppCompatActivity() {
         }
         qwantbar.setHighlight(QwantBar.QwantBarSelection.SEARCH)
         qwantbar.setLeftButton(QwantBar.LeftButtonType.HOME)
+        qwantbar.setBookmarkButton(QwantBar.BookmarkButtonType.OPEN)
     }
 
     private fun bookmarksOrTabsClosed() {
@@ -171,6 +175,7 @@ open class BrowserActivity : AppCompatActivity() {
             qwantbar.setHighlight(QwantBar.QwantBarSelection.SEARCH)
         } else {
             qwantbar.setHighlight(QwantBar.QwantBarSelection.NONE)
+            qwantbar.setBookmarkButton(QwantBar.BookmarkButtonType.SESSION)
         }
         qwantbar.setLeftButton(QwantBar.LeftButtonType.HOME)
     }

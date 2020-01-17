@@ -2,34 +2,41 @@ package org.mozilla.reference.browser.storage
 
 import android.content.Context
 import android.util.Log
+import mozilla.components.browser.session.Session
 import java.io.*
 
 class BookmarksStorage(private var context: Context) {
     private var bookmarksList: ArrayList<BookmarkItem> = arrayListOf()
     private var onChangeCallbacks: ArrayList<() -> Unit> = arrayListOf()
 
-    init {
-        this.restore()
-        bookmarksList.add(BookmarkItem("test", "test url", "fav"))
-        bookmarksList.add(BookmarkItem("test 2", "test url 2", "fav"))
-        bookmarksList.add(BookmarkItem("test 3", "test url 3", "fav"))
-        this.emitOnChange()
-    }
-
     fun addBookmark(item: BookmarkItem) {
         this.bookmarksList.add(item)
         this.emitOnChange()
     }
 
-    fun removeBookmark(item: BookmarkItem) {
+    fun addBookmark(session: Session?) {
+        if (session != null) {
+            this.addBookmark(BookmarkItem(session.title, session.url))
+        }
+    }
+
+    fun deleteBookmark(item: BookmarkItem) {
         this.bookmarksList.remove(item)
         this.emitOnChange()
     }
 
-    fun getBookmarks(): ArrayList<BookmarkItem> {
-        return this.bookmarksList
+    fun deleteBookmark(session: Session?) {
+        if (session != null) {
+            this.bookmarksList.forEach {
+                if (it.url == session.url) {
+                    this.deleteBookmark(it)
+                    return
+                }
+            }
+        }
     }
 
+    fun getBookmarks(): ArrayList<BookmarkItem> { return this.bookmarksList }
     fun count(): Int { return this.bookmarksList.size }
     fun get(i: Int): BookmarkItem { return this.bookmarksList[i] }
 
@@ -38,6 +45,7 @@ class BookmarksStorage(private var context: Context) {
         try {
             val fileOutputStream: FileOutputStream = context.openFileOutput(QWANT_BOOKMARKS_FILENAME, Context.MODE_PRIVATE)
             val objectOutputStream = ObjectOutputStream(fileOutputStream)
+            Log.d("QWANT_BROWSER", "saved bookmarks: " + this.bookmarksList.size)
             objectOutputStream.writeObject(this.bookmarksList)
             objectOutputStream.flush()
             objectOutputStream.close()
@@ -53,7 +61,8 @@ class BookmarksStorage(private var context: Context) {
         try {
             val fileInputStream: FileInputStream = context.openFileInput(QWANT_BOOKMARKS_FILENAME)
             val objectInputStream = ObjectInputStream(fileInputStream)
-            this.bookmarksList = objectInputStream.readObject() as java.util.ArrayList<BookmarkItem>
+            this.bookmarksList = objectInputStream.readObject() as ArrayList<BookmarkItem>
+            Log.d("QWANT_BROWSER", "restored bookmarks: " + this.bookmarksList.size)
             objectInputStream.close()
             fileInputStream.close()
             this.emitOnChange()
@@ -67,6 +76,14 @@ class BookmarksStorage(private var context: Context) {
             Log.e("QWANT_BROWSER", "Failed reading bookmarks file: " + e.message)
             e.printStackTrace()
         }
+    }
+
+    fun contains(url: String): Boolean {
+        bookmarksList.forEach {
+            if (it.url == url)
+                return true
+        }
+        return false
     }
 
     companion object {
