@@ -20,22 +20,17 @@
             android:title="@string/preferences_make_default_browser"/>
 
     <PreferenceCategory
-        android:title="@string/developer_tools_category">
-
-        <androidx.preference.SwitchPreferenceCompat
-            android:key="@string/pref_key_remote_debugging"
-            android:defaultValue="false"
-            android:title="@string/preferences_remote_debugging" />
-
-    </PreferenceCategory>
-
-    <PreferenceCategory
         android:title="@string/qwant_category">
 
         <androidx.preference.Preference
             android:key="@string/pref_key_about_page"
             android:title="@string/preferences_about_page" />
-
+        <androidx.preference.Preference
+            android:key="@string/pref_key_privacy_policy"
+            android:title="@string/preferences_privacy_policy" />
+        <androidx.preference.Preference
+            android:key="@string/pref_key_license"
+            android:title="@string/preferences_license" />
     </PreferenceCategory>
 
 </androidx.preference.PreferenceScreen>

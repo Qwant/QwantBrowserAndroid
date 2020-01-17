@@ -60,7 +60,6 @@
     <li>temporary files</li>
 </ul>
 <p>Private Browsing <strong>doesn\'t make you anonymous</strong> on the Internet. Your employer or Internet service provider can still know what page you visit.</p>
-<p class="about-info">Learn more about <a id="learnMore">Private Browsing</a>.</p>
      ]]></string>
     
     <string name="default_notification_channel">Browser</string>
@@ -68,7 +67,6 @@
     <!-- About content -->
     <string name="about_content"><![CDATA[
 <p>%1$s puts you in control.</p>
-<p>Powered by Mozilla components. NEED LICENSE ! cf. G.champeau <br/>
     ]]></string>
 
     <string name="menu_share_with">Share with…</string>
@@ -111,6 +109,13 @@
     <string name="context_menu_find">Find in Page</string>
     <string name="context_menu_addons">Add-ons</string>
 
+    <string name="preferences_privacy_policy">Privacy policy</string>
+    <string name="privacy_policy_url">https://about.qwant.com/legal/privacy/</string>
+    <string name="preferences_license">License (MPL 2.0)</string>
+    <string name="license_url">https://www.mozilla.org/en-US/MPL/2.0/</string>
+
     <!-- Text shown in the toolbar if it is empty -->
     <string name="toolbar_hint">@string/qwant_widget_text</string>
+    <string name="pref_key_privacy_policy" translatable="false">pref_key_privacy_policy</string>
+    <string name="pref_key_license" translatable="false">pref_key_license</string>
 </resources>

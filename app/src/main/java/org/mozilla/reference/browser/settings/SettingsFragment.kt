@@ -12,12 +12,11 @@ import androidx.preference.Preference.OnPreferenceClickListener
 import androidx.preference.PreferenceFragmentCompat
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
+import mozilla.components.support.base.feature.UserInteractionHandler
 import org.mozilla.reference.browser.R
+import org.mozilla.reference.browser.R.string.*
+import org.mozilla.reference.browser.ext.components
 import org.mozilla.reference.browser.ext.getPreferenceKey
-import org.mozilla.reference.browser.R.string.pref_key_make_default_browser
-import org.mozilla.reference.browser.R.string.pref_key_remote_debugging
-import org.mozilla.reference.browser.R.string.pref_key_about_page
-import org.mozilla.reference.browser.R.string.pref_key_privacy
 import org.mozilla.reference.browser.ext.requireComponents
 
 @Suppress("TooManyFunctions")
@@ -50,14 +49,22 @@ class SettingsFragment : PreferenceFragmentCompat() {
         val makeDefaultBrowserKey = context?.getPreferenceKey(pref_key_make_default_browser)
         val aboutPageKey = context?.getPreferenceKey(pref_key_about_page)
         val privacyKey = context?.getPreferenceKey(pref_key_privacy)
+        val privacyPolicyKey = context?.getPreferenceKey(pref_key_privacy_policy)
+        val licenseKey = context?.getPreferenceKey(pref_key_license)
 
         val preferenceMakeDefaultBrowser = findPreference(makeDefaultBrowserKey)
         val preferenceAboutPage = findPreference(aboutPageKey)
         val preferencePrivacy = findPreference(privacyKey)
 
+        val preferencePrivacyPolicy = findPreference(privacyPolicyKey)
+        val preferenceLicense = findPreference(licenseKey)
+
         preferenceMakeDefaultBrowser.onPreferenceClickListener = getClickListenerForMakeDefaultBrowser()
         preferenceAboutPage.onPreferenceClickListener = getAboutPageListener()
         preferencePrivacy.onPreferenceClickListener = getClickListenerForPrivacy()
+
+        preferencePrivacyPolicy.onPreferenceClickListener = getPrivacyPolicyListener()
+        preferenceLicense.onPreferenceClickListener = getLicenseListener()
     }
 
     private fun getClickListenerForMakeDefaultBrowser(): OnPreferenceClickListener {
@@ -93,6 +100,26 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 ?.replace(android.R.id.content, AboutFragment())
                 ?.addToBackStack(null)
                 ?.commit()
+            true
+        }
+    }
+
+    private fun getPrivacyPolicyListener(): OnPreferenceClickListener {
+        return OnPreferenceClickListener {
+            if (context != null) {
+                context!!.components.useCases.tabsUseCases.addTab(context!!.getString(privacy_policy_url))
+                activity?.finish()
+            }
+            true
+        }
+    }
+
+    private fun getLicenseListener(): OnPreferenceClickListener {
+        return OnPreferenceClickListener {
+            if (context != null) {
+                context!!.components.useCases.tabsUseCases.addTab(context!!.getString(license_url))
+                activity?.finish()
+            }
             true
         }
     }

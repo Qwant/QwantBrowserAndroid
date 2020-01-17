@@ -67,7 +67,6 @@
     <!-- About content -->
     <string name="about_content"><![CDATA[
 <p>%1$s gibt Ihnen die Kontrolle.</p>
-<p>Von Mozilla-Komponenten betrieben.<br/>
     ]]></string>
 
     <string name="menu_share_with">Teilen mit…</string>
@@ -110,6 +109,12 @@
     <string name="context_menu_add_homescreen">Dem Home-Bildschirm hinzufügen</string>
     <string name="context_menu_find">Auf der Seite finden</string>
     <string name="context_menu_addons">Add-ons</string>
+
+
+    <string name="preferences_privacy_policy">Datenschutzerklärung</string>
+    <string name="privacy_policy_url">https://about.qwant.com/de/rechtlich/datenschutzrichtlinie/</string>
+    <string name="preferences_license">License (MPL 2.0)</string>
+    <string name="license_url">https://www.mozilla.org/en-US/MPL/2.0/</string>
 
     <!-- Text shown in the toolbar if it is empty -->
     <string name="toolbar_hint">@string/qwant_widget_text</string>
