@@ -94,8 +94,22 @@
     <string name="menu_bookmarks">Segnalibri</string>
     <string name="menu_tabs">Schede</string>
     <string name="menu_more">Altro</string>
-    <string name="menu_back">Back</string>
+    <string name="menu_back">Indietro</string>
 
+    <string name="bookmarks_empty_1">Per aggiungere pagine ai segnalibri, fai clic sull\'icona</string>
+    <string name="bookmarks_empty_2">nella barra dei menu in basso</string>
+
+    <string name="bookmarks_delete">Elimina</string>
+    <string name="bookmarks_add">Aggiungi segnalibro</string>
+
+    <string name="context_menu_forward">Inoltra</string>
+    <string name="context_menu_refresh">Ricarica</string>
+    <string name="context_menu_stop">Ferma</string>
+    <string name="context_menu_share">Condividi</string>
+    <string name="context_menu_request_desktop">Richiedi sito desktop</string>
+    <string name="context_menu_add_homescreen">Aggiungi alla schermata Home</string>
+    <string name="context_menu_find">Trova nella Pagina</string>
+    <string name="context_menu_addons">Add-ons</string>
 
     <!-- Text shown in the toolbar if it is empty -->
     <string name="toolbar_hint">@string/qwant_widget_text</string>

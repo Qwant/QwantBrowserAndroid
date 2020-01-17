@@ -28,7 +28,7 @@
             android:layout_height="100dp"
             android:layout_marginTop="50dp"
             android:layout_marginBottom="50dp"
-            app:srcCompat="@drawable/ic_bookmark" />
+            app:srcCompat="@drawable/bookmarks_empty_image" />
 
         <TextView
             android:layout_width="match_parent"

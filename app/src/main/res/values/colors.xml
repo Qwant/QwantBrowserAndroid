@@ -19,6 +19,9 @@
 
     <color name="menu_items">#5c6f84</color>
     <color name="menu_items_selected">#4ba2ea</color>
+    <color name="menu_items_privacy">#c8cbd3</color>
+    <color name="menu_items_privacy_selected">#af27cc</color>
+    <color name="qwantbar_background_privacy">#2c3036</color>
 
     <!-- Overriding color of tab counter icon in toolbar -->
     <color name="mozac_ui_tabcounter_default_tint" tools:ignore="UnusedResources">@color/menu_items</color>

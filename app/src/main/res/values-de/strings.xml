@@ -94,10 +94,29 @@
     <string name="menu_bookmarks">Lesezeichen</string>
     <string name="menu_tabs">Tabs</string>
     <string name="menu_more">Mehr</string>
+    <string name="menu_back">Rückseite</string>
+
+    <string name="bookmarks_empty_1">Um Ihren Lesezeichen Seiten hinzuzufügen, klicken Sie auf das Symbol</string>
+    <string name="bookmarks_empty_2">in der untenstehenden Menüleiste.</string>
+
+    <string name="bookmarks_delete">Löschen</string>
+    <string name="bookmarks_add">Lesezeichen hinzufügen</string>
+
+    <string name="context_menu_forward">Weiter</string>
+    <string name="context_menu_refresh">Aktualisieren</string>
+    <string name="context_menu_stop">Stopp</string>
+    <string name="context_menu_share">Teilen</string>
+    <string name="context_menu_request_desktop">Desktop-Website anfordern</string>
+    <string name="context_menu_add_homescreen">Dem Home-Bildschirm hinzufügen</string>
+    <string name="context_menu_find">Auf der Seite finden</string>
+    <string name="context_menu_addons">Add-ons</string>
 
     <!-- Text shown in the toolbar if it is empty -->
     <string name="toolbar_hint">@string/qwant_widget_text</string>
 </resources>
+
+
+
 
 
 

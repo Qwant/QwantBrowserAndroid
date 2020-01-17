@@ -95,6 +95,22 @@
     <string name="menu_bookmarks">Marcadores</string>
     <string name="menu_tabs">Pestañas</string>
     <string name="menu_more">Más</string>
+    <string name="menu_back">Atrás</string>
+
+    <string name="bookmarks_empty_1">Para agregar páginas a sus marcadores, haga clic en el icono</string>
+    <string name="bookmarks_empty_2">en la barra del menú inferior</string>
+
+    <string name="bookmarks_delete">Eliminar</string>
+    <string name="bookmarks_add">Añadir marcador</string>
+
+    <string name="context_menu_forward">Adelante</string>
+    <string name="context_menu_refresh">Actualizar</string>
+    <string name="context_menu_stop">Detener</string>
+    <string name="context_menu_share">Compartir</string>
+    <string name="context_menu_request_desktop">Solicitar sitio de escritorio</string>
+    <string name="context_menu_add_homescreen">Añadir a la pantalla principal</string>
+    <string name="context_menu_find">Buscar en la página</string>
+    <string name="context_menu_addons">Add-ons</string>
 
     <!-- Text shown in the toolbar if it is empty -->
     <string name="toolbar_hint">@string/qwant_widget_text</string>

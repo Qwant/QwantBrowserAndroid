@@ -1,31 +1,44 @@
 package org.mozilla.reference.browser.storage
 
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
+import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import org.mozilla.reference.browser.R
-import org.mozilla.reference.browser.assist.HistoryAdapter
-import java.io.*
-import java.util.*
+import org.mozilla.reference.browser.ext.components
 
 class BookmarksAdapter(
         private val context: Context,
-        private val bookmarksStorage: BookmarksStorage
+        private val bookmarksStorage: BookmarksStorage,
+        private val bookmarkSelectedCallback: (bookmarkItem: BookmarkItem) -> Unit
 ) : BaseAdapter() {
 
-    internal class BookmarkItemViewHolder(item_layout: View) : RecyclerView.ViewHolder(item_layout) {
-        private var item_title: TextView = item_layout.findViewById(R.id.bookmark_title)
-        private var item_url: TextView = item_layout.findViewById(R.id.bookmark_url)
-        private var item_favicon: TextView = item_layout.findViewById(R.id.bookmark_title)
+    internal class BookmarkItemViewHolder(
+            item_layout: View,
+            private val bookmarkStorage: BookmarksStorage,
+            private val selectedCallback: (bookmarkItem: BookmarkItem) -> Unit,
+            private val context: Context
+    ) : RecyclerView.ViewHolder(item_layout) {
+        private var itemTitle: TextView = item_layout.findViewById(R.id.bookmark_title)
+        private var itemUrl: TextView = item_layout.findViewById(R.id.bookmark_url)
+        private var itemLayoutText: LinearLayout = item_layout.findViewById(R.id.bookmark_item_layout_text)
+        private var itemButtonDelete: Button = item_layout.findViewById(R.id.bookmark_item_delete)
 
         fun setup(bookmarkItem: BookmarkItem) {
-            this.item_title.text = bookmarkItem.title
-            this.item_url.text = bookmarkItem.url
+            this.itemTitle.text = bookmarkItem.title
+            this.itemUrl.text = bookmarkItem.url
+            this.itemLayoutText.setOnClickListener {
+                context.components.useCases.sessionUseCases.loadUrl(bookmarkItem.url)
+                selectedCallback.invoke(bookmarkItem)
+            }
+            this.itemButtonDelete.setOnClickListener {
+                bookmarkStorage.deleteBookmark(bookmarkItem)
+            }
         }
     }
 
@@ -35,7 +48,7 @@ class BookmarksAdapter(
         if (convertView == null) {
             val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
             newView = inflater.inflate(R.layout.bookmarks_list_item, parent, false)
-            viewHolder = BookmarkItemViewHolder(newView)
+            viewHolder = BookmarkItemViewHolder(newView, this.bookmarksStorage, this.bookmarkSelectedCallback, this.context)
             newView.tag = viewHolder
         } else {
             viewHolder = convertView.tag as BookmarkItemViewHolder

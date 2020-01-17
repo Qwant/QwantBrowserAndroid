@@ -63,7 +63,7 @@ class QwantBar @JvmOverloads constructor(
         val forward = BrowserMenuItemToolbar.Button(
             mozilla.components.ui.icons.R.drawable.mozac_ic_forward,
             iconTintColorResource = R.color.icons,
-            contentDescription = "Forward",
+            contentDescription = context.getString(R.string.context_menu_forward),
             isEnabled = { sessionManager.selectedSession?.canGoForward == true }) {
             sessionUseCases.goForward.invoke()
         }
@@ -71,14 +71,14 @@ class QwantBar @JvmOverloads constructor(
         val refresh = BrowserMenuItemToolbar.Button(
             mozilla.components.ui.icons.R.drawable.mozac_ic_refresh,
             iconTintColorResource = R.color.icons,
-            contentDescription = "Refresh") {
+            contentDescription = context.getString(R.string.context_menu_refresh)) {
             sessionUseCases.reload.invoke()
         }
 
         val stop = BrowserMenuItemToolbar.Button(
             mozilla.components.ui.icons.R.drawable.mozac_ic_stop,
             iconTintColorResource = R.color.icons,
-            contentDescription = "Stop") {
+            contentDescription = context.getString(R.string.context_menu_stop)) {
             sessionUseCases.stopLoading.invoke()
         }
 
@@ -88,14 +88,14 @@ class QwantBar @JvmOverloads constructor(
     private val menuItems: List<BrowserMenuItem> by lazy {
         listOf(
             menuToolbar,
-            SimpleBrowserMenuItem("Share") {
+            SimpleBrowserMenuItem(context.getString(R.string.context_menu_share)) {
                 val url = sessionManager.selectedSession?.url ?: ""
                 context.share(url)
             }.apply {
                 visible = { sessionManager.selectedSession != null }
             },
 
-            BrowserMenuSwitch("Request desktop site", {
+            BrowserMenuSwitch(context.getString(R.string.context_menu_request_desktop), {
                 sessionManager.selectedSessionOrThrow.desktopMode
             }) { checked ->
                 sessionUseCases.requestDesktopSite.invoke(checked)
@@ -103,25 +103,29 @@ class QwantBar @JvmOverloads constructor(
                 visible = { sessionManager.selectedSession != null }
             },
 
-            SimpleBrowserMenuItem("Add to homescreen") {
+            SimpleBrowserMenuItem(context.getString(R.string.context_menu_add_homescreen)) {
                 MainScope().launch { webAppUseCases.addToHomescreen() }
             }.apply {
                 visible = { webAppUseCases.isPinningSupported() }
             },
 
-            SimpleBrowserMenuItem("Find in Page") {
+            SimpleBrowserMenuItem(context.getString(R.string.context_menu_find)) {
                 FindInPageIntegration.launch?.invoke()
             }.apply {
                 visible = { sessionManager.selectedSession != null }
             },
 
-            SimpleBrowserMenuItem("Add-ons") {
+            SimpleBrowserMenuItem(context.getString(R.string.context_menu_addons)) {
                 val intent = Intent(context, AddonsActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 context.startActivity(intent)
             },
 
-            SimpleBrowserMenuItem("Settings") {
+            SimpleBrowserMenuItem(context.getString(R.string.bookmarks)) {
+                this.emitOnBookmarksClicked()
+            },
+
+            SimpleBrowserMenuItem(context.getString(R.string.settings)) {
                 val intent = Intent(context, SettingsActivity::class.java)
                 context.startActivity(intent)
             }
@@ -199,27 +203,94 @@ class QwantBar @JvmOverloads constructor(
         backCallbacks.add(callback)
     }
 
-    fun setHighlight(selection: QwantBarSelection) {
-        val colorDefault = ContextCompat.getColor(context, R.color.menu_items)
-        val colorSelected = ContextCompat.getColor(context, R.color.menu_items_selected)
+    private var currentSelection: QwantBarSelection = QwantBarSelection.SEARCH
 
-        qwantbar_button_home.setImageResource(if (selection == QwantBarSelection.SEARCH) R.drawable.ic_search_selected else R.drawable.ic_search)
+    fun setHighlight(selection: QwantBarSelection) {
+        currentSelection = selection
+
+        val colorDefault = ContextCompat.getColor(context, this.getIconColor(false))
+        val colorSelected = ContextCompat.getColor(context, this.getIconColor(true))
+
+        qwantbar_button_home.setImageResource(this.getIcon(QwantBarIcons.SEARCH, (selection == QwantBarSelection.SEARCH)))
         qwantbar_text_home.setTextColor(if (selection == QwantBarSelection.SEARCH) colorSelected else colorDefault)
 
-        qwantbar_button_bookmarks.setImageResource(if (selection == QwantBarSelection.BOOKMARKS) R.drawable.ic_bookmark_selected else R.drawable.ic_bookmark)
+        qwantbar_button_bookmarks.setImageResource(this.getIcon(QwantBarIcons.BOOKMARKS, (selection == QwantBarSelection.BOOKMARKS)))
         qwantbar_text_bookmarks.setTextColor(if (selection == QwantBarSelection.BOOKMARKS) colorSelected else colorDefault)
+
+        qwantbar_button_bookmarks_add.setImageResource(this.getIcon(QwantBarIcons.BOOKMARKS_ADD, false))
+        qwantbar_button_bookmarks_delete.setImageResource(this.getIcon(QwantBarIcons.BOOKMARKS_DELETE, false))
 
         val tabColor = if (selection == QwantBarSelection.TABS) colorSelected else colorDefault
         tabButtonBox?.setImageDrawable(DrawableUtils.loadAndTintDrawable(context, R.drawable.mozac_ui_tabcounter_box, tabColor))
         tabButtonBar?.setImageDrawable(DrawableUtils.loadAndTintDrawable(context, R.drawable.mozac_ui_tabcounter_bar, tabColor))
         tabButtonText?.setTextColor(tabColor)
         qwantbar_text_tabs.setTextColor(if (selection == QwantBarSelection.TABS) colorSelected else colorDefault)
+
+        qwantbar_button_menu.setColorFilter(colorDefault)
+        qwantbar_text_menu.setTextColor(colorDefault)
+
+        qwantbar_button_back.setImageResource(this.getIcon(QwantBarIcons.BACK, false))
+        qwantbar_text_back.setTextColor(colorDefault)
     }
 
     fun setPrivacyMode(enabled: Boolean) {
         if (enabled != currentPrivacyEnabled) {
-            qwantbar_container.setBackgroundColor(resources.getColor(if (enabled) R.color.photonOrange50 else R.color.photonWhite))
+            qwantbar_container.setBackgroundColor(resources.getColor(if (enabled) R.color.qwantbar_background_privacy else R.color.photonWhite))
             currentPrivacyEnabled = enabled
+            this.setHighlight(currentSelection)
+        }
+    }
+
+    enum class QwantBarIcons {
+        BACK, SEARCH, HOME, BOOKMARKS, BOOKMARKS_ADD, BOOKMARKS_DELETE, MORE
+    }
+
+    fun getIcon(icon: QwantBarIcons, selected: Boolean) : Int {
+        return when (icon) {
+            QwantBarIcons.BACK -> {
+                if (currentPrivacyEnabled) R.drawable.ic_back_privacy
+                else R.drawable.ic_back
+            }
+            QwantBarIcons.SEARCH -> {
+                if (currentPrivacyEnabled && selected) R.drawable.ic_search_privacy_selected
+                else if (currentPrivacyEnabled && !selected) R.drawable.ic_search_privacy
+                else if (!currentPrivacyEnabled && selected) R.drawable.ic_search_selected
+                else R.drawable.ic_search
+            }
+            QwantBarIcons.HOME -> {
+                // Should not have "selected" state as it transforms into a search
+                if (currentPrivacyEnabled) R.drawable.ic_home_privacy
+                else R.drawable.ic_home
+            }
+            QwantBarIcons.BOOKMARKS -> {
+                if (currentPrivacyEnabled && selected) R.drawable.ic_bookmark_privacy_selected
+                else if (currentPrivacyEnabled && !selected) R.drawable.ic_bookmark_privacy
+                else if (!currentPrivacyEnabled && selected) R.drawable.ic_bookmark_selected
+                else R.drawable.ic_bookmark
+            }
+            QwantBarIcons.BOOKMARKS_ADD -> {
+                // No selected state
+                if (currentPrivacyEnabled) R.drawable.ic_add_bookmark_privacy
+                else R.drawable.ic_add_bookmark
+            }
+            QwantBarIcons.BOOKMARKS_DELETE -> {
+                // No selected state
+                if (currentPrivacyEnabled) R.drawable.ic_del_bookmark_privacy
+                else R.drawable.ic_del_bookmark
+            }
+            QwantBarIcons.MORE -> {
+                // No selected state
+                if (currentPrivacyEnabled && selected) R.drawable.ic_menu_privacy
+                else R.drawable.ic_menu
+            }
+        }
+    }
+
+    private fun getIconColor(selected: Boolean) : Int  {
+        return if (currentPrivacyEnabled) {
+            if (selected) R.color.menu_items_privacy_selected else R.color.menu_items_privacy
+        } else {
+            if (selected) R.color.menu_items_selected else R.color.menu_items
         }
     }
 

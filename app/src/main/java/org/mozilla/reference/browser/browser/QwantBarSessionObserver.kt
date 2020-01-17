@@ -3,6 +3,7 @@ package org.mozilla.reference.browser.browser
 import android.content.Intent
 import android.content.res.Resources
 import android.view.View
+import android.widget.ImageView
 import mozilla.components.browser.session.Session
 import mozilla.components.browser.session.SessionManager
 import mozilla.components.support.ktx.android.util.dpToPx
@@ -20,9 +21,7 @@ class QwantBarSessionObserver(
     private var textviewTabs : View = qwantbar.findViewById(R.id.qwantbar_text_tabs)
     private var textviewMenu : View = qwantbar.findViewById(R.id.qwantbar_text_menu)
     private var textviewBack : View = qwantbar.findViewById(R.id.qwantbar_text_back)
-    private var layoutBookmarks : View = qwantbar.findViewById(R.id.qwantbar_layout_bookmarks)
-    private var layoutBookmarksAdd : View = qwantbar.findViewById(R.id.qwantbar_layout_bookmarks_add)
-    private var layoutBookmarksDelete : View = qwantbar.findViewById(R.id.qwantbar_layout_bookmarks_delete)
+    private var imageviewHome : ImageView = qwantbar.findViewById(R.id.qwantbar_button_home)
 
     private var currentMode: QwantBarMode = QwantBarMode.HOME
 
@@ -82,6 +81,7 @@ class QwantBarSessionObserver(
         if (currentMode != QwantBarMode.HOME) {
             this.setBarHeight(56)
             this.showButtonsTexts()
+            imageviewHome.setImageResource(qwantbar.getIcon(QwantBar.QwantBarIcons.SEARCH, false))
             qwantbar.setBookmarkButton(QwantBar.BookmarkButtonType.OPEN)
             currentMode = QwantBarMode.HOME
         }
@@ -91,6 +91,7 @@ class QwantBarSessionObserver(
         if (currentMode != QwantBarMode.NAVIGATION) {
             this.setBarHeight(36)
             this.hideButtonsTexts()
+            imageviewHome.setImageResource(qwantbar.getIcon(QwantBar.QwantBarIcons.HOME, false))
             qwantbar.setBookmarkButton(QwantBar.BookmarkButtonType.SESSION)
             currentMode = QwantBarMode.NAVIGATION
         }

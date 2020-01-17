@@ -89,13 +89,26 @@
 
     <string name="homepage">https://www.qwant.com/?client=brz-huawei</string>
 
-
     <string name="menu_search">Recherche</string>
     <string name="menu_bookmarks">Favoris</string>
     <string name="menu_tabs">Onglets</string>
     <string name="menu_more">Plus</string>
     <string name="menu_back">Retour</string>
 
+    <string name="bookmarks_empty_1">Pour ajouter une page à vos favoris, cliquez sur l\'icône</string>
+    <string name="bookmarks_empty_2">dans la barre de menu ci-dessous</string>
+
+    <string name="bookmarks_delete">Supprimer</string>
+    <string name="bookmarks_add">Ajouter aux favoris</string>
+
+    <string name="context_menu_forward">Suivant</string>
+    <string name="context_menu_refresh">Recharger</string>
+    <string name="context_menu_stop">Stop</string>
+    <string name="context_menu_share">Partager</string>
+    <string name="context_menu_request_desktop">Voir version ordinateur</string>
+    <string name="context_menu_add_homescreen">Ajouter à l\'accueil</string>
+    <string name="context_menu_find">Rechercher dans la page</string>
+    <string name="context_menu_addons">Add-ons</string>
 
     <!-- Text shown in the toolbar if it is empty -->
     <string name="toolbar_hint">@string/qwant_widget_text</string>

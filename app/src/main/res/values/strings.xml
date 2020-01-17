@@ -99,8 +99,17 @@
     <string name="bookmarks_empty_1">To add pages to your bookmarks, click on the icon</string>
     <string name="bookmarks_empty_2">in the bottom menu bar</string>
 
-    <string name="bookmarks_delete">Delete bookmark</string>
+    <string name="bookmarks_delete">Delete</string>
     <string name="bookmarks_add">Add bookmark</string>
+
+    <string name="context_menu_forward">Forward</string>
+    <string name="context_menu_refresh">Refresh</string>
+    <string name="context_menu_stop">Stop</string>
+    <string name="context_menu_share">Share</string>
+    <string name="context_menu_request_desktop">Request desktop site</string>
+    <string name="context_menu_add_homescreen">Add to homescreen</string>
+    <string name="context_menu_find">Find in Page</string>
+    <string name="context_menu_addons">Add-ons</string>
 
     <!-- Text shown in the toolbar if it is empty -->
     <string name="toolbar_hint">@string/qwant_widget_text</string>
