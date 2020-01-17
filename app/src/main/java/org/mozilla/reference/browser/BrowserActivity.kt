@@ -150,15 +150,9 @@ open class BrowserActivity : AppCompatActivity() {
 
     private fun showBrowserFragment() {
         var browserFragment = this.supportFragmentManager.findFragmentByTag("BROWSER_FRAGMENT")
-        if (browserFragment != null && browserFragment.isVisible) {
-            Log.d("QWANT_TEST", "already on fragment")
-        } else {
-            Log.d("QWANT_TEST", "fragment not there")
+        if (browserFragment == null || browserFragment.isHidden) {
             if (browserFragment == null) {
-                Log.d("QWANT_TEST", "and not existing")
                 browserFragment = BrowserFragment.create()
-            } else {
-                Log.d("QWANT_TEST", "but existing")
             }
             this.supportFragmentManager.beginTransaction().apply {
                 replace(R.id.container, browserFragment, "BROWSER_FRAGMENT")
@@ -202,7 +196,7 @@ open class BrowserActivity : AppCompatActivity() {
                 components.useCases.sessionUseCases.loadUrl(getString(R.string.settings_page))
         } */ // TODO Put that back, but block user non settings
         components.useCases.sessionUseCases.loadUrl(getString(R.string.settings_page))
-        
+
         this.showBrowserFragment()
 
         qwantbar.setHighlight(QwantBar.QwantBarSelection.MORE)
