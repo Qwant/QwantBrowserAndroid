@@ -212,13 +212,15 @@ open class BrowserActivity : AppCompatActivity() {
         val session: Session? = components.core.sessionManager.selectedSession
         if (session != null && session.url == getString(R.string.settings_page)) {
             qwantbar.setHighlight(QwantBar.QwantBarSelection.MORE)
+            qwantbar.setLeftButton(QwantBar.LeftButtonType.BACK)
         } else if (session == null || session.url.contains("https://www.qwant.com")) {
             qwantbar.setHighlight(QwantBar.QwantBarSelection.SEARCH)
+            qwantbar.setLeftButton(QwantBar.LeftButtonType.HOME)
         } else {
             qwantbar.setHighlight(QwantBar.QwantBarSelection.NONE)
             qwantbar.setBookmarkButton(QwantBar.BookmarkButtonType.SESSION)
+            qwantbar.setLeftButton(QwantBar.LeftButtonType.HOME)
         }
-        qwantbar.setLeftButton(QwantBar.LeftButtonType.HOME)
         qwantbar.updateHomeIcon(qwantbarSessionObserver?.getCurrentMode())
     }
 

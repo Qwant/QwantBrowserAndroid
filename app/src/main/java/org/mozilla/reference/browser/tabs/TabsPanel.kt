@@ -82,7 +82,7 @@ class TabsPanel @JvmOverloads constructor(
 
     private fun updateToggleStates(ours: ToggleImageButton, theirs: ToggleImageButton, isPrivate: Boolean) {
         // Tint our button
-        ours.drawable.colorTint(photonPurple50)
+        ours.drawable.colorTint(if (isPrivate) photonPurple50 else R.color.menu_items_selected)
 
         // Uncheck their button and remove tint
         theirs.isChecked = false
