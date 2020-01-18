@@ -70,6 +70,11 @@ open class BrowserActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
+        if (components.core.sessionManager.selectedSession != null && components.core.sessionManager.selectedSession!!.url == getString(R.string.settings_page)) {
+            qwantbar.setLeftButton(QwantBar.LeftButtonType.HOME)
+            qwantbar.setHighlight(QwantBar.QwantBarSelection.SEARCH)
+        }
+
         supportFragmentManager.fragments.forEach {
             if (it is UserInteractionHandler && it.onBackPressed()) {
                 return
@@ -199,13 +204,15 @@ open class BrowserActivity : AppCompatActivity() {
         this.showBrowserFragment()
 
         qwantbar.setHighlight(QwantBar.QwantBarSelection.MORE)
-        qwantbar.setLeftButton(QwantBar.LeftButtonType.HOME)
+        qwantbar.setLeftButton(QwantBar.LeftButtonType.BACK)
         qwantbar.setBookmarkButton(QwantBar.BookmarkButtonType.OPEN)
     }
 
     private fun bookmarksOrTabsClosed() {
         val session: Session? = components.core.sessionManager.selectedSession
-        if (session == null || session.url.contains("https://www.qwant.com")) {
+        if (session != null && session.url == getString(R.string.settings_page)) {
+            qwantbar.setHighlight(QwantBar.QwantBarSelection.MORE)
+        } else if (session == null || session.url.contains("https://www.qwant.com")) {
             qwantbar.setHighlight(QwantBar.QwantBarSelection.SEARCH)
         } else {
             qwantbar.setHighlight(QwantBar.QwantBarSelection.NONE)

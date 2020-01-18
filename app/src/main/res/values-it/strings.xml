@@ -92,7 +92,7 @@
     <string name="menu_search">Cerca</string>
     <string name="menu_bookmarks">Segnalibri</string>
     <string name="menu_tabs">Schede</string>
-    <string name="menu_more">Altro</string>
+    <string name="menu_more">@string/settings</string>
     <string name="menu_back">Indietro</string>
 
     <string name="bookmarks_empty_1">Per aggiungere pagine ai segnalibri, fai clic sull\'icona</string>

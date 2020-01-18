@@ -92,7 +92,7 @@
     <string name="menu_search">Suche</string>
     <string name="menu_bookmarks">Lesezeichen</string>
     <string name="menu_tabs">Tabs</string>
-    <string name="menu_more">Mehr</string>
+    <string name="menu_more">@string/settings</string>
     <string name="menu_back">Rückseite</string>
 
     <string name="bookmarks_empty_1">Um Ihren Lesezeichen Seiten hinzuzufügen, klicken Sie auf das Symbol</string>

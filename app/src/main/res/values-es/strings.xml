@@ -93,7 +93,7 @@
     <string name="menu_search">Buscar</string>
     <string name="menu_bookmarks">Marcadores</string>
     <string name="menu_tabs">Pestañas</string>
-    <string name="menu_more">Más</string>
+    <string name="menu_more">@string/settings</string>
     <string name="menu_back">Atrás</string>
 
     <string name="bookmarks_empty_1">Para agregar páginas a sus marcadores, haga clic en el icono</string>
