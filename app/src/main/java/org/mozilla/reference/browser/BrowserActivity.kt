@@ -6,7 +6,6 @@ package org.mozilla.reference.browser
 
 import android.content.Context
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
@@ -20,7 +19,6 @@ import mozilla.components.concept.tabstray.TabsTray
 import mozilla.components.feature.intent.ext.EXTRA_SESSION_ID
 import mozilla.components.support.base.feature.UserInteractionHandler
 import mozilla.components.support.utils.SafeIntent
-import org.mozilla.reference.browser.assist.Assist
 import org.mozilla.reference.browser.browser.BrowserFragment
 import org.mozilla.reference.browser.browser.QwantBarSessionObserver
 import org.mozilla.reference.browser.ext.components
@@ -165,8 +163,9 @@ open class BrowserActivity : AppCompatActivity() {
         val session: Session? = components.core.sessionManager.selectedSession
         if (session == null || session.url != getString(R.string.homepage)) {
             var alreadyThere = false
+            val currentSessionPrivate = (session != null && session.private)
             components.core.sessionManager.sessions.forEach {
-                if (it.url == getString(R.string.homepage)) {
+                if (it.private == currentSessionPrivate && it.url == getString(R.string.homepage)) {
                     components.core.sessionManager.select(it)
                     alreadyThere = true
                 }
@@ -213,6 +212,7 @@ open class BrowserActivity : AppCompatActivity() {
             qwantbar.setBookmarkButton(QwantBar.BookmarkButtonType.SESSION)
         }
         qwantbar.setLeftButton(QwantBar.LeftButtonType.HOME)
+        qwantbar.updateHomeIcon(qwantbarSessionObserver?.getCurrentMode())
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

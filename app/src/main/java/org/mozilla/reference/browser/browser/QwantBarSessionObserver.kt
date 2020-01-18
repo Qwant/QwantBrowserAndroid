@@ -45,6 +45,10 @@ class QwantBarSessionObserver(
         }
     }
 
+    fun getCurrentMode() : QwantBarMode {
+        return currentMode
+    }
+
     private fun checkBookmarks(url: String) {
         if (qwantbar.getBookmarkButtonType() == QwantBar.BookmarkButtonType.SESSION) {
             if (bookmarksStorage.contains(url)) {
@@ -81,7 +85,8 @@ class QwantBarSessionObserver(
         if (currentMode != QwantBarMode.HOME) {
             this.setBarHeight(56)
             this.showButtonsTexts()
-            imageviewHome.setImageResource(qwantbar.getIcon(QwantBar.QwantBarIcons.SEARCH, false))
+            val selected = (sessionManager.selectedSession != null && sessionManager.selectedSession!!.url == imageviewHome.context.getString(R.string.homepage))
+            imageviewHome.setImageResource(qwantbar.getIcon(QwantBar.QwantBarIcons.SEARCH, selected))
             qwantbar.setBookmarkButton(QwantBar.BookmarkButtonType.OPEN)
             currentMode = QwantBarMode.HOME
         }
