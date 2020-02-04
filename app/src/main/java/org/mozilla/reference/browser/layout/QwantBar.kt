@@ -64,7 +64,7 @@ class QwantBar @JvmOverloads constructor(
     private val menuToolbar by lazy {
         val forward = BrowserMenuItemToolbar.Button(
             mozilla.components.ui.icons.R.drawable.mozac_ic_forward,
-            iconTintColorResource = R.color.icons,
+            iconTintColorResource = R.color.qwant_main,
             contentDescription = context.getString(R.string.context_menu_forward),
             isEnabled = { sessionManager.selectedSession?.canGoForward == true }) {
             sessionUseCases.goForward.invoke()
@@ -72,14 +72,14 @@ class QwantBar @JvmOverloads constructor(
 
         val refresh = BrowserMenuItemToolbar.Button(
             mozilla.components.ui.icons.R.drawable.mozac_ic_refresh,
-            iconTintColorResource = R.color.icons,
+            iconTintColorResource = R.color.qwant_main,
             contentDescription = context.getString(R.string.context_menu_refresh)) {
             sessionUseCases.reload.invoke()
         }
 
         val stop = BrowserMenuItemToolbar.Button(
             mozilla.components.ui.icons.R.drawable.mozac_ic_stop,
-            iconTintColorResource = R.color.icons,
+            iconTintColorResource = R.color.qwant_main,
             contentDescription = context.getString(R.string.context_menu_stop)) {
             sessionUseCases.stopLoading.invoke()
         }
@@ -90,7 +90,7 @@ class QwantBar @JvmOverloads constructor(
     private val menuItems: List<BrowserMenuItem> by lazy {
         listOf(
             menuToolbar,
-            SimpleBrowserMenuItem(context.getString(R.string.context_menu_share)) {
+            SimpleBrowserMenuItem(context.getString(R.string.context_menu_share), textColorResource = R.color.qwant_main) {
                 val url = sessionManager.selectedSession?.url ?: ""
                 context.share(url)
             }.apply {
@@ -105,29 +105,29 @@ class QwantBar @JvmOverloads constructor(
                 visible = { sessionManager.selectedSession != null }
             },
 
-            SimpleBrowserMenuItem(context.getString(R.string.context_menu_add_homescreen)) {
+            SimpleBrowserMenuItem(context.getString(R.string.context_menu_add_homescreen), textColorResource = R.color.qwant_main) {
                 MainScope().launch { webAppUseCases.addToHomescreen() }
             }.apply {
                 visible = { webAppUseCases.isPinningSupported() }
             },
 
-            SimpleBrowserMenuItem(context.getString(R.string.context_menu_find)) {
+            SimpleBrowserMenuItem(context.getString(R.string.context_menu_find), textColorResource = R.color.qwant_main) {
                 FindInPageIntegration.launch?.invoke()
             }.apply {
                 visible = { sessionManager.selectedSession != null }
             },
 
-            SimpleBrowserMenuItem(context.getString(R.string.context_menu_addons)) {
+            SimpleBrowserMenuItem(context.getString(R.string.context_menu_addons), textColorResource = R.color.qwant_main) {
                 val intent = Intent(context, AddonsActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 context.startActivity(intent)
             },
 
-            SimpleBrowserMenuItem(context.getString(R.string.bookmarks)) {
+            SimpleBrowserMenuItem(context.getString(R.string.bookmarks), textColorResource = R.color.qwant_main) {
                 this.emitOnBookmarksClicked()
             },
 
-            SimpleBrowserMenuItem(context.getString(R.string.settings)) {
+            SimpleBrowserMenuItem(context.getString(R.string.settings), textColorResource = R.color.qwant_main) {
                 val intent = Intent(context, SettingsActivity::class.java)
                 context.startActivity(intent)
             }
@@ -166,6 +166,7 @@ class QwantBar @JvmOverloads constructor(
         qwantbar_layout_bookmarks_add.setOnClickListener { this.emitOnAddBookmarksClicked() }
         qwantbar_layout_bookmarks_delete.setOnClickListener { this.emitOnDeleteBookmarksClicked() }
         qwantbar_layout_menu.setOnClickListener { this.emitOnMenuClicked() }
+
         // qwantbar_button_menu.menuBuilder = menuBuilder
 
         val session = sessionManager.selectedSession

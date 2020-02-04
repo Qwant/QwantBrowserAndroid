@@ -22,7 +22,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
-        android:theme="@style/AppThemeNotActionBar"
+        android:theme="@style/ThemeQwantNoActionBar"
         android:name=".BrowserApplication"
         tools:ignore="UnusedAttribute">
         <activity android:name=".BrowserActivity"
@@ -39,12 +39,6 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".BrowserTestActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-            </intent-filter>
-        </activity>
-
         <activity android:name=".ExternalAppBrowserActivity"
             android:configChanges="keyboard|keyboardHidden|mcc|mnc|orientation|screenSize|locale|layoutDirection|smallestScreenSize|screenLayout"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden"
@@ -55,14 +49,14 @@
             android:label="@string/app_name" />
 
         <activity
-            android:theme="@style/Theme.AppCompat.Light"
+            android:theme="@style/ThemeQwant"
             android:name=".addons.AddonsActivity"
             android:label="@string/mozac_feature_addons_addons"
             android:exported="false"
             android:parentActivityName=".BrowserActivity" />
 
         <activity
-            android:theme="@style/Theme.AppCompat.Light"
+            android:theme="@style/ThemeQwant"
             android:name=".addons.AddonDetailsActivity"
             android:exported="false"
             android:label="@string/mozac_feature_addons_addons" />
@@ -71,25 +65,25 @@
             android:label="@string/mozac_feature_addons_addons"
             android:parentActivityName=".addons.AddonsActivity"
             android:exported="false"
-            android:theme="@style/Theme.AppCompat.Light" />
+            android:theme="@style/ThemeQwant" />
 
         <activity
             android:name=".settings.SettingsActivity"
             android:label="@string/settings"
-            android:theme="@style/AppTheme"
+            android:theme="@style/ThemeQwant"
             android:parentActivityName=".BrowserActivity" />
 
         <activity
             android:name=".addons.PermissionsDetailsActivity"
             android:label="@string/mozac_feature_addons_addons"
             android:exported="false"
-            android:theme="@style/Theme.AppCompat.Light" />
+            android:theme="@style/ThemeQwant" />
 
         <activity
             android:name=".addons.AddonSettingsActivity"
             android:label="@string/mozac_feature_addons_addons"
             android:exported="false"
-            android:theme="@style/Theme.AppCompat.Light" />
+            android:theme="@style/ThemeQwant" />
 
         <activity android:name=".IntentReceiverActivity">
             <intent-filter>

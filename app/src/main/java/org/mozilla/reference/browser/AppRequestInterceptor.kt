@@ -43,6 +43,8 @@ class AppRequestInterceptor(private val context: Context) : RequestInterceptor {
         errorType: ErrorType,
         uri: String?
     ): RequestInterceptor.ErrorResponse? {
-        return RequestInterceptor.ErrorResponse(ErrorPages.createErrorPage(context, errorType))
+        // return RequestInterceptor.ErrorResponse(ErrorPages.createErrorPage(context, errorType))
+        // return RequestInterceptor.ErrorResponse("test")
+        return null
     }
 }

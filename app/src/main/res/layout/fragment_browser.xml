@@ -55,7 +55,6 @@
         android:layout_gravity="top"
         android:paddingEnd="8dp"
         android:background="@color/toolbarBackgroundColor"
-        mozac:browserToolbarTrackingProtectionAndSecurityIndicatorSeparatorColor="@color/photonWhite"
         mozac:browserToolbarSuggestionForegroundColor="@color/toolbarSuggestionForeground"
         mozac:browserToolbarSuggestionBackgroundColor="@color/toolbarSuggestionBackground" />
 

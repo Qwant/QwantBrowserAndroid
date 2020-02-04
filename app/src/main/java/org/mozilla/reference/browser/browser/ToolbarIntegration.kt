@@ -12,7 +12,6 @@ import mozilla.components.browser.domains.autocomplete.ShippedDomainsProvider
 import mozilla.components.browser.menu.BrowserMenuBuilder
 import mozilla.components.browser.menu.BrowserMenuItem
 import mozilla.components.browser.menu.item.BrowserMenuItemToolbar
-import mozilla.components.browser.menu.item.BrowserMenuSwitch
 import mozilla.components.browser.menu.item.SimpleBrowserMenuItem
 import mozilla.components.browser.session.SessionManager
 import mozilla.components.browser.toolbar.BrowserToolbar
@@ -20,7 +19,6 @@ import mozilla.components.browser.toolbar.display.DisplayToolbar
 import mozilla.components.concept.storage.HistoryStorage
 import mozilla.components.feature.pwa.WebAppUseCases
 import mozilla.components.feature.session.SessionUseCases
-import mozilla.components.feature.tabs.TabsUseCases
 import mozilla.components.feature.toolbar.ToolbarAutocompleteFeature
 import mozilla.components.feature.toolbar.ToolbarFeature
 import mozilla.components.support.base.feature.LifecycleAwareFeature
@@ -30,6 +28,7 @@ import org.mozilla.reference.browser.addons.AddonsActivity
 import org.mozilla.reference.browser.ext.components
 import org.mozilla.reference.browser.ext.share
 import org.mozilla.reference.browser.settings.SettingsActivity
+import org.mozilla.reference.browser.view.BrowserMenuSwitch
 
 class ToolbarIntegration(
     context: Context,
@@ -47,7 +46,7 @@ class ToolbarIntegration(
     private val menuToolbar by lazy {
         val forward = BrowserMenuItemToolbar.Button(
             mozilla.components.ui.icons.R.drawable.mozac_ic_forward,
-            iconTintColorResource = R.color.icons,
+            iconTintColorResource = R.color.qwant_main,
             contentDescription = "Forward",
             isEnabled = { sessionManager.selectedSession?.canGoForward == true }) {
             sessionUseCases.goForward.invoke()
@@ -55,14 +54,14 @@ class ToolbarIntegration(
 
         val refresh = BrowserMenuItemToolbar.Button(
             mozilla.components.ui.icons.R.drawable.mozac_ic_refresh,
-            iconTintColorResource = R.color.icons,
+            iconTintColorResource = R.color.qwant_main,
             contentDescription = "Refresh") {
             sessionUseCases.reload.invoke()
         }
 
         val stop = BrowserMenuItemToolbar.Button(
             mozilla.components.ui.icons.R.drawable.mozac_ic_stop,
-            iconTintColorResource = R.color.icons,
+            iconTintColorResource = R.color.qwant_main,
             contentDescription = "Stop") {
             sessionUseCases.stopLoading.invoke()
         }
@@ -73,7 +72,7 @@ class ToolbarIntegration(
     private val menuItems: List<BrowserMenuItem> by lazy {
         listOf(
             menuToolbar,
-                SimpleBrowserMenuItem(context.getString(R.string.context_menu_share)) {
+                SimpleBrowserMenuItem(context.getString(R.string.context_menu_share), textColorResource = R.color.qwant_main) {
                     val url = sessionManager.selectedSession?.url ?: ""
                     context.share(url)
                 }.apply {
@@ -88,25 +87,25 @@ class ToolbarIntegration(
                     visible = { sessionManager.selectedSession != null }
                 },
 
-                SimpleBrowserMenuItem(context.getString(R.string.context_menu_add_homescreen)) {
+                SimpleBrowserMenuItem(context.getString(R.string.context_menu_add_homescreen), textColorResource = R.color.qwant_main) {
                     MainScope().launch { webAppUseCases.addToHomescreen() }
                 }.apply {
                     visible = { webAppUseCases.isPinningSupported() }
                 },
 
-                SimpleBrowserMenuItem(context.getString(R.string.context_menu_find)) {
+                SimpleBrowserMenuItem(context.getString(R.string.context_menu_find), textColorResource = R.color.qwant_main) {
                     FindInPageIntegration.launch?.invoke()
                 }.apply {
                     visible = { sessionManager.selectedSession != null }
                 },
 
-                SimpleBrowserMenuItem(context.getString(R.string.context_menu_addons)) {
+                SimpleBrowserMenuItem(context.getString(R.string.context_menu_addons), textColorResource = R.color.qwant_main) {
                     val intent = Intent(context, AddonsActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                     context.startActivity(intent)
                 },
 
-                SimpleBrowserMenuItem(context.getString(R.string.settings)) {
+                SimpleBrowserMenuItem(context.getString(R.string.settings), textColorResource = R.color.qwant_main) {
                     val intent = Intent(context, SettingsActivity::class.java)
                     context.startActivity(intent)
                 }
@@ -132,8 +131,19 @@ class ToolbarIntegration(
             addDomainProvider(shippedDomainsProvider)
         }
 
+        toolbar.display.colors = toolbar.display.colors.copy(
+            securityIconSecure = context.resources.getColor(R.color.photonGreen70),
+            securityIconInsecure = context.resources.getColor(R.color.photonRed70),
+            emptyIcon = context.resources.getColor(R.color.qwant_main),
+            menu = context.resources.getColor(R.color.qwant_main),
+            hint = context.resources.getColor(R.color.qwant_selected),
+            title = context.resources.getColor(R.color.qwant_main),
+            text = context.resources.getColor(R.color.qwant_main),
+            trackingProtection = context.resources.getColor(R.color.qwant_main),
+            separator = context.resources.getColor(R.color.qwant_main)
+        )
         toolbar.display.setUrlBackground(context.resources.getDrawable(R.drawable.url_background, context.theme))
-    }
+1    }
 
     private val toolbarFeature: ToolbarFeature = ToolbarFeature(
         toolbar,

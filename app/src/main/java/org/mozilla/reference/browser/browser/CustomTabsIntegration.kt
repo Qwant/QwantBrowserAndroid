@@ -47,21 +47,21 @@ class CustomTabsIntegration(
     private val menuToolbar by lazy {
         val forward = BrowserMenuItemToolbar.Button(
             mozilla.components.ui.icons.R.drawable.mozac_ic_forward,
-            iconTintColorResource = R.color.icons,
+            iconTintColorResource = R.color.qwant_main,
             contentDescription = "Forward") {
             sessionUseCases.goForward.invoke(session)
         }
 
         val refresh = BrowserMenuItemToolbar.Button(
             mozilla.components.ui.icons.R.drawable.mozac_ic_refresh,
-            iconTintColorResource = R.color.icons,
+            iconTintColorResource = R.color.qwant_main,
             contentDescription = "Refresh") {
             sessionUseCases.reload.invoke(session)
         }
 
         val stop = BrowserMenuItemToolbar.Button(
             mozilla.components.ui.icons.R.drawable.mozac_ic_stop,
-            iconTintColorResource = R.color.icons,
+            iconTintColorResource = R.color.qwant_main,
             contentDescription = "Stop") {
             sessionUseCases.stopLoading.invoke(session)
         }

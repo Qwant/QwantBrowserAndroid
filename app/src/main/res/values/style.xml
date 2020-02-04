@@ -3,7 +3,7 @@
    - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 
 <resources>
-    <style name="AppThemeNotActionBar" parent="Theme.AppCompat.NoActionBar">
+    <style name="AppThemeNotActionBar" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
 
         <item name="colorPrimary">@color/dark</item>
@@ -23,5 +23,29 @@
 
         <item name="android:navigationBarColor">@color/evenDarker</item>
         <item name="android:windowBackground">@color/dark</item>
+    </style>
+
+    <style name="ThemeQwantNoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
+
+        <item name="colorPrimary">@color/qwant_background</item>
+        <item name="colorPrimaryDark">@color/qwant_background_dark</item>
+        <item name="colorAccent">@color/qwant_selected</item>
+
+        <item name="android:navigationBarColor">@color/qwant_background_dark</item>
+        <item name="android:windowBackground">@color/qwant_background</item>
+        <item name="android:textColor">@color/qwant_main</item>
+    </style>
+
+    <style name="ThemeQwant" parent="Theme.AppCompat.Light">
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
+
+        <item name="colorPrimary">@color/qwant_background</item>
+        <item name="colorPrimaryDark">@color/qwant_background_dark</item>
+        <item name="colorAccent">@color/qwant_selected</item>
+
+        <item name="android:navigationBarColor">@color/qwant_background_dark</item>
+        <item name="android:windowBackground">@color/qwant_background</item>
+        <item name="android:textColor">@color/qwant_main</item>
     </style>
 </resources>
