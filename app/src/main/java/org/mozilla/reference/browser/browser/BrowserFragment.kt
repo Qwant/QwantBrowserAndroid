@@ -35,14 +35,7 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
         toolbarSessionObserver = ToolbarSessionObserver(requireContext().components.core.sessionManager, toolbar)
         requireContext().components.core.sessionManager.register(this.toolbarSessionObserver!!)
 
-        val seInput = requireContext().assets.open("opensearch_qwant.xml")
-        val seParser = SearchEngineParser()
-        val searchEngine = seParser.load("qwant", seInput)
-
-        if (requireContext().components.core.sessionManager.sessions.isEmpty()) {
-            requireContext().components.useCases.tabsUseCases.addTab.invoke(getString(R.string.homepage), selectTab = true) // TODO move to variable
-        }
-
+        val searchEngine = SearchEngineParser().load("qwant", requireContext().assets.open("opensearch_qwant.xml"))
         AwesomeBarFeature(awesomeBar, toolbar, engineView)
             .addSearchProvider(
                 searchEngine,
@@ -72,6 +65,10 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
             owner = this,
             view = view
         )
+
+        if (requireContext().components.core.sessionManager.sessions.isEmpty()) {
+            requireContext().components.useCases.tabsUseCases.addTab.invoke(getString(R.string.homepage), selectTab = true)
+        }
     }
 
     companion object {

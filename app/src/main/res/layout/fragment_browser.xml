@@ -30,10 +30,10 @@
         android:layout_marginTop="56dp"
         android:padding="4dp"
         android:visibility="gone"
-        mozac:awesomeBarTitleTextColor="#ffffff"
-        mozac:awesomeBarDescriptionTextColor="#dddddd"
-        mozac:awesomeBarChipTextColor="#ffffff"
-        mozac:awesomeBarChipBackgroundColor="#444444" />
+        mozac:awesomeBarTitleTextColor="@color/qwant_main"
+        mozac:awesomeBarDescriptionTextColor="@color/qwant_light"
+        mozac:awesomeBarChipTextColor="@color/qwant_white"
+        mozac:awesomeBarChipBackgroundColor="@color/qwant_selected" />
 
     <mozilla.components.feature.findinpage.view.FindInPageBar
         android:id="@+id/findInPageBar"

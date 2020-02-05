@@ -6,6 +6,7 @@ package org.mozilla.reference.browser.browser
 
 import android.content.Context
 import android.content.Intent
+import androidx.core.content.ContextCompat
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import mozilla.components.browser.domains.autocomplete.ShippedDomainsProvider
@@ -131,16 +132,25 @@ class ToolbarIntegration(
             addDomainProvider(shippedDomainsProvider)
         }
 
+        toolbar.edit.colors = toolbar.edit.colors.copy(
+            clear = ContextCompat.getColor(context, R.color.qwant_main),
+            hint = ContextCompat.getColor(context, R.color.qwant_light),
+            text = ContextCompat.getColor(context, R.color.qwant_main),
+            suggestionBackground = ContextCompat.getColor(context, R.color.qwant_selected),
+            suggestionForeground = ContextCompat.getColor(context, R.color.photonWhite)
+        )
+        toolbar.display.setUrlBackground(context.resources.getDrawable(R.drawable.url_background, context.theme))
+
         toolbar.display.colors = toolbar.display.colors.copy(
-            securityIconSecure = context.resources.getColor(R.color.photonGreen70),
-            securityIconInsecure = context.resources.getColor(R.color.photonRed70),
-            emptyIcon = context.resources.getColor(R.color.qwant_main),
-            menu = context.resources.getColor(R.color.qwant_main),
-            hint = context.resources.getColor(R.color.qwant_selected),
-            title = context.resources.getColor(R.color.qwant_main),
-            text = context.resources.getColor(R.color.qwant_main),
-            trackingProtection = context.resources.getColor(R.color.qwant_main),
-            separator = context.resources.getColor(R.color.qwant_main)
+            securityIconSecure = ContextCompat.getColor(context, R.color.photonGreen70),
+            securityIconInsecure = ContextCompat.getColor(context, R.color.photonRed70),
+            emptyIcon = ContextCompat.getColor(context, R.color.qwant_main),
+            menu = ContextCompat.getColor(context, R.color.qwant_main),
+            hint = ContextCompat.getColor(context, R.color.qwant_selected),
+            title = ContextCompat.getColor(context, R.color.qwant_main),
+            text = ContextCompat.getColor(context, R.color.qwant_main),
+            trackingProtection = ContextCompat.getColor(context, R.color.qwant_main),
+            separator = ContextCompat.getColor(context, R.color.qwant_main)
         )
         toolbar.display.setUrlBackground(context.resources.getDrawable(R.drawable.url_background, context.theme))
 1    }

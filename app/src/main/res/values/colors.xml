@@ -3,33 +3,42 @@
    - License, v. 2.0. If a copy of the MPL was not distributed with this
    - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <color name="placeholder_grey">#777777</color>
 
+    <!-- Original colors -->
+    <color name="placeholder_grey">#777777</color>
     <color name="dark">#ff212121</color>
     <color name="evenDarker">#ff1a1a1a</color>
     <color name="accent">#ff00BCD4</color>
 
+
+    <!-- QWANT COLORS -->
+    <color name="qwant_white">@color/photonWhite</color>
+
     <color name="qwant_background">#FFFFFF</color>
     <color name="qwant_background_dark">#EEEEEE</color>
     <color name="qwant_main">#5c6f84</color>
+    <color name="qwant_light">#AAAAAA</color>
     <color name="qwant_selected">#4ba2ea</color>
 
     <color name="qwant_background_privacy">#2c3036</color>
     <color name="qwant_background_dark_privacy">#ff1a1a1a</color>
     <color name="qwant_main_privacy">#c8cbd3</color>
+    <color name="qwant_light_privacy">#AAAAAA</color>
     <color name="qwant_selected_privacy">#af27cc</color>
 
-    <color name="toolbarBackgroundColor">@color/qwant_background</color>
-    <color name="toolbarUrlBoxColor">@color/qwant_background_dark</color>
+
+    <!-- TOOLBAR COLORS -->
+    <color name="toolbarBackgroundColor">@color/qwant_background_dark</color>
+    <color name="toolbarUrlBoxColor">@color/qwant_background</color>
     <color name="toolbarSuggestionForeground">@color/qwant_main</color>
     <color name="toolbarSuggestionBackground">@color/qwant_selected</color>
+    <color name="autocompleteBackgroundColor">@color/qwant_selected</color>
 
+    <!-- QWANTBAR COLORS -->
     <color name="menu_items">@color/qwant_main</color>
     <color name="menu_items_selected">@color/qwant_selected</color>
     <color name="menu_items_privacy">@color/qwant_main_privacy</color>
     <color name="menu_items_privacy_selected">@color/qwant_selected_privacy</color>
     <color name="qwantbar_background_privacy">@color/qwant_background_privacy</color>
-
-    <!-- Overriding color of tab counter icon in toolbar -->
-    <color name="mozac_ui_tabcounter_default_tint" tools:ignore="UnusedResources">@color/menu_items</color>
+    <color name="mozac_ui_tabcounter_default_tint" tools:ignore="UnusedResources">@color/menu_items</color> <!-- Overriding color of tab counter icon in toolbar -->
 </resources>
