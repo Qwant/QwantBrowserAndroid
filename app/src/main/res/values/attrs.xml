@@ -11,4 +11,18 @@
     <declare-styleable name="ToggleImageButton">
         <attr name="android:checked" />
     </declare-styleable>
+
+    <attr name="qwant_color_background" format="reference|color" />
+    <attr name="qwant_color_background_dark" format="reference|color" />
+    <attr name="qwant_color_main" format="reference|color" />
+    <attr name="qwant_color_light" format="reference|color" />
+    <attr name="qwant_color_selected" format="reference|color" />
+    <attr name="qwant_color_selected_text" format="reference|color" />
+    <attr name="qwant_color_green" format="reference|color" />
+    <attr name="qwant_color_red" format="reference|color" />
+
+    <attr name="toolbarSuggestionForeground" format="reference|color" />
+    <attr name="toolbarSuggestionBackground" format="reference|color" />
+    <attr name="toolbarBackgroundColor" format="reference|color" />
+    <attr name="toolbarUrlBoxColor" format="reference|color" />
 </resources>

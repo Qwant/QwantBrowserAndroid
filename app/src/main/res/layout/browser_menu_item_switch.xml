@@ -9,4 +9,4 @@
     android:orientation="vertical"
     android:paddingStart="16dp"
     android:paddingEnd="16dp"
-    android:textColor="@color/qwant_main" />
+    android:textColor="?attr/qwant_color_main" />

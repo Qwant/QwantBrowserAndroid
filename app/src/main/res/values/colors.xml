@@ -12,27 +12,19 @@
 
 
     <!-- QWANT COLORS -->
-    <color name="qwant_white">@color/photonWhite</color>
-
     <color name="qwant_background">#FFFFFF</color>
     <color name="qwant_background_dark">#EEEEEE</color>
     <color name="qwant_main">#5c6f84</color>
     <color name="qwant_light">#AAAAAA</color>
     <color name="qwant_selected">#4ba2ea</color>
+    <color name="qwant_selected_text">@color/photonWhite</color>
 
     <color name="qwant_background_privacy">#2c3036</color>
     <color name="qwant_background_dark_privacy">#ff1a1a1a</color>
     <color name="qwant_main_privacy">#c8cbd3</color>
     <color name="qwant_light_privacy">#AAAAAA</color>
     <color name="qwant_selected_privacy">#af27cc</color>
-
-
-    <!-- TOOLBAR COLORS -->
-    <color name="toolbarBackgroundColor">@color/qwant_background_dark</color>
-    <color name="toolbarUrlBoxColor">@color/qwant_background</color>
-    <color name="toolbarSuggestionForeground">@color/qwant_main</color>
-    <color name="toolbarSuggestionBackground">@color/qwant_selected</color>
-    <color name="autocompleteBackgroundColor">@color/qwant_selected</color>
+    <color name="qwant_selected_text_privacy">@color/photonWhite</color>
 
     <!-- QWANTBAR COLORS -->
     <color name="menu_items">@color/qwant_main</color>

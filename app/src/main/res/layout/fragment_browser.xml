@@ -32,7 +32,7 @@
         android:visibility="gone"
         mozac:awesomeBarTitleTextColor="@color/qwant_main"
         mozac:awesomeBarDescriptionTextColor="@color/qwant_light"
-        mozac:awesomeBarChipTextColor="@color/qwant_white"
+        mozac:awesomeBarChipTextColor="@color/qwant_selected_text"
         mozac:awesomeBarChipBackgroundColor="@color/qwant_selected" />
 
     <mozilla.components.feature.findinpage.view.FindInPageBar
@@ -54,9 +54,9 @@
         android:layout_height="0dp"
         android:layout_gravity="top"
         android:paddingEnd="8dp"
-        android:background="@color/toolbarBackgroundColor"
-        mozac:browserToolbarSuggestionForegroundColor="@color/toolbarSuggestionForeground"
-        mozac:browserToolbarSuggestionBackgroundColor="@color/toolbarSuggestionBackground" />
+        android:background="?attr/toolbarBackgroundColor"
+        mozac:browserToolbarSuggestionForegroundColor="?attr/toolbarSuggestionForeground"
+        mozac:browserToolbarSuggestionBackgroundColor="?attr/toolbarSuggestionBackground" />
 
 
     <ImageView

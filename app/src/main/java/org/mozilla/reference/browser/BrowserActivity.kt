@@ -11,6 +11,7 @@ import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.preference.PreferenceManager
 import kotlinx.android.synthetic.main.activity_main.*
 import mozilla.components.browser.session.Session
 import mozilla.components.browser.tabstray.BrowserTabsTray
@@ -28,6 +29,7 @@ import org.mozilla.reference.browser.storage.BookmarksStorage
 import org.mozilla.reference.browser.tabs.TabsTouchHelper
 import org.mozilla.reference.browser.tabs.TabsTrayFragment
 
+
 /**
  * Activity that holds the [BrowserFragment].
  */
@@ -44,7 +46,11 @@ open class BrowserActivity : AppCompatActivity() {
         BrowserFragment.create(sessionId)
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val themeId = PreferenceManager.getDefaultSharedPreferences(this).getInt("theme", R.style.ThemeQwantNoActionBar)
+        setTheme(themeId)
+
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_main)
 
         if (savedInstanceState == null) {

@@ -2,6 +2,7 @@ package org.mozilla.reference.browser.layout
 
 import android.content.Context
 import android.content.Intent
+import android.content.res.Resources
 import android.util.AttributeSet
 import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
@@ -9,6 +10,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import kotlinx.android.synthetic.main.component_qwantbar.view.*
 import kotlinx.coroutines.MainScope
@@ -22,6 +24,8 @@ import mozilla.components.browser.session.Session
 import mozilla.components.browser.session.SessionManager
 import mozilla.components.feature.pwa.WebAppUseCases
 import mozilla.components.feature.session.SessionUseCases
+import mozilla.components.support.ktx.android.content.getColorFromAttr
+import mozilla.components.support.ktx.android.content.res.resolveAttribute
 import mozilla.components.support.utils.DrawableUtils
 import mozilla.components.ui.tabcounter.TabCounter
 import org.mozilla.reference.browser.R
@@ -64,7 +68,7 @@ class QwantBar @JvmOverloads constructor(
     private val menuToolbar by lazy {
         val forward = BrowserMenuItemToolbar.Button(
             mozilla.components.ui.icons.R.drawable.mozac_ic_forward,
-            iconTintColorResource = R.color.qwant_main,
+            iconTintColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
             contentDescription = context.getString(R.string.context_menu_forward),
             isEnabled = { sessionManager.selectedSession?.canGoForward == true }) {
             sessionUseCases.goForward.invoke()
@@ -72,14 +76,14 @@ class QwantBar @JvmOverloads constructor(
 
         val refresh = BrowserMenuItemToolbar.Button(
             mozilla.components.ui.icons.R.drawable.mozac_ic_refresh,
-            iconTintColorResource = R.color.qwant_main,
+            iconTintColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
             contentDescription = context.getString(R.string.context_menu_refresh)) {
             sessionUseCases.reload.invoke()
         }
 
         val stop = BrowserMenuItemToolbar.Button(
             mozilla.components.ui.icons.R.drawable.mozac_ic_stop,
-            iconTintColorResource = R.color.qwant_main,
+            iconTintColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
             contentDescription = context.getString(R.string.context_menu_stop)) {
             sessionUseCases.stopLoading.invoke()
         }
@@ -90,7 +94,8 @@ class QwantBar @JvmOverloads constructor(
     private val menuItems: List<BrowserMenuItem> by lazy {
         listOf(
             menuToolbar,
-            SimpleBrowserMenuItem(context.getString(R.string.context_menu_share), textColorResource = R.color.qwant_main) {
+
+            SimpleBrowserMenuItem(context.getString(R.string.context_menu_share), textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main)) {
                 val url = sessionManager.selectedSession?.url ?: ""
                 context.share(url)
             }.apply {
@@ -105,29 +110,29 @@ class QwantBar @JvmOverloads constructor(
                 visible = { sessionManager.selectedSession != null }
             },
 
-            SimpleBrowserMenuItem(context.getString(R.string.context_menu_add_homescreen), textColorResource = R.color.qwant_main) {
+            SimpleBrowserMenuItem(context.getString(R.string.context_menu_add_homescreen), textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main)) {
                 MainScope().launch { webAppUseCases.addToHomescreen() }
             }.apply {
                 visible = { webAppUseCases.isPinningSupported() }
             },
 
-            SimpleBrowserMenuItem(context.getString(R.string.context_menu_find), textColorResource = R.color.qwant_main) {
+            SimpleBrowserMenuItem(context.getString(R.string.context_menu_find), textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main)) {
                 FindInPageIntegration.launch?.invoke()
             }.apply {
                 visible = { sessionManager.selectedSession != null }
             },
 
-            SimpleBrowserMenuItem(context.getString(R.string.context_menu_addons), textColorResource = R.color.qwant_main) {
+            SimpleBrowserMenuItem(context.getString(R.string.context_menu_addons), textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main)) {
                 val intent = Intent(context, AddonsActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 context.startActivity(intent)
             },
 
-            SimpleBrowserMenuItem(context.getString(R.string.bookmarks), textColorResource = R.color.qwant_main) {
+            SimpleBrowserMenuItem(context.getString(R.string.bookmarks), textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main)) {
                 this.emitOnBookmarksClicked()
             },
 
-            SimpleBrowserMenuItem(context.getString(R.string.settings), textColorResource = R.color.qwant_main) {
+            SimpleBrowserMenuItem(context.getString(R.string.settings), textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main)) {
                 val intent = Intent(context, SettingsActivity::class.java)
                 context.startActivity(intent)
             }

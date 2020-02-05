@@ -27,6 +27,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/tabsTray"
         android:elevation="4dp"
-        android:background="@color/toolbarBackgroundColor" />
+        android:background="?attr/toolbarBackgroundColor" />
     
 </androidx.constraintlayout.widget.ConstraintLayout>
