@@ -13,7 +13,7 @@
 
     <!-- QWANT COLORS -->
     <color name="qwant_background">#FFFFFF</color>
-    <color name="qwant_background_dark">#EEEEEE</color>
+    <color name="qwant_background_dark">#f4f6fa</color>
     <color name="qwant_main">#5c6f84</color>
     <color name="qwant_light">#AAAAAA</color>
     <color name="qwant_selected">#4ba2ea</color>

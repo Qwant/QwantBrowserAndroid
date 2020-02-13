@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.View
 import kotlinx.android.synthetic.main.fragment_browser.*
 import kotlinx.android.synthetic.main.fragment_browser.view.*
+import mozilla.components.browser.errorpages.ErrorPages
 import mozilla.components.browser.search.SearchEngineParser
 import mozilla.components.feature.awesomebar.AwesomeBarFeature
 import mozilla.components.feature.session.ThumbnailsFeature
@@ -36,14 +37,17 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
         requireContext().components.core.sessionManager.register(this.toolbarSessionObserver!!)
 
         val searchEngine = SearchEngineParser().load("qwant", requireContext().assets.open("opensearch_qwant.xml"))
+
         AwesomeBarFeature(awesomeBar, toolbar, engineView)
             .addSearchProvider(
                 searchEngine,
                 requireComponents.useCases.searchUseCases.defaultSearch,
                 requireComponents.core.client)
             .addSessionProvider(
+                resources,
                 requireComponents.core.sessionManager,
-                requireComponents.useCases.tabsUseCases.selectTab)
+                requireComponents.useCases.tabsUseCases.selectTab
+            )
             .addHistoryProvider(
                 requireComponents.core.historyStorage,
                 requireComponents.useCases.sessionUseCases.loadUrl)

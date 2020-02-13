@@ -10,21 +10,13 @@ import android.content.Context
 import android.content.res.Resources
 import android.graphics.PorterDuff.Mode.SRC_IN
 import android.graphics.drawable.Drawable
-import android.os.Bundle
-import android.os.Parcel
-import android.os.Parcelable
 import android.util.AttributeSet
-import android.util.Log
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
-import androidx.core.app.ActivityCompat.recreate
 import androidx.core.content.ContextCompat
-import androidx.preference.PreferenceManager
 import mozilla.components.feature.tabs.tabstray.TabsFeature
 import mozilla.components.support.ktx.android.content.res.resolveAttribute
-import mozilla.components.ui.colors.R.color.photonPurple50
 import org.mozilla.reference.browser.R
-import org.mozilla.reference.browser.ext.application
 import org.mozilla.reference.browser.ext.components
 import org.mozilla.reference.browser.view.ToggleImageButton
 
@@ -37,7 +29,7 @@ class TabsPanel @JvmOverloads constructor(
     private var tabsFeature: TabsFeature? = null
     private var isPrivateTray = false
     private var closeTabsTray: (() -> Unit)? = null
-    private var currentTheme = R.style.ThemeQwantNoActionBar
+    private var callbackTogglePrivacy: ((isPrivate: Boolean) -> Unit)? = null
 
     init {
         /* navigationContentDescription = "back"
@@ -45,19 +37,18 @@ class TabsPanel @JvmOverloads constructor(
         setNavigationOnClickListener {
             closeTabsTray?.invoke()
         } */
-        isSaveEnabled = true
 
         inflateMenu(R.menu.tabstray_menu)
         setOnMenuItemClickListener {
             val tabsUseCases = components.useCases.tabsUseCases
             when (it.itemId) {
-                R.id.newTab -> {
+                /* R.id.newTab -> {
                     when (isPrivateTray) {
                         true -> tabsUseCases.addPrivateTab.invoke(context.getString(R.string.homepage), selectTab = true) // TODO move to variable
                         false -> tabsUseCases.addTab.invoke(context.getString(R.string.homepage), selectTab = true)
                     }
                     closeTabsTray?.invoke()
-                }
+                } */
                 R.id.closeTab -> {
                     tabsUseCases.removeAllTabsOfType.invoke(private = isPrivateTray)
                 }
@@ -112,69 +103,20 @@ class TabsPanel @JvmOverloads constructor(
             context.getString(R.string.menu_action_close_tabs)
         }
 
-        val theme = if (isPrivate) R.style.ThemeQwantNoActionBarPrivacy else R.style.ThemeQwantNoActionBar
-        if (theme != currentTheme) {
-            with (PreferenceManager.getDefaultSharedPreferences(context).edit()) {
-                putInt("theme", theme)
-                commit()
-            }
-            context.application.currentActivity?.recreate()
-        }
+        this.callbackTogglePrivacy?.invoke(isPrivate)
     }
 
-    /* private class State(
-            var isPrivate: Boolean
-    ) : Parcelable {
-
-        constructor(): this(false)
-        constructor(parcel: Parcel) : this() {
-            isPrivate = (parcel.readInt() == 1)
-        }
-
-        override fun writeToParcel(parcel: Parcel, flags: Int) {
-            parcel.writeInt(if (this.isPrivate) 1 else 0)
-        }
-
-        override fun describeContents(): Int {
-            return 0
-        }
-
-        companion object CREATOR : Parcelable.Creator<State> {
-            override fun createFromParcel(parcel: Parcel): State {
-                return State(parcel)
-            }
-
-            override fun newArray(size: Int): Array<State?> {
-                return arrayOfNulls(size)
-            }
-        }
-
+    fun onTogglePrivacy(callback: (isPrivate: Boolean) ->  Unit) {
+        this.callbackTogglePrivacy = callback
     }
 
-    override fun onRestoreInstanceState(state: Parcelable?) {
-        Log.d("QWANT_BROWSER", "tabs restore")
-        super.onRestoreInstanceState(state)
-        if (state is State) {
-            isPrivateTray = state.isPrivate
-        }
-    }
-
-    override fun onSaveInstanceState(): Parcelable? {
-        super.onSaveInstanceState()
-        return State(this.isPrivateTray)
-    } */
-
-    fun initialize(tabsFeature: TabsFeature?, closeTabsTray: () -> Unit) {
-        Log.d("QWANT_BROWSER", "tabs init")
+    fun initialize(isPrivate: Boolean, tabsFeature: TabsFeature?, closeTabsTray: () -> Unit) {
         this.tabsFeature = tabsFeature
         this.closeTabsTray = closeTabsTray
+        this.isPrivateTray = isPrivate
 
-        // val currentSession = context.components.core.sessionManager.selectedSession
-        // button.isChecked = (currentSession == null || !currentSession.private)
-        // privateButton.isChecked = (currentSession != null && currentSession.private)
-
-        button.isChecked = !isPrivateTray
-        privateButton.isChecked = isPrivateTray
+        button.isChecked = !isPrivate
+        privateButton.isChecked = isPrivate
     }
 
     private fun Resources.getThemedDrawable(@DrawableRes resId: Int) = getDrawable(resId, context.theme)

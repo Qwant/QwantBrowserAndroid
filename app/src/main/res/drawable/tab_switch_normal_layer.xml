@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/tab_switch_foreground_normal" android:width="70dp" android:height="40dp"/>
+    <item android:drawable="@drawable/mozac_ui_tabcounter_box" android:gravity="center|center_vertical" android:width="16dp" android:height="16dp"/>
+</layer-list>

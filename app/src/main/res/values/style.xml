@@ -14,7 +14,7 @@
         <item name="android:windowBackground">@color/qwant_background</item>
         <item name="android:textColor">@color/qwant_main</item>
 
-        <item name="qwant_color_main">@color/qwant_main</item>
+        <item name="tabsTrayItemElevation">4dp</item>
     </style>
 
     <style name="ThemeQwantNoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
@@ -43,6 +43,11 @@
         <item name="toolbarBackgroundColor">@color/qwant_background_dark</item>
         <item name="toolbarUrlBoxColor">@color/qwant_background</item>
         <item name="autocompleteBackgroundColor">@color/qwant_selected</item>
+
+        <item name="tabsTrayItemBackgroundColor">@color/qwant_background</item>
+        <item name="tabsTrayItemTextColor">@color/qwant_main</item>
+        <item name="tabsTraySelectedItemBackgroundColor">@color/qwant_selected</item>
+        <item name="tabsTraySelectedItemTextColor">@color/qwant_selected_text</item>
     </style>
 
     <style name="ThemeQwantNoActionBarPrivacy" parent="ThemeQwantNoActionBar">
@@ -54,9 +59,9 @@
         <item name="android:windowBackground">@color/qwant_background_privacy</item>
         <item name="android:textColor">@color/qwant_main_privacy</item>
 
-        <item name="qwant_color_main">@color/qwant_main_privacy</item>
-        <item name="qwant_color_background">@color/qwant_background_privacy</item>
-        <item name="qwant_color_background_dark">@color/qwant_background_dark_privacy</item>
+        <item name="qwant_color_main">@color/qwant_main</item>
+        <item name="qwant_color_background">@color/qwant_background</item>
+        <item name="qwant_color_background_dark">@color/qwant_background_dark</item>
         <item name="qwant_color_light">@color/qwant_light_privacy</item>
         <item name="qwant_color_selected">@color/qwant_selected_privacy</item>
         <item name="qwant_color_selected_text">@color/qwant_selected_text_privacy</item>
@@ -65,5 +70,10 @@
         <item name="toolbarSuggestionBackground">@color/qwant_selected_privacy</item>
         <item name="toolbarBackgroundColor">@color/qwant_background_dark_privacy</item>
         <item name="toolbarUrlBoxColor">@color/qwant_background_privacy</item>
+
+        <item name="tabsTrayItemBackgroundColor">@color/qwant_background_privacy</item>
+        <item name="tabsTrayItemTextColor">@color/qwant_main_privacy</item>
+        <item name="tabsTraySelectedItemBackgroundColor">@color/qwant_selected_privacy</item>
+        <item name="tabsTraySelectedItemTextColor">@color/qwant_selected_text_privacy</item>
     </style>
 </resources>

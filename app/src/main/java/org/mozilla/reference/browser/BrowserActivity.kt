@@ -11,10 +11,9 @@ import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.preference.PreferenceManager
 import kotlinx.android.synthetic.main.activity_main.*
 import mozilla.components.browser.session.Session
-import mozilla.components.browser.tabstray.BrowserTabsTray
+import org.mozilla.reference.browser.tabs.tray.BrowserTabsTray
 import mozilla.components.concept.engine.EngineView
 import mozilla.components.concept.tabstray.TabsTray
 import mozilla.components.feature.intent.ext.EXTRA_SESSION_ID
@@ -46,9 +45,6 @@ open class BrowserActivity : AppCompatActivity() {
         BrowserFragment.create(sessionId)
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        val themeId = PreferenceManager.getDefaultSharedPreferences(this).getInt("theme", R.style.ThemeQwantNoActionBar)
-        setTheme(themeId)
-
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_main)
@@ -139,7 +135,10 @@ open class BrowserActivity : AppCompatActivity() {
 
     private fun showTabs() {
         this.supportFragmentManager.beginTransaction().apply {
-            replace(R.id.container, TabsTrayFragment(::bookmarksOrTabsClosed))
+            var isPrivate = false
+            if (components.core.sessionManager.selectedSession != null)
+                isPrivate = components.core.sessionManager.selectedSession!!.private
+            replace(R.id.container, TabsTrayFragment(::bookmarksOrTabsClosed, isPrivate), "TABS_FRAGMENT")
             commit()
         }
         qwantbar.setBookmarkButton(QwantBar.BookmarkButtonType.OPEN)

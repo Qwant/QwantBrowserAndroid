@@ -42,7 +42,8 @@ open class BrowserApplication : Application(), Application.ActivityLifecycleCall
 
         components.core.engine.warmUp()
 
-        WebExtensionSupport.initialize(
+        // TODO re enable extension support
+        /* WebExtensionSupport.initialize(
             engine = components.core.engine,
             store = components.core.store,
             onNewTabOverride = { _, engineSession, url ->
@@ -57,7 +58,7 @@ open class BrowserApplication : Application(), Application.ActivityLifecycleCall
                 val selected = components.core.sessionManager.findSessionById(sessionId)
                 selected?.let { components.useCases.tabsUseCases.selectTab(it) }
             }
-        )
+        ) */
     }
 
     override fun onTrimMemory(level: Int) {
