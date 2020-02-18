@@ -20,9 +20,12 @@
     <attr name="qwant_color_selected_text" format="reference|color" />
     <attr name="qwant_color_green" format="reference|color" />
     <attr name="qwant_color_red" format="reference|color" />
+    <attr name="qwant_color_tabpanel_tabcounter" format="reference|color" />
+    <attr name="qwant_color_tabpanel_tabtext" format="reference|color" />
 
     <attr name="toolbarSuggestionForeground" format="reference|color" />
     <attr name="toolbarSuggestionBackground" format="reference|color" />
     <attr name="toolbarBackgroundColor" format="reference|color" />
     <attr name="toolbarUrlBoxColor" format="reference|color" />
+
 </resources>

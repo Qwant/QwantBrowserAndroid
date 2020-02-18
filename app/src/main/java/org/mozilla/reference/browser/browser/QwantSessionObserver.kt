@@ -1,5 +1,6 @@
 package org.mozilla.reference.browser.browser
 
+import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
 import android.view.View
@@ -11,7 +12,8 @@ import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.layout.QwantBar
 import org.mozilla.reference.browser.storage.BookmarksStorage
 
-class QwantBarSessionObserver(
+class QwantSessionObserver(
+        private val context: Context,
         private val sessionManager: SessionManager,
         private val qwantbar: QwantBar,
         private val bookmarksStorage: BookmarksStorage
@@ -105,6 +107,7 @@ class QwantBarSessionObserver(
     private fun checkSession(session: Session) {
         checkSession(session.url)
         qwantbar.setPrivacyMode(session.private)
+        context.setTheme(if (session.private) R.style.ThemeQwantNoActionBarPrivacy else R.style.ThemeQwantNoActionBar)
     }
 
     private fun checkSession() {

@@ -1,11 +1,15 @@
 package org.mozilla.reference.browser.tabs.tray
 
 import android.content.Context
+import android.content.res.Resources
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import mozilla.components.browser.session.Session
 import mozilla.components.concept.tabstray.TabsTray
+import mozilla.components.support.ktx.android.util.dpToPx
 import org.mozilla.reference.browser.R
 
 const val DEFAULT_ITEM_BACKGROUND_COLOR = 0xFFFFFFFF.toInt()
@@ -25,9 +29,12 @@ class BrowserTabsTray @JvmOverloads constructor(
         TabsTray by tabsAdapter {
 
         internal val styling: TabsTrayStyling
+        private var onSessionsChangedCallback: (() -> Unit)? = null
 
         init {
                 tabsAdapter.tabsTray = this
+
+                this.setPadding(0, 10.dpToPx(Resources.getSystem().displayMetrics), 0, 0)
 
                 layoutManager = GridLayoutManager(context, 2)
                 adapter = tabsAdapter
@@ -59,6 +66,14 @@ class BrowserTabsTray @JvmOverloads constructor(
          */
         override fun asView(): View {
                 return this
+        }
+
+        override fun onSessionsChanged(position: Int, count: Int) {
+                this.onSessionsChangedCallback?.invoke()
+        }
+
+        fun onSessionsChangedRegister(callback: () -> Unit) {
+                this.onSessionsChangedCallback = callback
         }
 }
 

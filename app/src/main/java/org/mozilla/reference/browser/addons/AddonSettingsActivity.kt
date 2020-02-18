@@ -47,11 +47,13 @@ class AddonSettingsActivity : AppCompatActivity() {
      * A fragment to show the settings of an add-on with [EngineView].
      */
     class AddonSettingsFragment : Fragment() {
-        private lateinit var addon: Addon
+        private var addon: Addon? = null
         private lateinit var engineSession: EngineSession
 
         override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-            addon = requireNotNull(arguments?.getParcelable("add_on"))
+            // addon = requireNotNull(arguments?.getParcelable("add_on"))
+
+            addon = arguments?.getParcelable("add_on")
             engineSession = requireContext().components.core.engine.createSession()
 
             return inflater.inflate(R.layout.fragment_add_on_settings, container, false)
@@ -61,7 +63,8 @@ class AddonSettingsActivity : AppCompatActivity() {
             super.onViewCreated(view, savedInstanceState)
 
             addonSettingsEngineView.render(engineSession)
-            engineSession.loadUrl(addon.installedState!!.optionsPageUrl)
+            val s = addon?.installedState!!.optionsPageUrl
+            if (s != null) engineSession.loadUrl(s)
         }
 
         override fun onDestroyView() {

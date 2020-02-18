@@ -7,7 +7,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/qwant_color_background_dark">
+    >
 
     <mozilla.components.concept.tabstray.TabsTray
         android:id="@+id/tabsTray"
@@ -23,7 +23,7 @@
     <!-- <org.mozilla.reference.browser.tabs.TabsPanel
         android:id="@+id/tabsPanel"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="wrap_content""
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -67,15 +67,16 @@
         android:paddingBottom="8dp"
         android:background="?attr/qwant_color_background_dark">
 
-        <ImageView
+        <ImageButton
             android:id="@+id/tab_switch_button_background"
+            style="@style/Widget.AppCompat.ImageButton"
             android:layout_width="140dp"
             android:layout_height="40dp"
+            android:layout_centerHorizontal="true"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="4dp"
-            android:layout_centerHorizontal="true"
+            android:background="@android:color/transparent"
             app:srcCompat="@drawable/tab_switch_background" />
-
 
         <mozilla.components.ui.tabcounter.TabCounter
             android:id="@+id/tab_switch_normal_counter"
@@ -86,7 +87,7 @@
             android:elevation="6dp"
             android:layout_alignStart="@id/tab_switch_button_background"
             android:background="@drawable/tab_switch_foreground_normal"
-            app:drawableColor="@color/qwant_selected" />
+            app:drawableColor="?attr/qwant_color_tabpanel_tabcounter" />
 
         <ImageView
             android:id="@+id/tab_switch_private_browsing_icon"

@@ -27,12 +27,13 @@ class PermissionsDetailsActivity : AppCompatActivity(), View.OnClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_on_permissions)
-        val addon = requireNotNull(intent.getParcelableExtra<Addon>("add_on"))
-        title = addon.translatableName.translate()
 
-        bindPermissions(addon)
-
-        bindLearnMore()
+        val addon = intent.getParcelableExtra<Addon>("add_on")
+        if (addon != null) {
+            title = addon.translatableName.translate()
+            bindPermissions(addon)
+            bindLearnMore()
+        }
     }
 
     private fun bindPermissions(addon: Addon) {

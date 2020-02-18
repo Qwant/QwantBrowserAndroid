@@ -2,7 +2,6 @@ package org.mozilla.reference.browser.layout
 
 import android.content.Context
 import android.content.Intent
-import android.content.res.Resources
 import android.util.AttributeSet
 import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
@@ -10,7 +9,6 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import kotlinx.android.synthetic.main.component_qwantbar.view.*
 import kotlinx.coroutines.MainScope
@@ -24,14 +22,13 @@ import mozilla.components.browser.session.Session
 import mozilla.components.browser.session.SessionManager
 import mozilla.components.feature.pwa.WebAppUseCases
 import mozilla.components.feature.session.SessionUseCases
-import mozilla.components.support.ktx.android.content.getColorFromAttr
 import mozilla.components.support.ktx.android.content.res.resolveAttribute
 import mozilla.components.support.utils.DrawableUtils
 import mozilla.components.ui.tabcounter.TabCounter
 import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.addons.AddonsActivity
 import org.mozilla.reference.browser.browser.FindInPageIntegration
-import org.mozilla.reference.browser.browser.QwantBarSessionObserver
+import org.mozilla.reference.browser.browser.QwantSessionObserver
 import org.mozilla.reference.browser.ext.application
 import org.mozilla.reference.browser.ext.share
 import org.mozilla.reference.browser.settings.SettingsActivity
@@ -402,8 +399,8 @@ class QwantBar @JvmOverloads constructor(
         return currentBookmarkType
     }
 
-    fun updateHomeIcon(mode: QwantBarSessionObserver.QwantBarMode?) {
-        if (mode == QwantBarSessionObserver.QwantBarMode.NAVIGATION) {
+    fun updateHomeIcon(mode: QwantSessionObserver.QwantBarMode?) {
+        if (mode == QwantSessionObserver.QwantBarMode.NAVIGATION) {
             qwantbar_button_home.setImageResource(this.getIcon(QwantBarIcons.HOME, false))
         } else {
             val selected = (sessionManager.selectedSession != null && sessionManager.selectedSession!!.url.contains("https://www.qwant.com"))

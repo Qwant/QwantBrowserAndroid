@@ -70,7 +70,7 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
             view = view
         )
 
-        if (requireContext().components.core.sessionManager.sessions.isEmpty()) {
+        if (requireContext().components.core.sessionManager.sessions.none { !it.private }) {
             requireContext().components.useCases.tabsUseCases.addTab.invoke(getString(R.string.homepage), selectTab = true)
         }
     }

@@ -5,28 +5,57 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <style name="ThemeQwant" parent="Theme.AppCompat.Light">
         <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
+        <item name="actionOverflowButtonStyle">@style/QwantOverflowButtonStyle</item>
 
         <item name="colorPrimary">@color/qwant_background</item>
         <item name="colorPrimaryDark">@color/qwant_background_dark</item>
         <item name="colorAccent">@color/qwant_selected</item>
 
+        <item name="colorButtonNormal">@color/qwant_main</item>
+        <item name="colorControlNormal">@color/qwant_main</item>
+        <item name="android:colorButtonNormal">@color/qwant_main</item>
+        <item name="android:colorControlNormal">@color/qwant_main</item>
+        <item name="android:colorSecondary" tools:targetApi="n_mr1">@color/qwant_main</item>
+
+        <item name="actionMenuTextColor">@color/qwant_main</item>
         <item name="android:navigationBarColor">@color/qwant_background_dark</item>
         <item name="android:windowBackground">@color/qwant_background</item>
         <item name="android:textColor">@color/qwant_main</item>
+        <item name="android:textColorSecondary">@color/qwant_main</item>
+        <item name="android:textColorTertiary">@color/qwant_main</item>
+        <item name="android:actionMenuTextColor">@color/qwant_main</item>
+        <item name="android:statusBarColor">@color/qwant_background_dark</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
 
         <item name="tabsTrayItemElevation">4dp</item>
     </style>
 
     <style name="ThemeQwantNoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
+        <item name="actionOverflowButtonStyle">@style/QwantOverflowButtonStyle</item>
 
         <item name="colorPrimary">@color/qwant_background</item>
         <item name="colorPrimaryDark">@color/qwant_background_dark</item>
         <item name="colorAccent">@color/qwant_selected</item>
 
+        <item name="colorButtonNormal">@color/qwant_main</item>
+        <item name="colorControlNormal">@color/qwant_main</item>
+        <item name="android:colorButtonNormal">@color/qwant_main</item>
+        <item name="android:colorControlNormal">@color/qwant_main</item>
+        <item name="android:colorSecondary" tools:targetApi="n_mr1">@color/qwant_main</item>
+
+
         <item name="android:navigationBarColor">@color/qwant_background_dark</item>
         <item name="android:windowBackground">@color/qwant_background</item>
-        <item name="android:textColor">@color/qwant_main</item>
+        <!-- <item name="android:textColor">@color/qwant_main</item>
+    <item name="actionMenuTextColor">@color/qwant_main</item>
+   <item name="android:textColorSecondary">@color/qwant_main</item>
+   <item name="android:actionMenuTextColor">@color/qwant_main</item> -->
+
+        <item name="android:statusBarColor">@color/qwant_background_dark</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
 
         <item name="qwant_color_main">@color/qwant_main</item>
         <item name="qwant_color_background">@color/qwant_background</item>
@@ -34,6 +63,7 @@
         <item name="qwant_color_light">@color/qwant_light</item>
         <item name="qwant_color_selected">@color/qwant_selected</item>
         <item name="qwant_color_selected_text">@color/qwant_selected_text</item>
+        <item name="qwant_color_tabpanel_tabcounter">@color/qwant_selected</item>
 
         <item name="qwant_color_green">@color/photonGreen70</item>
         <item name="qwant_color_red">@color/photonRed70</item>
@@ -57,23 +87,24 @@
 
         <item name="android:navigationBarColor">@color/qwant_background_dark_privacy</item>
         <item name="android:windowBackground">@color/qwant_background_privacy</item>
-        <item name="android:textColor">@color/qwant_main_privacy</item>
+        <!-- <item name="android:textColor">@color/qwant_main_privacy</item>
+        <item name="android:textColorSecondary">@color/qwant_main_privacy</item>
+        <item name="android:actionMenuTextColor">@color/qwant_main_privacy</item> -->
 
-        <item name="qwant_color_main">@color/qwant_main</item>
-        <item name="qwant_color_background">@color/qwant_background</item>
-        <item name="qwant_color_background_dark">@color/qwant_background_dark</item>
         <item name="qwant_color_light">@color/qwant_light_privacy</item>
         <item name="qwant_color_selected">@color/qwant_selected_privacy</item>
         <item name="qwant_color_selected_text">@color/qwant_selected_text_privacy</item>
+        <item name="qwant_color_tabpanel_tabcounter">@color/qwant_selected_text</item>
 
         <item name="toolbarSuggestionForeground">@color/qwant_main_privacy</item>
         <item name="toolbarSuggestionBackground">@color/qwant_selected_privacy</item>
         <item name="toolbarBackgroundColor">@color/qwant_background_dark_privacy</item>
         <item name="toolbarUrlBoxColor">@color/qwant_background_privacy</item>
 
-        <item name="tabsTrayItemBackgroundColor">@color/qwant_background_privacy</item>
-        <item name="tabsTrayItemTextColor">@color/qwant_main_privacy</item>
         <item name="tabsTraySelectedItemBackgroundColor">@color/qwant_selected_privacy</item>
-        <item name="tabsTraySelectedItemTextColor">@color/qwant_selected_text_privacy</item>
+    </style>
+
+    <style name="QwantOverflowButtonStyle" parent="Widget.AppCompat.ActionButton.Overflow">
+        <item name="android:tint">@color/qwant_main</item>
     </style>
 </resources>

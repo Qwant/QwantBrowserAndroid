@@ -20,7 +20,7 @@ import mozilla.components.feature.intent.ext.EXTRA_SESSION_ID
 import mozilla.components.support.base.feature.UserInteractionHandler
 import mozilla.components.support.utils.SafeIntent
 import org.mozilla.reference.browser.browser.BrowserFragment
-import org.mozilla.reference.browser.browser.QwantBarSessionObserver
+import org.mozilla.reference.browser.browser.QwantSessionObserver
 import org.mozilla.reference.browser.ext.components
 import org.mozilla.reference.browser.layout.QwantBar
 import org.mozilla.reference.browser.storage.BookmarksFragment
@@ -34,7 +34,7 @@ import org.mozilla.reference.browser.tabs.TabsTrayFragment
  */
 open class BrowserActivity : AppCompatActivity() {
     private var bookmarksStorage: BookmarksStorage? = null
-    private var qwantbarSessionObserver: QwantBarSessionObserver? = null
+    private var qwantbarSessionObserver: QwantSessionObserver? = null
     private val sessionId: String?
         get() = SafeIntent(intent).getStringExtra(EXTRA_SESSION_ID)
 
@@ -49,15 +49,11 @@ open class BrowserActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_main)
 
-        if (savedInstanceState == null) {
-            supportFragmentManager.beginTransaction().apply {
-                replace(R.id.container, createBrowserFragment(sessionId))
-                commit()
-            }
-        }
-
         bookmarksStorage = BookmarksStorage(applicationContext)
         bookmarksStorage!!.restore()
+
+        qwantbarSessionObserver = QwantSessionObserver(this, components.core.sessionManager, qwantbar, bookmarksStorage!!)
+        components.core.sessionManager.register(this.qwantbarSessionObserver!!)
 
         qwantbar.setBookmarkStorage(bookmarksStorage!!)
         qwantbar.onTabsClicked(::showTabs)
@@ -66,9 +62,12 @@ open class BrowserActivity : AppCompatActivity() {
         qwantbar.onBackClicked(::onBackPressed)
         qwantbar.onMenuClicked(::showSettings)
 
-        qwantbarSessionObserver = QwantBarSessionObserver(components.core.sessionManager, qwantbar, bookmarksStorage!!)
-        components.core.sessionManager.register(this.qwantbarSessionObserver!!)
-
+        if (savedInstanceState == null) {
+            supportFragmentManager.beginTransaction().apply {
+                replace(R.id.container, createBrowserFragment(sessionId))
+                commit()
+            }
+        }
     }
 
     override fun onBackPressed() {
@@ -138,7 +137,7 @@ open class BrowserActivity : AppCompatActivity() {
             var isPrivate = false
             if (components.core.sessionManager.selectedSession != null)
                 isPrivate = components.core.sessionManager.selectedSession!!.private
-            replace(R.id.container, TabsTrayFragment(::bookmarksOrTabsClosed, isPrivate), "TABS_FRAGMENT")
+            replace(R.id.container, TabsTrayFragment(applicationContext, ::bookmarksOrTabsClosed, isPrivate, qwantbar), "TABS_FRAGMENT")
             commit()
         }
         qwantbar.setBookmarkButton(QwantBar.BookmarkButtonType.OPEN)
