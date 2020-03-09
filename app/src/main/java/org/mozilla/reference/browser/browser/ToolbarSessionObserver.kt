@@ -6,6 +6,7 @@ import android.view.View
 import mozilla.components.browser.session.Session
 import mozilla.components.browser.session.SessionManager
 import mozilla.components.support.ktx.android.util.dpToPx
+import org.mozilla.reference.browser.R
 
 class ToolbarSessionObserver(
         private val sessionManager: SessionManager,
@@ -20,7 +21,7 @@ class ToolbarSessionObserver(
 
     private fun checkSession(url: String) {
         // Use layout_height instead of visibility to trigger onDependentViewChanged in behaviors !
-        if (url.contains("https://www.qwant.com")) {
+        if (url.startsWith(toolbar.context.getString(R.string.homepage))) {
             val toolbarParams = toolbar.layoutParams
             toolbarParams.height = 0
             toolbar.layoutParams = toolbarParams

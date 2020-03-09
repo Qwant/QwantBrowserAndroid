@@ -225,7 +225,7 @@ open class BrowserActivity : AppCompatActivity() {
         if (session != null && session.url == getString(R.string.settings_page)) {
             qwantbar.setHighlight(QwantBar.QwantBarSelection.MORE)
             qwantbar.setLeftButton(QwantBar.LeftButtonType.BACK)
-        } else if (session == null || session.url.contains("https://www.qwant.com")) {
+        } else if (session == null || session.url.startsWith(baseContext.getString(R.string.homepage))) {
             qwantbar.setHighlight(QwantBar.QwantBarSelection.SEARCH)
             qwantbar.setLeftButton(QwantBar.LeftButtonType.HOME)
         } else {

@@ -39,7 +39,7 @@ class QwantBarSessionObserver(
     }
 
     private fun checkSession(url: String) {
-        if (url.contains("https://www.qwant.com")) {
+        if (url.startsWith(context.getString(R.string.homepage))) {
             setupHomeBar()
         } else {
             setupNavigationBar()

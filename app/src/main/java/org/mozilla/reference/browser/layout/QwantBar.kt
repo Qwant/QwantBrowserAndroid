@@ -177,7 +177,7 @@ class QwantBar @JvmOverloads constructor(
             this.setHighlight(QwantBarSelection.SEARCH)
         }
 
-        if (session == null || session.url.contains("https://www.qwant.com")) {
+        if (session == null || session.url.startsWith(context.getString(R.string.homepage))) {
             this.setBookmarkButton(BookmarkButtonType.OPEN)
         } else {
             this.setBookmarkButton(BookmarkButtonType.SESSION)

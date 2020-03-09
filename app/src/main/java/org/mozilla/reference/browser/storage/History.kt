@@ -24,7 +24,7 @@ class History : HistoryStorage {
             return
         }
 
-        if (uri.contains("https://www.qwant.com")) {
+        if (uri.startsWith("https://www.qwant.com")) {
             return
         }
 
