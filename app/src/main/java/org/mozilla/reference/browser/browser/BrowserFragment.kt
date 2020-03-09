@@ -31,7 +31,12 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        requireContext().components.core.engine.settings.userAgentString += " QwantMobile/4.0"
+        val engineSettings = requireContext().components.core.engine.settings
+        if (engineSettings.userAgentString != null)
+            if (!engineSettings.userAgentString!!.contains("QwantMobile"))
+                engineSettings.userAgentString += " QwantMobile/4.0"
+        engineSettings.remoteDebuggingEnabled = false
+        engineSettings.testingModeEnabled = false
 
         toolbarSessionObserver = ToolbarSessionObserver(requireContext().components.core.sessionManager, toolbar)
         requireContext().components.core.sessionManager.register(this.toolbarSessionObserver!!)
