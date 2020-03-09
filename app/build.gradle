@@ -237,6 +237,7 @@ dependencies {
     implementation Deps.androidx_constraintlayout
     implementation Deps.androidx_preference_ktx
     implementation Deps.androidx_work_runtime_ktx
+    implementation Deps.androidx_fragment
     implementation Deps.google_material
 
     androidTestImplementation Deps.uiautomator

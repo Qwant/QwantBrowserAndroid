@@ -3,19 +3,20 @@
    - License, v. 2.0. If a copy of the MPL was not distributed with this
    - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 <resources>
-    <string name="pref_key_sign_in" translatable="false">pref_key_sign_in</string>
-    <string name="pref_key_pair_sign_in" translatable="false">pref_key_pair_sign_in</string>
-    <string name="pref_key_sign_out" translatable="false">pref_key_sign_out</string>
-    <string name="pref_key_sync_now" translatable="false">pref_key_sync_now</string>
-    <string name="pref_key_firefox_account" translatable="false">pref_key_firefox_account</string>
-    <string name="pref_key_telemetry" translatable="false">pref_key_telemetry</string>
-    <string name="pref_key_make_default_browser" translatable="false">pref_key_make_default_browser</string>
-    <string name="pref_key_sync_history" translatable="false">pref_key_sync_history</string>
-    <string name="pref_key_remote_debugging" translatable="false">pref_key_remote_debugging</string>
-    <string name="pref_key_testing_mode" translatable="false">pref_key_testing_mode</string>
     <string name="pref_key_about_page" translatable="false">pref_key_about_page</string>
-    <string name="pref_key_privacy" translatable="false">pref_key_privacy</string>
     <string name="pref_key_tracking_protection_normal" translatable="false">pref_key_tracking_protection_normal</string>
     <string name="pref_key_tracking_protection_private" translatable="false">pref_key_tracking_protection_private</string>
-    <string name="pref_key_launch_external_app" translatable="false">pref_key_launch_external_app</string>
+    <string name="pref_key_remote_debugging" translatable="false">pref_key_remote_debugging</string>
+
+    <string name="pref_key_privacy" translatable="false">pref_key_privacy</string>
+    <string name="pref_key_general" translatable="false">pref_key_general</string>
+    <string name="pref_key_interface" translatable="false">pref_key_interface</string>
+    <string name="pref_key_about" translatable="false">pref_key_about</string>
+
+    <string name="pref_key_general_language" translatable="false">pref_key_general_language</string>
+    <string name="pref_key_general_adultcontent" translatable="false">pref_key_general_adultcontent</string>
+    <string name="pref_key_general_newsonhome" translatable="false">pref_key_general_newsonhome</string>
+    <string name="pref_key_general_cleardata" translatable="false">pref_key_general_cleardata</string>
+    <string name="pref_key_general_launchexternalapp" translatable="false">pref_key_general_launchexternalapp</string>
+    <string name="pref_key_general_makedefaultbrowser" translatable="false">pref_key_general_makedefaultbrowser</string>
 </resources>

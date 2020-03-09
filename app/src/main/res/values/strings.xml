@@ -86,7 +86,6 @@
 
     <string name="bookmarks">Bookmarks</string>
 
-    <string name="homepage">https://www.qwant.com/</string>
 
     <string name="menu_search">Search</string>
     <string name="menu_bookmarks">Bookmarks</string>
@@ -114,10 +113,20 @@
     <string name="preferences_license">License (MPL 2.0)</string>
     <string name="license_url">https://www.mozilla.org/en-US/MPL/2.0/</string>
 
+    <string name="settings_general">General</string>
+    <string name="settings_interface">Interface</string>
+    <string name="settings_about">About</string>
+
+    <string name="settings_general_language">Language</string>
+    <string name="settings_general_adultcontent">Adult content</string>
+    <string name="settings_general_newsonhome">News on homepage</string>
+    <string name="settings_general_cleardata">Clear browsing data</string>
+    <string name="settings_general_launchexternalapp">Open links in native app</string>
+    <string name="settings_general_makedefaultbrowser">Set as default browser</string>
+
+    <string name="homepage" translatable="false">https://www.qwant.com/</string>
     <string name="settings_page" translatable="false">https://www.qwant.com/settings</string>
 
     <!-- Text shown in the toolbar if it is empty -->
     <string name="toolbar_hint">@string/qwant_widget_text</string>
-    <string name="pref_key_privacy_policy" translatable="false">pref_key_privacy_policy</string>
-    <string name="pref_key_license" translatable="false">pref_key_license</string>
 </resources>

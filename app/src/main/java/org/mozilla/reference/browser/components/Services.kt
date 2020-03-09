@@ -23,7 +23,7 @@ class Services(
             context,
             interceptLinkClicks = true,
             launchInApp = {
-                prefs.getBoolean(context.getPreferenceKey(R.string.pref_key_launch_external_app), false)
+                prefs.getBoolean(context.getPreferenceKey(R.string.pref_key_general_launchexternalapp), false)
             }
         )
     }

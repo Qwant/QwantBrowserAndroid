@@ -30,7 +30,6 @@ import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.addons.AddonsActivity
 import org.mozilla.reference.browser.ext.components
 import org.mozilla.reference.browser.ext.share
-import org.mozilla.reference.browser.settings.SettingsActivity
 import org.mozilla.reference.browser.view.BrowserMenuSwitch
 
 class ToolbarIntegration(
@@ -110,8 +109,8 @@ class ToolbarIntegration(
             },
 
             SimpleBrowserMenuItem(context.getString(R.string.settings), textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main)) {
-                val intent = Intent(context, SettingsActivity::class.java)
-                context.startActivity(intent)
+                /* val intent = Intent(context, SettingsActivity::class.java)
+                context.startActivity(intent) */
             }
         )
     }

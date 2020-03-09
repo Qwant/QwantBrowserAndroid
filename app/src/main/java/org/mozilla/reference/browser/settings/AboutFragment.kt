@@ -22,11 +22,15 @@ import androidx.core.text.HtmlCompat.FROM_HTML_SEPARATOR_LINE_BREAK_LIST_ITEM
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.fragment_about.*
 import mozilla.components.Build
+import mozilla.components.support.base.feature.UserInteractionHandler
 import org.mozilla.geckoview.BuildConfig.MOZ_APP_VERSION
 import org.mozilla.reference.browser.R
 
-class AboutFragment : Fragment() {
+class AboutFragment(
+        val settingsContainer: SettingsContainerFragment
+) : Fragment(), UserInteractionHandler {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        settingsContainer.setTitle("About Qwant browser")
         return inflater.inflate(R.layout.fragment_about, container, false)
     }
 
@@ -70,5 +74,13 @@ class AboutFragment : Fragment() {
             Toast.makeText(requireContext(), getString(R.string.toast_copied), Toast.LENGTH_SHORT).show()
             true
         }
+    }
+
+    override fun onBackPressed(): Boolean {
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.settings_fragment_container, SettingsMainFragment(settingsContainer), "SETTINGS_MAIN_FRAGMENT")
+            .addToBackStack(null)
+            .commit()
+        return true
     }
 }

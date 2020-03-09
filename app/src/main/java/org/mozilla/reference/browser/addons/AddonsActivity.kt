@@ -18,7 +18,7 @@ class AddonsActivity : AppCompatActivity() {
 
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction().apply {
-                replace(R.id.container, AddonsFragment())
+                replace(R.id.container, AddonsFragment(), "ADDONS_FRAGMENT")
                 commit()
             }
         }

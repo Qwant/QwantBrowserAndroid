@@ -5,10 +5,36 @@
 
 <androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <androidx.preference.Preference
+    <org.mozilla.reference.browser.settings.QwantPreference
         android:key="@string/pref_key_privacy"
         android:title="@string/privacy"
-        android:summary="@string/preferences_privacy_summary"/>
+        android:icon="@drawable/ic_bookmark"
+        android:widgetLayout="@layout/preference_arrowed_widget" />
+
+    <org.mozilla.reference.browser.settings.QwantPreference
+        android:key="@string/pref_key_general"
+        android:title="@string/settings_general"
+        android:icon="@drawable/ic_bookmark"
+        android:widgetLayout="@layout/preference_arrowed_widget" />
+
+    <!-- <androidx.preference.Preference
+        android:key="@string/pref_key_interface"
+        android:title="@string/settings_interface"
+        android:icon="@drawable/ic_bookmark"
+        android:widgetLayout="@layout/preference_arrowed_widget" /> -->
+
+    <org.mozilla.reference.browser.settings.QwantPreference
+        android:key="@string/pref_key_about"
+        android:title="@string/settings_about"
+        android:icon="@drawable/ic_bookmark"
+        android:widgetLayout="@layout/preference_arrowed_widget" />
+
+    <!-- <androidx.preference.Preference
+        android:key="@string/pref_key_privacy"
+        android:title="@string/privacy"
+        android:summary="@string/preferences_privacy_summary"
+        android:icon="@drawable/ic_bookmark"
+        android:widgetLayout="@layout/preference_arrowed_widget" />
 
     <androidx.preference.SwitchPreferenceCompat
         android:key="@string/pref_key_launch_external_app"
@@ -31,6 +57,6 @@
         <androidx.preference.Preference
             android:key="@string/pref_key_license"
             android:title="@string/preferences_license" />
-    </PreferenceCategory>
+    </PreferenceCategory> -->
 
 </androidx.preference.PreferenceScreen>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+
+<androidx.preference.PreferenceScreen xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <org.mozilla.reference.browser.settings.QwantPreference
+        android:key="@string/pref_key_general_language"
+        android:title="@string/settings_general_language"
+        android:widgetLayout="@layout/preference_arrowed_widget"
+        app:iconSpaceReserved="false" />
+
+    <org.mozilla.reference.browser.settings.QwantPreference
+        android:key="@string/pref_key_general_adultcontent"
+        android:title="@string/settings_general_adultcontent"
+        android:widgetLayout="@layout/preference_arrowed_widget"
+        app:iconSpaceReserved="false" />
+
+    <org.mozilla.reference.browser.settings.QwantPreferenceSwitch
+        android:key="@string/pref_key_general_newsonhome"
+        android:defaultValue="true"
+        android:title="@string/settings_general_newsonhome"
+        app:iconSpaceReserved="false" />
+
+    <org.mozilla.reference.browser.settings.QwantPreference
+        android:key="@string/pref_key_general_cleardata"
+        android:title="@string/settings_general_cleardata"
+        android:widgetLayout="@layout/preference_arrowed_widget"
+        app:allowDividerBelow="true"
+        app:iconSpaceReserved="false" />
+
+    <org.mozilla.reference.browser.settings.QwantPreferenceSwitch
+        android:key="@string/pref_key_general_launchexternalapp"
+        android:defaultValue="true"
+        android:title="@string/settings_general_launchexternalapp"
+        app:allowDividerAbove="true"
+        app:iconSpaceReserved="false" />
+
+    <org.mozilla.reference.browser.settings.QwantPreference
+        android:key="@string/pref_key_general_makedefaultbrowser"
+        android:title="@string/settings_general_makedefaultbrowser"
+        android:widgetLayout="@layout/preference_arrowed_widget"
+        app:iconSpaceReserved="false" />
+
+</androidx.preference.PreferenceScreen>

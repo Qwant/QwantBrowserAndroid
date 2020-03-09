@@ -31,7 +31,6 @@ import org.mozilla.reference.browser.browser.FindInPageIntegration
 import org.mozilla.reference.browser.browser.QwantSessionObserver
 import org.mozilla.reference.browser.ext.application
 import org.mozilla.reference.browser.ext.share
-import org.mozilla.reference.browser.settings.SettingsActivity
 import org.mozilla.reference.browser.storage.BookmarksStorage
 import java.lang.ref.WeakReference
 
@@ -130,8 +129,8 @@ class QwantBar @JvmOverloads constructor(
             },
 
             SimpleBrowserMenuItem(context.getString(R.string.settings), textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main)) {
-                val intent = Intent(context, SettingsActivity::class.java)
-                context.startActivity(intent)
+                /* val intent = Intent(context, SettingsActivity::class.java)
+                context.startActivity(intent) */
             }
         )
     }

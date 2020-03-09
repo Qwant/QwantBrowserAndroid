@@ -7,7 +7,6 @@ package org.mozilla.reference.browser
 import android.content.Context
 import android.os.Bundle
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -23,6 +22,7 @@ import org.mozilla.reference.browser.browser.BrowserFragment
 import org.mozilla.reference.browser.browser.QwantSessionObserver
 import org.mozilla.reference.browser.ext.components
 import org.mozilla.reference.browser.layout.QwantBar
+import org.mozilla.reference.browser.settings.SettingsContainerFragment
 import org.mozilla.reference.browser.storage.BookmarksFragment
 import org.mozilla.reference.browser.storage.BookmarksStorage
 import org.mozilla.reference.browser.tabs.TabsTouchHelper
@@ -64,7 +64,7 @@ open class BrowserActivity : AppCompatActivity() {
 
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction().apply {
-                replace(R.id.container, createBrowserFragment(sessionId))
+                replace(R.id.container, createBrowserFragment(sessionId), "BROWSER_FRAGMENT")
                 commit()
             }
         }
@@ -147,7 +147,7 @@ open class BrowserActivity : AppCompatActivity() {
 
     private fun showBookmarks() {
         this.supportFragmentManager.beginTransaction().apply {
-            replace(R.id.container, BookmarksFragment(bookmarksStorage!!, ::bookmarksOrTabsClosed))
+            replace(R.id.container, BookmarksFragment(bookmarksStorage!!, ::bookmarksOrTabsClosed), "BOOKMARKS_FRAGMENT")
             commit()
         }
         qwantbar.setBookmarkButton(QwantBar.BookmarkButtonType.OPEN)
@@ -203,13 +203,21 @@ open class BrowserActivity : AppCompatActivity() {
             if (!alreadyThere)
                 components.useCases.sessionUseCases.loadUrl(getString(R.string.settings_page))
         } */ // TODO Put that back, but block user non settings
-        components.useCases.sessionUseCases.loadUrl(getString(R.string.settings_page))
+
+        /* components.useCases.sessionUseCases.loadUrl(getString(R.string.settings_page))
 
         this.showBrowserFragment()
 
         qwantbar.setHighlight(QwantBar.QwantBarSelection.MORE)
         qwantbar.setLeftButton(QwantBar.LeftButtonType.BACK)
-        qwantbar.setBookmarkButton(QwantBar.BookmarkButtonType.OPEN)
+        qwantbar.setBookmarkButton(QwantBar.BookmarkButtonType.OPEN) */
+
+        this.supportFragmentManager.beginTransaction().apply {
+            this.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
+            replace(R.id.container, SettingsContainerFragment(), "SETTINGS_FRAGMENT")
+            commit()
+        }
+        qwantbar.setHighlight(QwantBar.QwantBarSelection.MORE)
     }
 
     private fun bookmarksOrTabsClosed() {
@@ -229,13 +237,11 @@ open class BrowserActivity : AppCompatActivity() {
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        Log.d("QWANT_BROWSER", "on save instance")
         super.onSaveInstanceState(outState)
         this.bookmarksStorage?.persist()
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
-        Log.d("QWANT_BROWSER", "on restore instance")
         super.onRestoreInstanceState(savedInstanceState)
         this.bookmarksStorage?.restore()
     }

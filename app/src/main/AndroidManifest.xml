@@ -25,6 +25,7 @@
         android:theme="@style/ThemeQwantNoActionBar"
         android:name=".BrowserApplication"
         tools:ignore="UnusedAttribute">
+
         <activity android:name=".BrowserActivity"
             android:launchMode="singleTask"
             android:resizeableActivity="true"
@@ -33,7 +34,6 @@
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
@@ -66,12 +66,6 @@
             android:parentActivityName=".addons.AddonsActivity"
             android:exported="false"
             android:theme="@style/ThemeQwant" />
-
-        <activity
-            android:name=".settings.SettingsActivity"
-            android:label="@string/settings"
-            android:theme="@style/ThemeQwant"
-            android:parentActivityName=".BrowserActivity" />
 
         <activity
             android:name=".addons.PermissionsDetailsActivity"

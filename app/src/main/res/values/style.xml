@@ -49,9 +49,9 @@
         <item name="android:navigationBarColor">@color/qwant_background_dark</item>
         <item name="android:windowBackground">@color/qwant_background</item>
         <!-- <item name="android:textColor">@color/qwant_main</item>
-    <item name="actionMenuTextColor">@color/qwant_main</item>
-   <item name="android:textColorSecondary">@color/qwant_main</item>
-   <item name="android:actionMenuTextColor">@color/qwant_main</item> -->
+        <item name="actionMenuTextColor">@color/qwant_main</item>
+       <item name="android:textColorSecondary">@color/qwant_main</item>
+       <item name="android:actionMenuTextColor">@color/qwant_main</item> -->
 
         <item name="android:statusBarColor">@color/qwant_background_dark</item>
         <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
@@ -103,6 +103,8 @@
 
         <item name="tabsTraySelectedItemBackgroundColor">@color/qwant_selected_privacy</item>
     </style>
+
+    <style name="ThemeQwantSettings" parent="ThemeQwantNoActionBar"></style>
 
     <style name="QwantOverflowButtonStyle" parent="Widget.AppCompat.ActionButton.Overflow">
         <item name="android:tint">@color/qwant_main</item>
