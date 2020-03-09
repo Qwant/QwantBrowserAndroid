@@ -76,11 +76,11 @@ class CustomTabsIntegration(
                 session?.url?.let { context.share(it) }
             },
 
-            BrowserMenuSwitch("Request desktop site", {
+            /* BrowserMenuSwitch("Request desktop site", {
                 session?.desktopMode ?: false
             }) { checked ->
                 sessionUseCases.requestDesktopSite.invoke(checked, session)
-            },
+            }, */
 
             SimpleBrowserMenuItem("Find in Page") {
                 FindInPageIntegration.launch?.invoke()

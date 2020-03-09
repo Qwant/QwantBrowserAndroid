@@ -82,13 +82,13 @@ class ToolbarIntegration(
                 visible = { sessionManager.selectedSession != null }
             },
 
-            BrowserMenuSwitch(context.getString(R.string.context_menu_request_desktop), {
+            /* BrowserMenuSwitch(context.getString(R.string.context_menu_request_desktop), {
                 sessionManager.selectedSessionOrThrow.desktopMode
             }) { checked ->
                 sessionUseCases.requestDesktopSite.invoke(checked)
             }.apply {
                 visible = { sessionManager.selectedSession != null }
-            },
+            }, */
 
             SimpleBrowserMenuItem(context.getString(R.string.context_menu_add_homescreen), textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main)) {
                 MainScope().launch { webAppUseCases.addToHomescreen() }
