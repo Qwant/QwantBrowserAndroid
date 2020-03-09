@@ -71,7 +71,7 @@ open class BrowserActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        if (components.core.sessionManager.selectedSession != null && components.core.sessionManager.selectedSession!!.url == getString(R.string.settings_page)) {
+        if (components.core.sessionManager.selectedSession == null || components.core.sessionManager.selectedSession!!.url == getString(R.string.settings_page)) {
             qwantbar.setLeftButton(QwantBar.LeftButtonType.HOME)
             qwantbar.setHighlight(QwantBar.QwantBarSelection.SEARCH)
         }
