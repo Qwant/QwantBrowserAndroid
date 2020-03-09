@@ -54,22 +54,15 @@ class AboutFragment(
             ""
         }
 
-        val versionInfo = String.format(
-            "%s\ngit hash: %s",
-            aboutText,
-            Build.gitHash
+        about_content.text = HtmlCompat.fromHtml(
+                resources.getString(R.string.about_content, appName),
+                FROM_HTML_SEPARATOR_LINE_BREAK_LIST_ITEM
         )
-        val content = HtmlCompat.fromHtml(
-            resources.getString(R.string.about_content, appName),
-            FROM_HTML_SEPARATOR_LINE_BREAK_LIST_ITEM
-        )
-
-        about_content.text = content
-        version_info.text = versionInfo
+        version_info.text = aboutText
 
         version_info.setOnTouchListener { _, _ ->
             val clipBoard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-            clipBoard.primaryClip = ClipData.newPlainText(versionInfo, versionInfo)
+            clipBoard.primaryClip = ClipData.newPlainText(aboutText, aboutText)
 
             Toast.makeText(requireContext(), getString(R.string.toast_copied), Toast.LENGTH_SHORT).show()
             true
