@@ -28,8 +28,8 @@ class AddonSettingsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_on_settings)
 
-        val addon = requireNotNull(intent.getParcelableExtra<Addon>("add_on"))
-        title = addon.translatableName.translate()
+        val addon = intent.getParcelableExtra<Addon>("add_on")
+        title = addon?.translatableName?.translate()
 
         supportFragmentManager
             .beginTransaction()
@@ -76,7 +76,7 @@ class AddonSettingsActivity : AppCompatActivity() {
             /**
              * Create an [AddonSettingsFragment] with add_on as a required parameter.
              */
-            fun create(addon: Addon) = AddonSettingsFragment().apply {
+            fun create(addon: Addon?) = AddonSettingsFragment().apply {
                 arguments = Bundle().apply {
                     putParcelable("add_on", addon)
                 }
