@@ -38,6 +38,8 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
         engineSettings.remoteDebuggingEnabled = false
         engineSettings.testingModeEnabled = false
 
+        swipeRefresh.isEnabled = false
+
         toolbarSessionObserver = ToolbarSessionObserver(requireContext().components.core.sessionManager, toolbar)
         requireContext().components.core.sessionManager.register(this.toolbarSessionObserver!!)
 
