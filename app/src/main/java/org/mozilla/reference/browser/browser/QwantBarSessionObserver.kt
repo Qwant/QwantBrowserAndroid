@@ -12,7 +12,7 @@ import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.layout.QwantBar
 import org.mozilla.reference.browser.storage.BookmarksStorage
 
-class QwantSessionObserver(
+class QwantBarSessionObserver(
         private val context: Context,
         private val sessionManager: SessionManager,
         private val qwantbar: QwantBar,

@@ -19,7 +19,7 @@ import mozilla.components.feature.intent.ext.EXTRA_SESSION_ID
 import mozilla.components.support.base.feature.UserInteractionHandler
 import mozilla.components.support.utils.SafeIntent
 import org.mozilla.reference.browser.browser.BrowserFragment
-import org.mozilla.reference.browser.browser.QwantSessionObserver
+import org.mozilla.reference.browser.browser.QwantBarSessionObserver
 import org.mozilla.reference.browser.ext.components
 import org.mozilla.reference.browser.layout.QwantBar
 import org.mozilla.reference.browser.settings.SettingsContainerFragment
@@ -34,7 +34,7 @@ import org.mozilla.reference.browser.tabs.TabsTrayFragment
  */
 open class BrowserActivity : AppCompatActivity() {
     private var bookmarksStorage: BookmarksStorage? = null
-    private var qwantbarSessionObserver: QwantSessionObserver? = null
+    private var qwantbarSessionObserver: QwantBarSessionObserver? = null
     private val sessionId: String?
         get() = SafeIntent(intent).getStringExtra(EXTRA_SESSION_ID)
 
@@ -52,7 +52,7 @@ open class BrowserActivity : AppCompatActivity() {
         bookmarksStorage = BookmarksStorage(applicationContext)
         bookmarksStorage!!.restore()
 
-        qwantbarSessionObserver = QwantSessionObserver(this, components.core.sessionManager, qwantbar, bookmarksStorage!!)
+        qwantbarSessionObserver = QwantBarSessionObserver(this, components.core.sessionManager, qwantbar, bookmarksStorage!!)
         components.core.sessionManager.register(this.qwantbarSessionObserver!!)
 
         qwantbar.setBookmarkStorage(bookmarksStorage!!)

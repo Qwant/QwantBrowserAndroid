@@ -28,7 +28,7 @@ import mozilla.components.ui.tabcounter.TabCounter
 import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.addons.AddonsActivity
 import org.mozilla.reference.browser.browser.FindInPageIntegration
-import org.mozilla.reference.browser.browser.QwantSessionObserver
+import org.mozilla.reference.browser.browser.QwantBarSessionObserver
 import org.mozilla.reference.browser.ext.application
 import org.mozilla.reference.browser.ext.share
 import org.mozilla.reference.browser.storage.BookmarksStorage
@@ -398,8 +398,8 @@ class QwantBar @JvmOverloads constructor(
         return currentBookmarkType
     }
 
-    fun updateHomeIcon(mode: QwantSessionObserver.QwantBarMode?) {
-        if (mode == QwantSessionObserver.QwantBarMode.NAVIGATION) {
+    fun updateHomeIcon(mode: QwantBarSessionObserver.QwantBarMode?) {
+        if (mode == QwantBarSessionObserver.QwantBarMode.NAVIGATION) {
             qwantbar_button_home.setImageResource(this.getIcon(QwantBarIcons.HOME, false))
         } else {
             val selected = (sessionManager.selectedSession != null && sessionManager.selectedSession!!.url.contains("https://www.qwant.com"))
