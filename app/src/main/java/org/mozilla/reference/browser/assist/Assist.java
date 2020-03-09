@@ -150,7 +150,7 @@ public class Assist extends Activity {
                         if (ActivityCompat.shouldShowRequestPermissionRationale(Assist.this, Manifest.permission.READ_CONTACTS)) {
                             Log.d(LOGTAG, "permission show rationale");
                             new AlertDialog.Builder(Assist.this)
-                                .setMessage("Accept that dumbass !!")
+                                .setMessage("We can not provide location without this permission")
                                 .setNeutralButton("Understood ...", (dialogInterface, i) -> {
                                     permission_request_origin = origin;
                                     permission_request_callback = callback;
@@ -343,7 +343,7 @@ public class Assist extends Activity {
         if (query.length() > 0) {
             // home_layout.requestFocus(); // While webview is loading. Webview take focus after load
             home_layout.setVisibility(View.INVISIBLE);
-            webview.loadUrl(getString(R.string.homepage) + "&q=" + query);
+            webview.loadUrl(getString(R.string.homepage) + "?widget=1&q=" + query);
             // Force hide keyboard
             InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(search_text.getWindowToken(), 0);
