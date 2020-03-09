@@ -98,13 +98,13 @@ class QwantBar @JvmOverloads constructor(
                 visible = { sessionManager.selectedSession != null }
             },
 
-            BrowserMenuSwitch(context.getString(R.string.context_menu_request_desktop), {
+            /* BrowserMenuSwitch(context.getString(R.string.context_menu_request_desktop), {
                 sessionManager.selectedSessionOrThrow.desktopMode
             }) { checked ->
                 sessionUseCases.requestDesktopSite.invoke(checked)
             }.apply {
                 visible = { sessionManager.selectedSession != null }
-            },
+            }, */
 
             SimpleBrowserMenuItem(context.getString(R.string.context_menu_add_homescreen), textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main)) {
                 MainScope().launch { webAppUseCases.addToHomescreen() }
@@ -402,7 +402,7 @@ class QwantBar @JvmOverloads constructor(
         if (mode == QwantBarSessionObserver.QwantBarMode.NAVIGATION) {
             qwantbar_button_home.setImageResource(this.getIcon(QwantBarIcons.HOME, false))
         } else {
-            val selected = (sessionManager.selectedSession != null && sessionManager.selectedSession!!.url.contains("https://www.qwant.com"))
+            val selected = (sessionManager.selectedSession == null || sessionManager.selectedSession!!.url.startsWith(context.getString(R.string.homepage)))
             qwantbar_button_home.setImageResource(this.getIcon(QwantBarIcons.SEARCH, selected))
         }
     }
