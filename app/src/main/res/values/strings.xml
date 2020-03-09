@@ -86,7 +86,6 @@
 
     <string name="bookmarks">Bookmarks</string>
 
-
     <string name="menu_search">Search</string>
     <string name="menu_bookmarks">Bookmarks</string>
     <string name="menu_tabs">Tabs</string>
@@ -124,8 +123,8 @@
     <string name="settings_general_launchexternalapp">Open links in native app</string>
     <string name="settings_general_makedefaultbrowser">Set as default browser</string>
 
-    <string name="homepage" translatable="false">https://www.qwant.com/</string>
-    <string name="settings_page" translatable="false">https://www.qwant.com/settings</string>
+    <string name="homepage" translatable="false">https://www.qwant.com/?client=brz-huawei</string>
+    <string name="settings_page" translatable="false">https://www.qwant.com/settings?client=brz-huawei</string>
 
     <!-- Text shown in the toolbar if it is empty -->
     <string name="toolbar_hint">@string/qwant_widget_text</string>
