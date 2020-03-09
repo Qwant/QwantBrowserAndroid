@@ -14,7 +14,7 @@ import org.mozilla.reference.browser.R
 class AddonsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_addon_main)
 
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction().apply {
