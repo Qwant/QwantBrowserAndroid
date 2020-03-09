@@ -87,7 +87,7 @@ class QwantSessionObserver(
         if (currentMode != QwantBarMode.HOME) {
             this.setBarHeight(56)
             this.showButtonsTexts()
-            val selected = (sessionManager.selectedSession != null && sessionManager.selectedSession!!.url == imageviewHome.context.getString(R.string.homepage))
+            val selected = (sessionManager.selectedSession == null || sessionManager.selectedSession!!.url.startsWith(context.getString(R.string.homepage)))
             imageviewHome.setImageResource(qwantbar.getIcon(QwantBar.QwantBarIcons.SEARCH, selected))
             qwantbar.setBookmarkButton(QwantBar.BookmarkButtonType.OPEN)
             currentMode = QwantBarMode.HOME
