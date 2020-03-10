@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <array name="languages_interface_keys">
+        <item>de</item>
+        <item>en</item>
+        <item>fr</item>
+        <item>it</item>
+        <item>es</item>
+    </array>
+
+    <array name="languages_search_keys">
+        <item>de</item>
+        <item>en</item>
+        <item>fr</item>
+        <item>it</item>
+        <item>es</item>
+    </array>
+
+</resources>

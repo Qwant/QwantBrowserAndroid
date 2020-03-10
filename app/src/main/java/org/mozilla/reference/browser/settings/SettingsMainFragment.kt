@@ -9,10 +9,8 @@ import androidx.preference.Preference.OnPreferenceClickListener
 import androidx.preference.PreferenceFragmentCompat
 import androidx.fragment.app.Fragment
 import org.mozilla.reference.browser.R
-import org.mozilla.reference.browser.R.string.*
 import org.mozilla.reference.browser.ext.getPreferenceKey
 
-@Suppress("TooManyFunctions")
 class SettingsMainFragment(
         val settingsContainer: SettingsContainerFragment
 ) : PreferenceFragmentCompat() {
@@ -27,10 +25,10 @@ class SettingsMainFragment(
     }
 
     private fun setupPreferences() {
-        findPreference(context?.getPreferenceKey(pref_key_privacy)).onPreferenceClickListener = getPreferenceLinkListener(PrivacySettingsFragment(settingsContainer), "SETTINGS_PRIVACY_FRAGMENT")
-        findPreference(context?.getPreferenceKey(pref_key_general)).onPreferenceClickListener = getPreferenceLinkListener(SettingsGeneralFragment(settingsContainer), "SETTINGS_GENERAL_FRAGMENT")
+        findPreference(context?.getPreferenceKey(R.string.pref_key_privacy)).onPreferenceClickListener = getPreferenceLinkListener(PrivacySettingsFragment(settingsContainer), "SETTINGS_PRIVACY_FRAGMENT")
+        findPreference(context?.getPreferenceKey(R.string.pref_key_general)).onPreferenceClickListener = getPreferenceLinkListener(SettingsGeneralFragment(settingsContainer), "SETTINGS_GENERAL_FRAGMENT")
         // findPreference(context?.getPreferenceKey(pref_key_interface)).onPreferenceClickListener = getPreferenceLinkListener(SettingsInterfaceFragment(), "SETTINGS_INTERFACE_FRAGMENT")
-        findPreference(context?.getPreferenceKey(pref_key_about)).onPreferenceClickListener = getPreferenceLinkListener(AboutFragment(settingsContainer), "SETTINGS_ABOUT_FRAGMENT")
+        findPreference(context?.getPreferenceKey(R.string.pref_key_about)).onPreferenceClickListener = getPreferenceLinkListener(AboutFragment(settingsContainer), "SETTINGS_ABOUT_FRAGMENT")
     }
 
     private fun getPreferenceLinkListener(target: Fragment, fragment_id: String): OnPreferenceClickListener {
@@ -65,43 +63,6 @@ class SettingsMainFragment(
 
         preferencePrivacyPolicy.onPreferenceClickListener = getPrivacyPolicyListener()
         preferenceLicense.onPreferenceClickListener = getLicenseListener()
-    }
-
-    private fun getClickListenerForMakeDefaultBrowser(): OnPreferenceClickListener {
-        return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            OnPreferenceClickListener {
-                val intent = Intent(
-                        Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS
-                )
-                startActivity(intent)
-                true
-            }
-        } else {
-            OnPreferenceClickListener { preference ->
-                Toast.makeText(context, "${preference.title} Clicked", LENGTH_SHORT).show()
-                true
-            }
-        }
-    }
-
-    private fun getClickListenerForPrivacy(): OnPreferenceClickListener {
-        return OnPreferenceClickListener {
-            parentFragmentManager.beginTransaction()
-                    .replace(R.id.settings_fragment_container, PrivacySettingsFragment(), "SETTINGS_PRIVACY_FRAGMENT")
-                    .addToBackStack(null)
-                    .commit()
-            true
-        }
-    }
-
-    private fun getAboutPageListener(): OnPreferenceClickListener {
-        return OnPreferenceClickListener {
-            parentFragmentManager.beginTransaction()
-                    .replace(R.id.settings_fragment_container, AboutFragment(), "SETTINGS_ABOUT_FRAGMENT")
-                    .addToBackStack(null)
-                    .commit()
-            true
-        }
     }
 
     private fun getPrivacyPolicyListener(): OnPreferenceClickListener {

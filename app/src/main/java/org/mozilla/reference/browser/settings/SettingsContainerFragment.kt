@@ -18,7 +18,7 @@ import org.mozilla.reference.browser.browser.BrowserFragment
 
 class SettingsContainerFragment : Fragment(), UserInteractionHandler {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        context?.theme?.applyStyle(R.style.ThemeQwantSettings, true);
+        context?.theme?.applyStyle(R.style.ThemeQwantNoActionBar, true);
         return inflater.inflate(R.layout.fragment_settings, container, false)
     }
 

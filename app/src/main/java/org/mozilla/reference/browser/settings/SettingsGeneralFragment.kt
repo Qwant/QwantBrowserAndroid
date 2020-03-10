@@ -4,103 +4,43 @@
 
 package org.mozilla.reference.browser.settings
 
+import android.content.Intent
+import android.provider.Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS
+import android.widget.Toast
+import android.widget.Toast.LENGTH_SHORT
+import androidx.preference.Preference
 import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.ext.getPreferenceKey
 
-@Suppress("TooManyFunctions")
 class SettingsGeneralFragment(
         private val settingsContainer: SettingsContainerFragment
 ) : BaseSettingsFragment(settingsContainer, R.string.settings_general, R.xml.preferences_general) {
 
     override fun setupPreferences() {
-        // findPreference(context?.getPreferenceKey(R.string.pref_key_privacy)).onPreferenceClickListener = this.getPreferenceLinkListener(PrivacySettingsFragment(this.settingsContainer), "SETTINGS_PRIVACY_FRAGMENT")
-        // findPreference(context?.getPreferenceKey(pref_key_general)).onPreferenceClickListener = getPreferenceLinkListener(SettingsGeneralFragment(), "SETTINGS_GENERAL_FRAGMENT")
-        // findPreference(context?.getPreferenceKey(pref_key_interface)).onPreferenceClickListener = getPreferenceLinkListener(SettingsInterfaceFragment(), "SETTINGS_INTERFACE_FRAGMENT")
-        // findPreference(context?.getPreferenceKey(pref_key_about)).onPreferenceClickListener = getPreferenceLinkListener(AboutFragment(), "SETTINGS_ABOUT_FRAGMENT")
+        // Links
+        findPreference(context?.getPreferenceKey(R.string.pref_key_general_language)).onPreferenceClickListener = this.getPreferenceLinkListener(SettingsGeneralLanguageFragment(this.settingsContainer), "SETTINGS_GENERAL_LANGUAGE_FRAGMENT")
+        // findPreference(context?.getPreferenceKey(R.string.pref_key_general_adultcontent)).onPreferenceClickListener = this.getPreferenceLinkListener(SettingsGeneralAdultContentFragment(this.settingsContainer), "SETTINGS_GENERAL_ADULTCONTENT_FRAGMENT")
+        // findPreference(context?.getPreferenceKey(R.string.pref_key_general_cleardata)).onPreferenceClickListener = getPreferenceLinkListener(SettingsGeneralClearDataFragment(this.settingsContainer), "SETTINGS_GENERAL_CLEARDATA_FRAGMENT")
+
+        findPreference(context?.getPreferenceKey(R.string.pref_key_general_makedefaultbrowser)).onPreferenceClickListener = getClickListenerForMakeDefaultBrowser()
+
+        // TODO prefs to handle here
+        // pref_key_general_newsonhome
+        // pref_key_general_launchexternalapp
     }
 
-    /* private fun setupPreferences() {
-        val makeDefaultBrowserKey = context?.getPreferenceKey(pref_key_make_default_browser)
-        val aboutPageKey = context?.getPreferenceKey(pref_key_about_page)
-        val privacyKey = context?.getPreferenceKey(pref_key_privacy)
-        val privacyPolicyKey = context?.getPreferenceKey(pref_key_privacy_policy)
-        val licenseKey = context?.getPreferenceKey(pref_key_license)
-
-        val preferenceMakeDefaultBrowser = findPreference(makeDefaultBrowserKey)
-        val preferenceAboutPage = findPreference(aboutPageKey)
-        val preferencePrivacy = findPreference(privacyKey)
-
-        val preferencePrivacyPolicy = findPreference(privacyPolicyKey)
-        val preferenceLicense = findPreference(licenseKey)
-
-        preferenceMakeDefaultBrowser.onPreferenceClickListener = getClickListenerForMakeDefaultBrowser()
-        preferenceAboutPage.onPreferenceClickListener = getAboutPageListener()
-        preferencePrivacy.onPreferenceClickListener = getClickListenerForPrivacy()
-
-        preferencePrivacyPolicy.onPreferenceClickListener = getPrivacyPolicyListener()
-        preferenceLicense.onPreferenceClickListener = getLicenseListener()
-    }
-
-    private fun getClickListenerForMakeDefaultBrowser(): OnPreferenceClickListener {
+    private fun getClickListenerForMakeDefaultBrowser(): Preference.OnPreferenceClickListener {
         return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            OnPreferenceClickListener {
-                val intent = Intent(
-                        Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS
-                )
+            Preference.OnPreferenceClickListener {
+                val intent = Intent(ACTION_MANAGE_DEFAULT_APPS_SETTINGS)
                 startActivity(intent)
                 true
             }
         } else {
-            OnPreferenceClickListener { preference ->
+            Preference.OnPreferenceClickListener { preference ->
                 Toast.makeText(context, "${preference.title} Clicked", LENGTH_SHORT).show()
                 true
             }
         }
     }
-
-    private fun getClickListenerForPrivacy(): OnPreferenceClickListener {
-        return OnPreferenceClickListener {
-            parentFragmentManager.beginTransaction()
-                    .replace(R.id.settings_fragment_container, PrivacySettingsFragment(), "SETTINGS_PRIVACY_FRAGMENT")
-                    .addToBackStack(null)
-                    .commit()
-            true
-        }
-    }
-
-    private fun getAboutPageListener(): OnPreferenceClickListener {
-        return OnPreferenceClickListener {
-            parentFragmentManager.beginTransaction()
-                    .replace(R.id.settings_fragment_container, AboutFragment(), "SETTINGS_ABOUT_FRAGMENT")
-                    .addToBackStack(null)
-                    .commit()
-            true
-        }
-    }
-
-    private fun getPrivacyPolicyListener(): OnPreferenceClickListener {
-        return OnPreferenceClickListener {
-            if (context != null) {
-                context!!.components.useCases.tabsUseCases.addTab(context!!.getString(privacy_policy_url))
-                parentFragmentManager.beginTransaction()
-                        .replace(R.id.settings_fragment_container, BrowserFragment.create(), "BROWSER_FRAGMENT")
-                        .addToBackStack(null)
-                        .commit()
-            }
-            true
-        }
-    }
-
-    private fun getLicenseListener(): OnPreferenceClickListener {
-        return OnPreferenceClickListener {
-            if (context != null) {
-                context!!.components.useCases.tabsUseCases.addTab(context!!.getString(license_url))
-                parentFragmentManager.beginTransaction()
-                        .replace(R.id.settings_fragment_container, BrowserFragment.create(), "BROWSER_FRAGMENT")
-                        .addToBackStack(null)
-                        .commit()
-            }
-            true
-        }
-    } */
 }

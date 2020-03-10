@@ -32,7 +32,8 @@
     </style>
 
     <style name="ThemeQwantNoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
+        <!-- <item name="preferenceTheme">@style/PreferenceThemeOverlay</item> -->
+        <item name="android:spinnerDropDownItemStyle">@style/QwantSpinnerItemStyle</item>
         <item name="actionOverflowButtonStyle">@style/QwantOverflowButtonStyle</item>
 
         <item name="colorPrimary">@color/qwant_background</item>
@@ -104,9 +105,15 @@
         <item name="tabsTraySelectedItemBackgroundColor">@color/qwant_selected_privacy</item>
     </style>
 
-    <style name="ThemeQwantSettings" parent="ThemeQwantNoActionBar"></style>
-
     <style name="QwantOverflowButtonStyle" parent="Widget.AppCompat.ActionButton.Overflow">
         <item name="android:tint">@color/qwant_main</item>
+    </style>
+
+    <style name="QwantSpinnerItemStyle" parent="@android:style/Widget.Holo.DropDownItem.Spinner">
+        <item name="android:textColor">@color/qwant_main</item>
+        <item name="android:paddingStart">50dp</item>
+        <item name="android:paddingEnd">50dp</item>
+        <item name="android:divider">@color/qwant_light</item>
+        <item name="android:dividerHeight">2dp</item>
     </style>
 </resources>

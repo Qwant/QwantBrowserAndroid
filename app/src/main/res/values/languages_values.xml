@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <array name="languages_interface_values">
+        <item>Deutsch</item>
+        <item>English</item>
+        <item>French</item>
+        <item>Italian</item>
+        <item>Spanish</item>
+    </array>
+
+    <array name="languages_search_values">
+        <item>Deutsch</item>
+        <item>English</item>
+        <item>French</item>
+        <item>Italian</item>
+        <item>Spanish</item>
+    </array>
+
+</resources>

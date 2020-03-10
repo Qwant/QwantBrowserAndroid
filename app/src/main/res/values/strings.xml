@@ -123,6 +123,9 @@
     <string name="settings_general_launchexternalapp">Open links in native app</string>
     <string name="settings_general_makedefaultbrowser">Set as default browser</string>
 
+    <string name="settings_general_language_interface">Country / Region</string>
+    <string name="settings_general_language_search">Language of search results</string>
+
     <string name="homepage" translatable="false">https://www.qwant.com/?client=brz-huawei</string>
     <string name="settings_page" translatable="false">https://www.qwant.com/settings?client=brz-huawei</string>
 

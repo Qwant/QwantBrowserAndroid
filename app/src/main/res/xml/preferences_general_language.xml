@@ -1,0 +1,25 @@
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+
+<androidx.preference.PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <org.mozilla.reference.browser.settings.QwantPreferenceDropdown
+        android:id="@+id/dropdown_language_interface"
+        android:key="@string/pref_key_general_language_interface"
+        android:title="@string/settings_general_language_interface"
+        android:entries="@array/languages_interface_values"
+        android:entryValues="@array/languages_interface_keys"
+        app:iconSpaceReserved="false"/>
+
+    <org.mozilla.reference.browser.settings.QwantPreferenceDropdown
+        android:id="@+id/dropdown_language_search"
+        android:key="@string/pref_key_general_language_search"
+        android:title="@string/settings_general_language_search"
+        android:entries="@array/languages_interface_values"
+        android:entryValues="@array/languages_search_keys"
+        app:iconSpaceReserved="false"/>
+
+</androidx.preference.PreferenceScreen>

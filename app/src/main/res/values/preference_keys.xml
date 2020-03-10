@@ -19,4 +19,7 @@
     <string name="pref_key_general_cleardata" translatable="false">pref_key_general_cleardata</string>
     <string name="pref_key_general_launchexternalapp" translatable="false">pref_key_general_launchexternalapp</string>
     <string name="pref_key_general_makedefaultbrowser" translatable="false">pref_key_general_makedefaultbrowser</string>
+
+    <string name="pref_key_general_language_interface" translatable="false">pref_key_general_language_interface</string>
+    <string name="pref_key_general_language_search" translatable="false">pref_key_general_language_search</string>
 </resources>
