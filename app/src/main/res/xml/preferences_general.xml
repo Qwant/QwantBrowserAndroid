@@ -13,11 +13,13 @@
         android:widgetLayout="@layout/preference_arrowed_widget"
         app:iconSpaceReserved="false" />
 
-    <org.mozilla.reference.browser.settings.QwantPreference
+    <org.mozilla.reference.browser.settings.QwantPreferenceDropdown
         android:key="@string/pref_key_general_adultcontent"
         android:title="@string/settings_general_adultcontent"
-        android:widgetLayout="@layout/preference_arrowed_widget"
-        app:iconSpaceReserved="false" />
+        android:entries="@array/adult_content_values"
+        android:entryValues="@array/adult_content_keys"
+        android:defaultValue="@string/settings_adultcontent_none_code"
+        app:iconSpaceReserved="false"/>
 
     <org.mozilla.reference.browser.settings.QwantPreferenceSwitch
         android:key="@string/pref_key_general_newsonhome"

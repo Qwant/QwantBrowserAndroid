@@ -30,7 +30,7 @@ class AboutFragment(
         val settingsContainer: SettingsContainerFragment
 ) : Fragment(), UserInteractionHandler {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        settingsContainer.setTitle("About Qwant browser")
+        settingsContainer.setTitle(resources.getString(R.string.settings_about))
         return inflater.inflate(R.layout.fragment_about, container, false)
     }
 
@@ -71,7 +71,7 @@ class AboutFragment(
 
     override fun onBackPressed(): Boolean {
         parentFragmentManager.beginTransaction()
-            .replace(R.id.settings_fragment_container, SettingsMainFragment(settingsContainer), "SETTINGS_MAIN_FRAGMENT")
+            .replace(R.id.settings_fragment_container, AboutMenuFragment(settingsContainer), "SETTINGS_ABOUTMENU_FRAGMENT")
             .addToBackStack(null)
             .commit()
         return true

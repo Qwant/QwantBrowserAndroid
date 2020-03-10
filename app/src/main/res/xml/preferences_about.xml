@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <org.mozilla.reference.browser.settings.QwantPreference
+        android:key="@string/pref_key_about"
+        android:title="@string/settings_about"
+        android:widgetLayout="@layout/preference_arrowed_widget"
+        app:iconSpaceReserved="false" />
+
+    <org.mozilla.reference.browser.settings.QwantPreference
+        android:key="@string/pref_key_privacy_policy"
+        android:title="@string/settings_privacy_policy"
+        android:widgetLayout="@layout/preference_arrowed_widget"
+        app:iconSpaceReserved="false" />
+
+    <org.mozilla.reference.browser.settings.QwantPreference
+        android:key="@string/pref_key_license"
+        android:title="@string/settings_license"
+        android:widgetLayout="@layout/preference_arrowed_widget"
+        app:iconSpaceReserved="false" />
+</PreferenceScreen>

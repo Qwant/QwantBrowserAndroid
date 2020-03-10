@@ -24,8 +24,8 @@
         android:widgetLayout="@layout/preference_arrowed_widget" /> -->
 
     <org.mozilla.reference.browser.settings.QwantPreference
-        android:key="@string/pref_key_about"
-        android:title="@string/settings_about"
+        android:key="@string/pref_key_about_menu"
+        android:title="@string/settings_about_menu"
         android:icon="@drawable/ic_bookmark"
         android:widgetLayout="@layout/preference_arrowed_widget" />
 

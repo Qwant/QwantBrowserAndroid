@@ -5,7 +5,7 @@ import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.ext.getPreferenceKey
 
 class SettingsGeneralLanguageFragment(
-        settingsContainer: SettingsContainerFragment
+        private val settingsContainer: SettingsContainerFragment
 ) : BaseSettingsFragment(settingsContainer, R.string.settings_general_language, R.xml.preferences_general_language) {
     override fun setupPreferences() {
         val interfaceKeys = resources.getStringArray(R.array.languages_interface_keys)
@@ -27,5 +27,13 @@ class SettingsGeneralLanguageFragment(
             prefLanguageSearch.summary = searchValues.get(searchKeys.indexOf(value))
             true
         }
+    }
+
+    override fun onBackPressed(): Boolean {
+        fragmentManager?.beginTransaction()
+                ?.replace(R.id.settings_fragment_container, SettingsGeneralFragment(settingsContainer), "SETTINGS_GENERAL_FRAGMENT")
+                ?.addToBackStack(null)
+                ?.commit()
+        return true
     }
 }

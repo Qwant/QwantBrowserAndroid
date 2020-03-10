@@ -12,6 +12,7 @@
         android:title="@string/settings_general_language_interface"
         android:entries="@array/languages_interface_values"
         android:entryValues="@array/languages_interface_keys"
+        android:defaultValue="@string/settings_language_english_code"
         app:iconSpaceReserved="false"/>
 
     <org.mozilla.reference.browser.settings.QwantPreferenceDropdown
@@ -20,6 +21,7 @@
         android:title="@string/settings_general_language_search"
         android:entries="@array/languages_interface_values"
         android:entryValues="@array/languages_search_keys"
+        android:defaultValue="@string/settings_language_english_code"
         app:iconSpaceReserved="false"/>
 
 </androidx.preference.PreferenceScreen>

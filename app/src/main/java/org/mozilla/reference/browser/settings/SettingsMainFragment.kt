@@ -28,7 +28,7 @@ class SettingsMainFragment(
         findPreference(context?.getPreferenceKey(R.string.pref_key_privacy)).onPreferenceClickListener = getPreferenceLinkListener(PrivacySettingsFragment(settingsContainer), "SETTINGS_PRIVACY_FRAGMENT")
         findPreference(context?.getPreferenceKey(R.string.pref_key_general)).onPreferenceClickListener = getPreferenceLinkListener(SettingsGeneralFragment(settingsContainer), "SETTINGS_GENERAL_FRAGMENT")
         // findPreference(context?.getPreferenceKey(pref_key_interface)).onPreferenceClickListener = getPreferenceLinkListener(SettingsInterfaceFragment(), "SETTINGS_INTERFACE_FRAGMENT")
-        findPreference(context?.getPreferenceKey(R.string.pref_key_about)).onPreferenceClickListener = getPreferenceLinkListener(AboutFragment(settingsContainer), "SETTINGS_ABOUT_FRAGMENT")
+        findPreference(context?.getPreferenceKey(R.string.pref_key_about_menu)).onPreferenceClickListener = getPreferenceLinkListener(AboutMenuFragment(settingsContainer), "SETTINGS_ABOUTMENU_FRAGMENT")
     }
 
     private fun getPreferenceLinkListener(target: Fragment, fragment_id: String): OnPreferenceClickListener {
