@@ -83,6 +83,15 @@
             android:layout_marginBottom="4dp"
             android:layout_alignEnd="@+id/tab_switch_button_background"
             app:srcCompat="@drawable/mozac_ic_private_browsing" />
+
     </RelativeLayout>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="6dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:src="@drawable/shadow_gradient" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

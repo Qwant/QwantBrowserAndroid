@@ -11,11 +11,10 @@ import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.core.content.ContextCompat
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_tabstray.*
-import mozilla.components.browser.session.Session
 import mozilla.components.browser.session.SessionManager
-import mozilla.components.concept.tabstray.TabsTray
-import mozilla.components.feature.tabs.tabstray.TabsFeature
+import mozilla.components.browser.state.selector.selectedTab
 import mozilla.components.support.base.feature.UserInteractionHandler
 import mozilla.components.support.ktx.android.util.dpToPx
 import mozilla.components.ui.tabcounter.TabCounter
@@ -26,6 +25,7 @@ import org.mozilla.reference.browser.ext.components
 import org.mozilla.reference.browser.ext.requireComponents
 import org.mozilla.reference.browser.layout.QwantBar
 import org.mozilla.reference.browser.tabs.tray.BrowserTabsTray
+import org.mozilla.reference.browser.tabs.tray.TabsFeature
 import java.lang.ref.WeakReference
 
 /**
@@ -52,18 +52,19 @@ class TabsTrayFragment(
 
         val tray = tabsTray
         if (tray is BrowserTabsTray) {
-            tray.onSessionsChangedRegister {
+            tray.onTabsChangedRegister {
                 this.updateTabCount()
             }
         }
 
         tabsFeature = TabsFeature(
             tabsTray,
-            requireComponents.core.sessionManager,
+            requireComponents.core.store,
             requireComponents.useCases.tabsUseCases,
-            ::closeTabsTray)
+            closeTabsTray = ::closeTabsTray)
 
-        tabsFeature?.filterTabs { it.private == isPrivate }
+
+        tabsFeature?.filterTabs { it.content.private == isPrivate }
 
         val context = requireContext()
         if (isPrivate) {
@@ -77,13 +78,16 @@ class TabsTrayFragment(
             button_new_tab.setTextColor(ContextCompat.getColor(context, R.color.qwant_selected_text))
         }
 
-        tabsHeader.inflateMenu(R.menu.tabstray_menu)
+        // tabsHeader.inflateMenu(R.menu.tabstray_menu)
 
         tab_switch_button_background.setOnClickListener((View.OnClickListener {
             this.isPrivate = !isPrivate
             context.setTheme(if (isPrivate) R.style.ThemeQwantNoActionBarPrivacy else R.style.ThemeQwantNoActionBar)
             qwantbar.setPrivacyMode(isPrivate)
-            activity?.supportFragmentManager?.beginTransaction()?.setReorderingAllowed(false)?.detach(this)?.attach(this)?.commit()
+            val frg = activity?.supportFragmentManager?.findFragmentByTag("TABS_FRAGMENT")
+            if (frg != null) {
+                activity?.supportFragmentManager?.beginTransaction()?.setReorderingAllowed(false)?.detach(frg)?.attach(frg)?.commit()
+            }
         }))
 
         button_new_tab.setOnClickListener((View.OnClickListener {
@@ -115,7 +119,7 @@ class TabsTrayFragment(
         return true
     }
 
-    private fun closeTabsTray() {
+    private fun closeTabsTray(): Unit {
         activity?.supportFragmentManager?.beginTransaction()?.apply {
             replace(R.id.container, BrowserFragment.create(), "BROWSER_FRAGMENT")
             commit()
@@ -124,7 +128,6 @@ class TabsTrayFragment(
     }
 
     private fun updateTabCount() {
-        Log.d("QWANT_BROWSER", "update tab count: " + sessionManager.sessions.size)
         reference.get()?.setCountWithAnimation(sessionManager.sessions.filter { it.private == isPrivate }.size)
     }
 }

@@ -8,9 +8,11 @@ import android.view.View
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import mozilla.components.browser.session.Session
+import mozilla.components.browser.state.selector.selectedTab
 import mozilla.components.concept.tabstray.TabsTray
 import mozilla.components.support.ktx.android.util.dpToPx
 import org.mozilla.reference.browser.R
+import org.mozilla.reference.browser.ext.components
 
 const val DEFAULT_ITEM_BACKGROUND_COLOR = 0xFFFFFFFF.toInt()
 const val DEFAULT_ITEM_BACKGROUND_SELECTED_COLOR = 0xFFFF45A1FF.toInt()
@@ -24,7 +26,7 @@ class BrowserTabsTray @JvmOverloads constructor(
         context: Context,
         attrs: AttributeSet? = null,
         defStyleAttr: Int = 0,
-        val tabsAdapter: TabsAdapter = TabsAdapter()
+        val tabsAdapter: TabsAdapter = TabsAdapter(context)
 ) : RecyclerView(context, attrs, defStyleAttr),
         TabsTray by tabsAdapter {
 
@@ -68,11 +70,11 @@ class BrowserTabsTray @JvmOverloads constructor(
                 return this
         }
 
-        override fun onSessionsChanged(position: Int, count: Int) {
+        override fun onTabsChanged(position: Int, count: Int) {
                 this.onSessionsChangedCallback?.invoke()
         }
 
-        fun onSessionsChangedRegister(callback: () -> Unit) {
+        fun onTabsChangedRegister(callback: () -> Unit) {
                 this.onSessionsChangedCallback = callback
         }
 }
