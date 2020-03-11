@@ -5,14 +5,15 @@
 package org.mozilla.reference.browser
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.AttributeSet
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.preference.PreferenceManager
 import kotlinx.android.synthetic.main.activity_main.*
 import mozilla.components.browser.session.Session
-import org.mozilla.reference.browser.tabs.tray.BrowserTabsTray
 import mozilla.components.concept.engine.EngineView
 import mozilla.components.concept.tabstray.TabsTray
 import mozilla.components.feature.intent.ext.EXTRA_SESSION_ID
@@ -27,6 +28,8 @@ import org.mozilla.reference.browser.storage.BookmarksFragment
 import org.mozilla.reference.browser.storage.BookmarksStorage
 import org.mozilla.reference.browser.tabs.TabsTouchHelper
 import org.mozilla.reference.browser.tabs.TabsTrayFragment
+import org.mozilla.reference.browser.tabs.tray.BrowserTabsTray
+import java.util.*
 
 
 /**
@@ -45,6 +48,8 @@ open class BrowserActivity : AppCompatActivity() {
         BrowserFragment.create(sessionId)
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        this.loadLocale()
+
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_main)
@@ -63,10 +68,57 @@ open class BrowserActivity : AppCompatActivity() {
         qwantbar.onMenuClicked(::showSettings)
 
         if (savedInstanceState == null) {
-            supportFragmentManager.beginTransaction().apply {
-                replace(R.id.container, createBrowserFragment(sessionId), "BROWSER_FRAGMENT")
-                commit()
+            if (intent.action == "CHANGED_LANGUAGE") {
+                qwantbar.setHighlight(QwantBar.QwantBarSelection.MORE)
+                supportFragmentManager.beginTransaction().apply {
+                    replace(R.id.container, SettingsContainerFragment(true), "SETTINGS_FRAGMENT")
+                    commit()
+                }
+            } else {
+                supportFragmentManager.beginTransaction().apply {
+                    replace(R.id.container, createBrowserFragment(sessionId), "BROWSER_FRAGMENT")
+                    commit()
+                }
             }
+        }
+    }
+
+    private fun loadLocale() {
+        /* val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        val defaultLocale = resources.configuration.locale.language
+        val savedLocale = prefs.getString(resources.getString(R.string.pref_key_general_language_interface), defaultLocale)
+
+        if (savedLocale != defaultLocale) {
+            resources.configuration.locale = Locale(savedLocale)
+            Locale.setDefault(resources.configuration.locale)
+            resources.updateConfiguration(resources.configuration, resources.displayMetrics)
+        } else {
+            val editor: SharedPreferences.Editor = prefs.edit()
+            editor.putString(resources.getString(R.string.pref_key_general_language_interface), savedLocale)
+            editor.apply()
+        } */
+
+        val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        val savedLocale = prefs.getString(resources.getString(R.string.pref_key_general_language_interface), "undefined")
+
+        if (savedLocale == "undefined") {
+            // First time, set default locale for interface and search
+            var defaultLocale = resources.configuration.locale.language
+            if (!resources.getStringArray(R.array.languages_interface_keys).contains(defaultLocale)) {
+                defaultLocale = "en" // Fallback to english, as android does
+            }
+            val editor: SharedPreferences.Editor = prefs.edit()
+            editor.putString(resources.getString(R.string.pref_key_general_language_interface), defaultLocale)
+            // Set also search language
+            if (prefs.getString(resources.getString(R.string.pref_key_general_language_search), "undefined") == "undefined") {
+                editor.putString(resources.getString(R.string.pref_key_general_language_search), defaultLocale)
+            }
+            editor.apply()
+        } else if (savedLocale != resources.configuration.locale.language) {
+            // Locale has been changed by preferences system, so it's already saved. Just update configuration
+            resources.configuration.locale = Locale(savedLocale)
+            Locale.setDefault(resources.configuration.locale)
+            resources.updateConfiguration(resources.configuration, resources.displayMetrics)
         }
     }
 

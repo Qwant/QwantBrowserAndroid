@@ -16,7 +16,9 @@ import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.browser.BrowserFragment
 
 
-class SettingsContainerFragment : Fragment(), UserInteractionHandler {
+class SettingsContainerFragment(
+        val language_changed_reload: Boolean = false
+) : Fragment(), UserInteractionHandler {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         context?.theme?.applyStyle(R.style.ThemeQwantNoActionBar, true);
         return inflater.inflate(R.layout.fragment_settings, container, false)
@@ -29,10 +31,17 @@ class SettingsContainerFragment : Fragment(), UserInteractionHandler {
             this.onBackPressed()
         }
 
-        childFragmentManager.beginTransaction()
-            .replace(R.id.settings_fragment_container, SettingsMainFragment(this), "SETTINGS_MAIN_FRAGMENT")
-            .addToBackStack(null)
-            .commit()
+        if (language_changed_reload) {
+            childFragmentManager.beginTransaction()
+                    .replace(R.id.settings_fragment_container, SettingsGeneralLanguageFragment(this), "SETTINGS_GENERAL_LANGUAGE_FRAGMENT")
+                    .addToBackStack(null)
+                    .commit()
+        } else {
+            childFragmentManager.beginTransaction()
+                    .replace(R.id.settings_fragment_container, SettingsMainFragment(this), "SETTINGS_MAIN_FRAGMENT")
+                    .addToBackStack(null)
+                    .commit()
+        }
     }
 
     override fun onBackPressed(): Boolean {

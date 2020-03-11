@@ -84,10 +84,7 @@ class TabsTrayFragment(
             this.isPrivate = !isPrivate
             context.setTheme(if (isPrivate) R.style.ThemeQwantNoActionBarPrivacy else R.style.ThemeQwantNoActionBar)
             qwantbar.setPrivacyMode(isPrivate)
-            val frg = activity?.supportFragmentManager?.findFragmentByTag("TABS_FRAGMENT")
-            if (frg != null) {
-                activity?.supportFragmentManager?.beginTransaction()?.setReorderingAllowed(false)?.detach(frg)?.attach(frg)?.commit()
-            }
+            activity?.supportFragmentManager?.beginTransaction()?.setReorderingAllowed(false)?.detach(this)?.attach(this)?.commit()
         }))
 
         button_new_tab.setOnClickListener((View.OnClickListener {

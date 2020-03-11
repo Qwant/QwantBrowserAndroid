@@ -108,9 +108,16 @@
     <string name="context_menu_addons">Add-ons</string>
 
     <string name="preferences_privacy_policy">Politique de Confidentialité</string>
-    <string name="privacy_policy_url">https://about.qwant.com/fr/legal/confidentialite/</string>
     <string name="preferences_license">License (MPL 2.0)</string>
-    <string name="license_url">https://www.mozilla.org/en-US/MPL/2.0/</string>
+
+    <string name="settings_general_language_interface">Langue de l\'interface</string>
+    <string name="settings_general_language_search">Langue des résultats de recherche</string>
+
+    <string name="settings_language_english">Anglais</string>
+    <string name="settings_language_french">Français</string>
+    <string name="settings_language_german">Allemand</string>
+    <string name="settings_language_italian">Italien</string>
+    <string name="settings_language_spanish">Espagnol</string>
 
     <!-- Text shown in the toolbar if it is empty -->
     <string name="toolbar_hint">@string/qwant_widget_text</string>

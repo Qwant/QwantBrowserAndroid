@@ -1,8 +1,14 @@
 package org.mozilla.reference.browser.settings
 
+import android.content.Intent
+import android.content.res.Configuration
+import android.provider.Browser
 import androidx.preference.Preference
+import org.mozilla.reference.browser.BrowserActivity
 import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.ext.getPreferenceKey
+import java.util.*
+
 
 class SettingsGeneralLanguageFragment(
         private val settingsContainer: SettingsContainerFragment
@@ -20,11 +26,20 @@ class SettingsGeneralLanguageFragment(
         prefLanguageSearch.summary = searchValues[searchKeys.indexOf(prefLanguageSearch.value)]
 
         prefLanguageInterface.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, value ->
-            prefLanguageInterface.summary = interfaceValues[interfaceKeys.indexOf(value)]
+            val locale = Locale(value as String)
+            Locale.setDefault(locale)
+            resources.configuration.locale = locale
+            resources.updateConfiguration(resources.configuration, resources.displayMetrics)
+
+            val intent = Intent(context, BrowserActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
+            intent.action = "CHANGED_LANGUAGE"
+            startActivity(intent)
+
             true
         }
         prefLanguageSearch.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, value ->
-            prefLanguageSearch.summary = searchValues.get(searchKeys.indexOf(value))
+            prefLanguageSearch.summary = searchValues[searchKeys.indexOf(value)]
             true
         }
     }
