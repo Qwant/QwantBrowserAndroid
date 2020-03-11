@@ -70,7 +70,6 @@ class QwantSessionFeature(
             }
         }
 
-        Log.d("QWANT_BROWSER", "Nothing to go back to")
         return false
     }
 

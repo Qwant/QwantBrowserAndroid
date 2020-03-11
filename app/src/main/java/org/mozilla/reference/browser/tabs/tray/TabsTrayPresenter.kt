@@ -44,7 +44,6 @@ class TabsTrayPresenter(
 
                     // Do not invoke the callback on start if this is the initial state.
                     /* if (tabs.list.isEmpty() && this.tabs != null) {
-                        Log.d("QWANT_BROWSER", "closing because empty !")
                         closeTabsTray.invoke()
                     } */
 

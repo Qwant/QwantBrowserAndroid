@@ -15,6 +15,7 @@ import mozilla.components.feature.session.ThumbnailsFeature
 import mozilla.components.feature.toolbar.WebExtensionToolbarFeature
 import mozilla.components.support.base.feature.UserInteractionHandler
 import mozilla.components.support.base.feature.ViewBoundFeatureWrapper
+import org.mozilla.reference.browser.QwantUtils
 import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.ext.components
 import org.mozilla.reference.browser.ext.requireComponents
@@ -78,7 +79,7 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
         )
 
         if (requireContext().components.core.sessionManager.sessions.none { !it.private }) {
-            requireContext().components.useCases.tabsUseCases.addTab.invoke(getString(R.string.homepage), selectTab = true)
+            requireContext().components.useCases.tabsUseCases.addTab.invoke(QwantUtils.getHomepage(requireContext().applicationContext), selectTab = true)
         }
     }
 

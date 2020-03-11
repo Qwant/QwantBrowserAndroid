@@ -171,13 +171,13 @@ class QwantBar @JvmOverloads constructor(
         // qwantbar_button_menu.menuBuilder = menuBuilder
 
         val session = sessionManager.selectedSession
-        if (session != null && session.url == context.getString(R.string.settings_page)) {
+        if (session != null && session.url.startsWith(context.getString(R.string.settings_page_startwith_filter))) {
             this.setHighlight(QwantBarSelection.MORE)
-        } else if (session == null || session.url == context.getString(R.string.homepage)) {
+        } else if (session == null || session.url.startsWith(context.getString(R.string.homepage_startwith_filter))) {
             this.setHighlight(QwantBarSelection.SEARCH)
         }
 
-        if (session == null || session.url.startsWith(context.getString(R.string.homepage))) {
+        if (session == null || session.url.startsWith(context.getString(R.string.homepage_startwith_filter))) {
             this.setBookmarkButton(BookmarkButtonType.OPEN)
         } else {
             this.setBookmarkButton(BookmarkButtonType.SESSION)
@@ -402,7 +402,7 @@ class QwantBar @JvmOverloads constructor(
         if (mode == QwantBarSessionObserver.QwantBarMode.NAVIGATION) {
             qwantbar_button_home.setImageResource(this.getIcon(QwantBarIcons.HOME, false))
         } else {
-            val selected = (sessionManager.selectedSession == null || sessionManager.selectedSession!!.url.startsWith(context.getString(R.string.homepage)))
+            val selected = (sessionManager.selectedSession == null || sessionManager.selectedSession!!.url.startsWith(context.getString(R.string.homepage_startwith_filter)))
             qwantbar_button_home.setImageResource(this.getIcon(QwantBarIcons.SEARCH, selected))
         }
     }

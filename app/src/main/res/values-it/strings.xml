@@ -12,9 +12,6 @@
     <string name="menu_action_close_tabs">Chiudi tutte le schede</string>
     <string name="menu_action_close_tabs_private">Chiudi le schede private</string>
 
-    <!-- Preference for settings related to changing the default browser -->
-    <string name="preferences_make_default_browser">Rendi il browser predefinito</string>
-
     <!-- Preference enabling remote debugging -->
     <string name="preferences_remote_debugging">Debug remoto tramite USB</string>
 
@@ -23,12 +20,6 @@
 
     <!-- Preference for enabling tracking protection in private mode -->
     <string name="preferences_tracking_protection_private">Abilita in modalità navigazione privata</string>
-
-    <!-- Preference about page -->
-    <string name="preferences_about_page">Informazioni su Qwant Browser</string>
-
-    <!-- Preference for open links in apps -->
-    <string name="open_links_in_apps">Apri collegamenti nelle app</string>
 
     <!-- Preference category for developer tools -->
     <string name="developer_tools_category">Strumenti di sviluppo</string>
@@ -106,11 +97,6 @@
     <string name="context_menu_add_homescreen">Aggiungi alla schermata Home</string>
     <string name="context_menu_find">Trova nella Pagina</string>
     <string name="context_menu_addons">Add-ons</string>
-
-    <string name="preferences_privacy_policy">Informativa sulla protezione dei dati</string>
-    <string name="privacy_policy_url">https://about.qwant.com/it/legal/riservatezza/</string>
-    <string name="preferences_license">License (MPL 2.0)</string>
-    <string name="license_url">https://www.mozilla.org/en-US/MPL/2.0/</string>
 
     <!-- Text shown in the toolbar if it is empty -->
     <string name="toolbar_hint">@string/qwant_widget_text</string>

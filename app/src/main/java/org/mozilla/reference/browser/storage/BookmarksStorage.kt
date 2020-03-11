@@ -41,28 +41,23 @@ class BookmarksStorage(private var context: Context) {
     fun get(i: Int): BookmarkItem { return this.bookmarksList[i] }
 
     fun persist() {
-        Log.d("QWANT_BROWSER", "save bookmarks !")
         try {
             val fileOutputStream: FileOutputStream = context.openFileOutput(QWANT_BOOKMARKS_FILENAME, Context.MODE_PRIVATE)
             val objectOutputStream = ObjectOutputStream(fileOutputStream)
-            Log.d("QWANT_BROWSER", "saved bookmarks: " + this.bookmarksList.size)
             objectOutputStream.writeObject(this.bookmarksList)
             objectOutputStream.flush()
             objectOutputStream.close()
             fileOutputStream.close()
         } catch (e: Exception) {
-            Log.e("QWANT_BROWSER", "Failed to save history: " + e.message)
             e.printStackTrace()
         }
     }
 
     fun restore() {
-        Log.d("QWANT_BROWSER", "restore bookmarks !")
         try {
             val fileInputStream: FileInputStream = context.openFileInput(QWANT_BOOKMARKS_FILENAME)
             val objectInputStream = ObjectInputStream(fileInputStream)
             this.bookmarksList = objectInputStream.readObject() as ArrayList<BookmarkItem>
-            Log.d("QWANT_BROWSER", "restored bookmarks: " + this.bookmarksList.size)
             objectInputStream.close()
             fileInputStream.close()
             this.emitOnChange()

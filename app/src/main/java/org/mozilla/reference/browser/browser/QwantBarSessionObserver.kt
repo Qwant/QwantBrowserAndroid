@@ -39,7 +39,7 @@ class QwantBarSessionObserver(
     }
 
     private fun checkSession(url: String) {
-        if (url.startsWith(context.getString(R.string.homepage))) {
+        if (url.startsWith(context.getString(R.string.homepage_base))) { // include result page too
             setupHomeBar()
         } else {
             setupNavigationBar()
@@ -87,7 +87,7 @@ class QwantBarSessionObserver(
         if (currentMode != QwantBarMode.HOME) {
             this.setBarHeight(56)
             this.showButtonsTexts()
-            val selected = (sessionManager.selectedSession == null || sessionManager.selectedSession!!.url.startsWith(context.getString(R.string.homepage)))
+            val selected = (sessionManager.selectedSession == null || sessionManager.selectedSession!!.url.startsWith(context.getString(R.string.homepage_startwith_filter)))
             imageviewHome.setImageResource(qwantbar.getIcon(QwantBar.QwantBarIcons.SEARCH, selected))
             qwantbar.setBookmarkButton(QwantBar.BookmarkButtonType.OPEN)
             currentMode = QwantBarMode.HOME

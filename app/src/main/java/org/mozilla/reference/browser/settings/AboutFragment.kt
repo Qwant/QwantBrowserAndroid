@@ -39,7 +39,7 @@ class AboutFragment(
         super.onViewCreated(view, savedInstanceState)
 
         val appName = requireContext().resources.getString(R.string.app_name)
-        (activity as AppCompatActivity).title = getString(R.string.preferences_about_page)
+        (activity as AppCompatActivity).title = getString(R.string.settings_about)
 
         val aboutText = try {
             val packageInfo = requireContext().packageManager.getPackageInfo(requireContext().packageName, 0)

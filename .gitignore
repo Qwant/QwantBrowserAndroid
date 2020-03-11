@@ -65,3 +65,4 @@ test_artifacts/
 google-cloud-sdk/
 *.jar
 *.gz
+/app/nightly/

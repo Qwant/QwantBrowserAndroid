@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -84,29 +85,23 @@ open class BrowserActivity : AppCompatActivity() {
     }
 
     private fun loadLocale() {
-        /* val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-        val defaultLocale = resources.configuration.locale.language
-        val savedLocale = prefs.getString(resources.getString(R.string.pref_key_general_language_interface), defaultLocale)
-
-        if (savedLocale != defaultLocale) {
-            resources.configuration.locale = Locale(savedLocale)
-            Locale.setDefault(resources.configuration.locale)
-            resources.updateConfiguration(resources.configuration, resources.displayMetrics)
-        } else {
-            val editor: SharedPreferences.Editor = prefs.edit()
-            editor.putString(resources.getString(R.string.pref_key_general_language_interface), savedLocale)
-            editor.apply()
-        } */
-
         val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         val savedLocale = prefs.getString(resources.getString(R.string.pref_key_general_language_interface), "undefined")
 
         if (savedLocale == "undefined") {
             // First time, set default locale for interface and search
-            var defaultLocale = resources.configuration.locale.language
-            if (!resources.getStringArray(R.array.languages_interface_keys).contains(defaultLocale)) {
-                defaultLocale = "en" // Fallback to english, as android does
+            var defaultLocale = "en_US" // Fallback to english, as android does
+            val phoneLocale = resources.configuration.locale.language
+            val phoneCountry = resources.configuration.locale.country
+
+            Log.d("QWANT_BROWSER", "phone locale: $phoneLocale-$phoneCountry")
+            val availableLocale = resources.getStringArray(R.array.languages_interface_keys)
+            if (!availableLocale.contains("${phoneLocale}_$phoneCountry")) {
+                availableLocale.forEach { l -> if (l.startsWith(phoneLocale)) defaultLocale = l }
+            } else {
+                defaultLocale = "${phoneLocale}_$phoneCountry"
             }
+
             val editor: SharedPreferences.Editor = prefs.edit()
             editor.putString(resources.getString(R.string.pref_key_general_language_interface), defaultLocale)
             // Set also search language
@@ -123,7 +118,7 @@ open class BrowserActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        if (components.core.sessionManager.selectedSession == null || components.core.sessionManager.selectedSession!!.url == getString(R.string.settings_page)) {
+        if (components.core.sessionManager.selectedSession == null || components.core.sessionManager.selectedSession!!.url.startsWith(getString(R.string.settings_page_startwith_filter))) {
             qwantbar.setLeftButton(QwantBar.LeftButtonType.HOME)
             qwantbar.setHighlight(QwantBar.QwantBarSelection.SEARCH)
         }
@@ -176,9 +171,9 @@ open class BrowserActivity : AppCompatActivity() {
         when (name) {
             EngineView::class.java.name -> components.core.engine.createView(context, attrs).asView()
             TabsTray::class.java.name -> {
-                BrowserTabsTray(context, attrs).also { tray ->
+                BrowserTabsTray(context, attrs)/* .also { tray ->
                     TabsTouchHelper(tray.tabsAdapter).attachToRecyclerView(tray)
-                }
+                } */
             }
             else -> super.onCreateView(parent, name, context, attrs)
         }
@@ -222,17 +217,19 @@ open class BrowserActivity : AppCompatActivity() {
 
     private fun showHome() {
         val session: Session? = components.core.sessionManager.selectedSession
-        if (session == null || session.url != getString(R.string.homepage)) {
+        if (session == null || !session.url.startsWith(getString(R.string.homepage_startwith_filter))) {
             var alreadyThere = false
             val currentSessionPrivate = (session != null && session.private)
             components.core.sessionManager.sessions.forEach {
-                if (it.private == currentSessionPrivate && it.url == getString(R.string.homepage)) {
+                if (it.private == currentSessionPrivate && it.url.startsWith(getString(R.string.homepage_startwith_filter))) {
                     components.core.sessionManager.select(it)
                     alreadyThere = true
                 }
             }
             if (!alreadyThere)
-                components.useCases.sessionUseCases.loadUrl(getString(R.string.homepage))
+                components.useCases.sessionUseCases.loadUrl(QwantUtils.getHomepage(applicationContext))
+        } else {
+            components.useCases.sessionUseCases.loadUrl(QwantUtils.getHomepage(applicationContext))
         }
 
         this.showBrowserFragment()
@@ -274,10 +271,10 @@ open class BrowserActivity : AppCompatActivity() {
 
     private fun bookmarksOrTabsClosed() {
         val session: Session? = components.core.sessionManager.selectedSession
-        if (session != null && session.url == getString(R.string.settings_page)) {
+        if (session != null && session.url.startsWith(getString(R.string.settings_page_startwith_filter))) {
             qwantbar.setHighlight(QwantBar.QwantBarSelection.MORE)
             qwantbar.setLeftButton(QwantBar.LeftButtonType.BACK)
-        } else if (session == null || session.url.startsWith(baseContext.getString(R.string.homepage))) {
+        } else if (session == null || session.url.startsWith(baseContext.getString(R.string.homepage_base))) {
             qwantbar.setHighlight(QwantBar.QwantBarSelection.SEARCH)
             qwantbar.setLeftButton(QwantBar.LeftButtonType.HOME)
         } else {

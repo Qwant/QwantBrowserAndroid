@@ -18,6 +18,7 @@ import mozilla.components.browser.state.selector.selectedTab
 import mozilla.components.support.base.feature.UserInteractionHandler
 import mozilla.components.support.ktx.android.util.dpToPx
 import mozilla.components.ui.tabcounter.TabCounter
+import org.mozilla.reference.browser.QwantUtils
 import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.browser.BrowserFragment
 import org.mozilla.reference.browser.ext.application
@@ -89,9 +90,9 @@ class TabsTrayFragment(
 
         button_new_tab.setOnClickListener((View.OnClickListener {
             if (isPrivate) {
-                context.components.useCases.tabsUseCases.addPrivateTab.invoke(context.getString(R.string.homepage), selectTab = true)
+                context.components.useCases.tabsUseCases.addPrivateTab.invoke(QwantUtils.getHomepage(applicationContext), selectTab = true)
             } else {
-                context.components.useCases.tabsUseCases.addTab.invoke(context.getString(R.string.homepage), selectTab = true)
+                context.components.useCases.tabsUseCases.addTab.invoke(QwantUtils.getHomepage(applicationContext), selectTab = true)
             }
             this.closeTabsTray()
         }))

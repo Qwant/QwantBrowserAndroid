@@ -29,10 +29,6 @@ class SettingsGeneralFragment(
         findPreference(context?.getPreferenceKey(R.string.pref_key_general_makedefaultbrowser)).onPreferenceClickListener = getClickListenerForMakeDefaultBrowser()
 
         val prefAdultContent = findPreference(context?.getPreferenceKey(R.string.pref_key_general_adultcontent)) as QwantPreferenceDropdown
-
-        Log.d("QWANT_BROWSER", "adult content value: ${prefAdultContent.value}")
-        adultContentKeys.forEach { s -> Log.d("QWANT_BROWSER", "adult content keys: $s") }
-
         prefAdultContent.summary = adultContentValues[adultContentKeys.indexOf(prefAdultContent.value)]
         prefAdultContent.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, value ->
             prefAdultContent.summary = adultContentValues[adultContentKeys.indexOf(value)]

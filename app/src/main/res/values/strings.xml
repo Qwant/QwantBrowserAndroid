@@ -12,9 +12,6 @@
     <string name="menu_action_close_tabs">Close All Tabs</string>
     <string name="menu_action_close_tabs_private">Close Private Tabs</string>
 
-    <!-- Preference for settings related to changing the default browser -->
-    <string name="preferences_make_default_browser">Make default browser</string>
-
     <!-- Preference enabling remote debugging -->
     <string name="preferences_remote_debugging">Remote debugging via USB</string>
 
@@ -23,12 +20,6 @@
 
     <!-- Preference for enabling tracking protection in private mode -->
     <string name="preferences_tracking_protection_private">Enable in Private Browsing Mode</string>
-
-    <!-- Preference about page -->
-    <string name="preferences_about_page">About Qwant Browser</string>
-
-    <!-- Preference for open links in apps -->
-    <string name="open_links_in_apps">Open links in apps</string>
 
     <!-- Preference category for developer tools -->
     <string name="developer_tools_category">Developer tools</string>
@@ -107,11 +98,6 @@
     <string name="context_menu_find">Find in Page</string>
     <string name="context_menu_addons">Add-ons</string>
 
-    <string name="preferences_privacy_policy">Privacy policy</string>
-    <string name="privacy_policy_url">https://about.qwant.com/legal/privacy/</string>
-    <string name="preferences_license">License (MPL 2.0)</string>
-    <string name="license_url">https://www.mozilla.org/en-US/MPL/2.0/</string>
-
     <string name="settings_general">General</string>
     <string name="settings_interface">Interface</string>
 
@@ -140,14 +126,17 @@
     <string name="settings_privacy_policy">Privacy policy</string>
     <string name="settings_license">License (MPL 2.0)</string>
 
-    <string name="homepage" translatable="false">https://www.qwant.com/?client=brz-huawei</string>
-    <string name="settings_page" translatable="false">https://www.qwant.com/settings?client=brz-huawei</string>
+    <string name="browser_client" translatable="false">brz-huawei</string>
+    <string name="homepage_base" translatable="false">https://www.qwant.com/</string>
+    <string name="homepage_startwith_filter" translatable="false">https://www.qwant.com/?client</string>
+    <string name="settings_page_base" translatable="false">https://www.qwant.com/settings</string>
+    <string name="settings_page_startwith_filter" translatable="false">https://www.qwant.com/settings?client=brz-huawei</string>
 
-    <string name="settings_language_english_code" translatable="false">en</string>
-    <string name="settings_language_french_code" translatable="false">fr</string>
-    <string name="settings_language_german_code" translatable="false">de</string>
-    <string name="settings_language_italian_code" translatable="false">it</string>
-    <string name="settings_language_spanish_code" translatable="false">es</string>
+    <string name="settings_language_english_code" translatable="false">en_US</string>
+    <string name="settings_language_french_code" translatable="false">fr_FR</string>
+    <string name="settings_language_german_code" translatable="false">de_DE</string>
+    <string name="settings_language_italian_code" translatable="false">it_IT</string>
+    <string name="settings_language_spanish_code" translatable="false">es_ES</string>
 
     <string name="settings_adultcontent_none_code" translatable="false">0</string>
     <string name="settings_adultcontent_moderate_code" translatable="false">1</string>
@@ -156,7 +145,7 @@
     <!-- Text shown in the toolbar if it is empty -->
     <string name="toolbar_hint">@string/qwant_widget_text</string>
 
-    <string name="mpl_license_content"><![CDATA[
+    <string name="mpl_license_content" translatable="false"><![CDATA[
         <h1 id="mozilla-public-license-version-2.0">Mozilla Public License<br>Version 2.0</h1>
         <h2 id="definitions">1. Definitions</h2>
         <dl>

@@ -27,6 +27,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.mozilla.reference.browser.IntentReceiverActivity;
+import org.mozilla.reference.browser.QwantUtils;
 import org.mozilla.reference.browser.R;
 
 import java.net.MalformedURLException;
@@ -67,8 +68,6 @@ public class Assist extends Activity {
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override protected void onCreate(Bundle savedInstanceState) {
-        Log.d(LOGTAG, "OnCreate");
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.assist_main);
 
@@ -92,7 +91,7 @@ public class Assist extends Activity {
 
         webview = findViewById(R.id.webview);
         webview.getSettings().setJavaScriptEnabled(true);
-        webview.getSettings().setUserAgentString("Mozilla/5.0 (Android; Mobile) Gecko/68.0 Firefox/68.0.2 QwantMobile/3.4");
+        webview.getSettings().setUserAgentString("Mozilla/5.0 (Android 9; Mobile; rv:74.0) Gecko/74.0 Firefox/74.0 QwantMobile/4.0");
 
         // MAPS SETTINGS
         webview.getSettings().setGeolocationEnabled(true);
@@ -118,7 +117,6 @@ public class Assist extends Activity {
             @Override public void onPageFinished(WebView view, String url) {
                 if (webview.getVisibility() == View.INVISIBLE /* && !webview.getUrl().contains("preload") */) {
                     webview.setVisibility(View.VISIBLE);
-                    Log.d("QwantFocus", "Clearing focus");
                     search_text.clearFocus();
                     search_text.dismissDropDown();
                     webview.requestFocus();
@@ -132,9 +130,7 @@ public class Assist extends Activity {
                 permission_request_origin = null;
                 permission_request_callback = null;
                 final LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-                Log.d(LOGTAG, "test GPS");
                 if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                    Log.d(LOGTAG, "GPS disabled");
                     final AlertDialog.Builder builder = new AlertDialog.Builder(Assist.this);
                     builder.setMessage("Your GPS seems to be disabled, do you want to enable it?")
                         .setCancelable(false)
@@ -144,11 +140,8 @@ public class Assist extends Activity {
                     alert.show();
                     callback.invoke(origin, false, false);
                 } else {
-                    Log.d(LOGTAG, "GPS ok, check permission");
                     if (ContextCompat.checkSelfPermission(Assist.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                        Log.d(LOGTAG, "permission not ok");
                         if (ActivityCompat.shouldShowRequestPermissionRationale(Assist.this, Manifest.permission.READ_CONTACTS)) {
-                            Log.d(LOGTAG, "permission show rationale");
                             new AlertDialog.Builder(Assist.this)
                                 .setMessage("We can not provide location without this permission")
                                 .setNeutralButton("Understood ...", (dialogInterface, i) -> {
@@ -157,13 +150,11 @@ public class Assist extends Activity {
                                     ActivityCompat.requestPermissions(Assist.this, new String[] { Manifest.permission.ACCESS_FINE_LOCATION }, QWANT_PERMISSIONS_REQUEST_FINE_LOCATION);
                                 }).show();
                         } else {
-                            Log.d(LOGTAG, "request permission");
                             permission_request_origin = origin;
                             permission_request_callback = callback;
                             ActivityCompat.requestPermissions(Assist.this, new String[] { Manifest.permission.ACCESS_FINE_LOCATION }, 0);
                         }
                     } else {
-                        Log.d(LOGTAG, "permission ok");
                         callback.invoke(origin, true, true);
                     }
                 }
@@ -171,7 +162,6 @@ public class Assist extends Activity {
         });
         // Hide webview and preload SERP for speed of next user request (cache)
         webview.setVisibility(View.INVISIBLE);
-        // webview.loadUrl("https://www.qwant.com/?widget=1&q=a&preload=true");
 
         ImageView cancel_cross = findViewById(R.id.widget_search_bar_cross);
         cancel_cross.setVisibility(View.INVISIBLE);
@@ -250,14 +240,11 @@ public class Assist extends Activity {
     @Override public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == QWANT_PERMISSIONS_REQUEST_FINE_LOCATION) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Log.d(LOGTAG, "permission granted");
                 permission_request_callback.invoke(permission_request_origin, true, true);
             } else {
-                Log.d(LOGTAG, "permission refused");
                 permission_request_callback.invoke(permission_request_origin, false, false);
             }
         } else {
-            Log.e(LOGTAG, "Rejecting invalid RequestPermissionResult with unknown code: " + requestCode);
             permission_request_callback.invoke(permission_request_origin, false, false);
         }
     }
@@ -269,7 +256,6 @@ public class Assist extends Activity {
     }
 
     @Override public void onBackPressed() {
-        Log.d(LOGTAG, "onBackPressed");
         if (home_layout.getVisibility() == View.INVISIBLE) {
             home_layout.setVisibility(View.VISIBLE);
             reset_searchbar();
@@ -280,13 +266,11 @@ public class Assist extends Activity {
 
     @Override protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        Log.d(LOGTAG, "Save history");
         history_adapter.write_on_disk();
     }
 
     @Override protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        Log.d(LOGTAG, "Restore history");
         history_adapter.read_from_disk();
     }
 
@@ -302,22 +286,17 @@ public class Assist extends Activity {
         if (clipboard.hasPrimaryClip() &&
         (clipboard.getPrimaryClipDescription().hasMimeType(MIMETYPE_TEXT_PLAIN) || clipboard.getPrimaryClipDescription().hasMimeType(MIMETYPE_TEXT_HTML))) {
             ClipData.Item item = clipboard.getPrimaryClip().getItemAt(0);
-            Log.d(LOGTAG, "clipboard description data: " + clipboard.getPrimaryClip().getDescription().toString());
             String clipboard_text = null;
             Uri clipboard_uri = item.getUri();
             if (clipboard_uri != null) {
                 clipboard_is_url = true;
                 clipboard_text = clipboard_uri.toString();
-                Log.d(LOGTAG, "clipboard is url: " + clipboard_text);
             } else if (item.getText() != null) {
                 clipboard_text = item.getText().toString().trim();
                 try {
                     URL url = new URL(clipboard_text);
                     clipboard_is_url = true;
-                    Log.d(LOGTAG, "clipboard is url: " + clipboard_text);
-                } catch (MalformedURLException e) {
-                    Log.d(LOGTAG, "clipboard is text: " + clipboard_text);
-                }
+                } catch (MalformedURLException e) {}
             }
 
             if (clipboard_text != null && clipboard_text.length() > 0) {
@@ -330,7 +309,6 @@ public class Assist extends Activity {
             }
         }
         // If we get there, no clipboard value is usable so we hide it
-        Log.d(LOGTAG, "Final clipboard value is null");
         this.clipboard_layout.setVisibility(View.GONE);
     }
 
@@ -343,11 +321,10 @@ public class Assist extends Activity {
         if (query.length() > 0) {
             // home_layout.requestFocus(); // While webview is loading. Webview take focus after load
             home_layout.setVisibility(View.INVISIBLE);
-            webview.loadUrl(getString(R.string.homepage) + "?widget=1&q=" + query);
+            webview.loadUrl(QwantUtils.Companion.getHomepage(getApplicationContext(), query, true));
             // Force hide keyboard
             InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(search_text.getWindowToken(), 0);
-            Log.d("QwantFocus", "Clearing focus");
             search_text.clearFocus();
             search_text.dismissDropDown();
             webview.requestFocus();
