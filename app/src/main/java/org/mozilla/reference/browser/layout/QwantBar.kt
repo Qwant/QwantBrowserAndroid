@@ -3,7 +3,6 @@ package org.mozilla.reference.browser.layout
 import android.content.Context
 import android.content.Intent
 import android.util.AttributeSet
-import android.util.Log
 import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
 import android.widget.ImageView
@@ -48,8 +47,6 @@ class QwantBar @JvmOverloads constructor(
 
     private val tabCallbacks: MutableList<() -> Unit> = mutableListOf()
     private val bookmarksCallbacks: MutableList<() -> Unit> = mutableListOf()
-    private val addBookmarksCallbacks: MutableList<() -> Unit> = mutableListOf()
-    private val deleteBookmarksCallbacks: MutableList<() -> Unit> = mutableListOf()
     private val homeCallbacks: MutableList<() -> Unit> = mutableListOf()
     private val menuCallbacks: MutableList<() -> Unit> = mutableListOf()
 
@@ -299,35 +296,6 @@ class QwantBar @JvmOverloads constructor(
     private fun updateTabCount() {
         reference.get()?.setCountWithAnimation(sessionManager.sessions.size)
     }
-
-    /* enum class BookmarkButtonType {
-        OPEN, ADD, DELETE, SESSION
-    }
-
-    private var currentBookmarkType = BookmarkButtonType.OPEN */
-
-    /* fun setBookmarkButton(type: BookmarkButtonType) {
-        currentBookmarkType = type
-        if (type == BookmarkButtonType.SESSION) {
-            qwantbar_layout_bookmarks.visibility = View.GONE
-            val session = sessionManager.selectedSession
-            if (session != null && this.bookmarksStorage != null && this.bookmarksStorage!!.contains(session.url)) {
-                qwantbar_layout_bookmarks_add.visibility = View.GONE
-                qwantbar_layout_bookmarks_delete.visibility = View.VISIBLE
-            } else {
-                qwantbar_layout_bookmarks_add.visibility = View.VISIBLE
-                qwantbar_layout_bookmarks_delete.visibility = View.GONE
-            }
-        } else {
-            qwantbar_layout_bookmarks.visibility = if (type == BookmarkButtonType.OPEN) View.VISIBLE else View.GONE
-            qwantbar_layout_bookmarks_add.visibility = if (type == BookmarkButtonType.ADD) View.VISIBLE else View.GONE
-            qwantbar_layout_bookmarks_delete.visibility = if (type == BookmarkButtonType.DELETE) View.VISIBLE else View.GONE
-        }
-    }
-
-    fun getBookmarkButtonType(): BookmarkButtonType {
-        return currentBookmarkType
-    } */
 
     fun updateHomeIcon(mode: QwantBarSessionObserver.QwantBarMode?) {
         if (mode == QwantBarSessionObserver.QwantBarMode.NAVIGATION) {

@@ -90,6 +90,34 @@
     <string name="bookmarks_delete">Eliminar</string>
     <string name="bookmarks_add">Añadir marcador</string>
 
+    <string name="settings_general">General</string>
+    <string name="settings_interface">Interfaz</string>
+
+    <string name="settings_general_language">Idioma</string>
+    <string name="settings_general_adultcontent">Filtro de contenido para adultos</string>
+    <string name="settings_general_newsonhome">Noticias en la página de inicio</string>
+    <string name="settings_general_cleardata">Borrar datos de navegación</string>
+    <string name="settings_general_launchexternalapp">Abrir enlaces en la aplicación nativa</string>
+    <string name="settings_general_makedefaultbrowser">Navegador predeterminado</string>
+
+    <string name="settings_general_language_interface">Idioma de la interfaz</string>
+    <string name="settings_general_language_search">Idioma de resultados de búsqueda</string>
+
+    <string name="settings_language_english">Inglés</string>
+    <string name="settings_language_french">Francés</string>
+    <string name="settings_language_german">Alemán</string>
+    <string name="settings_language_italian">Italiano</string>
+    <string name="settings_language_spanish">Español</string>
+
+    <string name="settings_adultcontent_none">Ninguno</string>
+    <string name="settings_adultcontent_moderate">Moderado</string>
+    <string name="settings_adultcontent_strict">Estricto</string>
+
+    <string name="settings_about_menu">Acerca de</string>
+    <string name="settings_about">Acerca del navegador Qwant</string>
+    <string name="settings_privacy_policy">Política de privacidad</string>
+    <string name="settings_license">Licencia (MPL 2.0)</string>
+
     <string name="context_menu_forward">Adelante</string>
     <string name="context_menu_refresh">Actualizar</string>
     <string name="context_menu_stop">Detener</string>
@@ -98,6 +126,8 @@
     <string name="context_menu_add_homescreen">Añadir a la pantalla principal</string>
     <string name="context_menu_find">Buscar en la página</string>
     <string name="context_menu_addons">Add-ons</string>
+    <string name="context_menu_add_bookmark">Añadir marcador</string>
+    <string name="context_menu_del_bookmark">Eliminar marcador</string>
 
     <!-- Text shown in the toolbar if it is empty -->
     <string name="toolbar_hint">@string/qwant_widget_text</string>

@@ -89,6 +89,38 @@
     <string name="bookmarks_delete">Elimina</string>
     <string name="bookmarks_add">Aggiungi segnalibro</string>
 
+    <string name="context_menu_add_bookmark">Aggiungi segnalibro</string>
+    <string name="context_menu_del_bookmark">Elimina segnalibro</string>
+
+    <string name="settings_general">Generali</string>
+    <string name="settings_interface">Interfaccia</string>
+
+    <string name="settings_general_language">Lingua</string>
+    <string name="settings_general_adultcontent">Filtro contenuti per adulti</string>
+    <string name="settings_general_newsonhome">Notizie sulla pagina iniziale</string>
+    <string name="settings_general_cleardata">Cancella i dati di navigazione</string>
+    <string name="settings_general_launchexternalapp">Apri collegamenti nell\'app nativa</string>
+    <string name="settings_general_makedefaultbrowser">Imposta come browser predefinito</string>
+
+    <string name="settings_general_language_interface">Lingua dell\'interfaccia</string>
+    <string name="settings_general_language_search">Lingua dei risultati di ricerca</string>
+
+    <string name="settings_language_english">Inglese</string>
+    <string name="settings_language_french">Francese</string>
+    <string name="settings_language_german">Tedesco</string>
+    <string name="settings_language_italian">Italiano</string>
+    <string name="settings_language_spanish">Spagnolo</string>
+
+    <string name="settings_adultcontent_none">Nessuno</string>
+    <string name="settings_adultcontent_moderate">Moderato</string>
+    <string name="settings_adultcontent_strict">Rigoroso</string>
+
+    <string name="settings_about_menu">Informazioni</string>
+    <string name="settings_about">Informazioni sul motore di ricerca Qwant</string>
+    <string name="settings_privacy_policy">Informativa sulla privacy</string>
+    <string name="settings_license">Licenza (MPL 2.0)</string>
+
+
     <string name="context_menu_forward">Inoltra</string>
     <string name="context_menu_refresh">Ricarica</string>
     <string name="context_menu_stop">Ferma</string>

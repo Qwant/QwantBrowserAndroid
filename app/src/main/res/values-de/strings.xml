@@ -89,6 +89,39 @@
     <string name="bookmarks_delete">Löschen</string>
     <string name="bookmarks_add">Lesezeichen hinzufügen</string>
 
+
+    <string name="context_menu_add_bookmark">Lesezeichen hinzufügen</string>
+    <string name="context_menu_del_bookmark">Lesezeichen löschen</string>
+
+    <string name="settings_general">Allgemein</string>
+    <string name="settings_interface">Oberfläche</string>
+
+    <string name="settings_general_language">Sprache</string>
+    <string name="settings_general_adultcontent">Filter für Erwachseneninhalte</string>
+    <string name="settings_general_newsonhome">News auf Homepage</string>
+    <string name="settings_general_cleardata">Browsing-Daten zurücksetzen</string>
+    <string name="settings_general_launchexternalapp">Links in nativer App öffnen</string>
+    <string name="settings_general_makedefaultbrowser">Als Standardbrowser festlegen</string>
+
+    <string name="settings_general_language_interface">Oberflächensprache</string>
+    <string name="settings_general_language_search">Sprache der Suchergebnisse</string>
+
+    <string name="settings_language_english">Englisch</string>
+    <string name="settings_language_french">Französisch</string>
+    <string name="settings_language_german">Deutsch</string>
+    <string name="settings_language_italian">Italienisch</string>
+    <string name="settings_language_spanish">Spanisch</string>
+
+    <string name="settings_adultcontent_none">Keiner</string>
+    <string name="settings_adultcontent_moderate">Moderat</string>
+    <string name="settings_adultcontent_strict">Streng</string>
+
+    <string name="settings_about_menu">Über</string>
+    <string name="settings_about">Über Qwant Browser</string>
+    <string name="settings_privacy_policy">Datenschutzerklärung</string>
+    <string name="settings_license">Lizenz (MPL 2.0)</string>
+
+
     <string name="context_menu_forward">Weiter</string>
     <string name="context_menu_refresh">Aktualisieren</string>
     <string name="context_menu_stop">Stopp</string>

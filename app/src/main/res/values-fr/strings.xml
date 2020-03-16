@@ -97,6 +97,8 @@
     <string name="context_menu_add_homescreen">Ajouter à l\'accueil</string>
     <string name="context_menu_find">Rechercher dans la page</string>
     <string name="context_menu_addons">Add-ons</string>
+    <string name="context_menu_add_bookmark">Ajouter aux favoris</string>
+    <string name="context_menu_del_bookmark">Retirer des favoris</string>
 
     <string name="settings_general">General</string>
     <string name="settings_interface">Interface</string>
