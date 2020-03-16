@@ -7,7 +7,7 @@ package org.mozilla.reference.browser.components
 import android.content.Context
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
-import mozilla.components.browser.icons.BrowserIcons
+import org.mozilla.reference.browser.browser.icons.BrowserIcons
 import mozilla.components.browser.session.SessionManager
 import mozilla.components.browser.session.storage.SessionStorage
 import mozilla.components.browser.state.store.BrowserStore
@@ -25,7 +25,7 @@ import mozilla.components.feature.media.MediaFeature
 import mozilla.components.feature.media.RecordingDevicesNotificationFeature
 import mozilla.components.feature.media.state.MediaStateMachine
 import mozilla.components.feature.session.HistoryDelegate
-import mozilla.components.feature.webnotifications.WebNotificationFeature
+import org.mozilla.reference.browser.browser.WebNotificationFeature
 import org.mozilla.reference.browser.AppRequestInterceptor
 import org.mozilla.reference.browser.BrowserActivity
 import org.mozilla.reference.browser.EngineProvider
