@@ -40,7 +40,12 @@
         app:layout_constraintBottom_toTopOf="@+id/tabsTray"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="@color/qwant_background_dark"
+        android:backgroundTint="?attr/qwant_color_background_dark"
+        app:titleTextColor="?attr/qwant_color_main"
+        android:theme="@style/ThemeQwantNoActionBar"
+        app:navigationIcon="@drawable/ic_back" />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -52,6 +57,13 @@
         android:paddingTop="8dp"
         android:paddingBottom="8dp"
         android:background="?attr/qwant_color_background_dark">
+
+        <ImageButton
+            android:id="@+id/back_tabs_button"
+            android:layout_width="64dp"
+            android:layout_height="48dp"
+            android:background="@android:color/transparent"
+            app:srcCompat="@drawable/ic_back" />
 
         <ImageButton
             android:id="@+id/tab_switch_button_background"

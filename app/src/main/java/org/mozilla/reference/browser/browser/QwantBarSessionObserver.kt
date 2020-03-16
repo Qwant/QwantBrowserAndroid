@@ -5,8 +5,10 @@ import android.content.Intent
 import android.content.res.Resources
 import android.view.View
 import android.widget.ImageView
+import android.widget.TextView
 import mozilla.components.browser.session.Session
 import mozilla.components.browser.session.SessionManager
+import mozilla.components.support.ktx.android.content.getColorFromAttr
 import mozilla.components.support.ktx.android.util.dpToPx
 import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.layout.QwantBar
@@ -18,12 +20,19 @@ class QwantBarSessionObserver(
         private val qwantbar: QwantBar,
         private val bookmarksStorage: BookmarksStorage
 ) : SessionManager.Observer, Session.Observer {
-    private var textviewHome : View = qwantbar.findViewById(R.id.qwantbar_text_home)
+    private var textviewHome : TextView = qwantbar.findViewById(R.id.qwantbar_text_home)
     private var textviewBookmarks : View = qwantbar.findViewById(R.id.qwantbar_text_bookmarks)
     private var textviewTabs : View = qwantbar.findViewById(R.id.qwantbar_text_tabs)
-    private var textviewMenu : View = qwantbar.findViewById(R.id.qwantbar_text_menu)
-    private var textviewBack : View = qwantbar.findViewById(R.id.qwantbar_text_back)
+    private var textviewMenu : View = qwantbar.findViewById(R.id.qwantbar_text_menu_qwant)
     private var imageviewHome : ImageView = qwantbar.findViewById(R.id.qwantbar_button_home)
+    private var imageviewNavBack : ImageView = qwantbar.findViewById(R.id.qwantbar_button_nav_back)
+    private var imageviewNavForward : ImageView = qwantbar.findViewById(R.id.qwantbar_button_nav_forward)
+
+    private var layoutNavBack : View = qwantbar.findViewById(R.id.qwantbar_layout_nav_back)
+    private var layoutNavForward : View = qwantbar.findViewById(R.id.qwantbar_layout_nav_forward)
+    private var layoutBookmarks : View = qwantbar.findViewById(R.id.qwantbar_layout_bookmarks)
+    private var layoutMenuQwant : View = qwantbar.findViewById(R.id.qwantbar_layout_menu_qwant)
+    private var layoutMenuNav : View = qwantbar.findViewById(R.id.qwantbar_layout_menu_nav)
 
     private var currentMode: QwantBarMode = QwantBarMode.HOME
 
@@ -43,7 +52,6 @@ class QwantBarSessionObserver(
             setupHomeBar()
         } else {
             setupNavigationBar()
-            checkBookmarks(url)
         }
     }
 
@@ -51,22 +59,11 @@ class QwantBarSessionObserver(
         return currentMode
     }
 
-    private fun checkBookmarks(url: String) {
-        if (qwantbar.getBookmarkButtonType() == QwantBar.BookmarkButtonType.SESSION) {
-            if (bookmarksStorage.contains(url)) {
-                qwantbar.setBookmarkButton(QwantBar.BookmarkButtonType.DELETE)
-            } else {
-                qwantbar.setBookmarkButton(QwantBar.BookmarkButtonType.ADD)
-            }
-        }
-    }
-
     private fun showButtonsTexts() {
         textviewHome.visibility = View.VISIBLE
         textviewBookmarks.visibility = View.VISIBLE
         textviewTabs.visibility = View.VISIBLE
         textviewMenu.visibility = View.VISIBLE
-        textviewBack.visibility = View.VISIBLE
     }
 
     private fun hideButtonsTexts() {
@@ -74,7 +71,6 @@ class QwantBarSessionObserver(
         textviewBookmarks.visibility = View.GONE
         textviewTabs.visibility = View.GONE
         textviewMenu.visibility = View.GONE
-        textviewBack.visibility = View.GONE
     }
 
     private fun setBarHeight(height_dp: Int) {
@@ -83,23 +79,38 @@ class QwantBarSessionObserver(
         qwantbar.layoutParams = qwantbarParams
     }
 
-    private fun setupHomeBar() {
+    fun setupHomeBar() {
         if (currentMode != QwantBarMode.HOME) {
             this.setBarHeight(56)
             this.showButtonsTexts()
-            val selected = (sessionManager.selectedSession == null || sessionManager.selectedSession!!.url.startsWith(context.getString(R.string.homepage_startwith_filter)))
+            val selected = (sessionManager.selectedSession == null || sessionManager.selectedSession!!.url.startsWith("https://www.qwant.com"))
             imageviewHome.setImageResource(qwantbar.getIcon(QwantBar.QwantBarIcons.SEARCH, selected))
-            qwantbar.setBookmarkButton(QwantBar.BookmarkButtonType.OPEN)
+            if (selected) qwantbar.setHighlight(QwantBar.QwantBarSelection.SEARCH)
+            // qwantbar.setBookmarkButton(QwantBar.BookmarkButtonType.OPEN)
+
+            layoutNavBack.visibility = View.GONE
+            layoutNavForward.visibility = View.GONE
+            layoutBookmarks.visibility = View.VISIBLE
+            layoutMenuQwant.visibility = View.VISIBLE
+            layoutMenuNav.visibility = View.GONE
+
             currentMode = QwantBarMode.HOME
         }
     }
 
-    private fun setupNavigationBar() {
+    fun setupNavigationBar() {
         if (currentMode != QwantBarMode.NAVIGATION) {
             this.setBarHeight(36)
             this.hideButtonsTexts()
             imageviewHome.setImageResource(qwantbar.getIcon(QwantBar.QwantBarIcons.HOME, false))
-            qwantbar.setBookmarkButton(QwantBar.BookmarkButtonType.SESSION)
+            // qwantbar.setBookmarkButton(QwantBar.BookmarkButtonType.SESSION)
+
+            layoutNavBack.visibility = View.VISIBLE
+            layoutNavForward.visibility = View.VISIBLE
+            layoutBookmarks.visibility = View.GONE
+            layoutMenuQwant.visibility = View.GONE
+            layoutMenuNav.visibility = View.VISIBLE
+
             currentMode = QwantBarMode.NAVIGATION
         }
     }
@@ -140,5 +151,15 @@ class QwantBarSessionObserver(
 
     override fun onFullScreenChanged(session: Session, enabled: Boolean) {
         qwantbar.visibility = if (enabled) View.GONE else View.VISIBLE
+    }
+
+    override fun onNavigationStateChanged(session: Session, canGoBack: Boolean, canGoForward: Boolean) {
+        super.onNavigationStateChanged(session, canGoBack, canGoForward)
+        if (sessionManager.selectedSession != null && session.id == sessionManager.selectedSession!!.id) {
+            val backColor = if (canGoBack) context.getColorFromAttr(R.attr.qwant_color_main) else context.getColorFromAttr(R.attr.qwant_color_light)
+            imageviewNavBack.setBackgroundColor(backColor)
+            val forwardColor = if (canGoForward) context.getColorFromAttr(R.attr.qwant_color_main) else context.getColorFromAttr(R.attr.qwant_color_light)
+            imageviewNavForward.setBackgroundColor(forwardColor)
+        }
     }
 }

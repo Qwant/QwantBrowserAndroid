@@ -8,13 +8,13 @@
     <org.mozilla.reference.browser.settings.QwantPreference
         android:key="@string/pref_key_privacy"
         android:title="@string/privacy"
-        android:icon="@drawable/ic_bookmark"
+        android:icon="@drawable/ic_settings_privacy"
         android:widgetLayout="@layout/preference_arrowed_widget" />
 
     <org.mozilla.reference.browser.settings.QwantPreference
         android:key="@string/pref_key_general"
         android:title="@string/settings_general"
-        android:icon="@drawable/ic_bookmark"
+        android:icon="@drawable/ic_settings_general"
         android:widgetLayout="@layout/preference_arrowed_widget" />
 
     <!-- <androidx.preference.Preference
@@ -26,37 +26,7 @@
     <org.mozilla.reference.browser.settings.QwantPreference
         android:key="@string/pref_key_about_menu"
         android:title="@string/settings_about_menu"
-        android:icon="@drawable/ic_bookmark"
+        android:icon="@drawable/ic_settings_about"
         android:widgetLayout="@layout/preference_arrowed_widget" />
-
-    <!-- <androidx.preference.Preference
-        android:key="@string/pref_key_privacy"
-        android:title="@string/privacy"
-        android:summary="@string/preferences_privacy_summary"
-        android:icon="@drawable/ic_bookmark"
-        android:widgetLayout="@layout/preference_arrowed_widget" />
-
-    <androidx.preference.SwitchPreferenceCompat
-        android:key="@string/pref_key_launch_external_app"
-        android:defaultValue="false"
-        android:title="@string/open_links_in_apps" />
-
-    <androidx.preference.Preference
-            android:key="@string/pref_key_make_default_browser"
-            android:title="@string/preferences_make_default_browser"/>
-
-    <PreferenceCategory
-        android:title="@string/qwant_category">
-
-        <androidx.preference.Preference
-            android:key="@string/pref_key_about_page"
-            android:title="@string/preferences_about_page" />
-        <androidx.preference.Preference
-            android:key="@string/pref_key_privacy_policy"
-            android:title="@string/preferences_privacy_policy" />
-        <androidx.preference.Preference
-            android:key="@string/pref_key_license"
-            android:title="@string/preferences_license" />
-    </PreferenceCategory> -->
 
 </androidx.preference.PreferenceScreen>

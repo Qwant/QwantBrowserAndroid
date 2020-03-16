@@ -17,7 +17,8 @@ import org.mozilla.reference.browser.browser.BrowserFragment
 
 
 class SettingsContainerFragment(
-        val language_changed_reload: Boolean = false
+        private val settingsClosedCallback: (() -> Unit)? = null,
+        private val language_changed_reload: Boolean = false
 ) : Fragment(), UserInteractionHandler {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         context?.theme?.applyStyle(R.style.ThemeQwantNoActionBar, true);
@@ -55,6 +56,7 @@ class SettingsContainerFragment(
         parentFragmentManager.beginTransaction()
             .replace(R.id.container, BrowserFragment.create(), "BROWSER_FRAGMENT")
             .commit()
+        settingsClosedCallback?.invoke()
         return true
     }
 

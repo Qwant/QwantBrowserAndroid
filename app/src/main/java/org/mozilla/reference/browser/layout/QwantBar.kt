@@ -3,9 +3,9 @@ package org.mozilla.reference.browser.layout
 import android.content.Context
 import android.content.Intent
 import android.util.AttributeSet
+import android.util.Log
 import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
-import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -16,7 +16,6 @@ import kotlinx.coroutines.launch
 import mozilla.components.browser.menu.BrowserMenuBuilder
 import mozilla.components.browser.menu.BrowserMenuItem
 import mozilla.components.browser.menu.item.BrowserMenuItemToolbar
-import mozilla.components.browser.menu.item.BrowserMenuSwitch
 import mozilla.components.browser.menu.item.SimpleBrowserMenuItem
 import mozilla.components.browser.session.Session
 import mozilla.components.browser.session.SessionManager
@@ -52,7 +51,6 @@ class QwantBar @JvmOverloads constructor(
     private val addBookmarksCallbacks: MutableList<() -> Unit> = mutableListOf()
     private val deleteBookmarksCallbacks: MutableList<() -> Unit> = mutableListOf()
     private val homeCallbacks: MutableList<() -> Unit> = mutableListOf()
-    private val backCallbacks: MutableList<() -> Unit> = mutableListOf()
     private val menuCallbacks: MutableList<() -> Unit> = mutableListOf()
 
     private var tabButtonBox: ImageView? = null
@@ -62,14 +60,6 @@ class QwantBar @JvmOverloads constructor(
     private var currentPrivacyEnabled = false
 
     private val menuToolbar by lazy {
-        val forward = BrowserMenuItemToolbar.Button(
-            mozilla.components.ui.icons.R.drawable.mozac_ic_forward,
-            iconTintColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
-            contentDescription = context.getString(R.string.context_menu_forward),
-            isEnabled = { sessionManager.selectedSession?.canGoForward == true }) {
-            sessionUseCases.goForward.invoke()
-        }
-
         val refresh = BrowserMenuItemToolbar.Button(
             mozilla.components.ui.icons.R.drawable.mozac_ic_refresh,
             iconTintColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
@@ -84,12 +74,32 @@ class QwantBar @JvmOverloads constructor(
             sessionUseCases.stopLoading.invoke()
         }
 
-        BrowserMenuItemToolbar(listOf(forward, refresh, stop))
+        BrowserMenuItemToolbar(listOf(refresh, stop))
     }
 
     private val menuItems: List<BrowserMenuItem> by lazy {
         listOf(
             menuToolbar,
+
+            SimpleBrowserMenuItem(context.getString(R.string.context_menu_add_bookmark), textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main)) {
+                bookmarksStorage?.addBookmark(sessionManager.selectedSession)
+            }.apply {
+                visible = {
+                    if (bookmarksStorage != null && sessionManager.selectedSession != null)
+                        !bookmarksStorage!!.contains(sessionManager.selectedSession!!.url)
+                    else false
+                }
+            },
+
+            SimpleBrowserMenuItem(context.getString(R.string.context_menu_del_bookmark), textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main)) {
+                bookmarksStorage?.deleteBookmark(sessionManager.selectedSession)
+            }.apply {
+                visible = {
+                    if (bookmarksStorage != null && sessionManager.selectedSession != null)
+                        bookmarksStorage!!.contains(sessionManager.selectedSession!!.url)
+                    else false
+                }
+            },
 
             SimpleBrowserMenuItem(context.getString(R.string.context_menu_share), textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main)) {
                 val url = sessionManager.selectedSession?.url ?: ""
@@ -97,14 +107,6 @@ class QwantBar @JvmOverloads constructor(
             }.apply {
                 visible = { sessionManager.selectedSession != null }
             },
-
-            /* BrowserMenuSwitch(context.getString(R.string.context_menu_request_desktop), {
-                sessionManager.selectedSessionOrThrow.desktopMode
-            }) { checked ->
-                sessionUseCases.requestDesktopSite.invoke(checked)
-            }.apply {
-                visible = { sessionManager.selectedSession != null }
-            }, */
 
             SimpleBrowserMenuItem(context.getString(R.string.context_menu_add_homescreen), textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main)) {
                 MainScope().launch { webAppUseCases.addToHomescreen() }
@@ -129,8 +131,7 @@ class QwantBar @JvmOverloads constructor(
             },
 
             SimpleBrowserMenuItem(context.getString(R.string.settings), textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main)) {
-                /* val intent = Intent(context, SettingsActivity::class.java)
-                context.startActivity(intent) */
+                this.emitOnMenuClicked()
             }
         )
     }
@@ -162,25 +163,18 @@ class QwantBar @JvmOverloads constructor(
         qwantbar_button_tabs.contentDescription = context.getString(R.string.mozac_feature_tabs_toolbar_tabs_button)
 
         qwantbar_layout_home.setOnClickListener { this.emitOnHomeClicked() }
-        qwantbar_layout_back.setOnClickListener { this.emitOnBackClicked() }
         qwantbar_layout_bookmarks.setOnClickListener { this.emitOnBookmarksClicked() }
-        qwantbar_layout_bookmarks_add.setOnClickListener { this.emitOnAddBookmarksClicked() }
-        qwantbar_layout_bookmarks_delete.setOnClickListener { this.emitOnDeleteBookmarksClicked() }
-        qwantbar_layout_menu.setOnClickListener { this.emitOnMenuClicked() }
+        qwantbar_layout_menu_qwant.setOnClickListener { this.emitOnMenuClicked() }
+        qwantbar_layout_nav_back.setOnClickListener { sessionUseCases.goBack.invoke() }
+        qwantbar_layout_nav_forward.setOnClickListener { sessionUseCases.goForward.invoke() }
 
-        // qwantbar_button_menu.menuBuilder = menuBuilder
+        qwantbar_button_menu_nav.menuBuilder = menuBuilder
 
         val session = sessionManager.selectedSession
         if (session != null && session.url.startsWith(context.getString(R.string.settings_page_startwith_filter))) {
             this.setHighlight(QwantBarSelection.MORE)
         } else if (session == null || session.url.startsWith(context.getString(R.string.homepage_startwith_filter))) {
             this.setHighlight(QwantBarSelection.SEARCH)
-        }
-
-        if (session == null || session.url.startsWith(context.getString(R.string.homepage_startwith_filter))) {
-            this.setBookmarkButton(BookmarkButtonType.OPEN)
-        } else {
-            this.setBookmarkButton(BookmarkButtonType.SESSION)
         }
     }
 
@@ -196,20 +190,8 @@ class QwantBar @JvmOverloads constructor(
         bookmarksCallbacks.add(callback)
     }
 
-    fun onAddBookmarkClicked(callback: () -> Unit) {
-        addBookmarksCallbacks.add(callback)
-    }
-
-    fun onDeleteBookmarkClicked(callback: () -> Unit) {
-        deleteBookmarksCallbacks.add(callback)
-    }
-
     fun onHomeClicked(callback: () -> Unit) {
         homeCallbacks.add(callback)
-    }
-
-    fun onBackClicked(callback: () -> Unit) {
-        backCallbacks.add(callback)
     }
 
     fun onMenuClicked(callback: () -> Unit) {
@@ -230,13 +212,8 @@ class QwantBar @JvmOverloads constructor(
         qwantbar_button_bookmarks.setImageResource(this.getIcon(QwantBarIcons.BOOKMARKS, (selection == QwantBarSelection.BOOKMARKS)))
         qwantbar_text_bookmarks.setTextColor(if (selection == QwantBarSelection.BOOKMARKS) colorSelected else colorDefault)
 
-        qwantbar_button_bookmarks_add.setImageResource(this.getIcon(QwantBarIcons.BOOKMARKS_ADD, false))
-        qwantbar_button_bookmarks_delete.setImageResource(this.getIcon(QwantBarIcons.BOOKMARKS_DELETE, false))
-
-        qwantbar_button_menu.setImageResource(this.getIcon(QwantBarIcons.MORE, (selection == QwantBarSelection.MORE)))
-        qwantbar_text_menu.setTextColor(if (selection == QwantBarSelection.MORE) colorSelected else colorDefault)
-        /* qwantbar_button_menu.setColorFilter(colorDefault)
-        qwantbar_text_menu.setTextColor(colorDefault) */
+        qwantbar_button_menu_qwant.setImageResource(this.getIcon(QwantBarIcons.MENU_QWANT, (selection == QwantBarSelection.MORE)))
+        qwantbar_text_menu_qwant.setTextColor(if (selection == QwantBarSelection.MORE) colorSelected else colorDefault)
 
         val tabColor = if (selection == QwantBarSelection.TABS) colorSelected else colorDefault
         tabButtonBox?.setImageDrawable(DrawableUtils.loadAndTintDrawable(context, R.drawable.mozac_ui_tabcounter_box, tabColor))
@@ -244,58 +221,43 @@ class QwantBar @JvmOverloads constructor(
         tabButtonText?.setTextColor(tabColor)
         qwantbar_text_tabs.setTextColor(if (selection == QwantBarSelection.TABS) colorSelected else colorDefault)
 
-        qwantbar_button_back.setImageResource(this.getIcon(QwantBarIcons.BACK, false))
-        qwantbar_text_back.setTextColor(colorDefault)
+        qwantbar_button_menu_nav.setColorFilter(ContextCompat.getColor(context, this.getIconColor(false)))
     }
 
     fun setPrivacyMode(enabled: Boolean) {
         if (enabled != currentPrivacyEnabled) {
-            qwantbar_container.setBackgroundColor(resources.getColor(if (enabled) R.color.qwantbar_background_privacy else R.color.photonWhite))
+            // qwantbar_container.setBackgroundColor(resources.getColor(if (enabled) R.color.qwantbar_background_privacy else R.color.photonWhite))
             currentPrivacyEnabled = enabled
             this.setHighlight(currentSelection)
         }
     }
 
     enum class QwantBarIcons {
-        BACK, SEARCH, HOME, BOOKMARKS, BOOKMARKS_ADD, BOOKMARKS_DELETE, MORE
+        SEARCH, HOME, BOOKMARKS, MENU_QWANT
     }
 
     fun getIcon(icon: QwantBarIcons, selected: Boolean) : Int {
         return when (icon) {
-            QwantBarIcons.BACK -> {
-                if (currentPrivacyEnabled) R.drawable.ic_back_privacy
-                else R.drawable.ic_back
-            }
             QwantBarIcons.SEARCH -> {
                 if (currentPrivacyEnabled && selected) R.drawable.ic_search_privacy_selected
-                else if (currentPrivacyEnabled && !selected) R.drawable.ic_search_privacy
+                else if (currentPrivacyEnabled && !selected) R.drawable.ic_search
                 else if (!currentPrivacyEnabled && selected) R.drawable.ic_search_selected
                 else R.drawable.ic_search
             }
             QwantBarIcons.HOME -> {
                 // Should not have "selected" state as it transforms into a search
-                if (currentPrivacyEnabled) R.drawable.ic_home_privacy
-                else R.drawable.ic_home
+                // As it is qwant icon, there is no privacy state neither
+                R.drawable.ic_qwant_logo
             }
             QwantBarIcons.BOOKMARKS -> {
                 if (currentPrivacyEnabled && selected) R.drawable.ic_bookmark_privacy_selected
-                else if (currentPrivacyEnabled && !selected) R.drawable.ic_bookmark_privacy
+                else if (currentPrivacyEnabled && !selected) R.drawable.ic_bookmark
                 else if (!currentPrivacyEnabled && selected) R.drawable.ic_bookmark_selected
                 else R.drawable.ic_bookmark
             }
-            QwantBarIcons.BOOKMARKS_ADD -> {
-                // No selected state
-                if (currentPrivacyEnabled) R.drawable.ic_add_bookmark_privacy
-                else R.drawable.ic_add_bookmark
-            }
-            QwantBarIcons.BOOKMARKS_DELETE -> {
-                // No selected state
-                if (currentPrivacyEnabled) R.drawable.ic_del_bookmark_privacy
-                else R.drawable.ic_del_bookmark
-            }
-            QwantBarIcons.MORE -> {
+            QwantBarIcons.MENU_QWANT -> {
                 if (currentPrivacyEnabled && selected) R.drawable.ic_menu_privacy_selected
-                else if (currentPrivacyEnabled && !selected) R.drawable.ic_menu_privacy
+                else if (currentPrivacyEnabled && !selected) R.drawable.ic_menu
                 else if (!currentPrivacyEnabled && selected) R.drawable.ic_menu_selected
                 else R.drawable.ic_menu
             }
@@ -304,7 +266,7 @@ class QwantBar @JvmOverloads constructor(
 
     private fun getIconColor(selected: Boolean) : Int  {
         return if (currentPrivacyEnabled) {
-            if (selected) R.color.menu_items_privacy_selected else R.color.menu_items_privacy
+            if (selected) R.color.menu_items_privacy_selected else R.color.menu_items
         } else {
             if (selected) R.color.menu_items_selected else R.color.menu_items
         }
@@ -322,30 +284,8 @@ class QwantBar @JvmOverloads constructor(
         }
     }
 
-    private fun emitOnAddBookmarksClicked() {
-        bookmarksStorage?.addBookmark(sessionManager.selectedSession)
-        this.setBookmarkButton(BookmarkButtonType.DELETE)
-        addBookmarksCallbacks.forEach {
-            it.invoke()
-        }
-    }
-
-    private fun emitOnDeleteBookmarksClicked() {
-        bookmarksStorage?.deleteBookmark(sessionManager.selectedSession)
-        this.setBookmarkButton(BookmarkButtonType.ADD)
-        deleteBookmarksCallbacks.forEach {
-            it.invoke()
-        }
-    }
-
     private fun emitOnHomeClicked() {
         homeCallbacks.forEach {
-            it.invoke()
-        }
-    }
-
-    private fun emitOnBackClicked() {
-        backCallbacks.forEach {
             it.invoke()
         }
     }
@@ -360,22 +300,13 @@ class QwantBar @JvmOverloads constructor(
         reference.get()?.setCountWithAnimation(sessionManager.sessions.size)
     }
 
-    enum class LeftButtonType {
-        HOME, BACK
-    }
-
-    fun setLeftButton(type: LeftButtonType) {
-        qwantbar_layout_home.visibility = if (type == LeftButtonType.HOME) View.VISIBLE else View.GONE
-        qwantbar_layout_back.visibility = if (type == LeftButtonType.BACK) View.VISIBLE else View.GONE
-    }
-
-    enum class BookmarkButtonType {
+    /* enum class BookmarkButtonType {
         OPEN, ADD, DELETE, SESSION
     }
 
-    private var currentBookmarkType = BookmarkButtonType.OPEN
+    private var currentBookmarkType = BookmarkButtonType.OPEN */
 
-    fun setBookmarkButton(type: BookmarkButtonType) {
+    /* fun setBookmarkButton(type: BookmarkButtonType) {
         currentBookmarkType = type
         if (type == BookmarkButtonType.SESSION) {
             qwantbar_layout_bookmarks.visibility = View.GONE
@@ -396,7 +327,7 @@ class QwantBar @JvmOverloads constructor(
 
     fun getBookmarkButtonType(): BookmarkButtonType {
         return currentBookmarkType
-    }
+    } */
 
     fun updateHomeIcon(mode: QwantBarSessionObserver.QwantBarMode?) {
         if (mode == QwantBarSessionObserver.QwantBarMode.NAVIGATION) {

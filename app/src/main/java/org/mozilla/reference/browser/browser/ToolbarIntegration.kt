@@ -18,10 +18,12 @@ import mozilla.components.browser.session.SessionManager
 import mozilla.components.browser.toolbar.BrowserToolbar
 import mozilla.components.browser.toolbar.display.DisplayToolbar
 import mozilla.components.concept.storage.HistoryStorage
+import mozilla.components.concept.toolbar.Toolbar
 import mozilla.components.feature.pwa.WebAppUseCases
 import mozilla.components.feature.session.SessionUseCases
 import mozilla.components.feature.toolbar.ToolbarAutocompleteFeature
 import mozilla.components.feature.toolbar.ToolbarFeature
+import mozilla.components.support.base.android.Padding
 import mozilla.components.support.base.feature.LifecycleAwareFeature
 import mozilla.components.support.base.feature.UserInteractionHandler
 import mozilla.components.support.ktx.android.content.getColorFromAttr
@@ -45,77 +47,15 @@ class ToolbarIntegration(
         it.initialize(context)
     }
 
-    private val menuToolbar by lazy {
-        val forward = BrowserMenuItemToolbar.Button(
-            mozilla.components.ui.icons.R.drawable.mozac_ic_forward,
-            iconTintColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
-            contentDescription = "Forward",
-            isEnabled = { sessionManager.selectedSession?.canGoForward == true }) {
-            sessionUseCases.goForward.invoke()
-        }
-
-        val refresh = BrowserMenuItemToolbar.Button(
-            mozilla.components.ui.icons.R.drawable.mozac_ic_refresh,
-            iconTintColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
-            contentDescription = "Refresh") {
-            sessionUseCases.reload.invoke()
-        }
-
-        val stop = BrowserMenuItemToolbar.Button(
-            mozilla.components.ui.icons.R.drawable.mozac_ic_stop,
-            iconTintColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
-            contentDescription = "Stop") {
-            sessionUseCases.stopLoading.invoke()
-        }
-
-        BrowserMenuItemToolbar(listOf(forward, refresh, stop))
+    class PrivateBrowsingBrowserAction(context: Context, val sessionManager: SessionManager)
+        : Toolbar.ActionImage(
+            ContextCompat.getDrawable(context, R.drawable.ic_privacy_mask)!!,
+            padding = Padding(10, 10, 10, 10)
+    ) {
+        override val visible: () -> Boolean
+            get() = { if (sessionManager.selectedSession != null) sessionManager.selectedSession!!.private else false }
     }
-
-    private val menuItems: List<BrowserMenuItem> by lazy {
-        listOf(
-            menuToolbar,
-
-            SimpleBrowserMenuItem(context.getString(R.string.context_menu_share), textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main)) {
-                val url = sessionManager.selectedSession?.url ?: ""
-                context.share(url)
-            }.apply {
-                visible = { sessionManager.selectedSession != null }
-            },
-
-            /* BrowserMenuSwitch(context.getString(R.string.context_menu_request_desktop), {
-                sessionManager.selectedSessionOrThrow.desktopMode
-            }) { checked ->
-                sessionUseCases.requestDesktopSite.invoke(checked)
-            }.apply {
-                visible = { sessionManager.selectedSession != null }
-            }, */
-
-            SimpleBrowserMenuItem(context.getString(R.string.context_menu_add_homescreen), textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main)) {
-                MainScope().launch { webAppUseCases.addToHomescreen() }
-            }.apply {
-                visible = { webAppUseCases.isPinningSupported() }
-            },
-
-            SimpleBrowserMenuItem(context.getString(R.string.context_menu_find), textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main)) {
-                FindInPageIntegration.launch?.invoke()
-            }.apply {
-                visible = { sessionManager.selectedSession != null }
-            },
-
-            SimpleBrowserMenuItem(context.getString(R.string.context_menu_addons), textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main)) {
-                val intent = Intent(context, AddonsActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                context.startActivity(intent)
-            },
-
-            SimpleBrowserMenuItem(context.getString(R.string.settings), textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main)) {
-                /* val intent = Intent(context, SettingsActivity::class.java)
-                context.startActivity(intent) */
-            }
-        )
-    }
-
-    private val menuBuilder = BrowserMenuBuilder(menuItems)
+    private val privateBrowsingBrowserAction = PrivateBrowsingBrowserAction(context, sessionManager)
 
     init {
         toolbar.display.indicators = listOf(
@@ -124,8 +64,6 @@ class ToolbarIntegration(
         )
         toolbar.display.displayIndicatorSeparator = true
 
-        toolbar.display.menuBuilder = menuBuilder // TODO remove this to remove top menu
-
         toolbar.display.hint = context.getString(R.string.toolbar_hint)
         toolbar.edit.hint = context.getString(R.string.toolbar_hint)
 
@@ -133,6 +71,8 @@ class ToolbarIntegration(
             addHistoryStorageProvider(historyStorage)
             addDomainProvider(shippedDomainsProvider)
         }
+
+        toolbar.addBrowserAction(privateBrowsingBrowserAction)
 
         toolbar.edit.colors = toolbar.edit.colors.copy(
             clear = context.getColorFromAttr(R.attr.qwant_color_main),

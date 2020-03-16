@@ -3,6 +3,7 @@ package org.mozilla.reference.browser.settings
 import android.content.Intent
 import android.content.res.Configuration
 import android.provider.Browser
+import android.util.Log
 import androidx.preference.Preference
 import org.mozilla.reference.browser.BrowserActivity
 import org.mozilla.reference.browser.R
@@ -26,7 +27,9 @@ class SettingsGeneralLanguageFragment(
         prefLanguageSearch.summary = searchValues[searchKeys.indexOf(prefLanguageSearch.value)]
 
         prefLanguageInterface.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, value ->
-            val locale = Locale(value as String)
+            Log.d("QWANT_BROWSER", "set locale to configuration, from change listener")
+            val localeStringSplit = (value as String).split('_')
+            val locale = Locale(localeStringSplit[0], localeStringSplit[1])
             Locale.setDefault(locale)
             resources.configuration.locale = locale
             resources.updateConfiguration(resources.configuration, resources.displayMetrics)

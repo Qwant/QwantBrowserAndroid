@@ -65,14 +65,13 @@ open class BrowserActivity : AppCompatActivity() {
         qwantbar.onTabsClicked(::showTabs)
         qwantbar.onBookmarksClicked(::showBookmarks)
         qwantbar.onHomeClicked(::showHome)
-        qwantbar.onBackClicked(::onBackPressed)
         qwantbar.onMenuClicked(::showSettings)
 
         if (savedInstanceState == null) {
             if (intent.action == "CHANGED_LANGUAGE") {
                 qwantbar.setHighlight(QwantBar.QwantBarSelection.MORE)
                 supportFragmentManager.beginTransaction().apply {
-                    replace(R.id.container, SettingsContainerFragment(true), "SETTINGS_FRAGMENT")
+                    replace(R.id.container, SettingsContainerFragment(::bookmarksOrTabsOrSettingsClosed, true), "SETTINGS_FRAGMENT")
                     commit()
                 }
             } else {
@@ -86,7 +85,7 @@ open class BrowserActivity : AppCompatActivity() {
 
     private fun loadLocale() {
         val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-        val savedLocale = prefs.getString(resources.getString(R.string.pref_key_general_language_interface), "undefined")
+        var savedLocale = prefs.getString(resources.getString(R.string.pref_key_general_language_interface), "undefined")
 
         if (savedLocale == "undefined") {
             // First time, set default locale for interface and search
@@ -94,7 +93,6 @@ open class BrowserActivity : AppCompatActivity() {
             val phoneLocale = resources.configuration.locale.language
             val phoneCountry = resources.configuration.locale.country
 
-            Log.d("QWANT_BROWSER", "phone locale: $phoneLocale-$phoneCountry")
             val availableLocale = resources.getStringArray(R.array.languages_interface_keys)
             if (!availableLocale.contains("${phoneLocale}_$phoneCountry")) {
                 availableLocale.forEach { l -> if (l.startsWith(phoneLocale)) defaultLocale = l }
@@ -109,9 +107,12 @@ open class BrowserActivity : AppCompatActivity() {
                 editor.putString(resources.getString(R.string.pref_key_general_language_search), defaultLocale)
             }
             editor.apply()
-        } else if (savedLocale != resources.configuration.locale.language) {
+
+            savedLocale = defaultLocale
+        }
+        if (savedLocale != resources.configuration.locale.language + "_" + resources.configuration.locale.country) {
             // Locale has been changed by preferences system, so it's already saved. Just update configuration
-            resources.configuration.locale = Locale(savedLocale)
+            resources.configuration.locale = Locale(savedLocale!!.split('_')[0], savedLocale.split('_')[1])
             Locale.setDefault(resources.configuration.locale)
             resources.updateConfiguration(resources.configuration, resources.displayMetrics)
         }
@@ -119,7 +120,6 @@ open class BrowserActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         if (components.core.sessionManager.selectedSession == null || components.core.sessionManager.selectedSession!!.url.startsWith(getString(R.string.settings_page_startwith_filter))) {
-            qwantbar.setLeftButton(QwantBar.LeftButtonType.HOME)
             qwantbar.setHighlight(QwantBar.QwantBarSelection.SEARCH)
         }
 
@@ -184,22 +184,20 @@ open class BrowserActivity : AppCompatActivity() {
             var isPrivate = false
             if (components.core.sessionManager.selectedSession != null)
                 isPrivate = components.core.sessionManager.selectedSession!!.private
-            replace(R.id.container, TabsTrayFragment(applicationContext, ::bookmarksOrTabsClosed, isPrivate, qwantbar), "TABS_FRAGMENT")
+            replace(R.id.container, TabsTrayFragment(applicationContext, ::bookmarksOrTabsOrSettingsClosed, isPrivate, qwantbar), "TABS_FRAGMENT")
             commit()
         }
-        qwantbar.setBookmarkButton(QwantBar.BookmarkButtonType.OPEN)
+        qwantbarSessionObserver?.setupHomeBar()
         qwantbar.setHighlight(QwantBar.QwantBarSelection.TABS)
-        qwantbar.setLeftButton(QwantBar.LeftButtonType.BACK)
     }
 
     private fun showBookmarks() {
         this.supportFragmentManager.beginTransaction().apply {
-            replace(R.id.container, BookmarksFragment(bookmarksStorage!!, ::bookmarksOrTabsClosed), "BOOKMARKS_FRAGMENT")
+            replace(R.id.container, BookmarksFragment(bookmarksStorage!!, ::bookmarksOrTabsOrSettingsClosed), "BOOKMARKS_FRAGMENT")
             commit()
         }
-        qwantbar.setBookmarkButton(QwantBar.BookmarkButtonType.OPEN)
+        qwantbarSessionObserver?.setupHomeBar()
         qwantbar.setHighlight(QwantBar.QwantBarSelection.BOOKMARKS)
-        qwantbar.setLeftButton(QwantBar.LeftButtonType.BACK)
     }
 
     private fun showBrowserFragment() {
@@ -235,8 +233,7 @@ open class BrowserActivity : AppCompatActivity() {
         this.showBrowserFragment()
 
         qwantbar.setHighlight(QwantBar.QwantBarSelection.SEARCH)
-        qwantbar.setLeftButton(QwantBar.LeftButtonType.HOME)
-        qwantbar.setBookmarkButton(QwantBar.BookmarkButtonType.OPEN)
+        //qwantbar.setBookmarkButton(QwantBar.BookmarkButtonType.OPEN)
     }
 
     private fun showSettings() {
@@ -257,30 +254,27 @@ open class BrowserActivity : AppCompatActivity() {
 
         this.showBrowserFragment()
 
-        qwantbar.setHighlight(QwantBar.QwantBarSelection.MORE)
+        qwantbar.setHighlight(QwantBar.QwantBarSelection.MENU_QWANT)
         qwantbar.setLeftButton(QwantBar.LeftButtonType.BACK)
         qwantbar.setBookmarkButton(QwantBar.BookmarkButtonType.OPEN) */
 
         this.supportFragmentManager.beginTransaction().apply {
             this.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
-            replace(R.id.container, SettingsContainerFragment(), "SETTINGS_FRAGMENT")
+            replace(R.id.container, SettingsContainerFragment(::bookmarksOrTabsOrSettingsClosed), "SETTINGS_FRAGMENT")
             commit()
         }
+        qwantbarSessionObserver?.setupHomeBar()
         qwantbar.setHighlight(QwantBar.QwantBarSelection.MORE)
     }
 
-    private fun bookmarksOrTabsClosed() {
+    private fun bookmarksOrTabsOrSettingsClosed() {
         val session: Session? = components.core.sessionManager.selectedSession
-        if (session != null && session.url.startsWith(getString(R.string.settings_page_startwith_filter))) {
-            qwantbar.setHighlight(QwantBar.QwantBarSelection.MORE)
-            qwantbar.setLeftButton(QwantBar.LeftButtonType.BACK)
-        } else if (session == null || session.url.startsWith(baseContext.getString(R.string.homepage_base))) {
+        if (session == null || session.url.startsWith(baseContext.getString(R.string.homepage_base))) {
             qwantbar.setHighlight(QwantBar.QwantBarSelection.SEARCH)
-            qwantbar.setLeftButton(QwantBar.LeftButtonType.HOME)
+            qwantbarSessionObserver?.setupHomeBar()
         } else {
             qwantbar.setHighlight(QwantBar.QwantBarSelection.NONE)
-            qwantbar.setBookmarkButton(QwantBar.BookmarkButtonType.SESSION)
-            qwantbar.setLeftButton(QwantBar.LeftButtonType.HOME)
+            qwantbarSessionObserver?.setupNavigationBar()
         }
         qwantbar.updateHomeIcon(qwantbarSessionObserver?.getCurrentMode())
     }

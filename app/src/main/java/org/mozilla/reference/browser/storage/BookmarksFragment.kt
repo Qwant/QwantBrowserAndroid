@@ -11,6 +11,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.ListView
+import androidx.appcompat.widget.Toolbar
+import kotlinx.android.synthetic.main.fragment_bookmarks.*
 import mozilla.components.support.base.feature.UserInteractionHandler
 import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.browser.BrowserFragment
@@ -29,6 +31,12 @@ class BookmarksFragment(
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val view: View = inflater.inflate(R.layout.fragment_bookmarks, container, false)
+
+        val toolbar: Toolbar = view.findViewById(R.id.bookmarks_toolbar)
+        toolbar.title = context?.getString(R.string.bookmarks)
+        toolbar.setNavigationOnClickListener {
+            this.onBackPressed()
+        }
 
         listview = view.findViewById(R.id.bookmarks_listview)
         layoutNoResult = view.findViewById(R.id.bookmarks_noresult_layout)

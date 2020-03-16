@@ -97,6 +97,8 @@
     <string name="context_menu_add_homescreen">Add to homescreen</string>
     <string name="context_menu_find">Find in Page</string>
     <string name="context_menu_addons">Add-ons</string>
+    <string name="context_menu_add_bookmark">Add to bookmarks</string>
+    <string name="context_menu_del_bookmark">Delete bookmark</string>
 
     <string name="settings_general">General</string>
     <string name="settings_interface">Interface</string>
@@ -128,7 +130,7 @@
 
     <string name="browser_client" translatable="false">brz-huawei</string>
     <string name="homepage_base" translatable="false">https://www.qwant.com/</string>
-    <string name="homepage_startwith_filter" translatable="false">https://www.qwant.com/?client</string>
+    <string name="homepage_startwith_filter" translatable="false">https://www.qwant.com/</string>
     <string name="settings_page_base" translatable="false">https://www.qwant.com/settings</string>
     <string name="settings_page_startwith_filter" translatable="false">https://www.qwant.com/settings?client=brz-huawei</string>
 
