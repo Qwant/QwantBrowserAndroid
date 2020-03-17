@@ -2,7 +2,9 @@ package org.mozilla.reference.browser.browser
 
 import android.content.Intent
 import android.content.res.Resources
+import android.util.Log
 import android.view.View
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import mozilla.components.browser.session.Session
 import mozilla.components.browser.session.SessionManager
 import mozilla.components.support.ktx.android.util.dpToPx
@@ -10,8 +12,12 @@ import org.mozilla.reference.browser.R
 
 class ToolbarSessionObserver(
         private val sessionManager: SessionManager,
-        private val toolbar: View
+        private val toolbar: View,
+        private val swipeRefresh: SwipeRefreshLayout
 ) : SessionManager.Observer, Session.Observer {
+
+    private var shownSplash = false
+
     init {
         sessionManager.sessions.forEach {
             it.register(this)
@@ -29,6 +35,10 @@ class ToolbarSessionObserver(
             val toolbarParams = toolbar.layoutParams
             toolbarParams.height = 56.dpToPx(Resources.getSystem().displayMetrics)
             toolbar.layoutParams = toolbarParams
+        }
+
+        if (shownSplash && url.startsWith(toolbar.context.getString(R.string.homepage_startwith_filter))) {
+            toggleSplash(false)
         }
     }
 
@@ -62,5 +72,23 @@ class ToolbarSessionObserver(
 
     override fun onLaunchIntentRequest(session: Session, url: String, appIntent: Intent?) {
         checkSession(url)
+    }
+
+    override fun onProgress(session: Session, progress: Int) {
+        if (session.url.startsWith(toolbar.context.getString(R.string.homepage_startwith_filter))) {
+            if (progress < 100 && !shownSplash) {
+                toggleSplash(true)
+            } else if (progress == 100 && shownSplash) {
+                toggleSplash(false)
+            }
+        } else if (shownSplash) {
+            toggleSplash(false)
+        }
+    }
+
+    private fun toggleSplash(is_shown: Boolean) {
+        Log.d("QWANT_BROWSER","Toggle splash: $is_shown")
+        swipeRefresh.visibility = if (is_shown) View.INVISIBLE else View.VISIBLE
+        shownSplash = is_shown
     }
 }

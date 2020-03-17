@@ -7,13 +7,11 @@ package org.mozilla.reference.browser
 import android.app.Activity
 import android.app.Application
 import android.os.Bundle
-import androidx.annotation.Nullable
 import mozilla.components.browser.session.Session
 import mozilla.components.support.base.log.Log
 import mozilla.components.support.base.log.sink.AndroidLogSink
 import mozilla.components.support.ktx.android.content.isMainProcess
 import mozilla.components.support.ktx.android.content.runOnlyInMainProcess
-import mozilla.components.support.rustlog.RustLog
 import mozilla.components.support.rusthttp.RustHttpConfig
 import mozilla.components.support.webextensions.WebExtensionSupport
 import org.mozilla.reference.browser.ext.application
@@ -79,5 +77,5 @@ open class BrowserApplication : Application(), Application.ActivityLifecycleCall
 private fun setupLogging() {
     // We want the log messages of all builds to go to Android logcat
     Log.addSink(AndroidLogSink())
-    RustLog.enable()
+    // RustLog.enable()
 }

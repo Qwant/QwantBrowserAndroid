@@ -11,6 +11,15 @@
     android:layout_height="match_parent"
     tools:context=".BrowserActivity">
 
+    <ImageView
+        android:id="@+id/splashScreen"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="bottom"
+        android:background="@color/photonWhite"
+        android:scaleType="center"
+        android:src="@drawable/flat_icon"/>
+
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefresh"
         android:layout_width="match_parent"
@@ -30,6 +39,7 @@
         android:layout_marginTop="56dp"
         android:padding="4dp"
         android:visibility="gone"
+        android:background="@color/photonWhite"
         mozac:awesomeBarTitleTextColor="?attr/qwant_color_main"
         mozac:awesomeBarDescriptionTextColor="?attr/qwant_color_light"
         mozac:awesomeBarChipTextColor="?attr/qwant_color_selected_text"

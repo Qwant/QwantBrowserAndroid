@@ -19,7 +19,7 @@
         android:id="@+id/dropdown_language_search"
         android:key="@string/pref_key_general_language_search"
         android:title="@string/settings_general_language_search"
-        android:entries="@array/languages_interface_values"
+        android:entries="@array/languages_search_values"
         android:entryValues="@array/languages_search_keys"
         android:defaultValue="undefined"
         app:iconSpaceReserved="false"/>

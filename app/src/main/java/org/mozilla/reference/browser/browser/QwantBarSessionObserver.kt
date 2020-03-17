@@ -155,11 +155,11 @@ class QwantBarSessionObserver(
 
     override fun onNavigationStateChanged(session: Session, canGoBack: Boolean, canGoForward: Boolean) {
         super.onNavigationStateChanged(session, canGoBack, canGoForward)
-        if (sessionManager.selectedSession != null && session.id == sessionManager.selectedSession!!.id) {
+        /* if (sessionManager.selectedSession != null && session.id == sessionManager.selectedSession!!.id) {
             val backColor = if (canGoBack) context.getColorFromAttr(R.attr.qwant_color_main) else context.getColorFromAttr(R.attr.qwant_color_light)
             imageviewNavBack.setBackgroundColor(backColor)
             val forwardColor = if (canGoForward) context.getColorFromAttr(R.attr.qwant_color_main) else context.getColorFromAttr(R.attr.qwant_color_light)
             imageviewNavForward.setBackgroundColor(forwardColor)
-        }
+        } */
     }
 }

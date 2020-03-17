@@ -4,11 +4,12 @@
 
 package org.mozilla.reference.browser.browser
 
+import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import kotlinx.android.synthetic.main.fragment_browser.*
 import kotlinx.android.synthetic.main.fragment_browser.view.*
-import mozilla.components.browser.errorpages.ErrorPages
 import mozilla.components.browser.search.SearchEngineParser
 import mozilla.components.feature.awesomebar.AwesomeBarFeature
 import mozilla.components.feature.session.ThumbnailsFeature
@@ -16,9 +17,9 @@ import mozilla.components.feature.toolbar.WebExtensionToolbarFeature
 import mozilla.components.support.base.feature.UserInteractionHandler
 import mozilla.components.support.base.feature.ViewBoundFeatureWrapper
 import org.mozilla.reference.browser.QwantUtils
-import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.ext.components
 import org.mozilla.reference.browser.ext.requireComponents
+import java.lang.reflect.Method
 
 
 /**
@@ -34,14 +35,36 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
 
         val engineSettings = requireContext().components.core.engine.settings
         if (engineSettings.userAgentString != null)
-            if (!engineSettings.userAgentString!!.contains("QwantMobile"))
+            if (!engineSettings.userAgentString!!.contains("QwantMobile")) {
+                /* try {
+                    val cl = context!!.classLoader
+                    val systemProperties = cl.loadClass("android.os.SystemProperties")
+
+                    //Parameters Types
+                    val paramTypes: Array<Class<*>?> = arrayOfNulls(1)
+                    paramTypes[0] = String::class.java
+                    val get: Method = systemProperties.getMethod("get", *paramTypes)
+
+                    //Parameters
+                    val params = arrayOfNulls<Any>(1)
+                    params[0] = "ro.HuaweiID.com.qwant.liberty"
+
+                    val huaweiTrackingId = get.invoke(systemProperties, params) as String
+                    engineSettings.userAgentString += " $huaweiTrackingId"
+                } catch (iAE: IllegalArgumentException) {
+                    Log.e("QWANT_BROWSER", "Illegal argument exception recovering huawei tracking id")
+                } catch (e: Exception) {
+                    Log.e("QWANT_BROWSER", "Exception recovering huawei tracking id")
+                } */
+
                 engineSettings.userAgentString += " h QwantMobile/4.0"
+            }
         engineSettings.remoteDebuggingEnabled = false
         engineSettings.testingModeEnabled = false
 
         swipeRefresh.isEnabled = false
 
-        toolbarSessionObserver = ToolbarSessionObserver(requireContext().components.core.sessionManager, toolbar)
+        toolbarSessionObserver = ToolbarSessionObserver(requireContext().components.core.sessionManager, toolbar, swipeRefresh)
         requireContext().components.core.sessionManager.register(this.toolbarSessionObserver!!)
 
         val searchEngine = SearchEngineParser().load("qwant", requireContext().assets.open("opensearch_qwant.xml"))

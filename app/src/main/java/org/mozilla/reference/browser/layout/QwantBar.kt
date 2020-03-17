@@ -166,6 +166,7 @@ class QwantBar @JvmOverloads constructor(
         qwantbar_layout_nav_forward.setOnClickListener { sessionUseCases.goForward.invoke() }
 
         qwantbar_button_menu_nav.menuBuilder = menuBuilder
+        qwantbar_button_menu_nav.setColorFilter(ContextCompat.getColor(context, this.getIconColor(false)))
 
         val session = sessionManager.selectedSession
         if (session != null && session.url.startsWith(context.getString(R.string.settings_page_startwith_filter))) {

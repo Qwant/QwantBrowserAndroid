@@ -19,7 +19,7 @@
             android:id="@+id/qwantbar_button_nav_back"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="?attr/qwant_color_light"
+            android:background="?attr/qwant_color_main"
             android:src="@drawable/ic_nav_back"
             android:contentDescription="@string/menu_search" />
     </LinearLayout>
@@ -37,7 +37,7 @@
             android:id="@+id/qwantbar_button_nav_forward"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="?attr/qwant_color_light"
+            android:background="?attr/qwant_color_main"
             android:src="@drawable/ic_nav_forward"
             android:contentDescription="@string/menu_search" />
     </LinearLayout>
