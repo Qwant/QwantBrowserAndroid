@@ -7,14 +7,22 @@ import androidx.preference.PreferenceManager
 
 class QwantUtils {
     companion object {
-        fun getHomepage(context: Context, query: String? = null, widget: Boolean = false) : String {
+        fun getHomepage(
+                context: Context,
+                query: String? = null,
+                widget: Boolean = false,
+                interface_language: String? = null,
+                search_language: String? = null,
+                adult_content: String? = null,
+                news_on_home: Boolean? = null
+        ) : String {
             val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
             val client = context.getString(R.string.browser_client)
-            val l = prefs.getString(context.getString(R.string.pref_key_general_language_interface), "en_US")
-            val sr = prefs.getString(context.getString(R.string.pref_key_general_language_search), "en_US")
-            val s = prefs.getString(context.getString(R.string.pref_key_general_adultcontent), "0")
-            val hc = prefs.getBoolean(context.getString(R.string.pref_key_general_newsonhome), true)
+            val l = interface_language ?: prefs.getString(context.getString(R.string.pref_key_general_language_interface), "en_US")
+            val sr = search_language ?: prefs.getString(context.getString(R.string.pref_key_general_language_search), "en_US")
+            val s = adult_content ?: prefs.getString(context.getString(R.string.pref_key_general_adultcontent), "0")
+            val hc = news_on_home ?: prefs.getBoolean(context.getString(R.string.pref_key_general_newsonhome), true)
 
             val localeSplit = sr.split("_")
 

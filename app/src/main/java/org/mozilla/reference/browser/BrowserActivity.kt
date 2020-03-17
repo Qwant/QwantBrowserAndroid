@@ -51,9 +51,9 @@ open class BrowserActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         this.loadLocale()
 
-        super.onCreate(savedInstanceState)
-
         setContentView(R.layout.activity_main)
+
+        super.onCreate(savedInstanceState)
 
         bookmarksStorage = BookmarksStorage(applicationContext)
         bookmarksStorage!!.restore()

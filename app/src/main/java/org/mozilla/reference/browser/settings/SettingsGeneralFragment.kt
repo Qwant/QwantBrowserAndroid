@@ -10,8 +10,10 @@ import android.util.Log
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
 import androidx.preference.Preference
+import org.mozilla.reference.browser.QwantUtils
 import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.ext.getPreferenceKey
+import org.mozilla.reference.browser.ext.requireComponents
 
 class SettingsGeneralFragment(
         private val settingsContainer: SettingsContainerFragment
@@ -28,9 +30,35 @@ class SettingsGeneralFragment(
         // findPreference(context?.getPreferenceKey(R.string.pref_key_general_cleardata)).onPreferenceClickListener = getPreferenceLinkListener(SettingsGeneralClearDataFragment(this.settingsContainer), "SETTINGS_GENERAL_CLEARDATA_FRAGMENT")
         findPreference(context?.getPreferenceKey(R.string.pref_key_general_makedefaultbrowser)).onPreferenceClickListener = getClickListenerForMakeDefaultBrowser()
 
+        val prefNewsOnHome = findPreference(context?.getPreferenceKey(R.string.pref_key_general_newsonhome))
+        prefNewsOnHome.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+            requireComponents.core.sessionManager.sessions.forEach {
+                if (it.url.startsWith(requireContext().getString(R.string.homepage_startwith_filter))) {
+                    var query: String? = null
+                    if (it.url.contains("?q=") || it.url.contains("&q=")) {
+                        query = it.url.split("?q=", "&q=")[1].split("&")[0]
+                    }
+                    val reloadPage = QwantUtils.getHomepage(requireContext(), query = query)
+                    requireComponents.useCases.sessionUseCases.loadUrl(reloadPage, it)
+                }
+            }
+            true
+        }
+
         val prefAdultContent = findPreference(context?.getPreferenceKey(R.string.pref_key_general_adultcontent)) as QwantPreferenceDropdown
         prefAdultContent.summary = adultContentValues[adultContentKeys.indexOf(prefAdultContent.value)]
         prefAdultContent.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, value ->
+            requireComponents.core.sessionManager.sessions.forEach {
+                if (it.url.startsWith(requireContext().getString(R.string.homepage_startwith_filter))) {
+                    var query: String? = null
+                    if (it.url.contains("?q=") || it.url.contains("&q=")) {
+                        query = it.url.split("?q=", "&q=")[1].split("&")[0]
+                    }
+                    val reloadPage = QwantUtils.getHomepage(requireContext(), query = query, adult_content = value as String)
+                    requireComponents.useCases.sessionUseCases.loadUrl(reloadPage, it)
+                }
+            }
+
             prefAdultContent.summary = adultContentValues[adultContentKeys.indexOf(value)]
             true
         }

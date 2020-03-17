@@ -36,10 +36,6 @@ class ToolbarSessionObserver(
             toolbarParams.height = 56.dpToPx(Resources.getSystem().displayMetrics)
             toolbar.layoutParams = toolbarParams
         }
-
-        if (shownSplash && url.startsWith(toolbar.context.getString(R.string.homepage_startwith_filter))) {
-            toggleSplash(false)
-        }
     }
 
     private fun checkSession(session: Session) {
@@ -87,7 +83,6 @@ class ToolbarSessionObserver(
     }
 
     private fun toggleSplash(is_shown: Boolean) {
-        Log.d("QWANT_BROWSER","Toggle splash: $is_shown")
         swipeRefresh.visibility = if (is_shown) View.INVISIBLE else View.VISIBLE
         shownSplash = is_shown
     }
