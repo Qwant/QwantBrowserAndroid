@@ -17,8 +17,8 @@ class SettingsGeneralLanguageFragment(
     override fun setupPreferences() {
         val interfaceKeys = resources.getStringArray(R.array.languages_interface_keys)
         val interfaceValues = resources.getStringArray(R.array.languages_interface_values)
-        val searchKeys = resources.getStringArray(R.array.languages_interface_keys)
-        val searchValues = resources.getStringArray(R.array.languages_interface_values)
+        val searchKeys = resources.getStringArray(R.array.languages_search_keys)
+        val searchValues = resources.getStringArray(R.array.languages_search_values)
 
         val prefLanguageInterface = findPreference(context?.getPreferenceKey(R.string.pref_key_general_language_interface)) as QwantPreferenceDropdown
         val prefLanguageSearch = findPreference(context?.getPreferenceKey(R.string.pref_key_general_language_search)) as QwantPreferenceDropdown

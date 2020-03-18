@@ -24,6 +24,41 @@
         <item>@string/settings_language_french_code</item>
         <item>@string/settings_language_italian_code</item>
         <item>@string/settings_language_spanish_code</item>
+        <item>@string/settings_language_andorra_code</item>
+        <item>@string/settings_language_australia_code</item>
+        <item>@string/settings_language_austria_code</item>
+        <item>@string/settings_language_belgium_code</item>
+        <item>@string/settings_language_brazil_code</item>
+        <item>@string/settings_language_bulgaria_code</item>
+        <item>@string/settings_language_canada_code</item>
+        <item>@string/settings_language_chile_code</item>
+        <item>@string/settings_language_southkorea_code</item>
+        <item>@string/settings_language_czechrepublic_code</item>
+        <item>@string/settings_language_denmark_code</item>
+        <item>@string/settings_language_estonia_code</item>
+        <item>@string/settings_language_finland_code</item>
+        <item>@string/settings_language_greece_code</item>
+        <item>@string/settings_language_hungary_code</item>
+        <item>@string/settings_language_india_code</item>
+        <item>@string/settings_language_ireland_code</item>
+        <item>@string/settings_language_israel_code</item>
+        <item>@string/settings_language_japan_code</item>
+        <item>@string/settings_language_malaysia_code</item>
+        <item>@string/settings_language_mexico_code</item>
+        <item>@string/settings_language_netherlands_code</item>
+        <item>@string/settings_language_newzealand_code</item>
+        <item>@string/settings_language_norway_code</item>
+        <item>@string/settings_language_philippines_code</item>
+        <item>@string/settings_language_poland_code</item>
+        <item>@string/settings_language_portugal_code</item>
+        <item>@string/settings_language_romania_code</item>
+        <item>@string/settings_language_russia_code</item>
+        <item>@string/settings_language_singapore_code</item>
+        <item>@string/settings_language_sweden_code</item>
+        <item>@string/settings_language_switzerland_code</item>
+        <item>@string/settings_language_thailand_code</item>
+        <item>@string/settings_language_turkey_code</item>
+        <item>@string/settings_language_unitedstates_code</item>
     </array>
     <array name="languages_search_values">
         <item>@string/settings_language_german</item>
@@ -31,6 +66,40 @@
         <item>@string/settings_language_french</item>
         <item>@string/settings_language_italian</item>
         <item>@string/settings_language_spanish</item>
+        <item>@string/settings_language_andorra</item>
+        <item>@string/settings_language_australia</item>
+        <item>@string/settings_language_austria</item>
+        <item>@string/settings_language_belgium</item>
+        <item>@string/settings_language_brazil</item>
+        <item>@string/settings_language_bulgaria</item>
+        <item>@string/settings_language_canada</item>
+        <item>@string/settings_language_chile</item>
+        <item>@string/settings_language_southkorea</item>
+        <item>@string/settings_language_czechrepublic</item>
+        <item>@string/settings_language_denmark</item>
+        <item>@string/settings_language_estonia</item>
+        <item>@string/settings_language_finland</item>
+        <item>@string/settings_language_greece</item>
+        <item>@string/settings_language_hungary</item>
+        <item>@string/settings_language_india</item>
+        <item>@string/settings_language_israel</item>
+        <item>@string/settings_language_japan</item>
+        <item>@string/settings_language_malaysia</item>
+        <item>@string/settings_language_mexico</item>
+        <item>@string/settings_language_netherlands</item>
+        <item>@string/settings_language_newzealand</item>
+        <item>@string/settings_language_norway</item>
+        <item>@string/settings_language_philippines</item>
+        <item>@string/settings_language_poland</item>
+        <item>@string/settings_language_portugal</item>
+        <item>@string/settings_language_romania</item>
+        <item>@string/settings_language_russia</item>
+        <item>@string/settings_language_singapore</item>
+        <item>@string/settings_language_sweden</item>
+        <item>@string/settings_language_switzerland</item>
+        <item>@string/settings_language_thailand</item>
+        <item>@string/settings_language_turkey</item>
+        <item>@string/settings_language_unitedstates</item>
     </array>
 
 

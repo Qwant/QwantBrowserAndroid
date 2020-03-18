@@ -113,12 +113,6 @@
     <string name="settings_general_language_interface">Interface language</string>
     <string name="settings_general_language_search">Search results language</string>
 
-    <string name="settings_language_english">English</string>
-    <string name="settings_language_french">French</string>
-    <string name="settings_language_german">German</string>
-    <string name="settings_language_italian">Italian</string>
-    <string name="settings_language_spanish">Spanish</string>
-
     <string name="settings_adultcontent_none">None</string>
     <string name="settings_adultcontent_moderate">Moderate</string>
     <string name="settings_adultcontent_strict">Strict</string>
@@ -134,11 +128,89 @@
     <string name="settings_page_base" translatable="false">https://www.qwant.com/settings</string>
     <string name="settings_page_startwith_filter" translatable="false">https://www.qwant.com/settings?client=brz-huawei</string>
 
+
+    <string name="settings_language_english">English</string>
+    <string name="settings_language_french">French</string>
+    <string name="settings_language_german">German</string>
+    <string name="settings_language_italian">Italian</string>
+    <string name="settings_language_spanish">Spanish</string>
+    <string name="settings_language_andorra">Andorra</string>
+    <string name="settings_language_australia">Australia</string>
+    <string name="settings_language_austria">Austria</string>
+    <string name="settings_language_belgium">Belgium</string>
+    <string name="settings_language_brazil">Brazil</string>
+    <string name="settings_language_bulgaria">Bulgaria</string>
+    <string name="settings_language_canada">Canada</string>
+    <string name="settings_language_chile">Chile</string>
+    <string name="settings_language_southkorea">South Korea</string>
+    <string name="settings_language_czechrepublic">Czech Republic</string>
+    <string name="settings_language_denmark">Denmark</string>
+    <string name="settings_language_estonia">Estonia</string>
+    <string name="settings_language_finland">Finland</string>
+    <string name="settings_language_greece">Greece</string>
+    <string name="settings_language_hungary">Hungary</string>
+    <string name="settings_language_india">India</string>
+    <string name="settings_language_ireland">Ireland</string>
+    <string name="settings_language_israel">Israel</string>
+    <string name="settings_language_japan">Japan</string>
+    <string name="settings_language_malaysia">Malaysia</string>
+    <string name="settings_language_mexico">Mexico</string>
+    <string name="settings_language_netherlands">Netherlands</string>
+    <string name="settings_language_newzealand">New Zealand</string>
+    <string name="settings_language_norway">Norway</string>
+    <string name="settings_language_philippines">Philippines</string>
+    <string name="settings_language_poland">Poland</string>
+    <string name="settings_language_portugal">Portugal</string>
+    <string name="settings_language_romania">Romania</string>
+    <string name="settings_language_russia">Russia</string>
+    <string name="settings_language_singapore">Singapore</string>
+    <string name="settings_language_sweden">Sweden</string>
+    <string name="settings_language_switzerland">Switzerland</string>
+    <string name="settings_language_thailand">Thailand</string>
+    <string name="settings_language_turkey">Turkey</string>
+    <string name="settings_language_unitedstates">United States</string>
+
     <string name="settings_language_english_code" translatable="false">en_US</string>
     <string name="settings_language_french_code" translatable="false">fr_FR</string>
     <string name="settings_language_german_code" translatable="false">de_DE</string>
     <string name="settings_language_italian_code" translatable="false">it_IT</string>
     <string name="settings_language_spanish_code" translatable="false">es_ES</string>
+    <string name="settings_language_andorra_code" translatable="false">ca_AD</string>
+    <string name="settings_language_australia_code" translatable="false">en_AU</string>
+    <string name="settings_language_austria_code" translatable="false">de_AT</string>
+    <string name="settings_language_belgium_code" translatable="false">fr_BE</string>
+    <string name="settings_language_brazil_code" translatable="false">pt_BR</string>
+    <string name="settings_language_bulgaria_code" translatable="false">bg_BG</string>
+    <string name="settings_language_canada_code" translatable="false">en_CA</string>
+    <string name="settings_language_chile_code" translatable="false">es_CL</string>
+    <string name="settings_language_southkorea_code" translatable="false">ko_KR</string>
+    <string name="settings_language_czechrepublic_code" translatable="false">cs_CZ</string>
+    <string name="settings_language_denmark_code" translatable="false">da_DK</string>
+    <string name="settings_language_estonia_code" translatable="false">et_EE</string>
+    <string name="settings_language_finland_code" translatable="false">fi_FI</string>
+    <string name="settings_language_greece_code" translatable="false">el_GR</string>
+    <string name="settings_language_hungary_code" translatable="false">hu_HU</string>
+    <string name="settings_language_india_code" translatable="false">en_IN</string>
+    <string name="settings_language_ireland_code" translatable="false">en_IE</string>
+    <string name="settings_language_israel_code" translatable="false">he_IL</string>
+    <string name="settings_language_japan_code" translatable="false">ja_JP</string>
+    <string name="settings_language_malaysia_code" translatable="false">en_MY</string>
+    <string name="settings_language_mexico_code" translatable="false">es_MX</string>
+    <string name="settings_language_netherlands_code" translatable="false">nl_NL</string>
+    <string name="settings_language_newzealand_code" translatable="false">en_NZ</string>
+    <string name="settings_language_norway_code" translatable="false">nb_NO</string>
+    <string name="settings_language_philippines_code" translatable="false">en_PH</string>
+    <string name="settings_language_poland_code" translatable="false">pl_PL</string>
+    <string name="settings_language_portugal_code" translatable="false">pt_PT</string>
+    <string name="settings_language_romania_code" translatable="false">ro_RO</string>
+    <string name="settings_language_russia_code" translatable="false">ru_RU</string>
+    <string name="settings_language_singapore_code" translatable="false">en_SG</string>
+    <string name="settings_language_sweden_code" translatable="false">sv_SE</string>
+    <string name="settings_language_switzerland_code" translatable="false">de_CH</string>
+    <string name="settings_language_thailand_code" translatable="false">th_TH</string>
+    <string name="settings_language_turkey_code" translatable="false">tr_TR</string>
+    <string name="settings_language_unitedstates_code" translatable="false">en_US</string>
+
 
     <string name="settings_adultcontent_none_code" translatable="false">0</string>
     <string name="settings_adultcontent_moderate_code" translatable="false">1</string>
