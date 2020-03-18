@@ -16,7 +16,8 @@ class BookmarksStorage(private var context: Context) {
 
     fun addBookmark(session: Session?) {
         if (session != null) {
-            this.addBookmark(BookmarkItem(session.title, session.url))
+            if (session.icon != null) this.addBookmark(BookmarkItem(session.title, session.url, SerializableBitmap(session.icon!!)))
+            else this.addBookmark(BookmarkItem(session.title, session.url))
         }
     }
 
