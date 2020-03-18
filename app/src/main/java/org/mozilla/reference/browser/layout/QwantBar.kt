@@ -180,13 +180,19 @@ class QwantBar @JvmOverloads constructor(
     init {
         LayoutInflater.from(context).inflate(R.layout.component_qwantbar, this, true)
 
+        reference = WeakReference(qwantbar_button_tabs)
+
         sessionManager.register(sessionManagerObserver, view = this)
 
         tabButtonBox = qwantbar_button_tabs.findViewById(R.id.counter_box)
         tabButtonBar = qwantbar_button_tabs.findViewById(R.id.counter_bar)
         tabButtonText = qwantbar_button_tabs.findViewById(R.id.counter_text)
 
-        reference = WeakReference(qwantbar_button_tabs)
+        val colorDefault = ContextCompat.getColor(context, this.getIconColor(false))
+        tabButtonBox?.setImageDrawable(DrawableUtils.loadAndTintDrawable(context, R.drawable.mozac_ui_tabcounter_box, colorDefault))
+        tabButtonBar?.setImageDrawable(DrawableUtils.loadAndTintDrawable(context, R.drawable.mozac_ui_tabcounter_bar, colorDefault))
+        tabButtonText?.setTextColor(colorDefault)
+
         qwantbar_button_tabs.setCount(sessionManager.sessions.size)
         qwantbar_layout_tabs.setOnClickListener {
             it.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
