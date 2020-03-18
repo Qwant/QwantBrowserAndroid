@@ -15,7 +15,9 @@ import kotlinx.coroutines.launch
 import mozilla.components.browser.menu.BrowserMenuBuilder
 import mozilla.components.browser.menu.BrowserMenuItem
 import mozilla.components.browser.menu.item.BrowserMenuItemToolbar
+import mozilla.components.browser.menu.item.BrowserMenuDivider
 import mozilla.components.browser.menu.item.SimpleBrowserMenuItem
+import mozilla.components.browser.menu.item.BrowserMenuImageText
 import mozilla.components.browser.session.Session
 import mozilla.components.browser.session.SessionManager
 import mozilla.components.feature.pwa.WebAppUseCases
@@ -56,29 +58,32 @@ class QwantBar @JvmOverloads constructor(
 
     private var currentPrivacyEnabled = false
 
-    private val menuToolbar by lazy {
-        val refresh = BrowserMenuItemToolbar.Button(
-            mozilla.components.ui.icons.R.drawable.mozac_ic_refresh,
-            iconTintColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
-            contentDescription = context.getString(R.string.context_menu_refresh)) {
-            sessionUseCases.reload.invoke()
-        }
-
-        val stop = BrowserMenuItemToolbar.Button(
-            mozilla.components.ui.icons.R.drawable.mozac_ic_stop,
-            iconTintColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
-            contentDescription = context.getString(R.string.context_menu_stop)) {
-            sessionUseCases.stopLoading.invoke()
-        }
-
-        BrowserMenuItemToolbar(listOf(refresh, stop))
-    }
-
     private val menuItems: List<BrowserMenuItem> by lazy {
         listOf(
-            menuToolbar,
+            BrowserMenuItemToolbar(listOf(
+                BrowserMenuItemToolbar.Button(
+                    mozilla.components.ui.icons.R.drawable.mozac_ic_refresh,
+                    iconTintColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
+                    contentDescription = context.getString(R.string.context_menu_refresh)
+                ) {
+                    sessionUseCases.reload.invoke()
+                },
+                BrowserMenuItemToolbar.Button(
+                    mozilla.components.ui.icons.R.drawable.mozac_ic_stop,
+                    iconTintColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
+                    contentDescription = context.getString(R.string.context_menu_stop)
+                ) {
+                    sessionUseCases.stopLoading.invoke()
+                }
+            )),
 
-            SimpleBrowserMenuItem(context.getString(R.string.context_menu_add_bookmark), textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main)) {
+            BrowserMenuDivider(),
+
+            BrowserMenuImageText(
+                context.getString(R.string.context_menu_add_bookmark),
+                textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
+                imageResource = R.drawable.ic_add_bookmark
+            ) {
                 bookmarksStorage?.addBookmark(sessionManager.selectedSession)
             }.apply {
                 visible = {
@@ -88,7 +93,11 @@ class QwantBar @JvmOverloads constructor(
                 }
             },
 
-            SimpleBrowserMenuItem(context.getString(R.string.context_menu_del_bookmark), textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main)) {
+            BrowserMenuImageText(
+                context.getString(R.string.context_menu_del_bookmark),
+                textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
+                imageResource = R.drawable.ic_del_bookmark
+            ) {
                 bookmarksStorage?.deleteBookmark(sessionManager.selectedSession)
             }.apply {
                 visible = {
@@ -98,36 +107,62 @@ class QwantBar @JvmOverloads constructor(
                 }
             },
 
-            SimpleBrowserMenuItem(context.getString(R.string.context_menu_share), textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main)) {
+            BrowserMenuImageText(
+                context.getString(R.string.context_menu_share),
+                textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
+                imageResource = R.drawable.ic_share
+            ) {
                 val url = sessionManager.selectedSession?.url ?: ""
                 context.share(url)
             }.apply {
                 visible = { sessionManager.selectedSession != null }
             },
 
-            SimpleBrowserMenuItem(context.getString(R.string.context_menu_add_homescreen), textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main)) {
+            BrowserMenuImageText(
+                context.getString(R.string.context_menu_add_homescreen),
+                textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
+                imageResource = R.drawable.ic_add_homescreen
+            ) {
                 MainScope().launch { webAppUseCases.addToHomescreen() }
             }.apply {
                 visible = { webAppUseCases.isPinningSupported() }
             },
 
-            SimpleBrowserMenuItem(context.getString(R.string.context_menu_find), textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main)) {
+            BrowserMenuImageText(
+                context.getString(R.string.context_menu_find),
+                textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
+                imageResource = R.drawable.ic_search
+            ) {
                 FindInPageIntegration.launch?.invoke()
             }.apply {
                 visible = { sessionManager.selectedSession != null }
             },
 
-            SimpleBrowserMenuItem(context.getString(R.string.context_menu_addons), textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main)) {
+            BrowserMenuDivider(),
+
+            BrowserMenuImageText(
+                    context.getString(R.string.context_menu_addons),
+                    textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
+                    imageResource = R.drawable.ic_addons
+            ) {
                 val intent = Intent(context, AddonsActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 context.startActivity(intent)
             },
 
-            SimpleBrowserMenuItem(context.getString(R.string.bookmarks), textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main)) {
+            BrowserMenuImageText(
+                    context.getString(R.string.bookmarks),
+                    textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
+                    imageResource = R.drawable.ic_bookmark
+            ) {
                 this.emitOnBookmarksClicked()
             },
 
-            SimpleBrowserMenuItem(context.getString(R.string.settings), textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main)) {
+            BrowserMenuImageText(
+                    context.getString(R.string.settings),
+                    textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
+                    imageResource = R.drawable.ic_menu
+            ) {
                 this.emitOnMenuClicked()
             }
         )

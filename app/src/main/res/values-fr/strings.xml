@@ -172,43 +172,44 @@
         <div class="help_info_date">
             Dernière mise à jour : 21/02/2020
         </div>
+        <br/>
         <p>Qwant veille à protéger au mieux votre vie privée, et c’est même au cœur de notre philosophie. Nous n’utilisons aucun cookie ni aucun dispositif de traçage qui permettrait de suivre votre navigation ou d’établir votre profil. Vous bénéficiez bien sûr des droits garantis par le Règlement européen sur la protection des données personnelles du 27 avril 2016 dit «&nbsp;RGPD&nbsp;» et par la loi française sur la protection des données personnelles mais surtout nous continuons à veiller au respect maximal du principe de minimisation des données, c’est-à-dire que nous ne collectons pas de données inutiles pour vous apporter les services dont vous avez besoin. <strong>Nous ne cherchons jamais à savoir qui vous êtes ou ce que vous faites</strong> personnellement lorsque vous utilisez notre moteur de recherche.</p>
         <p>Cette Politique de protection des données a donc pour objet de vous présenter plus en détail notre approche éthique face à vos données personnelles, de vous expliquer les quelques cas dans lesquels nous devons tout de même collecter des informations qui vous concernent, les raisons pour lesquelles nous collectons alors certaines données, et l’utilisation que nous en faisons. Elle présente également les mesures de sécurité que nous appliquons pour protéger leur confidentialité, et rappelle vos droits et comment les exercer chez nous.</p>
-        <p><strong>Comment Qwant protège votre vie privée ?</strong></p>
+        <br/><p><strong>Comment Qwant protège votre vie privée ?</strong></p><br/>
         <p>Il faudrait toujours demander à son moteur de recherche quelles sont les données personnelles qu’il ne collecte pas 🙂</p>
         <p>Au maximum de ses possibilités et de l’état de l’art, <strong>Qwant anonymise les données</strong> qu’il doit collecter pour fournir le service. C’est simple.</p>
         <p>Lorsque vous utilisez Qwant comme moteur de recherche, nous ne mettons sur votre navigateur <strong>aucun cookie</strong> qui permettrait de vous reconnaître à chaque utilisation ou de vous suivre partout sur Internet. Nous n’utilisons <strong>aucun dispositif de reconnaissance précise de votre appareil</strong> (pixel, fingerprinting…). Nous ne collectons et ne conservons aucun historique des recherches associées à vous. Lors d’une requête, celle-ci est immédiatement anonymisée dans les conditions exposées ci-après. En bref, ce que vous faites avec Qwant reste votre vie privée et nous ne voulons pas le savoir.</p>
         <p>Qwant&nbsp;s’est doté d’un <strong>service Privacy dédié à la protection de votre vie privée</strong> et a également désigné un <strong>Délégué à la protection des données (DPO)</strong> auprès de la CNIL. En collaboration étroite avec le service Privacy, le DPO est notamment chargé de veiller à la bonne application et au respect des prescriptions légales relatives à la protection des données à caractère personnel.</p>
         <p>Le DPO tient le registre des traitements de données personnelles effectués par Qwant dans le cadre de son activité. Par exemple, lors de votre inscription sur le site, vous pouvez choisir de renseigner votre profil et cela correspond à un traitement de données personnelles pour lequel le registre des traitements va indiquer notamment les modalités de conservation de ces données ou l’absence de destinataires.</p>
         <p>Nous nous engageons aussi à tout mettre en œuvre afin de garantir la sécurité et la confidentialité des données personnelles de nos utilisateurs et notamment à empêcher que ces données ne soient altérées, effacées ou que des tiers non autorisés y aient accès. L’URL de Qwant comporte la mention HTTPS qui signale aux utilisateurs qu’ils communiquent leurs données de façon sécurisée à travers le protocole TLS. Techniquement, le TLS garantit aux visiteurs que leurs données ne peuvent être interceptées de manière frauduleuse ou accidentelle. Par ailleurs, le cadenas vert présent devant l’URL de Qwant sur la plupart des navigateurs certifie que vous êtes en train de naviguer sur un site sécurisé.</p>
-        <p><strong>Quand collecte-t-on des données personnelles, et pourquoi ?</strong></p>
+        <br/><p><strong>Quand collecte-t-on des données personnelles, et pourquoi ?</strong></p><br/>
         <p>Qwant n’exige de vous aucune inscription pour utiliser le moteur de recherche. Toutefois il peut arriver que vous souhaitiez vous inscrire pour vous identifier et bénéficier de fonctionnalités avancées.</p>
         <p>Nous collectons les données personnelles que vous nous communiquez telles que votre nom, prénom et votre adresse électronique&nbsp;:</p>
-        <ul>
+        <br/><ul>
         <li>lors de votre inscription à nos services. C’est vous qui gérez librement les informations de votre compte (modification d’information, correction, mise à jour et suppression)&nbsp;;</li>
         <li>sur les formulaires mis à votre disposition sur le site, ces informations sont nécessaires pour le traitement de votre demande par Qwant.</li>
-        </ul>
+        </ul><br/>
         <p>Qwant collecte également des données de connexion vous concernant, non associées à vos recherches, et exclusivement pour garantir la sécurité de son système d’information et, si vous créez ou modifiez des Carnets, pour respecter l’obligation d’identification des créateurs de contenus posée par <a href="https://www.legifrance.gouv.fr/affichTexteArticle.do;?idArticle=LEGIARTI000032400316&amp;cidTexte=LEGITEXT000005789847&amp;dateTexte=20170112">l’article 6-II de la Loi pour la confiance en l’économie numérique (LCEN)</a>.</p>
-        <p><strong>Même lorsque vous êtes connecté(e) avec un identifiant, nous n’utilisons toujours aucun cookie ni autre traceur publicitaire</strong> lors de votre navigation sur le site. La seule technologie susceptible d’être installée sur votre navigateur, dénommée « local storage », sert à sauvegarder sur votre appareil vos paramètres de navigation (langue, activation ou désactivation des options tendances, filtre adulte et “favicon”). Vous avez la possibilité de supprimer les données personnelles du « local storage » en désactivant les cookies à l’aide de la barre d’outils de votre navigateur. Toutefois, cette désactivation peut vous empêcher d’accéder à certaines fonctionnalités du site, par exemple la sauvegarde de vos paramètres de navigation.</p>
-        <p>Des&nbsp;données personnelles&nbsp; sont collectées et traitées par Qwant exclusivement pour les finalités suivantes :</p>
-        <ul>
+        <br/><p><strong>Même lorsque vous êtes connecté(e) avec un identifiant, nous n’utilisons toujours aucun cookie ni autre traceur publicitaire</strong> lors de votre navigation sur le site. La seule technologie susceptible d’être installée sur votre navigateur, dénommée « local storage », sert à sauvegarder sur votre appareil vos paramètres de navigation (langue, activation ou désactivation des options tendances, filtre adulte et “favicon”). Vous avez la possibilité de supprimer les données personnelles du « local storage » en désactivant les cookies à l’aide de la barre d’outils de votre navigateur. Toutefois, cette désactivation peut vous empêcher d’accéder à certaines fonctionnalités du site, par exemple la sauvegarde de vos paramètres de navigation.</p>
+        <br/><p>Des&nbsp;données personnelles&nbsp; sont collectées et traitées par Qwant exclusivement pour les finalités suivantes :</p>
+        <br/><ul>
         <li>la gestion technique du ou des compte(s) de l’utilisateur et des services disponibles sur le site, dans le cadre de l’exécution de nos Conditions Générales d’Utilisation, sur le fondement de l’article 6.1.b du RGPD (traitement nécessaire à l’exécution du contrat entre vous et nous);</li>
         <li>la gestion des demandes d’informations déposées sur le site, dans le cadre de la fourniture de ces services, sur le fondement de l’article 6.1.b du RGPD (traitement nécessaire à l’exécution des CGU, qui est un contrat entre vous et nous);</li>
         <li>la gestion des candidatures, dans le cadre du recrutement de Qwant, sur le fondement de l’article 6.1.f du RGPD (notre intérêt légitime, dans le respect de vos droits et libertés fondamentaux, à traiter vos candidatures)&nbsp;;</li>
         <li>la gestion des demandes de déréférencement, des demandes liées à l’exercice des droits portant sur les données personnelles et des demandes de retrait de contenu illicite, dans le cadre du respect des obligations légales s’imposant à Qwant, sur le fondement de l’article 6.1.c du RGPD (la nécessité de répondre à nos obligations légales) ;</li>
         <li>la sécurité du système d’information de Qwant, dans le cadre de la gestion de la sécurité et du bon fonctionnement du site, y compris la détection de clics frauduleux sur les publicités et de recherches abusives automatisées, sur le fondement de l’article 6.1.f du RGPD (notre intérêt légitime à sécuriser nos services et détecter les anomalies dans leur utilisation).</li>
         <li>l’indexation du Web et la présentation de résultats liés aux mots clés saisis par l’utilisateur, sur le fondement de l’article 6.1.b du RGPD (traitement nécessaire à l’exécution des CGU, qui est un contrat entre vous et nous).</li>
-        </ul>
-        <p><strong>Que fait-on de ces données personnelles ?</strong></p>
+        </ul><br/>
+        <p><strong>Que fait-on de ces données personnelles ?</strong></p><br/>
         <p>Vos données sont stockées sur des serveurs qui nous appartiennent en propre et ne sont en aucun cas transmises à des prestataires techniques externes.</p>
         <p>Certaines données sont transmises après anonymisation à nos partenaires publicitaires aux fins de détection de clics frauduleux ou abusifs, détection de systèmes automatisés (bots), et de sélection de publicités locales à l’échelle d’une région ou d’une ville.</p>
         <p>Par exemple, lorsque Qwant demande à son partenaire Microsoft de lui communiquer des publicités à afficher correspondant aux mots clés recherchés, Qwant anonymise les données nécessaires et ne transmet donc à Microsoft que le ou les mots clés saisis avec le User Agent de votre navigateur (c’est-à-dire le type de navigateur que vous utilisez et sa version) ainsi qu’un hash salé calculé à partir d’une fraction de votre adresse IP (amputée du dernier octet) et du User Agent. Une zone géographique approximative d’origine de la recherche, à l’échelle d’une région ou d’une ville, est transmise pour fournir des publicités plus pertinentes localement (par exemple si vous recherchez un plombier). Ces informations anonymisées peuvent être conservées par Microsoft selon les modalités prévues pour Bing dans la Déclaration de confidentialité Microsoft (<a href="https://privacy.microsoft.com/fr-fr/privacystatement">https://privacy.microsoft.com/fr-fr/privacystatement</a> ), c’est-à-dire au maximum pendant 18 mois.</p>
         <p>Nos sous-traitants interviennent exclusivement sur la fourniture des services (hébergement, indexation)&nbsp;:</p>
-        <ul>
+        <br/><ul>
         <li>Fourniture de locaux sécurisés pour nos serveurs&nbsp;: Equinix France SAS</li>
         <li>Fourniture de certains résultats de recherche&nbsp;: Microsoft Ireland Operations Limited</li>
-        </ul>
-        <p><strong>Combien de temps conserve-t-on les données collectées ?</strong></p>
+        </ul><br/>
+        <p><strong>Combien de temps conserve-t-on les données collectées ?</strong></p><br/>
         <p>Les données personnelles de nos utilisateurs sont conservées pendant toute la durée de la fourniture des services qui sont proposés sur le site.</p>
         <p>En ce qui concerne les données relatives aux requêtes, Qwant conserve pendant 7 jours le ou les mots clés saisis associés au User Agent de votre navigateur, et un hashé salé de votre adresse IP (c’est-à-dire une chaîne alphanumérique calculée spécifiquement pour qu’il ne soit pas possible de retrouver l’adresse IP réelle). Les mots clés sont ensuite conservés sans aucune donnée personnelle associée.</p>
         <p>S’agissant de votre compte Qwant, vos données seront supprimées au bout de 7 jours à compter de la demande de suppression du compte. Durant ce délai, vous avez la possibilité de réactiver votre compte en utilisant votre identifiant et votre mot de passe initiaux.</p>
@@ -217,49 +218,49 @@
         <p>Pour les candidatures, nous conservons vos données pour une durée maximale de deux ans.</p>
         <p>En ce qui concerne vos données de connexion, nous ne collectons aucune donnée directement identifiante (pas de conservation de l’adresse IP). Les données au stade du traitement de la gestion des requêtes utilisateurs étant le hash de l’adresse IP et les informations de géolocalisation (au plus ciblé, la région).</p>
         <p><em>Spécifiquement pour les opérations de création, suppression et modification de contenus sur le service Qwant Carnets et pour certaines données relatives à votre compte Qwant, nous sommes tenus par la loi de respecter une obligation de conservation des données délimitées par le décret n°2011-219 du 25 février 2011, pour une durée d’un an. Ce délai court à compter de l’opération de création, modification ou suppression de contenus sur Qwant Carnets, et pour les données liées au compte, à compter de la demande de clôture du compte.&nbsp;Toutes les données liées à votre compte seront alors supprimées au bout de 7 jours à compter de la demande de suppression, sous réserve de nos obligations légales et réglementaires.“</em></p>
-        <p><strong>Quels sont vos droits et comment les exercer ?</strong></p>
+        <br/><p><strong>Quels sont vos droits et comment les exercer ?</strong></p><br/>
         <p>La règlementation sur la protection des données personnelles &nbsp;vous octroie des droits&nbsp;spécifiques sur vos données et leur traitement par Qwant qui sont les suivants et tels que détaillés ci-dessous :</p>
-        <ul>
+        <br/><ul>
         <li>droit d’accès, de rectification et d’effacement des données&nbsp;dans les conditions prévues par la règlementation (article 15 à 17 du RGPD) ;</li>
         <li>droit d’opposition au traitement&nbsp;dans les conditions prévues par la règlementation (article 21 du RGPD) ;</li>
         <li>droit à la limitation du traitement de ces données dans les conditions prévues par la règlementation&nbsp;(article 18 du RGPD) ;</li>
         <li>droit à la portabilité des données&nbsp;(article 20 du RGPD) ;</li>
         <li>droit d’introduire une réclamation auprès d’une autorité de contrôle (article 13 du RGPD)</li>
         <li>droit de définir des directives en cas de décès (article 84 à 86 de la loi informatique et libertés)</li>
-        </ul>
+        </ul><br/>
         <p>Vous pouvez exercer chacun de ces droits à l’adresse suivante&nbsp;:</p>
-        <ul>
+        <br/><ul>
         <li>soit en écrivant par courrier à QWANT – Direction Ethique &amp; Affaires Juridiques, 7 rue Spontini, 75116 Paris, France ;</li>
         <li>soit en adressant un courrier électronique à l’adresse&nbsp;<a href="mailto:privacy@qwant.com">privacy@qwant.com</a>.</li>
-        </ul>
-        <p><strong>Droit d’accès</strong></p>
+        </ul><br/>
+        <br/><p><strong>Droit d’accès</strong></p><br/>
         <p>Vous pouvez nous demander directement si nous détenons des données vous concernant et aussi des informations relatives à leur traitement (comme par exemple les catégories de données traitées). Ce droit vous permet aussi de demander à Qwant de vous communiquer l’intégralité de ces données.</p>
         <p>Les informations liées à l’exercice de ce droit d’accès (par exemple vos coordonnées) sont conservées un an à compter de la date de réponse de Qwant, puis supprimées à échéance de ce délai.</p>
-        <p><strong>Droit&nbsp;de rectification </strong></p>
+        <br/><p><strong>Droit&nbsp;de rectification </strong></p><br/>
         <p>Vous pouvez modifier ou supprimer à tout moment les informations renseignées sur le profil de votre compte Qwant.</p>
         <p>Pour les candidatures, vous avez la possibilité de les rectifier soit en répondant au courriel automatique que vous avez reçu lors de l’envoi de votre candidature, soit en nous adressant un courrier électronique à l’adresse privacy@qwant.com.</p>
         <p>Pour les formulaires de demande de déréférencement et exercice des autres droits vous avez la possibilité de les rectifier en nous adressant un courrier électronique à l’adresse privacy@qwant.com.</p>
         <p>Les informations liées à l’exercice de ce droit de rectification (par exemple vos coordonnées) sont conservées un an à compter de la date de réponse de Qwant, puis supprimées à échéance de ce délai.</p>
-        <p><strong>Droit à l’effacement </strong></p>
+        <br/><p><strong>Droit à l’effacement </strong></p><br/>
         <p>Ce droit vous ouvre la possibilité d’obtenir l’effacement de vos données dans les meilleurs délais de la part de Qwant.</p>
         <p>Concrètement, vous avez la possibilité de supprimer votre compte en suivant les instructions détaillées <a href="https://help.qwant.com/fr/aide/qwant-com/compte-qwant/comment-supprimer-mon-compte/">ici</a>. <em>A compter de la demande de clôture du compte, les données que vous avez communiquées seront alors supprimées au bout de 7 jours sous réserve de nos obligations légales et réglementaires.</em></p>
         <p>De même, vous pouvez demander l’effacement de votre dossier de candidature si vous ne souhaitez plus qu’elle soit traitée par Qwant. <em>A compter de la réception de votre demande de clôture de votre dossier de candidature, toutes les données que vous avez communiquées seront alors supprimées dans les meilleurs délais et au plus tard dans les 15 jours suivant votre demande.</em></p>
         <p>Enfin, vous pouvez demander l’effacement des données collectées via les formulaires de demande d’informations sur le site, à l’exception des formulaires dédiés à l’exercice de vos droits. <em>A compter de la réception de votre demande d’effacement, toutes les données que vous avez communiquées via les formulaires concernés seront alors supprimées dans les meilleurs délais et au plus tard dans les 6 mois à compter de votre demande.</em></p>
         <p>Les informations liées à l’exercice du droit à l’effacement de vos données sont conservées un an à compter de la date de réponse de Qwant, puis supprimées à échéance de ce délai.</p>
-        <p><strong>Droit à l’oubli (droit au déréférencement)</strong></p>
+        <br/><p><strong>Droit à l’oubli (droit au déréférencement)</strong></p><br/>
         <p>Il s’agit d’un droit spécifique réservé aux particuliers imposé aux moteurs de recherche par la Cour de justice de l’Union européenne (CJUE), dont Qwant a décidé de faciliter l’exercice. Lorsque la recherche comportant vos nom et prénom aboutit à des résultats qui sont inexacts, obsolètes, sensibles ou excessifs, vous pouvez nous adresser une demande de déréférencement de la ou les pages web associées à vos nom et prénom en remplissant notre formulaire spécifique au format <a href="https://about.qwant.com/wp-content/uploads/dlm_uploads/2017/02/dereferencement.odt">ODT</a> ou <a href="https://about.qwant.com/wp-content/uploads/dlm_uploads/2017/02/dereferencement.pdf">PDF</a>. Votre demande fera l’objet d’un examen au cas par cas, et les URL mentionnées seront déréférencées sous réserve que la balance des intérêts en cause n’impose pas de privilégier le droit à l’information du public (par exemple si vous êtes un élu qui cherche à faire oublier une déclaration politique controversée).</p>
         <p>Les informations liées à l’exercice de ce droit à l’oubli (par exemple vos coordonnées) sont conservées un an à compter de la date de réponse de Qwant et seront définitivement supprimées au-delà du délai de prescription légale (trois ans).</p>
-        <p><strong>Droit d’opposition</strong></p>
+        <br/><p><strong>Droit d’opposition</strong></p><br/>
         <p>Le droit d’opposition, comme son nom l’indique, vous permet de vous opposer au traitement de vos données par Qwant.</p>
         <p>Les informations liées à l’exercice de ce droit d’opposition (par exemple vos coordonnées) sont conservées un an à compter de la date de réponse de Qwant et seront définitivement supprimées au-delà du délai de prescription légale (trois ans).</p>
-        <p><strong>Droit à la limitation du traitement</strong></p>
+        <br/><p><strong>Droit à la limitation du traitement</strong></p><br/>
         <p>Ce droit vous permet par exemple d’obtenir le retrait temporaire des données publiées sur le site en cas de contestation de l’exactitude des données, pendant une durée permettant à Qwant de procéder aux vérifications nécessaires.</p>
         <p>Les informations liées à l’exercice de ce droit (par exemple vos coordonnées) sont conservées un an à compter de la date de réponse de Qwant puis supprimées à échéance de ce délai.</p>
-        <p><strong>Droit à la portabilité</strong></p>
+        <br/><p><strong>Droit à la portabilité</strong></p><br/>
         <p>Ce droit vous permet de recevoir les données que vous avez communiquées ou de demander à Qwant de les transmettre à un autre responsable de traitement (autre site par exemple). Concrètement, en application de l’article 20 du RGPD, le droit à la portabilité concerne seulement vos carnets.</p>
         <p>Les informations liées à l’exercice de ce droit (par exemple vos coordonnées) sont conservées un an à compter de la date de réponse de Qwant puis supprimées à échéance de ce délai.</p>
         <p>Vous disposez de la possibilité d’obtenir une copie de vos données en vous rendant dans votre compte Qwant, en cliquant sur le bouton «&nbsp;Recevoir une copie de mes données&nbsp;».</p>
-        <p><strong>Et quid de nos publicités ? Ce n’est pas tracé ?</strong></p>
+        <br/><p><strong>Et quid de nos publicités ? Ce n’est pas tracé ?</strong></p><br/>
         <p>Qwant est un moteur de recherche gratuit, ouvert à tous. Notre principale source de revenus provient des publicités affichées sur la page de résultats Qwant.<br>
         Nous sommes fiers de le faire en respectant à la fois votre vie privée et votre expérience d’utilisateur sur Qwant.<br>
         Qwant ne vous traque pas et cela ne changera jamais !</p>
@@ -268,13 +269,13 @@
         Avec de tels engagements, nous voulons démontrer que la pub peut être responsable et respectueuse. Nous avons travaillé plusieurs mois à identifier et penser des solutions en accord avec ces principes, pour aboutir aux systèmes d’anonymisation détaillés précédemment.</p>
         <p>Quand vous utilisez Qwant, aucune information personnelle n’est enregistrée ou transmise aux annonceurs.<br>
         En détails :</p>
-        <ul>
+        <br/><ul>
         <li>Pas de cookies tiers</li>
         <li>Pas de trackers</li>
         <li>Pas de ciblage comportemental</li>
-        </ul>
+        </ul><br/>
         <p>Nous croyons que la publicité peut être un modèle économique responsable.</p>
-        <p><strong>Comment Qwant indexe le web ?</strong></p>
+        <br/><p><strong>Comment Qwant indexe le web ?</strong></p><br/>
         <p>Nous poursuivons nos efforts pour indexer toute la diversité du web. Nos crawlers visitent sans relâche le web du monde entier pour affiner la qualité de nos résultats. Cependant, cela demande à la fois des ressources et du temps ; certaines parties du Web ne sont pas encore parfaitement indexées. Dans l’attente, notre partenariat avec Microsoft Bing nous permet de compléter nos résultats avec ceux de Microsoft Bing pour offrir les meilleurs résultats provenant du Web tout entier.</p>
     ]]></string>
 </resources>
