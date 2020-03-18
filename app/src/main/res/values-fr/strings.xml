@@ -83,8 +83,8 @@
     <string name="menu_more">@string/settings</string>
     <string name="menu_back">Retour</string>
 
-    <string name="bookmarks_empty_1">Pour ajouter une page à vos favoris, cliquez sur l\'icône</string>
-    <string name="bookmarks_empty_2">dans la barre de menu ci-dessous</string>
+    <string name="bookmarks_empty_1">La liste des favoris est vide.</string>
+    <string name="bookmarks_empty_2">Ajouter un favori en utilisant le menu sur une page web.</string>
 
     <string name="bookmarks_delete">Supprimer</string>
     <string name="bookmarks_add">Ajouter aux favoris</string>

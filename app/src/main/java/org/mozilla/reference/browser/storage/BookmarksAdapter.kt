@@ -5,11 +5,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import mozilla.components.browser.menu.BrowserMenuBuilder
 import mozilla.components.browser.menu.item.BrowserMenuImageText
 import mozilla.components.browser.menu.item.BrowserMenuItemToolbar
 import mozilla.components.browser.menu.view.MenuButton
+import mozilla.components.support.ktx.android.content.res.resolveAttribute
 import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.ext.components
 
@@ -31,8 +33,7 @@ class BookmarksAdapter(
         private var itemTitle: TextView = item_layout.findViewById(R.id.bookmark_title)
         private var itemUrl: TextView = item_layout.findViewById(R.id.bookmark_url)
         private var itemLayoutText: LinearLayout = item_layout.findViewById(R.id.bookmark_item_layout_text)
-        private var itemButtonDelete: ImageButton = item_layout.findViewById(R.id.bookmark_item_delete)
-        // private var itemButtonMenu: MenuButton = item_layout.findViewById(R.id.bookmark_item_menu_button)
+        private var itemButtonMenu: MenuButton = item_layout.findViewById(R.id.bookmark_item_menu_button)
 
         fun setup(bookmarkItem: BookmarkItem) {
             if (bookmarkItem.icon != null) this.itemIcon.setImageBitmap(bookmarkItem.icon.bitmap)
@@ -46,40 +47,40 @@ class BookmarksAdapter(
                 context.components.useCases.sessionUseCases.loadUrl(bookmarkItem.url)
                 selectedCallback.invoke(bookmarkItem)
             }
-            this.itemButtonDelete.setOnClickListener {
-                bookmarkStorage.deleteBookmark(bookmarkItem)
-            }
 
-            /* itemButtonMenu.menuBuilder = BrowserMenuBuilder(listOf(
+            itemButtonMenu.setColorFilter(ContextCompat.getColor(context, context.theme.resolveAttribute(R.attr.qwant_color_main)))
+            itemButtonMenu.menuBuilder = BrowserMenuBuilder(listOf(
                 BrowserMenuImageText(
                         context.getString(R.string.mozac_feature_contextmenu_open_link_in_new_tab),
                         textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
-                        imageResource = R.drawable.ic_add_bookmark
+                        imageResource = R.drawable.ic_ctmenu_newtab
                 ) {
-                    bookmarkStorage.addBookmark(sessionManager.selectedSession)
+                    context.components.useCases.tabsUseCases.addTab.invoke(bookmarkItem.url, selectTab = true)
+                    selectedCallback.invoke(bookmarkItem)
                 },
                 BrowserMenuImageText(
                         context.getString(R.string.mozac_feature_contextmenu_open_link_in_private_tab),
                         textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
-                        imageResource = R.drawable.ic_add_bookmark
+                        imageResource = R.drawable.ic_ctmenu_newtab_private
                 ) {
-                    bookmarkStorage.addBookmark(sessionManager.selectedSession)
+                    context.components.useCases.tabsUseCases.addPrivateTab.invoke(bookmarkItem.url, selectTab = true)
+                    selectedCallback.invoke(bookmarkItem)
                 },
                 BrowserMenuImageText(
-                        context.getString(R.string.copy_link),
+                        context.getString(R.string.mozac_feature_contextmenu_copy_link),
                         textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
-                        imageResource = R.drawable.ic_add_bookmark
+                        imageResource = R.drawable.ic_ctmenu_clipboard
                 ) {
-                    bookmarkStorage.addBookmark(sessionManager.selectedSession)
+                    // TODO Copy url to clipboard
                 },
                 BrowserMenuImageText(
                         context.getString(R.string.bookmarks_delete),
                         textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
-                        imageResource = R.drawable.ic_add_bookmark
+                        imageResource = R.drawable.ic_trash
                 ) {
-                    bookmarkStorage.addBookmark(sessionManager.selectedSession)
-                },
-            )) */
+                    bookmarkStorage.deleteBookmark(bookmarkItem)
+                }
+            ))
         }
     }
 

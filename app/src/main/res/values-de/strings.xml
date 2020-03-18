@@ -83,8 +83,8 @@
     <string name="menu_more">@string/settings</string>
     <string name="menu_back">Rückseite</string>
 
-    <string name="bookmarks_empty_1">Um Ihren Lesezeichen Seiten hinzuzufügen, klicken Sie auf das Symbol</string>
-    <string name="bookmarks_empty_2">in der untenstehenden Menüleiste.</string>
+    <string name="bookmarks_empty_1">Die Liste der Lesezeichen ist leer.</string>
+    <string name="bookmarks_empty_2">Fügen Sie Lesezeichen über das Menü der Webseite hinzu.</string>
 
     <string name="bookmarks_delete">Löschen</string>
     <string name="bookmarks_add">Lesezeichen hinzufügen</string>

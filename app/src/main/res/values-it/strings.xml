@@ -83,8 +83,8 @@
     <string name="menu_more">@string/settings</string>
     <string name="menu_back">Indietro</string>
 
-    <string name="bookmarks_empty_1">Per aggiungere pagine ai segnalibri, fai clic sull\'icona</string>
-    <string name="bookmarks_empty_2">nella barra dei menu in basso</string>
+    <string name="bookmarks_empty_1">L\'elenco dei segnalibri è vuoto.</string>
+    <string name="bookmarks_empty_2">Aggiungi segnalibri utilizzando l\'accesso da menù sulla pagina web.</string>
 
     <string name="bookmarks_delete">Elimina</string>
     <string name="bookmarks_add">Aggiungi segnalibro</string>

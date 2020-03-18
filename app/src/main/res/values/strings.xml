@@ -83,8 +83,8 @@
     <string name="menu_more">@string/settings</string>
     <string name="menu_back">Back</string>
 
-    <string name="bookmarks_empty_1">To add pages to your bookmarks, click on the icon</string>
-    <string name="bookmarks_empty_2">in the bottom menu bar</string>
+    <string name="bookmarks_empty_1">The bookmarks list is empty.</string>
+    <string name="bookmarks_empty_2">Add bookmarks using the menu access on the web page.</string>
 
     <string name="bookmarks_delete">Delete</string>
     <string name="bookmarks_add">Add bookmark</string>
