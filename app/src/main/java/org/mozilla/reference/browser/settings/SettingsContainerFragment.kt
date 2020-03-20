@@ -52,15 +52,18 @@ class SettingsContainerFragment(
             }
         }
 
-        // If no child fragment intercept the back event, we are on main settings page so we go back to browsing
-        parentFragmentManager.beginTransaction()
-            .replace(R.id.container, BrowserFragment.create(), "BROWSER_FRAGMENT")
-            .commit()
-        settingsClosedCallback?.invoke()
+        closeSettings()
         return true
     }
 
     fun setTitle(title: String) {
         settings_toolbar.title = title
+    }
+
+    fun closeSettings() {
+        parentFragmentManager.beginTransaction()
+                .replace(R.id.container, BrowserFragment.create(), "BROWSER_FRAGMENT")
+                .commit()
+        settingsClosedCallback?.invoke()
     }
 }

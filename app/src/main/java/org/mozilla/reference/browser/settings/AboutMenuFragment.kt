@@ -1,10 +1,8 @@
 package org.mozilla.reference.browser.settings
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import androidx.preference.Preference
 import org.mozilla.reference.browser.R
+import org.mozilla.reference.browser.ext.components
 import org.mozilla.reference.browser.ext.getPreferenceKey
 
 class AboutMenuFragment(
@@ -14,9 +12,13 @@ class AboutMenuFragment(
         findPreference(context?.getPreferenceKey(R.string.pref_key_about)).onPreferenceClickListener = this.getPreferenceLinkListener(
             AboutFragment(this.settingsContainer), "SETTINGS_ABOUT_FRAGMENT"
         )
-        findPreference(context?.getPreferenceKey(R.string.pref_key_privacy_policy)).onPreferenceClickListener = this.getPreferenceLinkListener(
-            PrivacyPolicyFragment(this.settingsContainer), "SETTINGS_PRIVACYPOLICY_FRAGMENT"
-        )
+        findPreference(context?.getPreferenceKey(R.string.pref_key_privacy_policy)).onPreferenceClickListener = Preference.OnPreferenceClickListener {
+            if (context != null) {
+                context!!.components.useCases.tabsUseCases.addTab(getString(R.string.privacy_policy_url), true)
+                settingsContainer.closeSettings()
+            }
+            true
+        }
         findPreference(context?.getPreferenceKey(R.string.pref_key_license)).onPreferenceClickListener = this.getPreferenceLinkListener(
             LicenseFragment(this.settingsContainer), "SETTINGS_LICENSE_FRAGMENT"
         )
