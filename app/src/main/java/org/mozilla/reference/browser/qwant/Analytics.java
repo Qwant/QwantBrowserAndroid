@@ -6,12 +6,10 @@ import android.util.Log;
 import java.io.BufferedWriter;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -22,7 +20,6 @@ public class Analytics extends AsyncTask<String, Void, Boolean> {
 
     @Override
     protected Boolean doInBackground(String... params) {
-        Log.d("QWANT_BROWSER", "analytic call background");
         try {
             String event = (params.length > 0) ? params[0] : "default_event";
             String appversion = (params.length > 1) ? params[1] : "0";
@@ -38,9 +35,7 @@ public class Analytics extends AsyncTask<String, Void, Boolean> {
 
             OutputStream os = conn.getOutputStream();
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8));
-            String postData = getPostDataString(appversion);
-            Log.d("QWANT_BROWSER","post data: " + postData);
-            writer.write(postData);
+            writer.write(getPostDataString(appversion));
 
             writer.flush();
             writer.close();
@@ -48,15 +43,10 @@ public class Analytics extends AsyncTask<String, Void, Boolean> {
 
             int responseCode = conn.getResponseCode();
             if (responseCode == HttpsURLConnection.HTTP_OK) {
-                Log.d("QWANT_BROWSER", "analytic call ok");
                 return true;
-            }
-            else {
-                Log.d("QWANT_BROWSER", "analytic call not ok: " + responseCode);
             }
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("QWANT_BROWSER", "analytic call failed: " + e.getMessage());
         }
         return null;
     }
@@ -67,8 +57,6 @@ public class Analytics extends AsyncTask<String, Void, Boolean> {
 
         String huaweichannel = getHuaweiKey("ro.channel.com.qwant.liberty");
         if (huaweichannel == null || huaweichannel.length() == 0) huaweichannel = "Unknown";
-
-        Log.d("QWANT_BROWSER", "ids:" + huaweiid + " / "+ huaweichannel);
 
         StringBuilder result = new StringBuilder();
         result.append("version=").append(appversion);

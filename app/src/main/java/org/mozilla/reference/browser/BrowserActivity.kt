@@ -133,8 +133,6 @@ open class BrowserActivity : AppCompatActivity() {
                 defaultLocale = "${phoneLocale}_$phoneCountry"
             }
 
-            Log.d("QWANT_BROWSER", "Default locale: $defaultLocale")
-
             val editor: SharedPreferences.Editor = prefs.edit()
             editor.putString(resources.getString(R.string.pref_key_general_language_interface), defaultLocale)
             // Set also search language
