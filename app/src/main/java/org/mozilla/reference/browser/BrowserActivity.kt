@@ -6,6 +6,7 @@ package org.mozilla.reference.browser
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.content.pm.PackageInfo
 import android.os.Bundle
 import android.util.AttributeSet
 import android.util.Log
@@ -24,10 +25,10 @@ import org.mozilla.reference.browser.browser.BrowserFragment
 import org.mozilla.reference.browser.browser.QwantBarSessionObserver
 import org.mozilla.reference.browser.ext.components
 import org.mozilla.reference.browser.layout.QwantBar
+import org.mozilla.reference.browser.qwant.Analytics
 import org.mozilla.reference.browser.settings.SettingsContainerFragment
 import org.mozilla.reference.browser.storage.BookmarksFragment
 import org.mozilla.reference.browser.storage.BookmarksStorage
-import org.mozilla.reference.browser.tabs.TabsTouchHelper
 import org.mozilla.reference.browser.tabs.TabsTrayFragment
 import org.mozilla.reference.browser.tabs.tray.BrowserTabsTray
 import java.util.*
@@ -81,6 +82,38 @@ open class BrowserActivity : AppCompatActivity() {
                 }
             }
         }
+
+        checkVersion()
+    }
+
+    private fun checkVersion() {
+        val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        val savedVersion = prefs.getString(getString(R.string.pref_key_saved_version), "undefined")
+
+        // val pInfo: PackageInfo = applicationContext.getPackageManager().getPackageInfo(packageName, 0)
+        // val currentVersion = pInfo.longVersionCode.toString()
+        val currentVersion = BuildConfig.VERSION_CODE.toString()
+
+        Log.d("QWANT_BROWSER", "version code: $currentVersion")
+
+        var event: String? = null
+        if (savedVersion == "undefined") {
+            event = if (currentVersion.length > 7 && currentVersion.substring(0, 7) == getString(R.string.huawei_preinstalled_versioncode)) {
+                "first_launch_huawei_preinstall"
+            } else {
+                "first_launch"
+            }
+        } else if (savedVersion != currentVersion) {
+            event = "update"
+        }
+
+        if (event != null) {
+            Analytics().execute(event, currentVersion)
+
+            val editor: SharedPreferences.Editor = prefs.edit()
+            editor.putString(resources.getString(R.string.pref_key_saved_version), currentVersion)
+            editor.apply()
+        }
     }
 
     private fun loadLocale() {
@@ -99,6 +132,8 @@ open class BrowserActivity : AppCompatActivity() {
             } else {
                 defaultLocale = "${phoneLocale}_$phoneCountry"
             }
+
+            Log.d("QWANT_BROWSER", "Default locale: $defaultLocale")
 
             val editor: SharedPreferences.Editor = prefs.edit()
             editor.putString(resources.getString(R.string.pref_key_general_language_interface), defaultLocale)

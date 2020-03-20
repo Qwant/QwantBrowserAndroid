@@ -36,27 +36,6 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
         val engineSettings = requireContext().components.core.engine.settings
         if (engineSettings.userAgentString != null)
             if (!engineSettings.userAgentString!!.contains("QwantMobile")) {
-                /* try {
-                    val cl = context!!.classLoader
-                    val systemProperties = cl.loadClass("android.os.SystemProperties")
-
-                    //Parameters Types
-                    val paramTypes: Array<Class<*>?> = arrayOfNulls(1)
-                    paramTypes[0] = String::class.java
-                    val get: Method = systemProperties.getMethod("get", *paramTypes)
-
-                    //Parameters
-                    val params = arrayOfNulls<Any>(1)
-                    params[0] = "ro.HuaweiID.com.qwant.liberty"
-
-                    val huaweiTrackingId = get.invoke(systemProperties, params) as String
-                    engineSettings.userAgentString += " $huaweiTrackingId"
-                } catch (iAE: IllegalArgumentException) {
-                    Log.e("QWANT_BROWSER", "Illegal argument exception recovering huawei tracking id")
-                } catch (e: Exception) {
-                    Log.e("QWANT_BROWSER", "Exception recovering huawei tracking id")
-                } */
-
                 engineSettings.userAgentString += " h QwantMobile/4.0"
             }
         engineSettings.remoteDebuggingEnabled = false

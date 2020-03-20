@@ -54,7 +54,7 @@ class Core(private val context: Context) {
             requestInterceptor = AppRequestInterceptor(context),
             remoteDebuggingEnabled = prefs.getBoolean(context.getPreferenceKey(pref_key_remote_debugging), false),
             trackingProtectionPolicy = createTrackingProtectionPolicy(prefs),
-            historyTrackingDelegate = HistoryDelegate(historyStorage)
+            historyTrackingDelegate = HistoryDelegate(lazy { historyStorage })
         )
         EngineProvider.createEngine(context, defaultSettings)
     }

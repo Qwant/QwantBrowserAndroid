@@ -26,4 +26,7 @@
     <string name="pref_key_about" translatable="false">pref_key_about</string>
     <string name="pref_key_privacy_policy" translatable="false">pref_key_privacy_policy</string>
     <string name="pref_key_license" translatable="false">pref_key_license</string>
+
+
+    <string name="pref_key_saved_version" translatable="false">pref_key_saved_version</string>
 </resources>
