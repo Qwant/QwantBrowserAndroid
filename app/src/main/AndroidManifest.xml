@@ -113,12 +113,11 @@
                 <data android:scheme="https" />
             </intent-filter>
 
-            <intent-filter> <!-- TODO test this ! -->
-                <action android:name="android.intent.action.ASSIST"/>
+            <intent-filter>
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
 
-            <intent-filter> <!-- TODO test this ! -->
+            <intent-filter>
                 <action android:name="android.intent.action.WEB_SEARCH"/>
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
@@ -131,7 +130,6 @@
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
             android:launchMode="singleTask">
             <intent-filter>
-                <action android:name="android.intent.action.ASSIST" />
                 <action android:name="android.intent.action.SEARCH" />
                 <!-- <action android:name="android.intent.action.VOICE_ASSIST" /> -->
             </intent-filter>
