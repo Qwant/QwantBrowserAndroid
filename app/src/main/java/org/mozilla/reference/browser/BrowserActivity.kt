@@ -90,11 +90,7 @@ open class BrowserActivity : AppCompatActivity() {
         val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         val savedVersion = prefs.getString(getString(R.string.pref_key_saved_version), "undefined")
 
-        // val pInfo: PackageInfo = applicationContext.getPackageManager().getPackageInfo(packageName, 0)
-        // val currentVersion = pInfo.longVersionCode.toString()
         val currentVersion = BuildConfig.VERSION_CODE.toString()
-
-        Log.d("QWANT_BROWSER", "version code: $currentVersion")
 
         var event: String? = null
         if (savedVersion == "undefined") {
@@ -266,31 +262,9 @@ open class BrowserActivity : AppCompatActivity() {
         this.showBrowserFragment()
 
         qwantbar.setHighlight(QwantBar.QwantBarSelection.SEARCH)
-        //qwantbar.setBookmarkButton(QwantBar.BookmarkButtonType.OPEN)
     }
 
     private fun showSettings() {
-       /* val session: Session? = components.core.sessionManager.selectedSession
-        if (session == null || session.url != getString(R.string.settings_page)) {
-            var alreadyThere = false
-            components.core.sessionManager.sessions.forEach {
-                if (it.url == getString(R.string.settings_page)) {
-                    components.core.sessionManager.select(it)
-                    alreadyThere = true
-                }
-            }
-            if (!alreadyThere)
-                components.useCases.sessionUseCases.loadUrl(getString(R.string.settings_page))
-        } */ // TODO Put that back, but block user non settings
-
-        /* components.useCases.sessionUseCases.loadUrl(getString(R.string.settings_page))
-
-        this.showBrowserFragment()
-
-        qwantbar.setHighlight(QwantBar.QwantBarSelection.MENU_QWANT)
-        qwantbar.setLeftButton(QwantBar.LeftButtonType.BACK)
-        qwantbar.setBookmarkButton(QwantBar.BookmarkButtonType.OPEN) */
-
         this.supportFragmentManager.beginTransaction().apply {
             this.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
             replace(R.id.container, SettingsContainerFragment(::bookmarksOrTabsOrSettingsClosed), "SETTINGS_FRAGMENT")

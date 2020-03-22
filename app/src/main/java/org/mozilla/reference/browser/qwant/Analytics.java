@@ -25,6 +25,8 @@ public class Analytics extends AsyncTask<String, Void, Boolean> {
             String appversion = (params.length > 1) ? params[1] : "0";
 
             URL url = new URL(API_URL + event);
+            String data = getPostDataString(appversion);
+            Log.d("QWANT_BROWSER", "tracking data: " + data);
 
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setReadTimeout(15000);
@@ -35,8 +37,7 @@ public class Analytics extends AsyncTask<String, Void, Boolean> {
 
             OutputStream os = conn.getOutputStream();
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8));
-            writer.write(getPostDataString(appversion));
-
+            writer.write(data);
             writer.flush();
             writer.close();
             os.close();

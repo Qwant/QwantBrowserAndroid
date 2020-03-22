@@ -53,7 +53,7 @@
         <ImageView
             android:id="@+id/qwantbar_button_home"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="22dp"
             android:background="@android:color/transparent"
             android:src="@drawable/ic_search"
             android:contentDescription="@string/menu_search" />
@@ -78,7 +78,7 @@
         <ImageView
             android:id="@+id/qwantbar_button_bookmarks"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="22dp"
             android:background="@android:color/transparent"
             android:src="@drawable/ic_bookmark"
             android:contentDescription="@string/menu_bookmarks" />
@@ -103,7 +103,7 @@
         <mozilla.components.ui.tabcounter.TabCounter
             android:id="@+id/qwantbar_button_tabs"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="22dp" />
 
         <TextView
             android:id="@+id/qwantbar_text_tabs"
@@ -125,9 +125,10 @@
         <ImageView
             android:id="@+id/qwantbar_button_menu_qwant"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="22dp"
             android:background="@android:color/transparent"
-            android:src="@drawable/ic_menu"
+            android:src="@drawable/ic_menu_selected"
+            android:scaleType="center"
             android:contentDescription="@string/menu_bookmarks" />
 
         <TextView
