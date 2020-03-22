@@ -12,5 +12,4 @@
   public static *** d(...);
   public static *** i(...);
   public static *** w(...);
-  public static *** e(...);
 }

@@ -81,7 +81,7 @@
             android:theme="@style/ThemeQwant" />
 
         <activity android:name=".IntentReceiverActivity">
-            <intent-filter>
+           <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
@@ -143,14 +143,14 @@
                 android:resource="@xml/assist_config" />
         </receiver>
 
-        <service
+        <!-- <service
             android:name=".customtabs.CustomTabsService"
             android:exported="true"
             tools:ignore="ExportedService">
             <intent-filter>
                 <action android:name="android.support.customtabs.action.CustomTabsService" />
             </intent-filter>
-        </service>
+        </service> -->
 
         <service android:name=".downloads.DownloadService" />
     </application>
