@@ -56,8 +56,7 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
             .addSessionProvider(
                 resources,
                 requireComponents.core.store,
-                requireComponents.useCases.tabsUseCases.selectTab
-            )
+                requireComponents.useCases.tabsUseCases.selectTab)
             .addHistoryProvider(
                 requireComponents.core.historyStorage,
                 requireComponents.useCases.sessionUseCases.loadUrl)
