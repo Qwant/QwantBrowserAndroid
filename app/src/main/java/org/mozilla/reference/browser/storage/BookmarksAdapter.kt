@@ -9,7 +9,6 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import mozilla.components.browser.menu.BrowserMenuBuilder
 import mozilla.components.browser.menu.item.BrowserMenuImageText
-import mozilla.components.browser.menu.item.BrowserMenuItemToolbar
 import mozilla.components.browser.menu.view.MenuButton
 import mozilla.components.support.ktx.android.content.res.resolveAttribute
 import org.mozilla.reference.browser.R
@@ -18,12 +17,12 @@ import org.mozilla.reference.browser.ext.components
 class BookmarksAdapter(
         private val context: Context,
         private val bookmarksStorage: BookmarksStorage,
-        private val bookmarkSelectedCallback: (bookmarkItem: BookmarkItem) -> Unit
+        private val bookmarkSelectedCallback: (bookmarkItem: BookmarkItemV1) -> Unit
 ) : BaseAdapter() {
     internal class BookmarkItemViewHolder(
             item_layout: View,
             private val bookmarkStorage: BookmarksStorage,
-            private val selectedCallback: (bookmarkItem: BookmarkItem) -> Unit,
+            private val selectedCallback: (bookmarkItem: BookmarkItemV1) -> Unit,
             private val context: Context
     ) : RecyclerView.ViewHolder(item_layout) {
         private val MAX_TITLE_LENGTH = 40
@@ -35,7 +34,7 @@ class BookmarksAdapter(
         private var itemLayoutText: LinearLayout = item_layout.findViewById(R.id.bookmark_item_layout_text)
         private var itemButtonMenu: MenuButton = item_layout.findViewById(R.id.bookmark_item_menu_button)
 
-        fun setup(bookmarkItem: BookmarkItem) {
+        fun setup(bookmarkItem: BookmarkItemV1) {
             if (bookmarkItem.icon != null) this.itemIcon.setImageBitmap(bookmarkItem.icon.bitmap)
 
             val title = if (bookmarkItem.title.length > MAX_TITLE_LENGTH) bookmarkItem.title.substring(0, MAX_TITLE_LENGTH - 3) + "..." else bookmarkItem.title

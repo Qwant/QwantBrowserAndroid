@@ -12,7 +12,6 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.ListView
 import androidx.appcompat.widget.Toolbar
-import kotlinx.android.synthetic.main.fragment_bookmarks.*
 import mozilla.components.support.base.feature.UserInteractionHandler
 import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.browser.BrowserFragment
@@ -58,7 +57,7 @@ class BookmarksFragment(
         return true
     }
 
-    private fun bookmarkSelected(item: BookmarkItem) {
+    private fun bookmarkSelected(item: BookmarkItemV1) {
         this.closeBookmarks()
     }
 
