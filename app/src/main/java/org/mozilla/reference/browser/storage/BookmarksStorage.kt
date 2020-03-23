@@ -70,6 +70,7 @@ class BookmarksStorage(private var context: Context) {
                 this.bookmarksList.add(BookmarkItemV1(it.title, it.url))
             }
 
+            this.persist()
             this.emitOnChange()
         } catch (e: IOException) {
             Log.e("QWANT_BROWSER", "Failed reading bookmarks file: IO exception: " + e.message)
@@ -104,15 +105,16 @@ class BookmarksStorage(private var context: Context) {
     }
 
     fun restore() {
-        val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
-        val prefkeyBookmarksVersion = context.resources.getString(R.string.pref_key_bookmarks_version)
-        val bookmarksVersion = prefs.getInt(prefkeyBookmarksVersion, 0)
+        val prefs = PreferenceManager.getDefaultSharedPreferences(context)
+        val prefkey = context.resources.getString(R.string.pref_key_bookmarks_version)
+        val bookmarksVersion = prefs.getInt(prefkey, 0)
+
+        val editor: SharedPreferences.Editor = prefs.edit()
+        editor.putInt(prefkey, 1)
+        editor.apply()
 
         if (bookmarksVersion == 0) {
             do_restore_old()
-            val editor: SharedPreferences.Editor = prefs.edit()
-            editor.putInt(prefkeyBookmarksVersion, 1)
-            editor.apply()
         } else {
             do_restore()
         }

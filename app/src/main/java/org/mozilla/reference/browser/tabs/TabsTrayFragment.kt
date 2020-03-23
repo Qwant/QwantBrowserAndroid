@@ -72,7 +72,7 @@ class TabsTrayFragment(
         val context = requireContext()
         if (isPrivate) {
             button_new_tab.background = ContextCompat.getDrawable(context, R.drawable.purple_gradient)
-            button_new_tab.setCompoundDrawablesWithIntrinsicBounds(R.drawable.mozac_ic_private_browsing, 0, 0, 0)
+            button_new_tab.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_privacy_mask_white, 0, 0, 0)
             tab_switch_normal_counter.background = null
             tab_switch_normal_counter.elevation = 0F
 

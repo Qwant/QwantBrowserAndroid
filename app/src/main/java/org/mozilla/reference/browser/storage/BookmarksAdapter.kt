@@ -25,8 +25,8 @@ class BookmarksAdapter(
             private val selectedCallback: (bookmarkItem: BookmarkItemV1) -> Unit,
             private val context: Context
     ) : RecyclerView.ViewHolder(item_layout) {
-        private val MAX_TITLE_LENGTH = 40
-        private val MAX_URL_LENGTH = 50
+        private val MAX_TITLE_LENGTH = 35
+        private val MAX_URL_LENGTH = 40
 
         private var itemIcon: ImageView = item_layout.findViewById(R.id.bookmark_item_icon)
         private var itemTitle: TextView = item_layout.findViewById(R.id.bookmark_title)

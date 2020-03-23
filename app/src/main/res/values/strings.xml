@@ -3,7 +3,7 @@
    - License, v. 2.0. If a copy of the MPL was not distributed with this
    - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 <resources>
-    <string name="huawei_preinstalled_versioncode" translatable="false">4000008</string>
+    <string name="huawei_preinstalled_versioncode" translatable="false">4000009</string>
 
     <string name="app_name">Qwant</string>
 
@@ -101,6 +101,8 @@
     <string name="context_menu_addons">Add-ons</string>
     <string name="context_menu_add_bookmark">Add to bookmarks</string>
     <string name="context_menu_del_bookmark">Delete bookmark</string>
+
+    <string name="settings_main">Qwant Settings</string>
 
     <string name="settings_general">General</string>
     <string name="settings_interface">Interface</string>

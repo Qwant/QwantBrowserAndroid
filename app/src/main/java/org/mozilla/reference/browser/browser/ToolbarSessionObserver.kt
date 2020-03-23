@@ -83,7 +83,7 @@ class ToolbarSessionObserver(
     }
 
     private fun toggleSplash(is_shown: Boolean) {
-        swipeRefresh.visibility = if (is_shown) View.INVISIBLE else View.VISIBLE
-        shownSplash = is_shown
+        /* swipeRefresh.visibility = if (is_shown) View.INVISIBLE else View.VISIBLE
+        shownSplash = is_shown */
     }
 }

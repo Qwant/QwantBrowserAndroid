@@ -23,8 +23,8 @@
 
         <ImageView
             android:id="@+id/mozac_browser_tabstray_icon"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:importantForAccessibility="no"
             android:padding="4dp" />
 
@@ -61,6 +61,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_margin="8dp"
+                android:background="@drawable/tab_default_screenshot"
                 android:contentDescription="@string/mozac_browser_tabstray_open_tab" />
 
             <ImageView

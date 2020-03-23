@@ -16,7 +16,7 @@ class SettingsMainFragment(
 ) : PreferenceFragmentCompat() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.preferences_main, rootKey)
-        settingsContainer.setTitle("Settings")
+        settingsContainer.setTitle(getString(R.string.settings_main))
     }
 
     override fun onResume() {

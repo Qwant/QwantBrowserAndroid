@@ -7,15 +7,15 @@
     android:orientation="horizontal"
     android:paddingStart="10dp"
     android:paddingEnd="20dp"
-    android:paddingTop="5dp"
-    android:paddingBottom="5dp">
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp">
 
     <ImageView
         android:id="@+id/bookmark_item_icon"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:layout_gravity="center"
-        android:src="@drawable/ic_bookmark" />
+        android:src="@drawable/ic_bookmark_default_fav" />
 
     <LinearLayout
         android:id="@+id/bookmark_item_layout_text"
@@ -32,14 +32,15 @@
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:textColor="@color/menu_items"
-            android:textSize="18sp" />
+            android:textSize="15sp" />
 
         <TextView
             android:id="@+id/bookmark_url"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
-            android:textColor="#1b6e3c" />
+            android:textColor="#1b6e3c"
+            android:textSize="12sp" />
 
     </LinearLayout>
 
