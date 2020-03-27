@@ -30,4 +30,5 @@
 
     <string name="pref_key_saved_version" translatable="false">pref_key_saved_version</string>
     <string name="pref_key_bookmarks_version" translatable="false">pref_key_bookmarks_version</string>
+    <string name="pref_key_first_launch" translatable="false">pref_key_first_launch</string>
 </resources>

@@ -51,6 +51,7 @@ open class BrowserActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         this.loadLocale()
+        this.fixHuaweiDefaultContentFilter() // TODO remove this
 
         setContentView(R.layout.activity_main)
 
@@ -146,7 +147,20 @@ open class BrowserActivity : AppCompatActivity() {
             resources.updateConfiguration(resources.configuration, resources.displayMetrics)
         }
     }
-
+    fun fixHuaweiDefaultContentFilter() {
+        // force content filter to moderate if set to none on first launch
+        val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        val firstLaunch = prefs.getBoolean(resources.getString(R.string.pref_key_first_launch), true)
+        if (firstLaunch) {
+            val editor: SharedPreferences.Editor = prefs.edit()
+            editor.putBoolean(resources.getString(R.string.pref_key_first_launch), false)
+            val adultContentFilter = prefs.getString(resources.getString(R.string.pref_key_general_adultcontent), "undefined")
+            if (adultContentFilter == "undefined" || adultContentFilter == resources.getString(R.string.settings_adultcontent_none_code)) {
+                editor.putString(resources.getString(R.string.pref_key_general_adultcontent), resources.getString(R.string.settings_adultcontent_moderate_code))
+            }
+            editor.apply()
+        }
+    }
     override fun onBackPressed() {
         if (components.core.sessionManager.selectedSession == null || components.core.sessionManager.selectedSession!!.url.startsWith(getString(R.string.settings_page_startwith_filter))) {
             qwantbar.setHighlight(QwantBar.QwantBarSelection.SEARCH)
