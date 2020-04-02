@@ -6,7 +6,7 @@ package org.mozilla.reference.browser.components
 
 import android.content.Context
 import androidx.preference.PreferenceManager
-import mozilla.components.feature.app.links.AppLinksInterceptor
+import org.mozilla.reference.browser.applinks.AppLinksInterceptor
 import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.ext.getPreferenceKey
 
