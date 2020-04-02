@@ -21,9 +21,7 @@ import mozilla.components.feature.addons.amo.AddonCollectionProvider
 import mozilla.components.feature.addons.update.AddonUpdater
 import mozilla.components.feature.addons.update.DefaultAddonUpdater
 import mozilla.components.feature.downloads.DownloadsUseCases
-import mozilla.components.feature.media.MediaFeature
 import mozilla.components.feature.media.RecordingDevicesNotificationFeature
-import mozilla.components.feature.media.state.MediaStateMachine
 import mozilla.components.feature.session.HistoryDelegate
 import org.mozilla.reference.browser.browser.WebNotificationFeature
 import org.mozilla.reference.browser.AppRequestInterceptor
@@ -97,11 +95,11 @@ class Core(private val context: Context) {
             RecordingDevicesNotificationFeature(context, sessionManager = this)
                 .enable()
 
-            MediaStateMachine.start(this)
+            // MediaStateMachine.start(this)
 
             // Enable media features like showing an ongoing notification with media controls when
             // media in web content is playing.
-            MediaFeature(context).enable()
+            // MediaFeature(context).enable()
 
             WebNotificationFeature(context, engine, icons, R.drawable.notification_icon,
                 BrowserActivity::class.java)

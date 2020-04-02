@@ -157,6 +157,10 @@ class History : HistoryStorage {
         // Not applicable.
     }
 
+    override suspend fun warmUp() {
+        // TODO("Not yet implemented")
+    }
+
     override fun cleanup() {
         // GC will take care of our internal data structures, so there's nothing to do here.
     }
