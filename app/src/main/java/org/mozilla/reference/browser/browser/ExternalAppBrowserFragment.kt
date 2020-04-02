@@ -4,7 +4,7 @@
 
 package org.mozilla.reference.browser.browser
 
-import android.net.Uri
+/* import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import kotlinx.android.synthetic.main.fragment_browser.*
@@ -101,3 +101,4 @@ class ExternalAppBrowserFragment : BaseBrowserFragment(), UserInteractionHandler
         }
     }
 }
+ */

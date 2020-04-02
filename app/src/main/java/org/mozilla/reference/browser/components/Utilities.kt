@@ -8,8 +8,8 @@ import android.content.Context
 import mozilla.components.browser.session.SessionManager
 import mozilla.components.feature.customtabs.CustomTabIntentProcessor
 import mozilla.components.feature.intent.processing.TabIntentProcessor
-import mozilla.components.feature.pwa.ManifestStorage
-import mozilla.components.feature.pwa.intent.WebAppIntentProcessor
+/* import mozilla.components.feature.pwa.ManifestStorage
+import mozilla.components.feature.pwa.intent.WebAppIntentProcessor */
 import mozilla.components.feature.search.SearchUseCases
 import mozilla.components.feature.session.SessionUseCases
 
@@ -28,8 +28,8 @@ class Utilities(
      */
     val externalIntentProcessors by lazy {
         listOf(
-            CustomTabIntentProcessor(sessionManager, sessionUseCases.loadUrl, context.resources),
-            WebAppIntentProcessor(sessionManager, sessionUseCases.loadUrl, ManifestStorage(context))
+            CustomTabIntentProcessor(sessionManager, sessionUseCases.loadUrl, context.resources) //,
+            // WebAppIntentProcessor(sessionManager, sessionUseCases.loadUrl, ManifestStorage(context))
         )
     }
 

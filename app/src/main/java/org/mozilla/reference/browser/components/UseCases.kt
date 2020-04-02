@@ -11,9 +11,9 @@ import mozilla.components.browser.state.store.BrowserStore
 import mozilla.components.concept.engine.Settings
 import mozilla.components.concept.fetch.Client
 import mozilla.components.feature.contextmenu.ContextMenuUseCases
-import mozilla.components.feature.pwa.ManifestStorage
+/* import mozilla.components.feature.pwa.ManifestStorage
 import mozilla.components.feature.pwa.WebAppShortcutManager
-import mozilla.components.feature.pwa.WebAppUseCases
+import mozilla.components.feature.pwa.WebAppUseCases */
 import mozilla.components.feature.search.SearchUseCases
 import mozilla.components.feature.session.SessionUseCases
 import mozilla.components.feature.session.SettingsUseCases
@@ -54,10 +54,10 @@ class UseCases(
     /**
      * Use cases that provide shortcut and progressive web app management.
      */
-    val webAppUseCases by lazy {
+    /* val webAppUseCases by lazy {
         WebAppUseCases(context, sessionManager, client)
         // TODO use directly this to fix deprecated: WebAppShortcutManager(context, client, ManifestStorage(context), true)
-    }
+    } */
 
     /**
      * Uses cases that provides context menu

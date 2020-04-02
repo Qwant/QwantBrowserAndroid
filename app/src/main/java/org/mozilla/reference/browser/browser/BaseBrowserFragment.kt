@@ -96,7 +96,7 @@ abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler {
                 requireComponents.core.historyStorage,
                 requireComponents.core.sessionManager,
                 requireComponents.useCases.sessionUseCases,
-                requireComponents.useCases.webAppUseCases,
+                // requireComponents.useCases.webAppUseCases,
                 sessionId),
             owner = this,
             view = view)
