@@ -36,7 +36,7 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
         val engineSettings = requireContext().components.core.engine.settings
         if (engineSettings.userAgentString != null)
             if (!engineSettings.userAgentString!!.contains("QwantMobile")) {
-                engineSettings.userAgentString += " h QwantMobile/4.0"
+                engineSettings.userAgentString += " QwantMobile/4.0"
             }
         engineSettings.remoteDebuggingEnabled = false
         engineSettings.testingModeEnabled = false

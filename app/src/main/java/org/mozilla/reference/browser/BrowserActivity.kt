@@ -25,7 +25,6 @@ import org.mozilla.reference.browser.browser.BrowserFragment
 import org.mozilla.reference.browser.browser.QwantBarSessionObserver
 import org.mozilla.reference.browser.ext.components
 import org.mozilla.reference.browser.layout.QwantBar
-import org.mozilla.reference.browser.qwant.Analytics
 import org.mozilla.reference.browser.settings.SettingsContainerFragment
 import org.mozilla.reference.browser.storage.BookmarksFragment
 import org.mozilla.reference.browser.storage.BookmarksStorage
@@ -82,34 +81,6 @@ open class BrowserActivity : AppCompatActivity() {
                     commit()
                 }
             }
-        }
-
-        checkVersion()
-    }
-
-    private fun checkVersion() {
-        val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-        val savedVersion = prefs.getString(getString(R.string.pref_key_saved_version), "undefined")
-
-        val currentVersion = BuildConfig.VERSION_CODE.toString()
-
-        var event: String? = null
-        if (savedVersion == "undefined") {
-            event = if (currentVersion.length > 7 && currentVersion.substring(0, 7) == getString(R.string.huawei_preinstalled_versioncode)) {
-                "first_launch_huawei_preinstall"
-            } else {
-                "first_launch"
-            }
-        } else if (savedVersion != currentVersion) {
-            event = "update"
-        }
-
-        if (event != null) {
-            Analytics().execute(event, currentVersion)
-
-            val editor: SharedPreferences.Editor = prefs.edit()
-            editor.putString(resources.getString(R.string.pref_key_saved_version), currentVersion)
-            editor.apply()
         }
     }
 
