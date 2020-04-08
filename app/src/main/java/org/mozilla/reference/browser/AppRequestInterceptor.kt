@@ -18,7 +18,7 @@ import org.mozilla.reference.browser.tabs.PrivatePage
  * which in turn needs 'core' itself.
  */
 class AppRequestInterceptor(private val context: Context) : RequestInterceptor {
-    override fun onLoadRequest(
+    /* override fun onLoadRequest(
         engineSession: EngineSession,
         uri: String,
         hasUserGesture: Boolean,
@@ -36,7 +36,7 @@ class AppRequestInterceptor(private val context: Context) : RequestInterceptor {
                 )
             }
         }
-    }
+    } */
 
     override fun onErrorRequest(
         session: EngineSession,

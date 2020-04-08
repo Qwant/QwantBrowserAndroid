@@ -72,7 +72,7 @@ open class BrowserActivity : AppCompatActivity() {
             if (intent.action == "CHANGED_LANGUAGE") {
                 qwantbar.setHighlight(QwantBar.QwantBarSelection.MORE)
                 supportFragmentManager.beginTransaction().apply {
-                    replace(R.id.container, SettingsContainerFragment(::bookmarksOrTabsOrSettingsClosed, true), "SETTINGS_FRAGMENT")
+                    replace(R.id.container, SettingsContainerFragment.create(::bookmarksOrTabsOrSettingsClosed, true), "SETTINGS_FRAGMENT")
                     commit()
                 }
             } else {
@@ -252,7 +252,7 @@ open class BrowserActivity : AppCompatActivity() {
     private fun showSettings() {
         this.supportFragmentManager.beginTransaction().apply {
             this.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
-            replace(R.id.container, SettingsContainerFragment(::bookmarksOrTabsOrSettingsClosed), "SETTINGS_FRAGMENT")
+            replace(R.id.container, SettingsContainerFragment.create(::bookmarksOrTabsOrSettingsClosed), "SETTINGS_FRAGMENT")
             commit()
         }
         qwantbarSessionObserver?.setupHomeBar()

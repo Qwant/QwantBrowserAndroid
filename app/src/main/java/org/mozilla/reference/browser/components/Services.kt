@@ -6,7 +6,6 @@ package org.mozilla.reference.browser.components
 
 import android.content.Context
 import androidx.preference.PreferenceManager
-import org.mozilla.reference.browser.applinks.AppLinksInterceptor
 import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.ext.getPreferenceKey
 
@@ -18,7 +17,7 @@ class Services(
 ) {
     private val prefs = PreferenceManager.getDefaultSharedPreferences(context)
 
-    val appLinksInterceptor by lazy {
+    /* val appLinksInterceptor by lazy {
         AppLinksInterceptor(
             context,
             interceptLinkClicks = true,
@@ -26,5 +25,5 @@ class Services(
                 prefs.getBoolean(context.getPreferenceKey(R.string.pref_key_general_launchexternalapp), false)
             }
         )
-    }
+    } */
 }
