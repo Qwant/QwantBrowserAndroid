@@ -6,10 +6,8 @@ package org.mozilla.reference.browser
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.content.pm.PackageInfo
 import android.os.Bundle
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -36,7 +34,7 @@ import java.util.*
 /**
  * Activity that holds the [BrowserFragment].
  */
-open class BrowserActivity : AppCompatActivity() {
+open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSettingsClosed {
     private var bookmarksStorage: BookmarksStorage? = null
     private var qwantbarSessionObserver: QwantBarSessionObserver? = null
     private val sessionId: String?
@@ -72,7 +70,7 @@ open class BrowserActivity : AppCompatActivity() {
             if (intent.action == "CHANGED_LANGUAGE") {
                 qwantbar.setHighlight(QwantBar.QwantBarSelection.MORE)
                 supportFragmentManager.beginTransaction().apply {
-                    replace(R.id.container, SettingsContainerFragment.create(::bookmarksOrTabsOrSettingsClosed, true), "SETTINGS_FRAGMENT")
+                    replace(R.id.container, SettingsContainerFragment.create(true), "SETTINGS_FRAGMENT")
                     commit()
                 }
             } else {
@@ -148,6 +146,12 @@ open class BrowserActivity : AppCompatActivity() {
         removeSessionIfNeeded()
     }
 
+    override fun onAttachFragment(fragment: Fragment) {
+        if (fragment is SettingsContainerFragment) {
+            fragment.setOnSettingsClosed(this)
+        }
+
+    }
     /**
      * If needed remove the current session.
      *
@@ -249,10 +253,10 @@ open class BrowserActivity : AppCompatActivity() {
         qwantbar.setHighlight(QwantBar.QwantBarSelection.SEARCH)
     }
 
-    private fun showSettings() {
+    fun showSettings() {
         this.supportFragmentManager.beginTransaction().apply {
             this.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
-            replace(R.id.container, SettingsContainerFragment.create(::bookmarksOrTabsOrSettingsClosed), "SETTINGS_FRAGMENT")
+            replace(R.id.container, SettingsContainerFragment.create(), "SETTINGS_FRAGMENT")
             commit()
         }
         qwantbarSessionObserver?.setupHomeBar()
@@ -269,6 +273,10 @@ open class BrowserActivity : AppCompatActivity() {
             qwantbarSessionObserver?.setupNavigationBar()
         }
         qwantbar.updateHomeIcon(qwantbarSessionObserver?.getCurrentMode())
+    }
+
+    override fun settingsClosed() {
+        bookmarksOrTabsOrSettingsClosed()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

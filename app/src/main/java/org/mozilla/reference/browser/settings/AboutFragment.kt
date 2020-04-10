@@ -26,11 +26,8 @@ import mozilla.components.support.base.feature.UserInteractionHandler
 import org.mozilla.geckoview.BuildConfig.MOZ_APP_VERSION
 import org.mozilla.reference.browser.R
 
-class AboutFragment(
-        val settingsContainer: SettingsContainerFragment
-) : Fragment(), UserInteractionHandler {
+class AboutFragment: Fragment(), UserInteractionHandler {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        settingsContainer.setTitle(resources.getString(R.string.settings_about))
         return inflater.inflate(R.layout.fragment_about, container, false)
     }
 
@@ -71,7 +68,7 @@ class AboutFragment(
 
     override fun onBackPressed(): Boolean {
         parentFragmentManager.beginTransaction()
-            .replace(R.id.settings_fragment_container, AboutMenuFragment(settingsContainer), "SETTINGS_ABOUTMENU_FRAGMENT")
+            .replace(R.id.settings_fragment_container, AboutMenuFragment(), "SETTINGS_ABOUTMENU_FRAGMENT")
             .addToBackStack(null)
             .commit()
         return true

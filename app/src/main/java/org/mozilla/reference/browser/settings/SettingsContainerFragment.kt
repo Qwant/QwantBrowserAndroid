@@ -13,12 +13,24 @@ import kotlinx.android.synthetic.main.fragment_settings.*
 import mozilla.components.support.base.feature.UserInteractionHandler
 import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.browser.BrowserFragment
-import java.io.Serializable
-
 
 class SettingsContainerFragment: Fragment(), UserInteractionHandler {
     private var languageChangedReload: Boolean = false
-    private var settingsClosedCallback: (() -> Unit)? = null
+    private var settingsClosedCallback: OnSettingsClosed? = null
+
+    fun setOnSettingsClosed(callback: OnSettingsClosed) {
+        this.settingsClosedCallback = callback
+    }
+
+    interface OnSettingsClosed {
+        fun settingsClosed()
+    }
+
+    override fun onAttachFragment(childFragment: Fragment) {
+        if (childFragment is BaseSettingsFragment) {
+            childFragment.setSettingsContainerFragment(this)
+        }
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         context?.theme?.applyStyle(R.style.ThemeQwantNoActionBar, true);
@@ -28,14 +40,8 @@ class SettingsContainerFragment: Fragment(), UserInteractionHandler {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        try {
-            settingsClosedCallback = arguments?.getSerializable(BUNDLE_CALLBACK) as () -> Unit
-            val tmp = arguments?.getBoolean(BUNDLE_LANGUAGE_CHANGE)
-            if (tmp != null) languageChangedReload = tmp
-        } catch (ex: Exception) {
-            // callback has a wrong format
-            ex.printStackTrace()
-        }
+        val tmp = arguments?.getBoolean(BUNDLE_LANGUAGE_CHANGE)
+        if (tmp != null) languageChangedReload = tmp
 
         settings_toolbar.setNavigationOnClickListener {
             this.onBackPressed()
@@ -43,12 +49,12 @@ class SettingsContainerFragment: Fragment(), UserInteractionHandler {
 
         if (languageChangedReload) {
             childFragmentManager.beginTransaction()
-                    .replace(R.id.settings_fragment_container, SettingsGeneralLanguageFragment(this), "SETTINGS_GENERAL_LANGUAGE_FRAGMENT")
+                    .replace(R.id.settings_fragment_container, SettingsGeneralLanguageFragment(), "SETTINGS_GENERAL_LANGUAGE_FRAGMENT")
                     .addToBackStack(null)
                     .commit()
         } else {
             childFragmentManager.beginTransaction()
-                    .replace(R.id.settings_fragment_container, SettingsMainFragment(this), "SETTINGS_MAIN_FRAGMENT")
+                    .replace(R.id.settings_fragment_container, SettingsMainFragment(), "SETTINGS_MAIN_FRAGMENT")
                     .addToBackStack(null)
                     .commit()
         }
@@ -73,18 +79,16 @@ class SettingsContainerFragment: Fragment(), UserInteractionHandler {
         parentFragmentManager.beginTransaction()
                 .replace(R.id.container, BrowserFragment.create(), "BROWSER_FRAGMENT")
                 .commit()
-        settingsClosedCallback?.invoke()
+        settingsClosedCallback?.settingsClosed()
     }
 
     companion object {
-        private const val BUNDLE_CALLBACK: String = "CALLBACK"
         private const val BUNDLE_LANGUAGE_CHANGE: String = "LANGUAGE_CHANGE"
 
-        fun create(settingsClosedCallback: (() -> Unit)? = null, language_changed_reload: Boolean = false) = SettingsContainerFragment().apply {
-            arguments = Bundle().apply {
-                putSerializable(BUNDLE_CALLBACK, settingsClosedCallback as Serializable)
-                putBoolean(BUNDLE_LANGUAGE_CHANGE, language_changed_reload)
-            }
+        fun create(language_changed_reload: Boolean = false) = SettingsContainerFragment().apply {
+               arguments = Bundle().apply {
+                   putBoolean(BUNDLE_LANGUAGE_CHANGE, language_changed_reload)
+               }
         }
     }
 }

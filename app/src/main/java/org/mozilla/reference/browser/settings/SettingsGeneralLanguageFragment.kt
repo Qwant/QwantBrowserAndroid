@@ -1,6 +1,7 @@
 package org.mozilla.reference.browser.settings
 
 import android.content.Intent
+import android.os.Bundle
 import android.util.Log
 import androidx.preference.Preference
 import org.mozilla.reference.browser.BrowserActivity
@@ -11,9 +12,12 @@ import org.mozilla.reference.browser.ext.requireComponents
 import java.util.*
 
 
-class SettingsGeneralLanguageFragment(
-        private val settingsContainer: SettingsContainerFragment
-) : BaseSettingsFragment(settingsContainer, R.string.settings_general_language, R.xml.preferences_general_language) {
+class SettingsGeneralLanguageFragment: BaseSettingsFragment() {
+    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+        this.setup(R.string.settings_general_language, R.xml.preferences_general_language)
+        super.onCreatePreferences(savedInstanceState, rootKey)
+    }
+
     override fun setupPreferences() {
         val interfaceKeys = resources.getStringArray(R.array.languages_interface_keys)
         val interfaceValues = resources.getStringArray(R.array.languages_interface_values)
@@ -56,7 +60,7 @@ class SettingsGeneralLanguageFragment(
 
     override fun onBackPressed(): Boolean {
         fragmentManager?.beginTransaction()
-                ?.replace(R.id.settings_fragment_container, SettingsGeneralFragment(settingsContainer), "SETTINGS_GENERAL_FRAGMENT")
+                ?.replace(R.id.settings_fragment_container, SettingsGeneralFragment(), "SETTINGS_GENERAL_FRAGMENT")
                 ?.addToBackStack(null)
                 ?.commit()
         return true

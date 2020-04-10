@@ -1,22 +1,33 @@
 package org.mozilla.reference.browser.settings
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import mozilla.components.support.base.feature.UserInteractionHandler
 import org.mozilla.reference.browser.R
 
-abstract class BaseSettingsFragment(
-        private val settingsContainer: SettingsContainerFragment,
-        private val titleResourceId: Int,
-        private val preferenceResourceId: Int
-) : PreferenceFragmentCompat(), UserInteractionHandler {
+abstract class BaseSettingsFragment: PreferenceFragmentCompat(), UserInteractionHandler {
+    private var titleResourceId: Int = R.string.settings
+    private var preferenceResourceId: Int = R.xml.preferences_general
+    protected var settingsContainer: SettingsContainerFragment? = null
+
+
+    fun setSettingsContainerFragment(settingsContainer: SettingsContainerFragment) {
+        this.settingsContainer = settingsContainer
+    }
+
+    fun setup(titleResourceId: Int, preferenceResourceId: Int) {
+        this.titleResourceId = titleResourceId
+        this.preferenceResourceId = preferenceResourceId
+    }
+
     abstract fun setupPreferences()
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(preferenceResourceId, rootKey)
-        settingsContainer.setTitle(resources.getString(titleResourceId))
+        settingsContainer?.setTitle(resources.getString(titleResourceId))
     }
 
     override fun onResume() {
@@ -26,9 +37,9 @@ abstract class BaseSettingsFragment(
 
     override fun onBackPressed(): Boolean {
         fragmentManager?.beginTransaction()
-            ?.replace(R.id.settings_fragment_container, SettingsMainFragment(settingsContainer), "SETTINGS_MAIN_FRAGMENT")
-            ?.addToBackStack(null)
-            ?.commit()
+                ?.replace(R.id.settings_fragment_container, SettingsMainFragment(), "SETTINGS_MAIN_FRAGMENT")
+                ?.addToBackStack(null)
+                ?.commit()
         return true
     }
 

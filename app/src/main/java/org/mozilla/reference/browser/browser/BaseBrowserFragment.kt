@@ -15,7 +15,6 @@ import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
 import kotlinx.android.synthetic.main.fragment_browser.*
 import kotlinx.android.synthetic.main.fragment_browser.view.*
-import mozilla.components.feature.app.links.AppLinksFeature
 import mozilla.components.feature.downloads.DownloadsFeature
 import mozilla.components.feature.downloads.manager.FetchDownloadManager
 import mozilla.components.feature.findinpage.view.FindInPageView
@@ -48,7 +47,6 @@ abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler {
     private val toolbarIntegration = ViewBoundFeatureWrapper<ToolbarIntegration>()
     private val contextMenuIntegration = ViewBoundFeatureWrapper<ContextMenuIntegration>()
     private val downloadsFeature = ViewBoundFeatureWrapper<DownloadsFeature>()
-    private val appLinksFeature = ViewBoundFeatureWrapper<AppLinksFeature>()
     private val promptsFeature = ViewBoundFeatureWrapper<PromptFeature>()
     private val fullScreenFeature = ViewBoundFeatureWrapper<FullScreenFeature>()
     private val findInPageIntegration = ViewBoundFeatureWrapper<FindInPageIntegration>()
@@ -129,20 +127,6 @@ abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler {
             owner = this,
             view = view)
 
-        appLinksFeature.set(
-            feature = AppLinksFeature(
-                requireContext(),
-                sessionManager = requireComponents.core.sessionManager,
-                sessionId = sessionId,
-                fragmentManager = requireFragmentManager(),
-                launchInApp = {
-                    prefs.getBoolean(requireContext().getPreferenceKey(R.string.pref_key_general_launchexternalapp), false)
-                }
-            ),
-            owner = this,
-            view = view
-        )
-
         promptsFeature.set(
             feature = PromptFeature(
                 fragment = this,
@@ -165,7 +149,7 @@ abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler {
             feature = FullScreenFeature(
                 requireComponents.core.sessionManager,
                 requireComponents.useCases.sessionUseCases,
-                sessionId, ::fullScreenChanged),
+                sessionId, fullScreenChanged = ::fullScreenChanged),
             owner = this,
             view = view)
 

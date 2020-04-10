@@ -5,8 +5,8 @@
 package org.mozilla.reference.browser.settings
 
 import android.content.Intent
+import android.os.Bundle
 import android.provider.Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS
-import android.util.Log
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
 import androidx.preference.Preference
@@ -15,9 +15,11 @@ import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.ext.getPreferenceKey
 import org.mozilla.reference.browser.ext.requireComponents
 
-class SettingsGeneralFragment(
-        private val settingsContainer: SettingsContainerFragment
-) : BaseSettingsFragment(settingsContainer, R.string.settings_general, R.xml.preferences_general) {
+class SettingsGeneralFragment: BaseSettingsFragment() {
+    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+        this.setup(R.string.settings_general, R.xml.preferences_general)
+        super.onCreatePreferences(savedInstanceState, rootKey)
+    }
 
     override fun setupPreferences() {
         val adultContentKeys = resources.getStringArray(R.array.adult_content_keys)
@@ -25,7 +27,7 @@ class SettingsGeneralFragment(
 
         // Links
         findPreference(context?.getPreferenceKey(R.string.pref_key_general_language)).onPreferenceClickListener = this.getPreferenceLinkListener(
-                SettingsGeneralLanguageFragment(this.settingsContainer), "SETTINGS_GENERAL_LANGUAGE_FRAGMENT"
+                SettingsGeneralLanguageFragment(), "SETTINGS_GENERAL_LANGUAGE_FRAGMENT"
         )
         // findPreference(context?.getPreferenceKey(R.string.pref_key_general_cleardata)).onPreferenceClickListener = getPreferenceLinkListener(SettingsGeneralClearDataFragment(this.settingsContainer), "SETTINGS_GENERAL_CLEARDATA_FRAGMENT")
         findPreference(context?.getPreferenceKey(R.string.pref_key_general_makedefaultbrowser)).onPreferenceClickListener = getClickListenerForMakeDefaultBrowser()
@@ -81,7 +83,7 @@ class SettingsGeneralFragment(
 
     override fun onBackPressed(): Boolean {
         fragmentManager?.beginTransaction()
-                ?.replace(R.id.settings_fragment_container, SettingsMainFragment(settingsContainer), "SETTINGS_MAIN_FRAGMENT")
+                ?.replace(R.id.settings_fragment_container, SettingsMainFragment(), "SETTINGS_MAIN_FRAGMENT")
                 ?.addToBackStack(null)
                 ?.commit()
         return true

@@ -4,15 +4,18 @@
 
 package org.mozilla.reference.browser.settings
 
+import android.os.Bundle
 import androidx.preference.Preference.OnPreferenceChangeListener
 import mozilla.components.concept.engine.EngineSession.TrackingProtectionPolicy
 import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.ext.getPreferenceKey
 import org.mozilla.reference.browser.ext.requireComponents
 
-class PrivacySettingsFragment(
-        settingsContainer: SettingsContainerFragment
-) : BaseSettingsFragment(settingsContainer, R.string.privacy_settings, R.xml.privacy_preferences){
+class PrivacySettingsFragment: BaseSettingsFragment(){
+    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+        this.setup(R.string.privacy_settings, R.xml.privacy_preferences)
+        super.onCreatePreferences(savedInstanceState, rootKey)
+    }
 
     override fun setupPreferences() {
         val trackingProtectionNormalKey = context?.getPreferenceKey(R.string.pref_key_tracking_protection_normal)

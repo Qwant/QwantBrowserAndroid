@@ -12,13 +12,9 @@ import kotlinx.android.synthetic.main.fragment_license.*
 import mozilla.components.support.base.feature.UserInteractionHandler
 import org.mozilla.reference.browser.R
 
-class LicenseFragment(
-    private val settingsContainer: SettingsContainerFragment
-) : Fragment(), UserInteractionHandler {
+class LicenseFragment: Fragment(), UserInteractionHandler {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
-
-        settingsContainer.setTitle(resources.getString(R.string.settings_license))
         return inflater.inflate(R.layout.fragment_license, container, false)
     }
 
@@ -35,7 +31,7 @@ class LicenseFragment(
 
     override fun onBackPressed(): Boolean {
         parentFragmentManager.beginTransaction()
-            .replace(R.id.settings_fragment_container, AboutMenuFragment(settingsContainer), "SETTINGS_ABOUTMENU_FRAGMENT")
+            .replace(R.id.settings_fragment_container, AboutMenuFragment(), "SETTINGS_ABOUTMENU_FRAGMENT")
             .addToBackStack(null)
             .commit()
         return true
