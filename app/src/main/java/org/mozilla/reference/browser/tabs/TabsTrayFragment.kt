@@ -7,16 +7,13 @@ package org.mozilla.reference.browser.tabs
 import android.content.Context
 import android.content.res.Resources
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.core.content.ContextCompat
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_tabstray.*
 import mozilla.components.browser.session.SessionManager
-import mozilla.components.browser.state.selector.selectedTab
 import mozilla.components.support.base.feature.UserInteractionHandler
 import mozilla.components.support.ktx.android.util.dpToPx
 import mozilla.components.support.utils.DrawableUtils
@@ -24,10 +21,10 @@ import mozilla.components.ui.tabcounter.TabCounter
 import org.mozilla.reference.browser.QwantUtils
 import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.browser.BrowserFragment
-import org.mozilla.reference.browser.ext.application
 import org.mozilla.reference.browser.ext.components
 import org.mozilla.reference.browser.ext.requireComponents
 import org.mozilla.reference.browser.layout.QwantBar
+import org.mozilla.reference.browser.settings.SettingsContainerFragment
 import org.mozilla.reference.browser.tabs.tray.BrowserTabsTray
 import org.mozilla.reference.browser.tabs.tray.TabsFeature
 import java.lang.ref.WeakReference
@@ -35,16 +32,28 @@ import java.lang.ref.WeakReference
 /**
  * A fragment for displaying the tabs tray.
  */
-class TabsTrayFragment(
-        val applicationContext: Context,
-        val tabsClosedCallback: (() -> Unit)? = null,
-        var isPrivate: Boolean = false,
-        var qwantbar: QwantBar
-) : Fragment(), UserInteractionHandler {
+class TabsTrayFragment: Fragment(), UserInteractionHandler {
+    private var tabsClosedCallback: (() -> Unit)? = null
+    fun setTabsClosedCallback(tabsClosedCallback: (() -> Unit)) { this.tabsClosedCallback = tabsClosedCallback }
+    private var isPrivate: Boolean = false
+    fun setPrivacy(is_private: Boolean) { this.isPrivate = is_private }
+    private var qwantbar: QwantBar? = null
+    fun setQwantBar(bar: QwantBar) { this.qwantbar = bar }
+
+
     private var tabsFeature: TabsFeature? = null
 
     private var reference: WeakReference<TabCounter> = WeakReference<TabCounter>(null)
-    private val sessionManager: SessionManager = applicationContext.application.components.core.sessionManager
+    private var sessionManager: SessionManager? = null
+    private var applicationContext: Context? = null
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        if (activity != null) {
+            applicationContext = activity!!.applicationContext
+            sessionManager = activity!!.application.components.core.sessionManager
+        }
+        super.onActivityCreated(savedInstanceState)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         inflater.inflate(R.layout.fragment_tabstray, container, false)
@@ -99,17 +108,19 @@ class TabsTrayFragment(
         tab_switch_button_background.setOnClickListener((View.OnClickListener {
             this.isPrivate = !isPrivate
             context.setTheme(if (isPrivate) R.style.ThemeQwantNoActionBarPrivacy else R.style.ThemeQwantNoActionBar)
-            qwantbar.setPrivacyMode(isPrivate)
+            qwantbar?.setPrivacyMode(isPrivate)
             activity?.supportFragmentManager?.beginTransaction()?.setReorderingAllowed(false)?.detach(this)?.attach(this)?.commit()
         }))
 
         button_new_tab.setOnClickListener((View.OnClickListener {
-            if (isPrivate) {
-                context.components.useCases.tabsUseCases.addPrivateTab.invoke(QwantUtils.getHomepage(applicationContext), selectTab = true)
-            } else {
-                context.components.useCases.tabsUseCases.addTab.invoke(QwantUtils.getHomepage(applicationContext), selectTab = true)
+            if (applicationContext != null) {
+                if (isPrivate) {
+                    context.components.useCases.tabsUseCases.addPrivateTab.invoke(QwantUtils.getHomepage(applicationContext!!), selectTab = true)
+                } else {
+                    context.components.useCases.tabsUseCases.addTab.invoke(QwantUtils.getHomepage(applicationContext!!), selectTab = true)
+                }
+                this.closeTabsTray()
             }
-            this.closeTabsTray()
         }))
 
         this.updateTabCount()
@@ -133,9 +144,9 @@ class TabsTrayFragment(
     }
 
     private fun closeTabsTray(): Unit {
-        isPrivate = (sessionManager.selectedSession != null && sessionManager.selectedSession!!.private)
+        isPrivate = (sessionManager != null && sessionManager!!.selectedSession != null && sessionManager!!.selectedSession!!.private)
         context?.setTheme(if (isPrivate) R.style.ThemeQwantNoActionBarPrivacy else R.style.ThemeQwantNoActionBar)
-        qwantbar.setPrivacyMode(isPrivate)
+        qwantbar?.setPrivacyMode(isPrivate)
 
         activity?.supportFragmentManager?.beginTransaction()?.apply {
             replace(R.id.container, BrowserFragment.create(), "BROWSER_FRAGMENT")
@@ -145,6 +156,7 @@ class TabsTrayFragment(
     }
 
     private fun updateTabCount() {
-        reference.get()?.setCountWithAnimation(sessionManager.sessions.filter { it.private == isPrivate }.size)
+        if (sessionManager != null)
+            reference.get()?.setCountWithAnimation(sessionManager!!.sessions.filter { it.private == isPrivate }.size)
     }
 }

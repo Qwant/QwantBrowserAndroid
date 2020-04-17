@@ -19,10 +19,12 @@ import org.mozilla.reference.browser.browser.BrowserFragment
 /**
  * A fragment for displaying the tabs tray.
  */
-class BookmarksFragment(
-        var bookmarksStorage: BookmarksStorage,
-        val bookmarksClosedCallback: (() -> Unit)? = null
-) : Fragment(), UserInteractionHandler {
+class BookmarksFragment: Fragment(), UserInteractionHandler {
+    private var bookmarksStorage: BookmarksStorage? = null
+    fun setBookmarkStorage(bookmarksStorage: BookmarksStorage) { this.bookmarksStorage = bookmarksStorage }
+    private var bookmarksClosedCallback: (() -> Unit)? = null
+    fun setBookmarksClosedCallback(cb: () -> Unit) { this.bookmarksClosedCallback = cb }
+
     private var adapter: BookmarksAdapter? = null
 
     var listview: ListView? = null
@@ -40,11 +42,11 @@ class BookmarksFragment(
         listview = view.findViewById(R.id.bookmarks_listview)
         layoutNoResult = view.findViewById(R.id.bookmarks_noresult_layout)
 
-        adapter = BookmarksAdapter(this.context!!, bookmarksStorage, ::bookmarkSelected)
-        bookmarksStorage.onChange(::storageChanged)
+        if (bookmarksStorage != null) adapter = BookmarksAdapter(this.context!!, bookmarksStorage!!, ::bookmarkSelected)
+        bookmarksStorage?.onChange(::storageChanged)
         listview!!.adapter = adapter
 
-        if (bookmarksStorage.count() == 0) {
+        if (bookmarksStorage?.count() == 0) {
             listview!!.visibility = View.GONE
             layoutNoResult!!.visibility = View.VISIBLE
         }
@@ -71,7 +73,7 @@ class BookmarksFragment(
 
     private fun storageChanged() {
         adapter?.notifyDataSetChanged()
-        if (bookmarksStorage.count() == 0) {
+        if (bookmarksStorage == null || bookmarksStorage!!.count() == 0) {
             listview!!.visibility = View.GONE
             layoutNoResult!!.visibility = View.VISIBLE
         } else {

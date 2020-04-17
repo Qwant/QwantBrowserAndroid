@@ -2,6 +2,7 @@ package org.mozilla.reference.browser.settings
 
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
@@ -12,7 +13,6 @@ abstract class BaseSettingsFragment: PreferenceFragmentCompat(), UserInteraction
     private var titleResourceId: Int = R.string.settings
     private var preferenceResourceId: Int = R.xml.preferences_general
     protected var settingsContainer: SettingsContainerFragment? = null
-
 
     fun setSettingsContainerFragment(settingsContainer: SettingsContainerFragment) {
         this.settingsContainer = settingsContainer
@@ -27,6 +27,10 @@ abstract class BaseSettingsFragment: PreferenceFragmentCompat(), UserInteraction
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(preferenceResourceId, rootKey)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         settingsContainer?.setTitle(resources.getString(titleResourceId))
     }
 

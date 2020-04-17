@@ -149,9 +149,19 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
     override fun onAttachFragment(fragment: Fragment) {
         if (fragment is SettingsContainerFragment) {
             fragment.setOnSettingsClosed(this)
+        } else if (fragment is TabsTrayFragment) {
+            var isPrivate = false
+            if (components.core.sessionManager.selectedSession != null)
+                isPrivate = components.core.sessionManager.selectedSession!!.private
+            fragment.setPrivacy(isPrivate)
+            fragment.setQwantBar(qwantbar)
+            fragment.setTabsClosedCallback(::bookmarksOrTabsOrSettingsClosed)
+        } else if (fragment is BookmarksFragment) {
+            if (bookmarksStorage != null) fragment.setBookmarkStorage(bookmarksStorage!!)
+            fragment.setBookmarksClosedCallback(::bookmarksOrTabsOrSettingsClosed)
         }
-
     }
+
     /**
      * If needed remove the current session.
      *
@@ -202,7 +212,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
             var isPrivate = false
             if (components.core.sessionManager.selectedSession != null)
                 isPrivate = components.core.sessionManager.selectedSession!!.private
-            replace(R.id.container, TabsTrayFragment(applicationContext, ::bookmarksOrTabsOrSettingsClosed, isPrivate, qwantbar), "TABS_FRAGMENT")
+            replace(R.id.container, TabsTrayFragment(), "TABS_FRAGMENT")
             commit()
         }
         qwantbarSessionObserver?.setupHomeBar()
@@ -211,7 +221,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
 
     private fun showBookmarks() {
         this.supportFragmentManager.beginTransaction().apply {
-            replace(R.id.container, BookmarksFragment(bookmarksStorage!!, ::bookmarksOrTabsOrSettingsClosed), "BOOKMARKS_FRAGMENT")
+            replace(R.id.container, BookmarksFragment(), "BOOKMARKS_FRAGMENT")
             commit()
         }
         qwantbarSessionObserver?.setupHomeBar()
