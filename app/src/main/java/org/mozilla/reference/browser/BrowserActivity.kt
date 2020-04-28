@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -84,39 +85,54 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
 
     private fun loadLocale() {
         val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-        var savedLocale = prefs.getString(resources.getString(R.string.pref_key_general_language_interface), "undefined")
+        val phoneLocale = resources.configuration.locale.language
+        val phoneCountry = resources.configuration.locale.country
 
-        if (savedLocale == "undefined") {
+        val prefEditor: SharedPreferences.Editor = prefs.edit()
+
+        val availableCountries = resources.getStringArray(R.array.languages_search_keys)
+        val savedSearchLanguage = prefs.getString(resources.getString(R.string.pref_key_general_language_search), "undefined")
+        val savedSearchRegion = prefs.getString(resources.getString(R.string.pref_key_general_region_search), "undefined")
+        Log.d("QWANT_BROWSER", "savedSearchLanguage: $savedSearchLanguage")
+        Log.d("QWANT_BROWSER", "savedSearchRegion: $savedSearchRegion")
+        if (savedSearchLanguage == null || savedSearchLanguage == "undefined" || !availableCountries.contains(savedSearchLanguage)) {
+            var searchLanguage = "GB" // Fallback to english, as android does
+            if (availableCountries.contains(phoneCountry)) searchLanguage = phoneCountry
+
+            Log.d("QWANT_BROWSER", "SearchLanguage redefined to: $searchLanguage")
+            prefEditor.putString(resources.getString(R.string.pref_key_general_language_search), searchLanguage)
+
+            // TODO search region
+        }
+
+        var savedInterfaceLanguage = prefs.getString(resources.getString(R.string.pref_key_general_language_interface), "undefined")
+        if (savedInterfaceLanguage == "undefined") {
             // First time, set default locale for interface and search
-            var defaultLocale = "en_US" // Fallback to english, as android does
-            val phoneLocale = resources.configuration.locale.language
-            val phoneCountry = resources.configuration.locale.country
+            var interfaceLanguage = "en_GB" // Fallback to english, as android does
 
             val availableLocale = resources.getStringArray(R.array.languages_interface_keys)
             if (!availableLocale.contains("${phoneLocale}_$phoneCountry")) {
-                availableLocale.forEach { l -> if (l.startsWith(phoneLocale)) defaultLocale = l }
+                availableLocale.forEach { l -> if (l.startsWith(phoneLocale)) interfaceLanguage = l }
             } else {
-                defaultLocale = "${phoneLocale}_$phoneCountry"
+                interfaceLanguage = "${phoneLocale}_$phoneCountry"
             }
 
-            val editor: SharedPreferences.Editor = prefs.edit()
-            editor.putString(resources.getString(R.string.pref_key_general_language_interface), defaultLocale)
-            // Set also search language
-            if (prefs.getString(resources.getString(R.string.pref_key_general_language_search), "undefined") == "undefined") {
-                editor.putString(resources.getString(R.string.pref_key_general_language_search), defaultLocale)
-            }
-            editor.apply()
+            prefEditor.putString(resources.getString(R.string.pref_key_general_language_interface), interfaceLanguage)
 
-            savedLocale = defaultLocale
+            savedInterfaceLanguage = interfaceLanguage
         }
-        if (savedLocale != resources.configuration.locale.language + "_" + resources.configuration.locale.country) {
-            // Locale has been changed by preferences system, so it's already saved. Just update configuration
-            resources.configuration.locale = Locale(savedLocale!!.split('_')[0], savedLocale.split('_')[1])
+        if (savedInterfaceLanguage != resources.configuration.locale.language + "_" + resources.configuration.locale.country) {
+            // Locale has been changed by preferences system, so it's already saved. But we need to update configuration
+            resources.configuration.locale = Locale(savedInterfaceLanguage!!.split('_')[0], savedInterfaceLanguage.split('_')[1])
             Locale.setDefault(resources.configuration.locale)
             resources.updateConfiguration(resources.configuration, resources.displayMetrics)
         }
+
+        prefEditor.apply()
     }
+
     fun fixHuaweiDefaultContentFilter() {
+        // TODO remove that at one point
         // force content filter to moderate if set to none on first launch
         val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         val firstLaunch = prefs.getBoolean(resources.getString(R.string.pref_key_first_launch), true)

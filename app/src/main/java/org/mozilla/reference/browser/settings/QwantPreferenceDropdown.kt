@@ -19,4 +19,8 @@ class QwantPreferenceDropdown : DropDownPreference {
         val titleView = holder?.findViewById(android.R.id.title) as TextView
         titleView.setTextColor(context.getColorFromAttr(R.attr.qwant_color_main))
     }
+
+    fun forceNotifyChange() {
+        notifyChanged()
+    }
 }

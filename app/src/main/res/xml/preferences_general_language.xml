@@ -24,4 +24,12 @@
         android:defaultValue="undefined"
         app:iconSpaceReserved="false"/>
 
+    <org.mozilla.reference.browser.settings.QwantPreferenceDropdown
+        android:id="@+id/dropdown_region_search"
+        android:key="@string/pref_key_general_region_search"
+        android:title="@string/settings_general_region_search"
+        android:defaultValue="undefined"
+        app:isPreferenceVisible="false"
+        app:iconSpaceReserved="false"/>
+
 </androidx.preference.PreferenceScreen>

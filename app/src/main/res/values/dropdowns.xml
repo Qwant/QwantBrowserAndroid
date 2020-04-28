@@ -1,13 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <array name="adult_content_keys">
+        <item>@string/settings_adultcontent_none_code</item>
+        <item>@string/settings_adultcontent_moderate_code</item>
+        <item>@string/settings_adultcontent_strict_code</item>
+    </array>
+    <array name="adult_content_values">
+        <item>@string/settings_adultcontent_none</item>
+        <item>@string/settings_adultcontent_moderate</item>
+        <item>@string/settings_adultcontent_strict</item>
+    </array>
+
 
     <array name="languages_interface_keys">
-        <item>@string/settings_language_german_code</item>
-        <item>@string/settings_language_english_code</item>
-        <item>@string/settings_language_french_code</item>
-        <item>@string/settings_language_italian_code</item>
-        <item>@string/settings_language_spanish_code</item>
+        <item>@string/settings_language_interface_german_code</item>
+        <item>@string/settings_language_interface_english_code</item>
+        <item>@string/settings_language_interface_french_code</item>
+        <item>@string/settings_language_interface_italian_code</item>
+        <item>@string/settings_language_interface_spanish_code</item>
     </array>
     <array name="languages_interface_values">
         <item>@string/settings_language_german</item>
@@ -19,46 +30,46 @@
 
 
     <array name="languages_search_keys">
-        <item>@string/settings_language_german_code</item>
-        <item>@string/settings_language_english_code</item>
-        <item>@string/settings_language_french_code</item>
-        <item>@string/settings_language_italian_code</item>
-        <item>@string/settings_language_spanish_code</item>
-        <item>@string/settings_language_andorra_code</item>
-        <item>@string/settings_language_australia_code</item>
-        <item>@string/settings_language_austria_code</item>
-        <item>@string/settings_language_belgium_code</item>
-        <item>@string/settings_language_brazil_code</item>
-        <item>@string/settings_language_bulgaria_code</item>
-        <item>@string/settings_language_canada_code</item>
-        <item>@string/settings_language_chile_code</item>
-        <item>@string/settings_language_southkorea_code</item>
-        <item>@string/settings_language_czechrepublic_code</item>
-        <item>@string/settings_language_denmark_code</item>
-        <item>@string/settings_language_estonia_code</item>
-        <item>@string/settings_language_finland_code</item>
-        <item>@string/settings_language_greece_code</item>
-        <item>@string/settings_language_hungary_code</item>
-        <item>@string/settings_language_india_code</item>
-        <item>@string/settings_language_ireland_code</item>
-        <item>@string/settings_language_israel_code</item>
-        <item>@string/settings_language_japan_code</item>
-        <item>@string/settings_language_malaysia_code</item>
-        <item>@string/settings_language_mexico_code</item>
-        <item>@string/settings_language_netherlands_code</item>
-        <item>@string/settings_language_newzealand_code</item>
-        <item>@string/settings_language_norway_code</item>
-        <item>@string/settings_language_philippines_code</item>
-        <item>@string/settings_language_poland_code</item>
-        <item>@string/settings_language_portugal_code</item>
-        <item>@string/settings_language_romania_code</item>
-        <item>@string/settings_language_russia_code</item>
-        <item>@string/settings_language_singapore_code</item>
-        <item>@string/settings_language_sweden_code</item>
-        <item>@string/settings_language_switzerland_code</item>
-        <item>@string/settings_language_thailand_code</item>
-        <item>@string/settings_language_turkey_code</item>
-        <item>@string/settings_language_unitedstates_code</item>
+        <item>@string/settings_language_search_german_code</item>
+        <item>@string/settings_language_search_english_code</item>
+        <item>@string/settings_language_search_french_code</item>
+        <item>@string/settings_language_search_italian_code</item>
+        <item>@string/settings_language_search_spanish_code</item>
+        <item>@string/settings_language_search_andorra_code</item>
+        <item>@string/settings_language_search_australia_code</item>
+        <item>@string/settings_language_search_austria_code</item>
+        <item>@string/settings_language_search_belgium_code</item>
+        <item>@string/settings_language_search_brazil_code</item>
+        <item>@string/settings_language_search_bulgaria_code</item>
+        <item>@string/settings_language_search_canada_code</item>
+        <item>@string/settings_language_search_chile_code</item>
+        <item>@string/settings_language_search_southkorea_code</item>
+        <item>@string/settings_language_search_czechrepublic_code</item>
+        <item>@string/settings_language_search_denmark_code</item>
+        <item>@string/settings_language_search_estonia_code</item>
+        <item>@string/settings_language_search_finland_code</item>
+        <item>@string/settings_language_search_greece_code</item>
+        <item>@string/settings_language_search_hungary_code</item>
+        <item>@string/settings_language_search_india_code</item>
+        <item>@string/settings_language_search_ireland_code</item>
+        <item>@string/settings_language_search_israel_code</item>
+        <item>@string/settings_language_search_japan_code</item>
+        <item>@string/settings_language_search_malaysia_code</item>
+        <item>@string/settings_language_search_mexico_code</item>
+        <item>@string/settings_language_search_netherlands_code</item>
+        <item>@string/settings_language_search_newzealand_code</item>
+        <item>@string/settings_language_search_norway_code</item>
+        <item>@string/settings_language_search_philippines_code</item>
+        <item>@string/settings_language_search_poland_code</item>
+        <item>@string/settings_language_search_portugal_code</item>
+        <item>@string/settings_language_search_romania_code</item>
+        <item>@string/settings_language_search_russia_code</item>
+        <item>@string/settings_language_search_singapore_code</item>
+        <item>@string/settings_language_search_sweden_code</item>
+        <item>@string/settings_language_search_switzerland_code</item>
+        <item>@string/settings_language_search_thailand_code</item>
+        <item>@string/settings_language_search_turkey_code</item>
+        <item>@string/settings_language_search_unitedstates_code</item>
     </array>
     <array name="languages_search_values">
         <item>@string/settings_language_german</item>
@@ -103,15 +114,580 @@
         <item>@string/settings_language_unitedstates</item>
     </array>
 
+    <!-- CF: Language_search_keys order !! -->
+    <array name="region_list_arrays_keys">
+        <item>@array/region_keys_german</item>
+        <item>@array/region_keys_english</item>
+        <item>@array/region_keys_french</item>
+        <item>@array/region_keys_italia</item>
+        <item>@array/region_keys_spanish</item>
+        <item>@array/region_keys_andorra</item>
+        <item>@array/region_keys_australia</item>
+        <item>@array/region_keys_austria</item>
+        <item>@array/region_keys_belgium</item>
+        <item>@array/region_keys_brazil</item>
+        <item>@array/region_keys_bulgaria</item>
+        <item>@array/region_keys_canada</item>
+        <item>@array/region_keys_chile</item>
+        <item>@array/region_keys_southkorea</item>
+        <item>@array/region_keys_czechrepublic</item>
+        <item>@array/region_keys_denmark</item>
+        <item>@array/region_keys_estonia</item>
+        <item>@array/region_keys_finland</item>
+        <item>@array/region_keys_greece</item>
+        <item>@array/region_keys_hungary</item>
+        <item>@array/region_keys_india</item>
+        <item>@array/region_keys_ireland</item>
+        <item>@array/region_keys_israel</item>
+        <item>@array/region_keys_japan</item>
+        <item>@array/region_keys_malaysia</item>
+        <item>@array/region_keys_mexico</item>
+        <item>@array/region_keys_netherlands</item>
+        <item>@array/region_keys_newzealand</item>
+        <item>@array/region_keys_norway</item>
+        <item>@array/region_keys_philippines</item>
+        <item>@array/region_keys_poland</item>
+        <item>@array/region_keys_portugal</item>
+        <item>@array/region_keys_romania</item>
+        <item>@array/region_keys_russia</item>
+        <item>@array/region_keys_singapore</item>
+        <item>@array/region_keys_sweden</item>
+        <item>@array/region_keys_switzerland</item>
+        <item>@array/region_keys_thailand</item>
+        <item>@array/region_keys_turkey</item>
+        <item>@array/region_keys_unitedstates</item>
+    </array>
+    <array name="region_list_arrays_values_sr">
+        <item>@array/region_values_german_sr</item>
+        <item>@array/region_values_english_sr</item>
+        <item>@array/region_values_french_sr</item>
+        <item>@array/region_values_italia_sr</item>
+        <item>@array/region_values_spanish_sr</item>
+        <item>@array/region_values_andorra_sr</item>
+        <item>@array/region_values_australia_sr</item>
+        <item>@array/region_values_austria_sr</item>
+        <item>@array/region_values_belgium_sr</item>
+        <item>@array/region_values_brazil_sr</item>
+        <item>@array/region_values_bulgaria_sr</item>
+        <item>@array/region_values_canada_sr</item>
+        <item>@array/region_values_chile_sr</item>
+        <item>@array/region_values_southkorea_sr</item>
+        <item>@array/region_values_czechrepublic_sr</item>
+        <item>@array/region_values_denmark_sr</item>
+        <item>@array/region_values_estonia_sr</item>
+        <item>@array/region_values_finland_sr</item>
+        <item>@array/region_values_greece_sr</item>
+        <item>@array/region_values_hungary_sr</item>
+        <item>@array/region_values_india_sr</item>
+        <item>@array/region_values_ireland_sr</item>
+        <item>@array/region_values_israel_sr</item>
+        <item>@array/region_values_japan_sr</item>
+        <item>@array/region_values_malaysia_sr</item>
+        <item>@array/region_values_mexico_sr</item>
+        <item>@array/region_values_netherlands_sr</item>
+        <item>@array/region_values_newzealand_sr</item>
+        <item>@array/region_values_norway_sr</item>
+        <item>@array/region_values_philippines_sr</item>
+        <item>@array/region_values_poland_sr</item>
+        <item>@array/region_values_portugal_sr</item>
+        <item>@array/region_values_romania_sr</item>
+        <item>@array/region_values_russia_sr</item>
+        <item>@array/region_values_singapore_sr</item>
+        <item>@array/region_values_sweden_sr</item>
+        <item>@array/region_values_switzerland_sr</item>
+        <item>@array/region_values_thailand_sr</item>
+        <item>@array/region_values_turkey_sr</item>
+        <item>@array/region_values_unitedstates_sr</item>
+    </array>
 
-    <array name="adult_content_keys">
-        <item>@string/settings_adultcontent_none_code</item>
-        <item>@string/settings_adultcontent_moderate_code</item>
-        <item>@string/settings_adultcontent_strict_code</item>
+    <!-- <array name="region_list_arrays_values_l">
+        <item>@array/region_values_german_l</item>
+        <item>@array/region_values_english_l</item>
+        <item>@array/region_values_french_l</item>
+        <item>@array/region_values_italia_l</item>
+        <item>@array/region_values_spanish_l</item>
+        <item>@array/region_values_andorra_l</item>
+        <item>@array/region_values_australia_l</item>
+        <item>@array/region_values_austria_l</item>
+        <item>@array/region_values_belgium_l</item>
+        <item>@array/region_values_brazil_l</item>
+        <item>@array/region_values_bulgaria_l</item>
+        <item>@array/region_values_canada_l</item>
+        <item>@array/region_values_chile_l</item>
+        <item>@array/region_values_southkorea_l</item>
+        <item>@array/region_values_czechrepublic_l</item>
+        <item>@array/region_values_denmark_l</item>
+        <item>@array/region_values_estonia_l</item>
+        <item>@array/region_values_finland_l</item>
+        <item>@array/region_values_greece_l</item>
+        <item>@array/region_values_hungary_l</item>
+        <item>@array/region_values_india_l</item>
+        <item>@array/region_values_ireland_l</item>
+        <item>@array/region_values_israel_l</item>
+        <item>@array/region_values_japan_l</item>
+        <item>@array/region_values_malaysia_l</item>
+        <item>@array/region_values_mexico_l</item>
+        <item>@array/region_values_netherlands_l</item>
+        <item>@array/region_values_newzealand_l</item>
+        <item>@array/region_values_norway_l</item>
+        <item>@array/region_values_philippines_l</item>
+        <item>@array/region_values_poland_l</item>
+        <item>@array/region_values_portugal_l</item>
+        <item>@array/region_values_romania_l</item>
+        <item>@array/region_values_russia_l</item>
+        <item>@array/region_values_singapore_l</item>
+        <item>@array/region_values_sweden_l</item>
+        <item>@array/region_values_switzerland_l</item>
+        <item>@array/region_values_thailand_l</item>
+        <item>@array/region_values_turkey_l</item>
+        <item>@array/region_values_unitedstates_l</item>
+    </array> -->
+
+    <array name="region_keys_german">
+        <item>@string/settings_region_not_displayed</item>
     </array>
-    <array name="adult_content_values">
-        <item>@string/settings_adultcontent_none</item>
-        <item>@string/settings_adultcontent_moderate</item>
-        <item>@string/settings_adultcontent_strict</item>
+    <array name="region_values_german_sr">
+        <item>@string/settings_region_german_sr_code</item>
     </array>
+    <!-- <array name="region_values_german_l">
+        <item>@string/settings_region_german_l_code</item>
+    </array> -->
+
+    <array name="region_keys_english">
+        <item>@string/settings_region_english</item>
+        <item>@string/settings_region_welsh</item>
+        <item>@string/settings_region_scottish</item>
+    </array>
+    <array name="region_values_english_sr">
+        <item>@string/settings_region_english_sr_code</item>
+        <item>@string/settings_region_welsh_sr_code</item>
+        <item>@string/settings_region_scottish_sr_code</item>
+    </array>
+    <!-- <array name="region_values_english_l">
+        <item>@string/settings_region_english_l_code</item>
+        <item>@string/settings_region_welsh_l_code</item>
+        <item>@string/settings_region_scottish_l_code</item>
+    </array> -->
+
+    <array name="region_keys_french">
+        <item>@string/settings_region_french</item>
+        <item>@string/settings_region_corsican</item>
+        <item>@string/settings_region_breton</item>
+        <item>@string/settings_region_catalan</item>
+        <item>@string/settings_region_basque</item>
+    </array>
+    <array name="region_values_french_sr">
+        <item>@string/settings_region_french_sr_code</item>
+        <item>@string/settings_region_corsican_sr_code</item>
+        <item>@string/settings_region_breton_sr_code</item>
+        <item>@string/settings_region_catalan_sr_code</item>
+        <item>@string/settings_region_basque_sr_code</item>
+    </array>
+    <!-- <array name="region_values_french_l">
+        <item>@string/settings_region_french_l_code</item>
+        <item>@string/settings_region_corsican_l_code</item>
+        <item>@string/settings_region_breton_l_code</item>
+        <item>@string/settings_region_catalan_l_code</item>
+        <item>@string/settings_region_basque_l_code</item>
+    </array> -->
+
+    <array name="region_keys_italia">
+        <item>@string/settings_region_not_displayed</item>
+    </array>
+    <array name="region_values_italia_sr">
+        <item>@string/settings_region_italia_sr_code</item>
+    </array>
+    <!-- <array name="region_values_italia_l">
+        <item>@string/settings_region_italia_l_code</item>
+    </array> -->
+
+    <array name="region_keys_spanish">
+        <item>@string/settings_region_spanish</item>
+        <item>@string/settings_region_catalan</item>
+        <item>@string/settings_region_basque</item>
+    </array>
+    <array name="region_values_spanish_sr">
+        <item>@string/settings_region_spanish_sr_code</item>
+        <item>@string/settings_region_catalan_sr_code</item>
+        <item>@string/settings_region_basque_sr_code</item>
+    </array>
+    <!-- <array name="region_values_spanish_l">
+        <item>@string/settings_region_spanish_l_code</item>
+        <item>@string/settings_region_catalan_l_code</item>
+        <item>@string/settings_region_basque_l_code</item>
+    </array> -->
+
+    <array name="region_keys_andorra">
+        <item>@string/settings_region_catalan</item>
+        <item>@string/settings_region_spanish</item>
+        <item>@string/settings_region_portuguese</item>
+        <item>@string/settings_region_french</item>
+    </array>
+    <array name="region_values_andorra_sr">
+        <item>@string/settings_region_catalan_sr_code</item>
+        <item>@string/settings_region_spanish_sr_code</item>
+        <item>@string/settings_region_portugal_sr_code</item>
+        <item>@string/settings_region_french_sr_code</item>
+    </array>
+    <!-- <array name="region_values_andorra_l">
+        <item>@string/settings_region_catalan_l_code</item>
+        <item>@string/settings_region_spanish_l_code</item>
+        <item>@string/settings_region_portugal_l_code</item>
+        <item>@string/settings_region_french_l_code</item>
+    </array> -->
+
+    <array name="region_keys_australia">
+        <item>@string/settings_region_not_displayed</item>
+    </array>
+    <array name="region_values_australia_sr">
+        <item>@string/settings_region_australia_sr_code</item>
+    </array>
+    <!-- <array name="region_values_australia_l">
+        <item>@string/settings_region_australia_l_code</item>
+    </array> -->
+
+    <array name="region_keys_austria">
+        <item>@string/settings_region_not_displayed</item>
+    </array>
+    <array name="region_values_austria_sr">
+        <item>@string/settings_region_austria_sr_code</item>
+    </array>
+    <!-- <array name="region_values_austria_l">
+        <item>@string/settings_region_austria_l_code</item>
+    </array> -->
+
+    <array name="region_keys_belgium">
+        <item>@string/settings_region_french</item>
+        <item>@string/settings_region_netherlands</item>
+    </array>
+    <array name="region_values_belgium_sr">
+        <item>@string/settings_region_french_sr_code</item>
+        <item>@string/settings_region_netherlands_sr_code</item>
+    </array>
+    <!-- <array name="region_values_belgium_l">
+        <item>@string/settings_region_french_l_code</item>
+        <item>@string/settings_region_netherlands_l_code</item>
+    </array> -->
+
+    <array name="region_keys_brazil">
+        <item>@string/settings_region_not_displayed</item>
+    </array>
+    <array name="region_values_brazil_sr">
+        <item>@string/settings_region_brazil_sr_code</item>
+    </array>
+    <!-- <array name="region_values_brazil_l">
+        <item>@string/settings_region_brazil_l_code</item>
+    </array> -->
+
+    <array name="region_keys_bulgaria">
+        <item>@string/settings_region_not_displayed</item>
+    </array>
+    <array name="region_values_bulgaria_sr">
+        <item>@string/settings_region_bulgaria_sr_code</item>
+    </array>
+    <!-- <array name="region_values_bulgaria_l">
+        <item>@string/settings_region_bulgaria_l_code</item>
+    </array> -->
+
+    <array name="region_keys_canada">
+        <item>@string/settings_region_french</item>
+        <item>@string/settings_region_english</item>
+    </array>
+    <array name="region_values_canada_sr">
+        <item>@string/settings_region_french_sr_code</item>
+        <item>@string/settings_region_english_sr_code</item>
+    </array>
+    <!-- <array name="region_values_canada_l">
+        <item>@string/settings_region_french_l_code</item>
+        <item>@string/settings_region_english_l_code</item>
+    </array> -->
+
+    <array name="region_keys_chile">
+        <item>@string/settings_region_not_displayed</item>
+    </array>
+    <array name="region_values_chile_sr">
+        <item>@string/settings_region_chile_sr_code</item>
+    </array>
+    <!-- <array name="region_values_chile_l">
+        <item>@string/settings_region_chile_l_code</item>
+    </array> -->
+
+    <array name="region_keys_southkorea">
+        <item>@string/settings_region_not_displayed</item>
+    </array>
+    <array name="region_values_southkorea_sr">
+        <item>@string/settings_region_southkorea_sr_code</item>
+    </array>
+    <!-- <array name="region_values_southkorea_l">
+        <item>@string/settings_region_southkorea_l_code</item>
+    </array> -->
+
+    <array name="region_keys_czechrepublic">
+        <item>@string/settings_region_not_displayed</item>
+    </array>
+    <array name="region_values_czechrepublic_sr">
+        <item>@string/settings_region_czechrepublic_sr_code</item>
+    </array>
+    <!-- <array name="region_values_czechrepublic_l">
+        <item>@string/settings_region_czechrepublic_l_code</item>
+    </array> -->
+
+    <array name="region_keys_denmark">
+        <item>@string/settings_region_not_displayed</item>
+    </array>
+    <array name="region_values_denmark_sr">
+        <item>@string/settings_region_denmark_sr_code</item>
+    </array>
+    <!-- <array name="region_values_denmark_l">
+        <item>@string/settings_region_denmark_l_code</item>
+    </array> -->
+
+    <array name="region_keys_estonia">
+        <item>@string/settings_region_not_displayed</item>
+    </array>
+    <array name="region_values_estonia_sr">
+        <item>@string/settings_region_estonia_sr_code</item>
+    </array>
+    <!-- <array name="region_values_estonia_l">
+        <item>@string/settings_region_estonia_l_code</item>
+    </array> -->
+
+    <array name="region_keys_finland">
+        <item>@string/settings_region_not_displayed</item>
+    </array>
+    <array name="region_values_finland_sr">
+        <item>@string/settings_region_finland_sr_code</item>
+    </array>
+    <!-- <array name="region_values_finland_l">
+        <item>@string/settings_region_finland_l_code</item>
+    </array> -->
+
+    <array name="region_keys_greece">
+        <item>@string/settings_region_not_displayed</item>
+    </array>
+    <array name="region_values_greece_sr">
+        <item>@string/settings_region_greece_sr_code</item>
+    </array>
+    <!-- <array name="region_values_greece_l">
+        <item>@string/settings_region_greece_l_code</item>
+    </array> -->
+
+    <array name="region_keys_hungary">
+        <item>@string/settings_region_not_displayed</item>
+    </array>
+    <array name="region_values_hungary_sr">
+        <item>@string/settings_region_hungary_sr_code</item>
+    </array>
+    <!-- <array name="region_values_hungary_l">
+        <item>@string/settings_region_hungary_l_code</item>
+    </array> -->
+
+    <array name="region_keys_india">
+        <item>@string/settings_region_not_displayed</item>
+    </array>
+    <array name="region_values_india_sr">
+        <item>@string/settings_region_india_sr_code</item>
+    </array>
+    <!-- <array name="region_values_india_l">
+        <item>@string/settings_region_india_l_code</item>
+    </array> -->
+
+    <array name="region_keys_ireland">
+        <item>@string/settings_region_not_displayed</item>
+    </array>
+    <array name="region_values_ireland_sr">
+        <item>@string/settings_region_ireland_sr_code</item>
+    </array>
+    <!-- <array name="region_values_ireland_l">
+        <item>@string/settings_region_ireland_l_code</item>
+    </array> -->
+
+    <array name="region_keys_israel">
+        <item>@string/settings_region_not_displayed</item>
+    </array>
+    <array name="region_values_israel_sr">
+        <item>@string/settings_region_israel_sr_code</item>
+    </array>
+    <!-- <array name="region_values_israel_l">
+        <item>@string/settings_region_israel_l_code</item>
+    </array> -->
+
+    <array name="region_keys_japan">
+        <item>@string/settings_region_not_displayed</item>
+    </array>
+    <array name="region_values_japan_sr">
+        <item>@string/settings_region_japan_sr_code</item>
+    </array>
+    <!-- <array name="region_values_japan_l">
+        <item>@string/settings_region_japan_l_code</item>
+    </array> -->
+
+    <array name="region_keys_malaysia">
+        <item>@string/settings_region_english</item>
+        <item>@string/settings_region_malaysian</item>
+    </array>
+    <array name="region_values_malaysia_sr">
+        <item>@string/settings_region_english_sr_code</item>
+        <item>@string/settings_region_malaysian_sr_code</item>
+    </array>
+    <!-- <array name="region_values_malaysia_l">
+        <item>@string/settings_region_english_l_code</item>
+        <item>@string/settings_region_malaysian_l_code</item>
+    </array> -->
+
+    <array name="region_keys_mexico">
+        <item>@string/settings_region_not_displayed</item>
+    </array>
+    <array name="region_values_mexico_sr">
+        <item>@string/settings_region_mexico_sr_code</item>
+    </array>
+    <!-- <array name="region_values_mexico_l">
+        <item>@string/settings_region_mexico_l_code</item>
+    </array> -->
+
+    <array name="region_keys_netherlands">
+        <item>@string/settings_region_not_displayed</item>
+    </array>
+    <array name="region_values_netherlands_sr">
+        <item>@string/settings_region_netherlands_sr_code</item>
+    </array>
+    <!-- <array name="region_values_netherlands_l">
+        <item>@string/settings_region_netherlands_l_code</item>
+    </array> -->
+
+    <array name="region_keys_newzealand">
+        <item>@string/settings_region_not_displayed</item>
+    </array>
+    <array name="region_values_newzealand_sr">
+        <item>@string/settings_region_newzealand_sr_code</item>
+    </array>
+    <!-- <array name="region_values_newzealand_l">
+        <item>@string/settings_region_newzealand_l_code</item>
+    </array> -->
+
+    <array name="region_keys_norway">
+        <item>@string/settings_region_not_displayed</item>
+    </array>
+    <array name="region_values_norway_sr">
+        <item>@string/settings_region_norway_sr_code</item>
+    </array>
+    <!-- <array name="region_values_norway_l">
+        <item>@string/settings_region_norway_l_code</item>
+    </array> -->
+
+    <array name="region_keys_philippines">
+        <item>@string/settings_region_not_displayed</item>
+    </array>
+    <array name="region_values_philippines_sr">
+        <item>@string/settings_region_philippines_sr_code</item>
+    </array>
+    <!-- <array name="region_values_philippines_l">
+        <item>@string/settings_region_philippines_l_code</item>
+    </array> -->
+
+    <array name="region_keys_poland">
+        <item>@string/settings_region_not_displayed</item>
+    </array>
+    <array name="region_values_poland_sr">
+        <item>@string/settings_region_poland_sr_code</item>
+    </array>
+    <!-- <array name="region_values_poland_l">
+        <item>@string/settings_region_poland_l_code</item>
+    </array> -->
+
+    <array name="region_keys_portugal">
+        <item>@string/settings_region_not_displayed</item>
+    </array>
+    <array name="region_values_portugal_sr">
+        <item>@string/settings_region_portugal_sr_code</item>
+    </array>
+    <!-- <array name="region_values_portugal_l">
+        <item>@string/settings_region_portugal_l_code</item>
+    </array> -->
+
+    <array name="region_keys_romania">
+        <item>@string/settings_region_not_displayed</item>
+    </array>
+    <array name="region_values_romania_sr">
+        <item>@string/settings_region_romania_sr_code</item>
+    </array>
+    <!-- <array name="region_values_romania_l">
+        <item>@string/settings_region_romania_l_code</item>
+    </array> -->
+
+    <array name="region_keys_russia">
+        <item>@string/settings_region_not_displayed</item>
+    </array>
+    <array name="region_values_russia_sr">
+        <item>@string/settings_region_russia_sr_code</item>
+    </array>
+    <!-- <array name="region_values_russia_l">
+        <item>@string/settings_region_russia_l_code</item>
+    </array> -->
+
+    <array name="region_keys_singapore">
+        <item>@string/settings_region_not_displayed</item>
+    </array>
+    <array name="region_values_singapore_sr">
+        <item>@string/settings_region_singapore_sr_code</item>
+    </array>
+    <!-- <array name="region_values_singapore_l">
+        <item>@string/settings_region_singapore_l_code</item>
+    </array> -->
+
+    <array name="region_keys_sweden">
+        <item>@string/settings_region_not_displayed</item>
+    </array>
+    <array name="region_values_sweden_sr">
+        <item>@string/settings_region_sweden_sr_code</item>
+    </array>
+    <!-- <array name="region_values_sweden_l">
+        <item>@string/settings_region_sweden_l_code</item>
+    </array> -->
+
+    <array name="region_keys_switzerland">
+        <item>@string/settings_region_french</item>
+        <item>@string/settings_region_german</item>
+        <item>@string/settings_region_italian</item>
+    </array>
+    <array name="region_values_switzerland_sr">
+        <item>@string/settings_region_french_sr_code</item>
+        <item>@string/settings_region_german_sr_code</item>
+        <item>@string/settings_region_italia_sr_code</item>
+    </array>
+    <!-- <array name="region_values_switzerland_l">
+        <item>@string/settings_region_french_l_code</item>
+        <item>@string/settings_region_german_l_code</item>
+        <item>@string/settings_region_italia_l_code</item>
+    </array> -->
+
+    <array name="region_keys_thailand">
+        <item>@string/settings_region_not_displayed</item>
+    </array>
+    <array name="region_values_thailand_sr">
+        <item>@string/settings_region_thailand_sr_code</item>
+    </array>
+    <!--  <array name="region_values_thailand_l">
+         <item>@string/settings_region_thailand_l_code</item>
+     </array> -->
+
+    <array name="region_keys_turkey">
+        <item>@string/settings_region_not_displayed</item>
+    </array>
+    <array name="region_values_turkey_sr">
+        <item>@string/settings_region_turkey_sr_code</item>
+    </array>
+    <!-- <array name="region_values_turkey_l">
+        <item>@string/settings_region_turkey_l_code</item>
+    </array> -->
+
+    <array name="region_keys_unitedstates">
+        <item>@string/settings_region_not_displayed</item>
+    </array>
+    <array name="region_values_unitedstates_sr">
+        <item>@string/settings_region_unitedstates_sr_code</item>
+    </array>
+    <!-- <array name="region_values_unitedstates_l">
+        <item>@string/settings_region_unitedstates_l_code</item>
+    </array> -->
 </resources>

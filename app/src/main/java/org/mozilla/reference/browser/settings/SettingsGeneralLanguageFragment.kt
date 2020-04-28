@@ -1,9 +1,12 @@
 package org.mozilla.reference.browser.settings
 
+import android.R.array
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import androidx.preference.Preference
+import androidx.preference.PreferenceManager
 import org.mozilla.reference.browser.BrowserActivity
 import org.mozilla.reference.browser.QwantUtils
 import org.mozilla.reference.browser.R
@@ -26,16 +29,17 @@ class SettingsGeneralLanguageFragment: BaseSettingsFragment() {
 
         val prefLanguageInterface = findPreference(context?.getPreferenceKey(R.string.pref_key_general_language_interface)) as QwantPreferenceDropdown
         val prefLanguageSearch = findPreference(context?.getPreferenceKey(R.string.pref_key_general_language_search)) as QwantPreferenceDropdown
+        val prefRegionSearch = findPreference(context?.getPreferenceKey(R.string.pref_key_general_region_search)) as QwantPreferenceDropdown
 
         prefLanguageInterface.summary = interfaceValues[interfaceKeys.indexOf(prefLanguageInterface.value)]
-        prefLanguageSearch.summary = searchValues[searchKeys.indexOf(prefLanguageSearch.value)]
+        val languageIndex = searchKeys.indexOf(prefLanguageSearch.value)
+        prefLanguageSearch.summary = searchValues[languageIndex]
+        toggleRegionForLanguage(languageIndex, prefRegionSearch.value)
 
         prefLanguageInterface.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, value ->
-            Log.d("QWANT_BROWSER","change interface language: $value")
-
             this.refreshQwantPage(interfaceLanguage = value as String)
 
-            val localeStringSplit = (value as String).split('_')
+            val localeStringSplit = value.split('_')
             val locale = Locale(localeStringSplit[0], localeStringSplit[1])
             Locale.setDefault(locale)
             resources.configuration.locale = locale
@@ -49,11 +53,19 @@ class SettingsGeneralLanguageFragment: BaseSettingsFragment() {
             true
         }
         prefLanguageSearch.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, value ->
-            Log.d("QWANT_BROWSER","change search language: $value")
+            val index = searchKeys.indexOf(value)
+            prefLanguageSearch.summary = searchValues[index]
+            toggleRegionForLanguage(index)
 
             this.refreshQwantPage(searchLanguage = value as String)
 
-            prefLanguageSearch.summary = searchValues[searchKeys.indexOf(value)]
+            true
+        }
+        prefRegionSearch.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, value ->
+            prefRegionSearch.summary = prefRegionSearch.entries[prefRegionSearch.findIndexOfValue(value as String)]
+
+            this.refreshQwantPage(searchRegion = value)
+
             true
         }
     }
@@ -66,16 +78,53 @@ class SettingsGeneralLanguageFragment: BaseSettingsFragment() {
         return true
     }
 
-    private fun refreshQwantPage(interfaceLanguage: String? = null, searchLanguage: String? = null) {
+    private fun refreshQwantPage(interfaceLanguage: String? = null, searchLanguage: String? = null, searchRegion: String? = null) {
         requireComponents.core.sessionManager.sessions.forEach {
             if (it.url.startsWith(requireContext().getString(R.string.homepage_startwith_filter))) {
                 var query: String? = null
                 if (it.url.contains("?q=") || it.url.contains("&q=")) {
                     query = it.url.split("?q=", "&q=")[1].split("&")[0]
                 }
-                val reloadPage = QwantUtils.getHomepage(requireContext(), query = query, interface_language = interfaceLanguage, search_language = searchLanguage)
+                val reloadPage = QwantUtils.getHomepage(requireContext(), query = query, interface_language = interfaceLanguage, search_language = searchLanguage, search_region = searchRegion)
                 requireComponents.useCases.sessionUseCases.loadUrl(reloadPage, it)
             }
         }
+    }
+
+    private fun toggleRegionForLanguage(languageIndex: Int, value: String? = null) {
+        val listArrayKeys = resources.obtainTypedArray(R.array.region_list_arrays_keys)
+        val listArrayValues = resources.obtainTypedArray(R.array.region_list_arrays_values_sr)
+
+        val arrayIdKeys = listArrayKeys.getResourceId(languageIndex, 0)
+        val arrayIdValues = listArrayValues.getResourceId(languageIndex, 0)
+        if (arrayIdKeys > 0 && arrayIdValues > 0) {
+            val regionKeys = resources.getStringArray(arrayIdKeys)
+            val regionValues = resources.getStringArray(arrayIdValues)
+
+            val prefRegionSearch = findPreference(context?.getPreferenceKey(R.string.pref_key_general_region_search)) as QwantPreferenceDropdown
+            prefRegionSearch.entries = regionKeys
+            prefRegionSearch.entryValues = regionValues
+            if (regionKeys.size > 1) {
+                if (value != null) {
+                    prefRegionSearch.value = value
+                    val valueIndex = prefRegionSearch.findIndexOfValue(value)
+                    if (valueIndex >= 0)
+                        prefRegionSearch.summary = regionKeys[prefRegionSearch.findIndexOfValue(value)]
+                    else
+                        prefRegionSearch.summary = "probleme"
+                }
+                prefRegionSearch.isVisible = true
+            } else {
+                prefRegionSearch.value = regionValues[0]
+                prefRegionSearch.summary = regionKeys[0]
+                prefRegionSearch.isVisible = false
+            }
+            prefRegionSearch.forceNotifyChange()
+        } else {
+            Log.d("QWANT_BROWSER", "Error in language XML files")
+        }
+
+        listArrayKeys.recycle();
+        listArrayValues.recycle();
     }
 }
