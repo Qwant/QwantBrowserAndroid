@@ -63,7 +63,7 @@ class QwantSessionFeature(
                 if (sessionManager.sessions.size > 1) {
                     session?.let { tabsUseCases.removeTab(it) }
 
-                    // TODO should know if session is from assist, so we can go back to assist ...
+                    // TODO should know if session is from assist or external, so we can go back to assist or close the app ...
 
                     return true
                 }

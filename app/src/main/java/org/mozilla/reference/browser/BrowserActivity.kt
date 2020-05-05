@@ -56,9 +56,9 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         super.onCreate(savedInstanceState)
 
         bookmarksStorage = BookmarksStorage(applicationContext)
-        bookmarksStorage!!.restore()
+        bookmarksStorage?.restore()
 
-        qwantbarSessionObserver = QwantBarSessionObserver(this, components.core.sessionManager, qwantbar, bookmarksStorage!!)
+        qwantbarSessionObserver = QwantBarSessionObserver(this, components.core.sessionManager, qwantbar)
         components.core.sessionManager.register(this.qwantbarSessionObserver!!)
 
         qwantbar.setBookmarkStorage(bookmarksStorage!!)
@@ -66,6 +66,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         qwantbar.onBookmarksClicked(::showBookmarks)
         qwantbar.onHomeClicked(::showHome)
         qwantbar.onMenuClicked(::showSettings)
+        qwantbar.onBackClicked(::onBackPressed)
 
         if (savedInstanceState == null) {
             if (intent.action == "CHANGED_LANGUAGE") {
@@ -93,16 +94,18 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         val availableCountries = resources.getStringArray(R.array.languages_search_keys)
         val savedSearchLanguage = prefs.getString(resources.getString(R.string.pref_key_general_language_search), "undefined")
         val savedSearchRegion = prefs.getString(resources.getString(R.string.pref_key_general_region_search), "undefined")
-        Log.d("QWANT_BROWSER", "savedSearchLanguage: $savedSearchLanguage")
-        Log.d("QWANT_BROWSER", "savedSearchRegion: $savedSearchRegion")
         if (savedSearchLanguage == null || savedSearchLanguage == "undefined" || !availableCountries.contains(savedSearchLanguage)) {
             var searchLanguage = "GB" // Fallback to english, as android does
             if (availableCountries.contains(phoneCountry)) searchLanguage = phoneCountry
-
-            Log.d("QWANT_BROWSER", "SearchLanguage redefined to: $searchLanguage")
             prefEditor.putString(resources.getString(R.string.pref_key_general_language_search), searchLanguage)
 
-            // TODO search region
+            // TODO set also region pref
+        }
+
+        if (savedSearchRegion == null || savedSearchRegion == "undefined" || !availableCountries.contains(savedSearchRegion)) {
+            var searchRegion = "en" // Fallback to english, as android does
+            if (availableCountries.contains(phoneCountry)) searchRegion = phoneLocale
+            prefEditor.putString(resources.getString(R.string.pref_key_general_language_search), searchRegion)
         }
 
         var savedInterfaceLanguage = prefs.getString(resources.getString(R.string.pref_key_general_language_interface), "undefined")
@@ -146,6 +149,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
             editor.apply()
         }
     }
+
     override fun onBackPressed() {
         if (components.core.sessionManager.selectedSession == null || components.core.sessionManager.selectedSession!!.url.startsWith(getString(R.string.settings_page_startwith_filter))) {
             qwantbar.setHighlight(QwantBar.QwantBarSelection.SEARCH)

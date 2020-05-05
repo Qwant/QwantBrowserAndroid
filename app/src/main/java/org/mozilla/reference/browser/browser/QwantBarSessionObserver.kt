@@ -3,6 +3,7 @@ package org.mozilla.reference.browser.browser
 import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -17,8 +18,7 @@ import org.mozilla.reference.browser.storage.BookmarksStorage
 class QwantBarSessionObserver(
         private val context: Context,
         private val sessionManager: SessionManager,
-        private val qwantbar: QwantBar,
-        private val bookmarksStorage: BookmarksStorage
+        private val qwantbar: QwantBar
 ) : SessionManager.Observer, Session.Observer {
     private var textviewHome : TextView = qwantbar.findViewById(R.id.qwantbar_text_home)
     private var textviewBookmarks : View = qwantbar.findViewById(R.id.qwantbar_text_bookmarks)
@@ -48,7 +48,7 @@ class QwantBarSessionObserver(
     }
 
     private fun checkSession(url: String) {
-        if (url.startsWith(context.getString(R.string.homepage_base))) { // include result page too
+        if (url.startsWith(context.getString(R.string.homepage_base))) { // include results page too
             setupHomeBar()
         } else {
             setupNavigationBar()
@@ -103,7 +103,6 @@ class QwantBarSessionObserver(
             this.setBarHeight(36)
             this.hideButtonsTexts()
             imageviewHome.setImageResource(qwantbar.getIcon(QwantBar.QwantBarIcons.HOME, false))
-            // qwantbar.setBookmarkButton(QwantBar.BookmarkButtonType.SESSION)
 
             layoutNavBack.visibility = View.VISIBLE
             layoutNavForward.visibility = View.VISIBLE
@@ -119,6 +118,9 @@ class QwantBarSessionObserver(
         checkSession(session.url)
         qwantbar.setPrivacyMode(session.private)
         context.setTheme(if (session.private) R.style.ThemeQwantNoActionBarPrivacy else R.style.ThemeQwantNoActionBar)
+        Log.d("QWANT_BROWSER", "check session")
+        val forwardColor = if (session.canGoForward) context.getColorFromAttr(R.attr.qwant_color_main) else context.getColorFromAttr(R.attr.qwant_color_light)
+        imageviewNavForward.setBackgroundColor(forwardColor)
     }
 
     private fun checkSession() {
@@ -130,9 +132,11 @@ class QwantBarSessionObserver(
     //
     override fun onSessionAdded(session: Session) {
         session.register(this)
+        Log.d("QWANT_BROWSER", "session added")
     }
     override fun onSessionSelected(session: Session) {
         checkSession(session)
+        Log.d("QWANT_BROWSER", "session selected")
     }
     override fun onSessionsRestored() {
         checkSession()
@@ -153,13 +157,21 @@ class QwantBarSessionObserver(
         qwantbar.visibility = if (enabled) View.GONE else View.VISIBLE
     }
 
-    /* override fun onNavigationStateChanged(session: Session, canGoBack: Boolean, canGoForward: Boolean) {
+    override fun onNavigationStateChanged(session: Session, canGoBack: Boolean, canGoForward: Boolean) {
         super.onNavigationStateChanged(session, canGoBack, canGoForward)
+        Log.d("QWANT_BROWSER", "navigationStateChanged")
         if (sessionManager.selectedSession != null && session.id == sessionManager.selectedSession!!.id) {
-            val backColor = if (canGoBack) context.getColorFromAttr(R.attr.qwant_color_main) else context.getColorFromAttr(R.attr.qwant_color_light)
-            imageviewNavBack.setBackgroundColor(backColor)
-            val forwardColor = if (canGoForward) context.getColorFromAttr(R.attr.qwant_color_main) else context.getColorFromAttr(R.attr.qwant_color_light)
+            Log.d("QWANT_BROWSER", "1")
+            // val backColor = if (canGoBack) context.getColorFromAttr(R.attr.qwant_color_main) else context.getColorFromAttr(R.attr.qwant_color_light)
+            // imageviewNavBack.setBackgroundColor(backColor)
+            Log.d("QWANT_BROWSER", "navigationStateChanged: $canGoForward (${session.canGoForward}) - ${sessionManager.selectedSession!!.canGoForward}")
+            Log.d("QWANT_BROWSER", "selected tab: ${session.id} - ${session.url}")
+            val forwardColor = if (canGoForward && session.canGoForward) context.getColorFromAttr(R.attr.qwant_color_main) else context.getColorFromAttr(R.attr.qwant_color_light)
             imageviewNavForward.setBackgroundColor(forwardColor)
+        } else if (sessionManager.selectedSession != null) {
+            Log.d("QWANT_BROWSER", "2")
+        } else {
+            Log.d("QWANT_BROWSER", "3")
         }
-    } */
+    }
 }

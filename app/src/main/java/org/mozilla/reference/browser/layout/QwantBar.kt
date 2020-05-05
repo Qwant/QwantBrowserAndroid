@@ -51,6 +51,7 @@ class QwantBar @JvmOverloads constructor(
     private val bookmarksCallbacks: MutableList<() -> Unit> = mutableListOf()
     private val homeCallbacks: MutableList<() -> Unit> = mutableListOf()
     private val menuCallbacks: MutableList<() -> Unit> = mutableListOf()
+    private val backCallbacks: MutableList<() -> Unit> = mutableListOf()
 
     private var tabButtonBox: ImageView? = null
     private var tabButtonBar: ImageView? = null
@@ -200,10 +201,10 @@ class QwantBar @JvmOverloads constructor(
         }
         qwantbar_button_tabs.contentDescription = context.getString(R.string.mozac_feature_tabs_toolbar_tabs_button)
 
-        qwantbar_layout_home.setOnClickListener { this.emitOnHomeClicked() }
-        qwantbar_layout_bookmarks.setOnClickListener { this.emitOnBookmarksClicked() }
-        qwantbar_layout_menu_qwant.setOnClickListener { this.emitOnMenuClicked() }
-        qwantbar_layout_nav_back.setOnClickListener { sessionUseCases.goBack.invoke() }
+        qwantbar_layout_home.setOnClickListener { emitOnHomeClicked() }
+        qwantbar_layout_bookmarks.setOnClickListener { emitOnBookmarksClicked() }
+        qwantbar_layout_menu_qwant.setOnClickListener { emitOnMenuClicked() }
+        qwantbar_layout_nav_back.setOnClickListener { backCallbacks.forEach { it.invoke() } } // sessionUseCases.goBack.invoke() }
         qwantbar_layout_nav_forward.setOnClickListener { sessionUseCases.goForward.invoke() }
 
         qwantbar_button_menu_nav.menuBuilder = menuBuilder
@@ -217,25 +218,13 @@ class QwantBar @JvmOverloads constructor(
         }
     }
 
-    fun setBookmarkStorage(storage: BookmarksStorage) {
-        this.bookmarksStorage = storage
-    }
+    fun setBookmarkStorage(storage: BookmarksStorage) { this.bookmarksStorage = storage }
 
-    fun onTabsClicked(callback: () -> Unit) {
-        tabCallbacks.add(callback)
-    }
-
-    fun onBookmarksClicked(callback: () -> Unit) {
-        bookmarksCallbacks.add(callback)
-    }
-
-    fun onHomeClicked(callback: () -> Unit) {
-        homeCallbacks.add(callback)
-    }
-
-    fun onMenuClicked(callback: () -> Unit) {
-        menuCallbacks.add(callback)
-    }
+    fun onTabsClicked(callback: () -> Unit) { tabCallbacks.add(callback) }
+    fun onBookmarksClicked(callback: () -> Unit) { bookmarksCallbacks.add(callback) }
+    fun onHomeClicked(callback: () -> Unit) { homeCallbacks.add(callback) }
+    fun onMenuClicked(callback: () -> Unit) { menuCallbacks.add(callback) }
+    fun onBackClicked(callback: () -> Unit) { backCallbacks.add(callback) }
 
     private var currentSelection: QwantBarSelection = QwantBarSelection.SEARCH
 

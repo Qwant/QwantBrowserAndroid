@@ -75,8 +75,6 @@ abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler {
 
     @CallSuper
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val prefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
-
         sessionFeature.set(
             feature = QwantSessionFeature(
                 requireComponents.core.sessionManager,

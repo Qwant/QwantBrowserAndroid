@@ -4,9 +4,7 @@
 
 package org.mozilla.reference.browser.browser
 
-import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import kotlinx.android.synthetic.main.fragment_browser.*
 import kotlinx.android.synthetic.main.fragment_browser.view.*
@@ -19,7 +17,6 @@ import mozilla.components.support.base.feature.ViewBoundFeatureWrapper
 import org.mozilla.reference.browser.QwantUtils
 import org.mozilla.reference.browser.ext.components
 import org.mozilla.reference.browser.ext.requireComponents
-import java.lang.reflect.Method
 
 
 /**
@@ -28,7 +25,7 @@ import java.lang.reflect.Method
 class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
     private val thumbnailsFeature = ViewBoundFeatureWrapper<ThumbnailsFeature>()
     private val webExtToolbarFeature = ViewBoundFeatureWrapper<WebExtensionToolbarFeature>()
-    private var toolbarSessionObserver: ToolbarSessionObserver? = null
+    // private var toolbarSessionObserver: ToolbarSessionObserver? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -43,8 +40,8 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
 
         swipeRefresh.isEnabled = false
 
-        toolbarSessionObserver = ToolbarSessionObserver(requireContext().components.core.sessionManager, toolbar, swipeRefresh)
-        requireContext().components.core.sessionManager.register(this.toolbarSessionObserver!!)
+        // toolbarSessionObserver = ToolbarSessionObserver(requireContext().components.core.sessionManager, toolbar, swipeRefresh)
+        // requireContext().components.core.sessionManager.register(this.toolbarSessionObserver!!)
 
         val searchEngine = SearchEngineParser().load("qwant", requireContext().assets.open("opensearch_qwant.xml"))
 
