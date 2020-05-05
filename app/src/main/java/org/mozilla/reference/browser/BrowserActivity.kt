@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
 import kotlinx.android.synthetic.main.activity_main.*
 import mozilla.components.browser.session.Session
+import mozilla.components.browser.session.ext.toTabSessionState
 import mozilla.components.concept.engine.EngineView
 import mozilla.components.concept.tabstray.TabsTray
 import mozilla.components.feature.intent.ext.EXTRA_SESSION_ID
@@ -29,6 +30,7 @@ import org.mozilla.reference.browser.storage.BookmarksFragment
 import org.mozilla.reference.browser.storage.BookmarksStorage
 import org.mozilla.reference.browser.tabs.TabsTrayFragment
 import org.mozilla.reference.browser.tabs.tray.BrowserTabsTray
+import org.mozilla.reference.browser.tabs.tray.toTab
 import java.util.*
 
 
@@ -151,6 +153,13 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
     }
 
     override fun onBackPressed() {
+        if (components.core.sessionManager.selectedSession != null && !components.core.sessionManager.selectedSession!!.canGoBack && components.core.sessionManager.selectedSession!!.source.name == "ACTION_VIEW") {
+            // Tab has been opened from external app, so we close the app to get back to it, after closing the tab
+            super.onBackPressed()
+            components.core.sessionManager.remove(components.core.sessionManager.selectedSession!!)
+            return
+        }
+
         if (components.core.sessionManager.selectedSession == null || components.core.sessionManager.selectedSession!!.url.startsWith(getString(R.string.settings_page_startwith_filter))) {
             qwantbar.setHighlight(QwantBar.QwantBarSelection.SEARCH)
         }

@@ -11,14 +11,15 @@
     android:layout_height="match_parent"
     tools:context=".BrowserActivity">
 
-    <ImageView
+    <!-- <ImageView
         android:id="@+id/splashScreen"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="bottom"
         android:background="@color/photonWhite"
         android:scaleType="center"
-        android:src="@drawable/flat_icon"/>
+        android:visibility="gone"
+        android:src="@drawable/flat_icon"/> -->
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefresh"
@@ -61,13 +62,12 @@
     <mozilla.components.browser.toolbar.BrowserToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="56dp"
         android:layout_gravity="top"
         android:paddingEnd="8dp"
         android:background="?attr/toolbarBackgroundColor"
         mozac:browserToolbarSuggestionForegroundColor="?attr/toolbarSuggestionForeground"
         mozac:browserToolbarSuggestionBackgroundColor="?attr/toolbarSuggestionBackground" />
-
 
     <ImageView
         android:layout_width="match_parent"
