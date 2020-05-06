@@ -176,20 +176,20 @@
     <string name="settings_language_unitedstates">United States</string>
 
     <string name="settings_region_not_displayed" translatable="false">Region not displayed</string>
-    <string name="settings_region_english">English</string>
+    <string name="settings_region_english" translatable="false">@string/settings_language_english</string>
+    <string name="settings_region_spanish" translatable="false">@string/settings_language_spanish</string>
+    <string name="settings_region_portuguese" translatable="false">@string/settings_language_portugal</string>
+    <string name="settings_region_netherlands" translatable="false">@string/settings_language_netherlands</string>
+    <string name="settings_region_malaysian" translatable="false">@string/settings_language_malaysia</string>
+    <string name="settings_region_german" translatable="false">@string/settings_language_german</string>
+    <string name="settings_region_italian" translatable="false">@string/settings_language_italian</string>
+    <string name="settings_region_french" translatable="false">@string/settings_language_french</string>
     <string name="settings_region_welsh">Welsh</string>
     <string name="settings_region_scottish">Scottish</string>
-    <string name="settings_region_french">French</string>
     <string name="settings_region_corsican">Corse</string>
     <string name="settings_region_breton">Breton</string>
     <string name="settings_region_catalan">Catalan</string>
     <string name="settings_region_basque">Basque</string>
-    <string name="settings_region_spanish">Spanish</string>
-    <string name="settings_region_portuguese">Portuguese</string>
-    <string name="settings_region_netherlands">Netherlands</string>
-    <string name="settings_region_malaysian">Malaysian</string>
-    <string name="settings_region_german">German</string>
-    <string name="settings_region_italian">Italian</string>
 
     <string name="settings_language_interface_english_code" translatable="false">en_GB</string>
     <string name="settings_language_interface_french_code" translatable="false">fr_FR</string>

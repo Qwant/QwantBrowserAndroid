@@ -149,6 +149,12 @@
     <string name="settings_language_turkey">Turchia</string>
     <string name="settings_language_unitedstates">Stati Uniti</string>
 
+    <string name="settings_region_welsh">Gallese</string>
+    <string name="settings_region_scottish">Scozzese</string>
+    <string name="settings_region_corsican">Corso</string>
+    <string name="settings_region_breton">Bretone</string>
+    <string name="settings_region_catalan">Catalano</string>
+    <string name="settings_region_basque">Basco</string>
 
     <string name="settings_adultcontent_none">Nessuno</string>
     <string name="settings_adultcontent_moderate">Moderato</string>
