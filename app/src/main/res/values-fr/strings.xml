@@ -116,6 +116,7 @@
 
     <string name="settings_general_language_interface">Langue de l\'interface</string>
     <string name="settings_general_language_search">Langue des résultats de recherche</string>
+    <string name="settings_general_region_search">Région des résultats de recherche</string>
 
     <string name="settings_language_english">Anglais</string>
     <string name="settings_language_french">Français</string>

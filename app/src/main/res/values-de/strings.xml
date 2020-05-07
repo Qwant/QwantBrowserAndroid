@@ -107,6 +107,7 @@
 
     <string name="settings_general_language_interface">Oberflächensprache</string>
     <string name="settings_general_language_search">Sprache der Suchergebnisse</string>
+    <string name="settings_general_region_search">Suchergebnisse nach Region</string>
 
     <string name="settings_language_english">Englisch</string>
     <string name="settings_language_french">Französisch</string>
