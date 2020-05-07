@@ -94,20 +94,27 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         val prefEditor: SharedPreferences.Editor = prefs.edit()
 
         val availableCountries = resources.getStringArray(R.array.languages_search_keys)
-        val savedSearchLanguage = prefs.getString(resources.getString(R.string.pref_key_general_language_search), "undefined")
-        val savedSearchRegion = prefs.getString(resources.getString(R.string.pref_key_general_region_search), "undefined")
+        var savedSearchLanguage = prefs.getString(resources.getString(R.string.pref_key_general_language_search), "undefined")
         if (savedSearchLanguage == null || savedSearchLanguage == "undefined" || !availableCountries.contains(savedSearchLanguage)) {
             var searchLanguage = "GB" // Fallback to english, as android does
             if (availableCountries.contains(phoneCountry)) searchLanguage = phoneCountry
             prefEditor.putString(resources.getString(R.string.pref_key_general_language_search), searchLanguage)
-
-            // TODO set also region pref
+            Log.d("QWANT_BROWSER", "update language: $savedSearchLanguage -> $searchLanguage")
+            savedSearchLanguage = searchLanguage
         }
 
-        if (savedSearchRegion == null || savedSearchRegion == "undefined" || !availableCountries.contains(savedSearchRegion)) {
-            var searchRegion = "en" // Fallback to english, as android does
-            if (availableCountries.contains(phoneCountry)) searchRegion = phoneLocale
-            prefEditor.putString(resources.getString(R.string.pref_key_general_language_search), searchRegion)
+        val savedSearchLanguageIndex = availableCountries.indexOf(savedSearchLanguage)
+        val listRegionsArrays = resources.obtainTypedArray(R.array.region_list_arrays_values_sr)
+        val arrayIdValues = listRegionsArrays.getResourceId(savedSearchLanguageIndex, 0)
+        if (arrayIdValues > 0) {
+            val availableRegions = resources.getStringArray(arrayIdValues)
+            val savedSearchRegion = prefs.getString(resources.getString(R.string.pref_key_general_region_search), "undefined")
+            if (savedSearchRegion == null || savedSearchRegion == "undefined" || !availableRegions.contains(savedSearchRegion)) {
+                var searchRegion = availableRegions[0]
+                if (availableRegions.contains(phoneLocale)) searchRegion = phoneLocale
+                Log.d("QWANT_BROWSER", "update region: $savedSearchRegion -> $searchRegion")
+                prefEditor.putString(resources.getString(R.string.pref_key_general_region_search), searchRegion)
+            }
         }
 
         var savedInterfaceLanguage = prefs.getString(resources.getString(R.string.pref_key_general_language_interface), "undefined")
@@ -123,6 +130,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
             }
 
             prefEditor.putString(resources.getString(R.string.pref_key_general_language_interface), interfaceLanguage)
+            Log.d("QWANT_BROWSER", "update interface language: $savedInterfaceLanguage -> $interfaceLanguage")
 
             savedInterfaceLanguage = interfaceLanguage
         }
