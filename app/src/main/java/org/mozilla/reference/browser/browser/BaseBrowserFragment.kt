@@ -161,16 +161,17 @@ abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler {
             view = view)
 
         sitePermissionFeature.set(
-            feature = SitePermissionsFeature(
+                feature = SitePermissionsFeature(
                 context = requireContext(),
                 fragmentManager = requireFragmentManager(),
                 sessionManager = requireComponents.core.sessionManager,
-                sessionId = sessionId
-            ) { permissions ->
-                requestPermissions(permissions, REQUEST_CODE_APP_PERMISSIONS)
-            },
-            owner = this,
-            view = view
+                sessionId = sessionId,
+                onNeedToRequestPermissions = { permissions ->
+                    requestPermissions(permissions, REQUEST_CODE_APP_PERMISSIONS)
+                },
+                onShouldShowRequestPermissionRationale = { shouldShowRequestPermissionRationale(it) }),
+                owner = this,
+                view = view
         )
 
         pictureInPictureIntegration.set(
