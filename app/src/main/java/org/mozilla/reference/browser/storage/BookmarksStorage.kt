@@ -15,6 +15,7 @@ class BookmarksStorage(private var context: Context) {
     fun addBookmark(item: BookmarkItemV1) {
         this.bookmarksList.add(item)
         this.emitOnChange()
+        this.persist()
     }
 
     fun addBookmark(session: Session?) {
@@ -27,6 +28,7 @@ class BookmarksStorage(private var context: Context) {
     fun deleteBookmark(item: BookmarkItemV1) {
         this.bookmarksList.remove(item)
         this.emitOnChange()
+        this.persist()
     }
 
     fun deleteBookmark(session: Session?) {

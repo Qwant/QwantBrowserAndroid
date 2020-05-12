@@ -8,14 +8,12 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
 import kotlinx.android.synthetic.main.activity_main.*
 import mozilla.components.browser.session.Session
-import mozilla.components.browser.session.ext.toTabSessionState
 import mozilla.components.concept.engine.EngineView
 import mozilla.components.concept.tabstray.TabsTray
 import mozilla.components.feature.intent.ext.EXTRA_SESSION_ID
@@ -30,7 +28,6 @@ import org.mozilla.reference.browser.storage.BookmarksFragment
 import org.mozilla.reference.browser.storage.BookmarksStorage
 import org.mozilla.reference.browser.tabs.TabsTrayFragment
 import org.mozilla.reference.browser.tabs.tray.BrowserTabsTray
-import org.mozilla.reference.browser.tabs.tray.toTab
 import java.util.*
 
 
@@ -99,7 +96,6 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
             var searchLanguage = "GB" // Fallback to english, as android does
             if (availableCountries.contains(phoneCountry)) searchLanguage = phoneCountry
             prefEditor.putString(resources.getString(R.string.pref_key_general_language_search), searchLanguage)
-            Log.d("QWANT_BROWSER", "update language: $savedSearchLanguage -> $searchLanguage")
             savedSearchLanguage = searchLanguage
         }
 
@@ -112,7 +108,6 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
             if (savedSearchRegion == null || savedSearchRegion == "undefined" || !availableRegions.contains(savedSearchRegion)) {
                 var searchRegion = availableRegions[0]
                 if (availableRegions.contains(phoneLocale)) searchRegion = phoneLocale
-                Log.d("QWANT_BROWSER", "update region: $savedSearchRegion -> $searchRegion")
                 prefEditor.putString(resources.getString(R.string.pref_key_general_region_search), searchRegion)
             }
         }
@@ -130,7 +125,6 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
             }
 
             prefEditor.putString(resources.getString(R.string.pref_key_general_language_interface), interfaceLanguage)
-            Log.d("QWANT_BROWSER", "update interface language: $savedInterfaceLanguage -> $interfaceLanguage")
 
             savedInterfaceLanguage = interfaceLanguage
         }
@@ -161,10 +155,11 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
     }
 
     override fun onBackPressed() {
-        if (components.core.sessionManager.selectedSession != null && !components.core.sessionManager.selectedSession!!.canGoBack && components.core.sessionManager.selectedSession!!.source.name == "ACTION_VIEW") {
+        val sessionManager  = components.core.sessionManager
+        if (sessionManager.selectedSession != null && !sessionManager.selectedSession!!.canGoBack && sessionManager.selectedSession!!.source.name == "ACTION_VIEW") {
             // Tab has been opened from external app, so we close the app to get back to it, after closing the tab
             super.onBackPressed()
-            components.core.sessionManager.remove(components.core.sessionManager.selectedSession!!)
+            sessionManager.remove(sessionManager.selectedSession!!)
             return
         }
 
@@ -179,23 +174,26 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         }
 
         super.onBackPressed()
-
         removeSessionIfNeeded()
     }
 
     override fun onAttachFragment(fragment: Fragment) {
-        if (fragment is SettingsContainerFragment) {
-            fragment.setOnSettingsClosed(this)
-        } else if (fragment is TabsTrayFragment) {
-            var isPrivate = false
-            if (components.core.sessionManager.selectedSession != null)
-                isPrivate = components.core.sessionManager.selectedSession!!.private
-            fragment.setPrivacy(isPrivate)
-            fragment.setQwantBar(qwantbar)
-            fragment.setTabsClosedCallback(::bookmarksOrTabsOrSettingsClosed)
-        } else if (fragment is BookmarksFragment) {
-            if (bookmarksStorage != null) fragment.setBookmarkStorage(bookmarksStorage!!)
-            fragment.setBookmarksClosedCallback(::bookmarksOrTabsOrSettingsClosed)
+        when (fragment) {
+            is SettingsContainerFragment -> {
+                fragment.setOnSettingsClosed(this)
+            }
+            is TabsTrayFragment -> {
+                var isPrivate = false
+                if (components.core.sessionManager.selectedSession != null)
+                    isPrivate = components.core.sessionManager.selectedSession!!.private
+                fragment.setPrivacy(isPrivate)
+                fragment.setQwantBar(qwantbar)
+                fragment.setTabsClosedCallback(::bookmarksOrTabsOrSettingsClosed)
+            }
+            is BookmarksFragment -> {
+                if (bookmarksStorage != null) fragment.setBookmarkStorage(bookmarksStorage!!)
+                fragment.setBookmarksClosedCallback(::bookmarksOrTabsOrSettingsClosed)
+            }
         }
     }
 

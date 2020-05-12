@@ -1,20 +1,28 @@
 package org.mozilla.reference.browser.browser
 
+import android.content.Context
 import android.util.Log
 import mozilla.components.browser.session.SessionManager
+import mozilla.components.browser.session.ext.toTabSessionState
+import mozilla.components.concept.engine.EngineSession
 import mozilla.components.concept.engine.EngineView
 import mozilla.components.feature.session.EngineViewPresenter
 import mozilla.components.feature.session.SessionUseCases
 import mozilla.components.feature.tabs.TabsUseCases
 import mozilla.components.support.base.feature.UserInteractionHandler
 import mozilla.components.support.base.feature.LifecycleAwareFeature
+import org.mozilla.reference.browser.QwantUtils
+import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.ext.components
+import org.mozilla.reference.browser.ext.requireComponents
 
 /**
  * Feature implementation for connecting the engine module with the session module.
  */
 class QwantSessionFeature(
+        private val context: Context,
         private val sessionManager: SessionManager,
+        private val sessionUseCases: SessionUseCases,
         private val goBackUseCase: SessionUseCases.GoBackUseCase,
         private val tabsUseCases: TabsUseCases,
         private val engineView: EngineView,
@@ -26,12 +34,13 @@ class QwantSessionFeature(
      * @deprecated Pass [SessionUseCases.GoBackUseCase] directly instead.
      */
     constructor(
+            context: Context,
             sessionManager: SessionManager,
             sessionUseCases: SessionUseCases,
             tabsUseCases: TabsUseCases,
             engineView: EngineView,
             sessionId: String? = null
-    ) : this(sessionManager, sessionUseCases.goBack, tabsUseCases, engineView, sessionId)
+    ) : this(context, sessionManager, sessionUseCases, sessionUseCases.goBack, tabsUseCases, engineView, sessionId)
 
     /**
      * Start feature: App is in the foreground.
@@ -50,22 +59,36 @@ class QwantSessionFeature(
             sessionManager.findSessionById(it)
         } ?: sessionManager.selectedSession
 
-        when {
-            engineView.canClearSelection() -> {
-                engineView.clearSelection()
-                return true
-            }
-
-            session?.canGoBack == true -> {
-                goBackUseCase(session)
-                return true
-            } else -> {
-                if (sessionManager.sessions.size > 1) {
-                    session?.let { tabsUseCases.removeTab(it) }
-
-                    // TODO should know if session is from assist or external, so we can go back to assist or close the app ...
-
-                    return true
+        if (engineView.canClearSelection()) {
+            engineView.clearSelection()
+            return true
+        } else if (session?.canGoBack == true) {
+            goBackUseCase(session)
+            return true
+        } else {
+            if (sessionManager.sessions.size > 1) {
+                if (session != null) {
+                    if (session.hasParentSession) {
+                        val parentId = session.toTabSessionState().parentId
+                        sessionManager.sessions.forEach {
+                            if (it.id == parentId) {
+                                sessionManager.select(it)
+                                tabsUseCases.removeTab(session)
+                                return true
+                            }
+                        }
+                    } else {
+                        val currentSessionPrivate = session.private
+                        sessionManager.sessions.forEach {
+                            if (it.private == currentSessionPrivate && it.url.startsWith(context.getString(R.string.homepage_startwith_filter))) {
+                                sessionManager.select(it)
+                                tabsUseCases.removeTab(session)
+                                return true
+                            }
+                        }
+                        sessionUseCases.loadUrl(QwantUtils.getHomepage(context.applicationContext))
+                        return true
+                    }
                 }
             }
         }

@@ -38,13 +38,11 @@ class QwantUtils {
                 .append("&hc=").append(if (hc) "1" else "0")
                 // TODO
                 // .append("&a=").append(enableSuggest)
-                // .append("&b=").append(targetBlank)
+                // .append("&b=").append("0")
                 // .append("&t=").append(theme)
 
             if (widget) builder.append("&widget=1")
             if (query != null) builder.append("&q=").append(query)
-
-            Log.d("QWANT_BROWSER", "get homepage: $builder")
 
             return builder.toString()
         }
