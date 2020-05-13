@@ -25,7 +25,7 @@ import org.mozilla.reference.browser.ext.requireComponents
 class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
     private val thumbnailsFeature = ViewBoundFeatureWrapper<ThumbnailsFeature>()
     private val webExtToolbarFeature = ViewBoundFeatureWrapper<WebExtensionToolbarFeature>()
-    // private var toolbarSessionObserver: ToolbarSessionObserver? = null
+    private var toolbarSessionObserver: ToolbarSessionObserver? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -33,15 +33,15 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
         val engineSettings = requireContext().components.core.engine.settings
         if (engineSettings.userAgentString != null)
             if (!engineSettings.userAgentString!!.contains("QwantMobile")) {
-                engineSettings.userAgentString += " QwantMobile/4.0"
+                engineSettings.userAgentString += " h QwantMobile/4.0"
             }
         engineSettings.remoteDebuggingEnabled = false
         engineSettings.testingModeEnabled = false
 
         swipeRefresh.isEnabled = false
 
-        // toolbarSessionObserver = ToolbarSessionObserver(requireContext().components.core.sessionManager, toolbar, swipeRefresh)
-        // requireContext().components.core.sessionManager.register(this.toolbarSessionObserver!!)
+        toolbarSessionObserver = ToolbarSessionObserver(requireContext().components.core.sessionManager, toolbar, swipeRefresh)
+        requireContext().components.core.sessionManager.register(this.toolbarSessionObserver!!)
 
         val searchEngine = SearchEngineParser().load("qwant", requireContext().assets.open("opensearch_qwant.xml"))
 
