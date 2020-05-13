@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -111,13 +112,16 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
                 prefEditor.putString(resources.getString(R.string.pref_key_general_region_search), searchRegion)
             }
         }
+        listRegionsArrays.recycle()
 
         var savedInterfaceLanguage = prefs.getString(resources.getString(R.string.pref_key_general_language_interface), "undefined")
-        if (savedInterfaceLanguage == "undefined") {
+        val availableLocale = resources.getStringArray(R.array.languages_interface_keys)
+        Log.d("QWANT_BROWSER", "saved interface language: $savedInterfaceLanguage")
+        Log.d("QWANT_BROWSER", "phone language: ${phoneLocale}_$phoneCountry")
+        if (savedInterfaceLanguage == "undefined" || !availableLocale.contains(savedInterfaceLanguage)) {
             // First time, set default locale for interface and search
             var interfaceLanguage = "en_GB" // Fallback to english, as android does
 
-            val availableLocale = resources.getStringArray(R.array.languages_interface_keys)
             if (!availableLocale.contains("${phoneLocale}_$phoneCountry")) {
                 availableLocale.forEach { l -> if (l.startsWith(phoneLocale)) interfaceLanguage = l }
             } else {

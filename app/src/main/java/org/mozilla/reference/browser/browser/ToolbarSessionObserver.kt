@@ -70,8 +70,8 @@ class ToolbarSessionObserver(
         checkSession(url)
     }
 
-    override fun onProgress(session: Session, progress: Int) {
-        if (session.url.startsWith(toolbar.context.getString(R.string.homepage_startwith_filter))) {
+    // override fun onProgress(session: Session, progress: Int) {
+        /* if (session.url.startsWith(toolbar.context.getString(R.string.homepage_startwith_filter))) {
             if (progress < 100 && !shownSplash) {
                 toggleSplash(true)
             } else if (progress == 100 && shownSplash) {
@@ -79,8 +79,8 @@ class ToolbarSessionObserver(
             }
         } else if (shownSplash) {
             toggleSplash(false)
-        }
-    }
+        } */
+    // }
 
     private fun toggleSplash(is_shown: Boolean) {
         /* swipeRefresh.visibility = if (is_shown) View.INVISIBLE else View.VISIBLE
