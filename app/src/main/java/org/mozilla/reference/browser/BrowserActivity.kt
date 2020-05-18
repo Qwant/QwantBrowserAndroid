@@ -160,15 +160,21 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
 
     override fun onBackPressed() {
         val sessionManager  = components.core.sessionManager
-        if (sessionManager.selectedSession != null && !sessionManager.selectedSession!!.canGoBack && sessionManager.selectedSession!!.source.name == "ACTION_VIEW") {
-            // Tab has been opened from external app, so we close the app to get back to it, after closing the tab
-            super.onBackPressed()
-            sessionManager.remove(sessionManager.selectedSession!!)
-            return
-        }
-
-        if (components.core.sessionManager.selectedSession == null || components.core.sessionManager.selectedSession!!.url.startsWith(getString(R.string.settings_page_startwith_filter))) {
-            qwantbar.setHighlight(QwantBar.QwantBarSelection.SEARCH)
+        if (sessionManager.selectedSession != null) {
+            val url = components.core.sessionManager.selectedSession!!.url
+            if (!sessionManager.selectedSession!!.canGoBack && sessionManager.selectedSession!!.source.name == "ACTION_VIEW") {
+                // Tab has been opened from external app, so we close the app to get back to it, after closing the tab
+                super.onBackPressed()
+                sessionManager.remove(sessionManager.selectedSession!!)
+                return
+            } else if (url.startsWith(getString(R.string.homepage_startwith_filter)) && url.contains("&o=")) {
+                // Fix for closing qwant opened medias with back button
+                components.useCases.sessionUseCases.loadUrl(url.substringBefore("&o="))
+                return
+            } else if (components.core.sessionManager.selectedSession!!.url.startsWith(getString(R.string.settings_page_startwith_filter))) {
+                // Highlight search icon when on the settings page. Do not return.
+                qwantbar.setHighlight(QwantBar.QwantBarSelection.SEARCH)
+            }
         }
 
         supportFragmentManager.fragments.forEach {
