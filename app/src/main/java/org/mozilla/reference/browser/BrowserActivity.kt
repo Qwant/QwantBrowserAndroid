@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
 import kotlinx.android.synthetic.main.activity_main.*
 import mozilla.components.browser.session.Session
+import mozilla.components.concept.engine.EngineSession
 import mozilla.components.concept.engine.EngineView
 import mozilla.components.concept.tabstray.TabsTray
 import mozilla.components.feature.intent.ext.EXTRA_SESSION_ID
@@ -169,7 +170,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
                 return
             } else if (url.startsWith(getString(R.string.homepage_startwith_filter)) && url.contains("&o=")) {
                 // Fix for closing qwant opened medias with back button
-                components.useCases.sessionUseCases.loadUrl(url.substringBefore("&o="))
+                components.useCases.sessionUseCases.loadUrl(url.substringBefore("&o="), flags = EngineSession.LoadUrlFlags.select(64)) // FLAG_REPLACE_HISTORY from GeckoSession native
                 return
             } else if (components.core.sessionManager.selectedSession!!.url.startsWith(getString(R.string.settings_page_startwith_filter))) {
                 // Highlight search icon when on the settings page. Do not return.
