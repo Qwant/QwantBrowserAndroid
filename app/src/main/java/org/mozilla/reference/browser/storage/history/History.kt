@@ -1,17 +1,22 @@
-package org.mozilla.reference.browser.storage
+package org.mozilla.reference.browser.storage.history
 
+import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.annotation.VisibleForTesting
 import mozilla.components.concept.storage.*
 import mozilla.components.support.utils.StorageUtils.levenshteinDistance
 import mozilla.components.support.utils.segmentAwareDomainMatch
+import java.io.*
 import java.util.*
 
-data class Visit(val timestamp: Long, val type: VisitType)
+data class Visit(val timestamp: Long, val type: VisitType): Serializable
+data class PageObservation(val title: String?) : Serializable
 
 const val AUTOCOMPLETE_SOURCE_NAME = "history"
 
-class History : HistoryStorage {
+class History(val context: Context) : HistoryStorage {
 
     @VisibleForTesting
     internal var pages: HashMap<String, MutableList<Visit>> = linkedMapOf()
@@ -37,8 +42,8 @@ class History : HistoryStorage {
         }
     }
 
-    override suspend fun recordObservation(uri: String, observation: PageObservation) = synchronized(pageMeta) {
-        pageMeta[uri] = observation
+    override suspend fun recordObservation(uri: String, observation: mozilla.components.concept.storage.PageObservation) = synchronized(pageMeta) {
+        pageMeta[uri] = PageObservation(observation.title)
     }
 
     override suspend fun getVisited(uris: List<String>): List<Boolean> = synchronized(pages) {
@@ -158,10 +163,64 @@ class History : HistoryStorage {
     }
 
     override suspend fun warmUp() {
-        // TODO("Not yet implemented")
+        this.restore()
     }
 
     override fun cleanup() {
+        this.persist()
         // GC will take care of our internal data structures, so there's nothing to do here.
+    }
+
+    fun setup_auto_persist(delayMs: Long = 20000) {
+        Log.d("QWANT_BROWSER", "autopersist history setup")
+        val mainHandler = Handler(Looper.getMainLooper())
+        mainHandler.post(object : Runnable {
+            override fun run() {
+                Log.d("QWANT_BROWSER", "autopersist history")
+                this@History.persist()
+                mainHandler.postDelayed(this, delayMs)
+            }
+        })
+    }
+
+    fun persist() {
+        Log.d("QWANT_BROWSER", "persist history: ${pages.size} pages / ${pageMeta.size} metas")
+        try {
+            val fileOutputStream: FileOutputStream = context.openFileOutput(QWANT_HISTORY_FILENAME, Context.MODE_PRIVATE)
+            val objectOutputStream = ObjectOutputStream(fileOutputStream)
+            objectOutputStream.writeObject(this.pages)
+            objectOutputStream.writeObject(this.pageMeta)
+            objectOutputStream.flush()
+            objectOutputStream.close()
+            fileOutputStream.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    fun restore() {
+        Log.d("QWANT_BROWSER", "restore history !")
+        try {
+            val fileInputStream: FileInputStream = context.openFileInput(QWANT_HISTORY_FILENAME)
+            val objectInputStream = ObjectInputStream(fileInputStream)
+            this.pages = objectInputStream.readObject() as HashMap<String, MutableList<Visit>>
+            this.pageMeta = objectInputStream.readObject() as HashMap<String, PageObservation>
+            objectInputStream.close()
+            fileInputStream.close()
+            Log.d("QWANT_BROWSER", "history restored: ${pages.size} pages / ${pageMeta.size} metas")
+        } catch (e: IOException) {
+            Log.e("QWANT_BROWSER", "Failed reading history file: IO exception: " + e.message)
+            e.printStackTrace()
+        } catch (e: ClassNotFoundException) {
+            Log.e("QWANT_BROWSER", "Failed reading history file: Class not found: " + e.message)
+            e.printStackTrace()
+        } catch (e: Exception) {
+            Log.e("QWANT_BROWSER", "Failed reading history file: " + e.message)
+            e.printStackTrace()
+        }
+    }
+
+    companion object {
+        const val QWANT_HISTORY_FILENAME = "qwant_history"
     }
 }

@@ -1,4 +1,4 @@
-package org.mozilla.reference.browser.storage
+package org.mozilla.reference.browser.storage.bookmarks
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.preference.PreferenceManager
 import mozilla.components.browser.session.Session
 import org.mozilla.reference.browser.R
+import org.mozilla.reference.browser.storage.SerializableBitmap
 import java.io.*
 
 class BookmarksStorage(private var context: Context) {

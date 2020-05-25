@@ -26,8 +26,8 @@ import org.mozilla.reference.browser.browser.QwantBarSessionObserver
 import org.mozilla.reference.browser.ext.components
 import org.mozilla.reference.browser.layout.QwantBar
 import org.mozilla.reference.browser.settings.SettingsContainerFragment
-import org.mozilla.reference.browser.storage.BookmarksFragment
-import org.mozilla.reference.browser.storage.BookmarksStorage
+import org.mozilla.reference.browser.storage.bookmarks.BookmarksFragment
+import org.mozilla.reference.browser.storage.bookmarks.BookmarksStorage
 import org.mozilla.reference.browser.tabs.TabsTrayFragment
 import org.mozilla.reference.browser.tabs.tray.BrowserTabsTray
 import java.util.*
@@ -337,11 +337,13 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
+        components.core.historyStorage.run { this.persist() }
         this.bookmarksStorage?.persist()
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
         super.onRestoreInstanceState(savedInstanceState)
+        components.core.historyStorage.run { this.restore() }
         this.bookmarksStorage?.restore()
     }
 }

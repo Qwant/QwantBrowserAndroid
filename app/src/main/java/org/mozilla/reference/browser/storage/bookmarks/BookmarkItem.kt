@@ -1,4 +1,4 @@
-package org.mozilla.reference.browser.storage
+package org.mozilla.reference.browser.storage.bookmarks
 
 import java.io.Serializable
 

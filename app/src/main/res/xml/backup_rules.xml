@@ -5,4 +5,5 @@
 <full-backup-content>
     <include domain="sharedpref" path="."/>
     <include domain="file" path="qwant_bookmarks"/>
+    <!-- <include domain="file" path="qwant_history"/> -->
 </full-backup-content>

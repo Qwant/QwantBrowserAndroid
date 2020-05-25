@@ -10,13 +10,10 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import kotlinx.android.synthetic.main.component_qwantbar.view.*
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
 import mozilla.components.browser.menu.BrowserMenuBuilder
 import mozilla.components.browser.menu.BrowserMenuItem
 import mozilla.components.browser.menu.item.BrowserMenuItemToolbar
 import mozilla.components.browser.menu.item.BrowserMenuDivider
-import mozilla.components.browser.menu.item.SimpleBrowserMenuItem
 import mozilla.components.browser.menu.item.BrowserMenuImageText
 import mozilla.components.browser.session.Session
 import mozilla.components.browser.session.SessionManager
@@ -31,7 +28,7 @@ import org.mozilla.reference.browser.browser.FindInPageIntegration
 import org.mozilla.reference.browser.browser.QwantBarSessionObserver
 import org.mozilla.reference.browser.ext.application
 import org.mozilla.reference.browser.ext.share
-import org.mozilla.reference.browser.storage.BookmarksStorage
+import org.mozilla.reference.browser.storage.bookmarks.BookmarksStorage
 import java.lang.ref.WeakReference
 
 class QwantBar @JvmOverloads constructor(

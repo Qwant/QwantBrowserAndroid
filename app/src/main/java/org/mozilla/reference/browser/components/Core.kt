@@ -15,7 +15,6 @@ import mozilla.components.concept.engine.DefaultSettings
 import mozilla.components.concept.engine.Engine
 import mozilla.components.concept.engine.EngineSession.TrackingProtectionPolicy
 import mozilla.components.concept.fetch.Client
-import mozilla.components.concept.storage.HistoryStorage
 import mozilla.components.feature.addons.AddonManager
 import mozilla.components.feature.addons.amo.AddonCollectionProvider
 import mozilla.components.feature.addons.update.AddonUpdater
@@ -27,7 +26,7 @@ import org.mozilla.reference.browser.browser.WebNotificationFeature
 import org.mozilla.reference.browser.AppRequestInterceptor
 import org.mozilla.reference.browser.BrowserActivity
 import org.mozilla.reference.browser.EngineProvider
-import org.mozilla.reference.browser.storage.History
+import org.mozilla.reference.browser.storage.history.History
 import org.mozilla.reference.browser.ext.getPreferenceKey
 import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.R.string.pref_key_remote_debugging
@@ -115,7 +114,10 @@ class Core(private val context: Context) {
      * The storage component to persist browsing history (with the exception of
      * private sessions).
      */
-    val historyStorage by lazy { History() }
+    val historyStorage by lazy { History(context).apply {
+        this.restore()
+        this.setup_auto_persist(30000)
+    } }
         /* val h = History(context)
         // h.load_from_storage()
         h
