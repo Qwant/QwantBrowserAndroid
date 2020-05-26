@@ -289,13 +289,13 @@ class AddonsFragment : Fragment(), View.OnClickListener {
 
     private val onPositiveButtonClicked: ((Addon) -> Unit) = { addon ->
         addonProgressOverlay.visibility = View.VISIBLE
-        requireContext().components.core.addonManager.installAddon(
+        context?.components?.core?.addonManager?.installAddon(
             addon,
             onSuccess = {
                 Toast.makeText(
-                    requireContext(),
-                    "Successfully installed: ${it.translatableName.translate()}",
-                    Toast.LENGTH_SHORT
+                        context,
+                        "Successfully installed: ${it.translatableName.translate()}",
+                        Toast.LENGTH_SHORT
                 ).show()
 
                 this@AddonsFragment.view?.let { view ->
@@ -306,9 +306,9 @@ class AddonsFragment : Fragment(), View.OnClickListener {
             },
             onError = { _, _ ->
                 Toast.makeText(
-                    requireContext(),
-                    "Failed to install: ${addon.translatableName.translate()}",
-                    Toast.LENGTH_SHORT
+                        context,
+                        "Failed to install: ${addon.translatableName.translate()}",
+                        Toast.LENGTH_SHORT
                 ).show()
 
                 addonProgressOverlay.visibility = View.GONE
