@@ -8,10 +8,8 @@ import android.content.ComponentCallbacks2
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
-import android.view.View
 import android.widget.ImageView
 import androidx.annotation.MainThread
-import androidx.annotation.VisibleForTesting
 import androidx.annotation.WorkerThread
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
@@ -25,12 +23,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import mozilla.components.browser.icons.DesiredSize
 import mozilla.components.browser.icons.Icon
 import mozilla.components.browser.icons.IconRequest
-import mozilla.components.browser.icons.decoder.AndroidIconDecoder
+import mozilla.components.browser.icons.R
 import mozilla.components.browser.icons.decoder.ICOIconDecoder
-import mozilla.components.browser.icons.decoder.IconDecoder
 import mozilla.components.browser.icons.generator.DefaultIconGenerator
 import mozilla.components.browser.icons.generator.IconGenerator
 import mozilla.components.browser.icons.loader.DataUriIconLoader
@@ -45,25 +41,22 @@ import mozilla.components.browser.icons.processor.DiskIconProcessor
 import mozilla.components.browser.icons.processor.IconProcessor
 import mozilla.components.browser.icons.processor.MemoryIconProcessor
 import mozilla.components.browser.icons.utils.IconDiskCache
-import mozilla.components.browser.state.action.ContentAction
 import mozilla.components.browser.state.state.BrowserState
 import mozilla.components.browser.state.store.BrowserStore
 import mozilla.components.concept.engine.Engine
-import mozilla.components.concept.engine.EngineSession
-import mozilla.components.concept.engine.manifest.Size
-import mozilla.components.concept.engine.webextension.MessageHandler
 import mozilla.components.concept.engine.webextension.WebExtension
 import mozilla.components.concept.fetch.Client
 import mozilla.components.lib.state.ext.flowScoped
 import mozilla.components.support.base.log.logger.Logger
 import mozilla.components.support.base.memory.MemoryConsumer
-import mozilla.components.support.ktx.android.org.json.asSequence
-import mozilla.components.support.ktx.android.org.json.tryGetString
+import mozilla.components.support.images.DesiredSize
+import mozilla.components.support.images.decoder.AndroidImageDecoder
+import mozilla.components.support.images.decoder.ImageDecoder
 import mozilla.components.support.ktx.kotlinx.coroutines.flow.filterChanged
-import org.json.JSONArray
-import org.json.JSONException
-import org.json.JSONObject
-import org.mozilla.reference.browser.R
+import org.mozilla.reference.browser.browser.icons.utils.IconMessageHandler
+import org.mozilla.reference.browser.browser.icons.utils.CancelOnDetach
+import org.mozilla.reference.browser.browser.icons.utils.IconResourceComparator
+import org.mozilla.reference.browser.browser.icons.utils.IconMemoryCache
 import java.lang.ref.WeakReference
 import java.util.concurrent.Executors
 
@@ -76,189 +69,6 @@ private const val THREADS = 3
 
 internal val sharedMemoryCache = IconMemoryCache()
 internal val sharedDiskCache = IconDiskCache()
-
-/**
- * Cancels the provided job when a view is detached from the window
- */
-internal class CancelOnDetach(private val job: Job) : View.OnAttachStateChangeListener {
-
-    override fun onViewAttachedToWindow(v: View?) = Unit
-
-    override fun onViewDetachedFromWindow(v: View?) = job.cancel()
-}
-
-@Suppress("MagicNumber", "ComplexMethod")
-private fun IconRequest.Resource.Type.rank(): Int {
-    return when (this) {
-        // An icon from our "tippy top" list should always be preferred
-        IconRequest.Resource.Type.TIPPY_TOP -> 25
-        IconRequest.Resource.Type.MANIFEST_ICON -> 20
-        // We prefer touch icons because they tend to have a higher resolution than ordinary favicons.
-        IconRequest.Resource.Type.APPLE_TOUCH_ICON -> 15
-        IconRequest.Resource.Type.FAVICON -> 10
-
-        // Fallback icon types:
-        IconRequest.Resource.Type.IMAGE_SRC -> 6
-        IconRequest.Resource.Type.FLUID_ICON -> 5
-        IconRequest.Resource.Type.OPENGRAPH -> 4
-        IconRequest.Resource.Type.TWITTER -> 3
-        IconRequest.Resource.Type.MICROSOFT_TILE -> 2
-    }
-}
-
-private val IconRequest.Resource.maxSize: Int
-    get() = sizes.asSequence().map { size -> size.minLength }.max() ?: 0
-
-private val IconRequest.Resource.isContainerType: Boolean
-    get() = mimeType != null && containerTypes.contains(mimeType as String)
-
-private val containerTypes = listOf(
-        "image/vnd.microsoft.icon",
-        "image/ico",
-        "image/icon",
-        "image/x-icon",
-        "text/ico",
-        "application/ico"
-)
-
-/**
- * This [Comparator] implementations compares [IconRequest.Resource] objects to determine which icon to try to load
- * first.
- */
-internal object IconResourceComparator : Comparator<IconRequest.Resource> {
-
-    /**
-     * Compare two icon resources. If [resource] is more important, a negative number is returned.
-     * If [other] is more important, a positive number is returned.
-     * If the two resources are of equal importance, 0 is returned.
-     * Importance represents which icon we should try to load first.
-     */
-    override fun compare(resource: IconRequest.Resource, other: IconRequest.Resource) = when {
-        // Two resources pointing to the same URL are always referencing the same icon. So treat them as equal.
-        resource.url == other.url -> 0
-        resource.maskable != other.maskable -> -resource.maskable.compareTo(other.maskable)
-        resource.type != other.type -> -resource.type.rank().compareTo(other.type.rank())
-        resource.maxSize != other.maxSize -> -resource.maxSize.compareTo(other.maxSize)
-        else -> {
-            // If there's no other way to choose, we prefer container types.
-            // They *might* contain an image larger than the size given in the <link> tag.
-            val isResourceContainerType = resource.isContainerType
-            if (isResourceContainerType != other.isContainerType) {
-                if (isResourceContainerType) -1 else 1
-            } else {
-                // There's no way to know which icon might be better. However we need to pick a consistent one
-                // to avoid breaking set implementations (See Fennec Bug 1331808).
-                // Therefore we are  picking one by just comparing the URLs.
-                resource.url.compareTo(other.url)
-            }
-        }
-    }
-}
-
-private val typeMap: Map<String, IconRequest.Resource.Type> = mutableMapOf(
-        "manifest" to IconRequest.Resource.Type.MANIFEST_ICON,
-        "icon" to IconRequest.Resource.Type.FAVICON,
-        "shortcut icon" to IconRequest.Resource.Type.FAVICON,
-        "fluid-icon" to IconRequest.Resource.Type.FLUID_ICON,
-        "apple-touch-icon" to IconRequest.Resource.Type.APPLE_TOUCH_ICON,
-        "image_src" to IconRequest.Resource.Type.IMAGE_SRC,
-        "apple-touch-icon image_src" to IconRequest.Resource.Type.APPLE_TOUCH_ICON,
-        "apple-touch-icon-precomposed" to IconRequest.Resource.Type.APPLE_TOUCH_ICON,
-        "og:image" to IconRequest.Resource.Type.OPENGRAPH,
-        "og:image:url" to IconRequest.Resource.Type.OPENGRAPH,
-        "og:image:secure_url" to IconRequest.Resource.Type.OPENGRAPH,
-        "twitter:image" to IconRequest.Resource.Type.TWITTER,
-        "msapplication-TileImage" to IconRequest.Resource.Type.MICROSOFT_TILE
-)
-
-private fun JSONArray?.toResourceSizes(): List<Size> {
-    val array = this ?: return emptyList()
-
-    return try {
-        array.asSequence { i -> getString(i) }
-                .mapNotNull { raw -> Size.parse(raw) }
-                .toList()
-    } catch (e: JSONException) {
-        Logger.warn("Could not parse message from icons extensions", e)
-        emptyList()
-    } catch (e: NumberFormatException) {
-        Logger.warn("Could not parse message from icons extensions", e)
-        emptyList()
-    }
-}
-
-private fun JSONObject.toIconResource(): IconRequest.Resource? {
-    try {
-        val url = getString("href")
-        val type = typeMap[getString("type")] ?: return null
-        val sizes = optJSONArray("sizes").toResourceSizes()
-        val mimeType = tryGetString("mimeType")
-        val maskable = optBoolean("maskable", false)
-
-        return IconRequest.Resource(
-                url = url,
-                type = type,
-                sizes = sizes,
-                mimeType = if (mimeType.isNullOrEmpty()) null else mimeType,
-                maskable = maskable
-        )
-    } catch (e: JSONException) {
-        Logger.warn("Could not parse message from icons extensions", e)
-        return null
-    }
-}
-
-internal fun JSONArray.toIconResources(): List<IconRequest.Resource> {
-    return asSequence { i -> getJSONObject(i) }
-            .mapNotNull { it.toIconResource() }
-            .toList()
-}
-
-internal fun JSONObject.toIconRequest(isPrivate: Boolean): IconRequest? {
-    return try {
-        val url = getString("url")
-
-        IconRequest(url, isPrivate = isPrivate, resources = getJSONArray("icons").toIconResources())
-    } catch (e: JSONException) {
-        Logger.warn("Could not parse message from icons extensions", e)
-        null
-    }
-}
-
-/**
- * [MessageHandler] implementation that receives messages from the icons web extensions and performs icon loads.
- */
-internal class IconMessageHandler(
-        private val store: BrowserStore,
-        private val sessionId: String,
-        private val private: Boolean,
-        private val icons: BrowserIcons
-) : MessageHandler {
-    private val scope = CoroutineScope(Dispatchers.IO)
-
-    @VisibleForTesting(otherwise = VisibleForTesting.NONE) // This only exists so that we can wait in tests.
-    internal var lastJob: Job? = null
-
-    override fun onMessage(message: Any, source: EngineSession?): Any {
-        if (message is JSONObject) {
-            message.toIconRequest(private)?.let { loadRequest(it) }
-        } else {
-            throw IllegalStateException("Received unexpected message: $message")
-        }
-
-        // Needs to return something that is not null and not Unit:
-        // https://github.com/mozilla-mobile/android-components/issues/2969
-        return ""
-    }
-
-    private fun loadRequest(request: IconRequest) {
-        lastJob = scope.launch {
-            val icon = icons.loadIcon(request).await()
-
-            store.dispatch(ContentAction.UpdateIconAction(sessionId, request.url, icon.bitmap))
-        }
-    }
-}
 
 /**
  * Entry point for loading icons for websites.
@@ -280,8 +90,8 @@ class BrowserIcons(
                 HttpIconLoader(httpClient),
                 DataUriIconLoader()
         ),
-        private val decoders: List<IconDecoder> = listOf(
-                AndroidIconDecoder(),
+        private val decoders: List<ImageDecoder> = listOf(
+                AndroidImageDecoder(),
                 ICOIconDecoder()
         ),
         private val processors: List<IconProcessor> = listOf(
@@ -333,6 +143,7 @@ class BrowserIcons(
                 allowContentMessaging = true,
                 onSuccess = { extension ->
                     Logger.debug("Installed browser-icons extension")
+
                     store.flowScoped { flow -> subscribeToUpdates(store, flow, extension) }
                 },
                 onError = { _, throwable ->
@@ -436,7 +247,7 @@ private fun load(
         context: Context,
         request: IconRequest,
         loaders: List<IconLoader>,
-        decoders: List<IconDecoder>,
+        decoders: List<ImageDecoder>,
         desiredSize: DesiredSize
 ): Pair<Icon, IconRequest.Resource>? {
     request.resources
@@ -460,7 +271,7 @@ private fun load(
 
 private fun decodeIconLoaderResult(
         result: IconLoader.Result,
-        decoders: List<IconDecoder>,
+        decoders: List<ImageDecoder>,
         desiredSize: DesiredSize
 ): Icon? = when (result) {
     IconLoader.Result.NoResult -> null
@@ -473,7 +284,7 @@ private fun decodeIconLoaderResult(
 
 private fun decodeBytes(
         data: ByteArray,
-        decoders: List<IconDecoder>,
+        decoders: List<ImageDecoder>,
         desiredSize: DesiredSize
 ): Bitmap? {
     decoders.forEach { decoder ->
