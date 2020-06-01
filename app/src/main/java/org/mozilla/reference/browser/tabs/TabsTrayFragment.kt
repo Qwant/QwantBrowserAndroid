@@ -69,14 +69,23 @@ class TabsTrayFragment: Fragment(), UserInteractionHandler {
                 this.updateTabCount()
             }
         }
-        tabsFeature = TabsFeature(
+
+        /* tabsFeature = TabsFeature(
             tabsTray,
             requireComponents.core.store,
             requireComponents.useCases.tabsUseCases,
-            closeTabsTray = ::closeTabsTray)
+            closeTabsTray = ::closeTabsTray) */
 
 
-        tabsFeature?.filterTabs { it.content.private == isPrivate }
+        tabsFeature = TabsFeature(
+                tabsTray,
+                requireComponents.core.store,
+                requireComponents.useCases.tabsUseCases,
+                requireComponents.useCases.thumbnailUseCases,
+                { it.content.private == isPrivate },
+                ::closeTabsTray)
+
+        // tabsFeature?.filterTabs { it.content.private == isPrivate }
 
         val context = requireContext()
         if (isPrivate) {

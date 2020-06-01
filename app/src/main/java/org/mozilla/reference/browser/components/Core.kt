@@ -11,6 +11,7 @@ import org.mozilla.reference.browser.browser.icons.BrowserIcons
 import mozilla.components.browser.session.SessionManager
 import mozilla.components.browser.session.storage.SessionStorage
 import mozilla.components.browser.state.store.BrowserStore
+import mozilla.components.browser.thumbnails.storage.ThumbnailStorage
 import mozilla.components.concept.engine.DefaultSettings
 import mozilla.components.concept.engine.Engine
 import mozilla.components.concept.engine.EngineSession.TrackingProtectionPolicy
@@ -122,6 +123,11 @@ class Core(private val context: Context) {
         // h.load_from_storage()
         h
     } */
+
+    /**
+     * A storage component for persisting thumbnail images of tabs.
+     */
+    val thumbnailStorage by lazy { ThumbnailStorage(context) }
 
     /**
      * Icons component for loading, caching and processing website icons.

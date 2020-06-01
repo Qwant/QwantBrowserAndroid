@@ -10,7 +10,8 @@ import kotlinx.android.synthetic.main.fragment_browser.*
 import kotlinx.android.synthetic.main.fragment_browser.view.*
 import mozilla.components.browser.search.SearchEngineParser
 import mozilla.components.feature.awesomebar.AwesomeBarFeature
-import mozilla.components.feature.session.ThumbnailsFeature
+// import mozilla.components.feature.session.ThumbnailsFeature
+import mozilla.components.browser.thumbnails.BrowserThumbnails
 import mozilla.components.feature.toolbar.WebExtensionToolbarFeature
 import mozilla.components.support.base.feature.UserInteractionHandler
 import mozilla.components.support.base.feature.ViewBoundFeatureWrapper
@@ -23,7 +24,7 @@ import org.mozilla.reference.browser.ext.requireComponents
  * Fragment used for browsing the web within the main app.
  */
 class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
-    private val thumbnailsFeature = ViewBoundFeatureWrapper<ThumbnailsFeature>()
+    private val thumbnailsFeature = ViewBoundFeatureWrapper<BrowserThumbnails>()
     private val webExtToolbarFeature = ViewBoundFeatureWrapper<WebExtensionToolbarFeature>()
     private var toolbarSessionObserver: ToolbarSessionObserver? = null
 
@@ -60,9 +61,9 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
             .addClipboardProvider(requireContext(), requireComponents.useCases.sessionUseCases.loadUrl)
 
         thumbnailsFeature.set(
-                feature = ThumbnailsFeature(requireContext(),
+                feature = BrowserThumbnails(requireContext(),
                         engineView,
-                        requireComponents.core.sessionManager),
+                        requireComponents.core.store),
                 owner = this,
                 view = view
         )

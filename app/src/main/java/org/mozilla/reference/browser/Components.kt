@@ -5,6 +5,7 @@
 package org.mozilla.reference.browser
 
 import android.content.Context
+import mozilla.components.browser.thumbnails.ThumbnailsUseCases
 import org.mozilla.reference.browser.components.Core
 import org.mozilla.reference.browser.components.Services
 import org.mozilla.reference.browser.components.Search
@@ -24,7 +25,8 @@ class Components(private val context: Context) {
             core.store,
             core.engine.settings,
             search.searchEngineManager,
-            core.client
+            core.client,
+            core.thumbnailStorage
         )
     }
     val utils by lazy {
