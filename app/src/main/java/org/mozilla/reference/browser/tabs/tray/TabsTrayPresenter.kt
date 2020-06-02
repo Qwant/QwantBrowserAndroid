@@ -1,6 +1,5 @@
 package org.mozilla.reference.browser.tabs.tray
 
-import android.util.Log
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListUpdateCallback
 import kotlinx.coroutines.CoroutineScope
