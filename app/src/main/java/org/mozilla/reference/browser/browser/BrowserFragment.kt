@@ -5,9 +5,11 @@
 package org.mozilla.reference.browser.browser
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import kotlinx.android.synthetic.main.fragment_browser.*
 import kotlinx.android.synthetic.main.fragment_browser.view.*
+import mozilla.components.browser.search.SearchEngine
 import mozilla.components.browser.search.SearchEngineParser
 import mozilla.components.feature.awesomebar.AwesomeBarFeature
 // import mozilla.components.feature.session.ThumbnailsFeature
@@ -28,9 +30,12 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
     private val webExtToolbarFeature = ViewBoundFeatureWrapper<WebExtensionToolbarFeature>()
     private var toolbarSessionObserver: ToolbarSessionObserver? = null
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    private var searchEngine: SearchEngine? = null
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        // TODO move this to core initialisation
         val engineSettings = requireContext().components.core.engine.settings
         if (engineSettings.userAgentString != null)
             if (!engineSettings.userAgentString!!.contains("QwantMobile")) {
@@ -39,16 +44,32 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
         engineSettings.remoteDebuggingEnabled = false
         engineSettings.testingModeEnabled = false
 
+        searchEngine = SearchEngineParser().load("qwant", requireContext().assets.open("opensearch_qwant.xml"))
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        Log.d("QWANT_BROWSER", "Browser fragment - onViewCreated")
+
+        super.onViewCreated(view, savedInstanceState)
+
+        /* val engineSettings = requireContext().components.core.engine.settings
+        if (engineSettings.userAgentString != null)
+            if (!engineSettings.userAgentString!!.contains("QwantMobile")) {
+                engineSettings.userAgentString += " h QwantMobile/4.0"
+            }
+        engineSettings.remoteDebuggingEnabled = false
+        engineSettings.testingModeEnabled = false */
+
         swipeRefresh.isEnabled = false
 
         toolbarSessionObserver = ToolbarSessionObserver(requireContext().components.core.sessionManager, toolbar, swipeRefresh)
         requireContext().components.core.sessionManager.register(this.toolbarSessionObserver!!)
 
-        val searchEngine = SearchEngineParser().load("qwant", requireContext().assets.open("opensearch_qwant.xml"))
+        // val searchEngine = SearchEngineParser().load("qwant", requireContext().assets.open("opensearch_qwant.xml"))
 
         AwesomeBarFeature(awesomeBar, toolbar, engineView)
             .addSearchProvider(
-                searchEngine,
+                searchEngine!!,
                 requireComponents.useCases.searchUseCases.defaultSearch,
                 requireComponents.core.client)
             .addSessionProvider(
@@ -82,8 +103,19 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
         }
     }
 
+    override fun onPause() {
+        super.onPause()
+        requireContext().components.core.sessionManager.unregister(this.toolbarSessionObserver!!)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        requireContext().components.core.sessionManager.register(this.toolbarSessionObserver!!)
+    }
+
     companion object {
         fun create(sessionId: String? = null) = BrowserFragment().apply {
+            Log.d("QWANT_BROWSER", "browser fragment - create")
             arguments = Bundle().apply {
                 putSessionId(sessionId)
             }

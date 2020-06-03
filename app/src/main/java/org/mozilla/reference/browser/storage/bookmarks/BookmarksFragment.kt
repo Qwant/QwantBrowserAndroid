@@ -13,6 +13,7 @@ import android.widget.LinearLayout
 import android.widget.ListView
 import androidx.appcompat.widget.Toolbar
 import mozilla.components.support.base.feature.UserInteractionHandler
+import org.mozilla.reference.browser.BrowserActivity
 import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.browser.BrowserFragment
 
@@ -64,10 +65,11 @@ class BookmarksFragment: Fragment(), UserInteractionHandler {
     }
 
     private fun closeBookmarks() {
-        activity?.supportFragmentManager?.beginTransaction()?.apply {
+        /* activity?.supportFragmentManager?.beginTransaction()?.apply {
             replace(R.id.container, BrowserFragment.create(), "BROWSER_FRAGMENT")
             commit()
-        }
+        } */
+        (activity as BrowserActivity).showBrowserFragment()
         bookmarksClosedCallback?.invoke()
     }
 

@@ -12,6 +12,7 @@ import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
 import androidx.preference.PreferenceManager
 import kotlinx.android.synthetic.main.activity_main.*
 import mozilla.components.browser.session.Session
@@ -49,6 +50,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         BrowserFragment.create(sessionId)
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d("QWANT_BROWSER", "browser activity - onCreate")
         this.loadLocale()
         this.fixHuaweiDefaultContentFilter() // TODO remove this
 
@@ -77,6 +79,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
                     commit()
                 }
             } else {
+                Log.d("QWANT_BROWSER", "browser activity - onCreate - new browser fragment with session")
                 supportFragmentManager.beginTransaction().apply {
                     replace(R.id.container, createBrowserFragment(sessionId), "BROWSER_FRAGMENT")
                     commit()
@@ -117,20 +120,15 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
 
         var savedInterfaceLanguage = prefs.getString(resources.getString(R.string.pref_key_general_language_interface), "undefined")
         val availableLocale = resources.getStringArray(R.array.languages_interface_keys)
-        Log.d("QWANT_BROWSER", "saved interface language: $savedInterfaceLanguage")
-        Log.d("QWANT_BROWSER", "phone language: ${phoneLocale}_$phoneCountry")
         if (savedInterfaceLanguage == "undefined" || !availableLocale.contains(savedInterfaceLanguage)) {
             // First time, set default locale for interface and search
             var interfaceLanguage = "en_GB" // Fallback to english, as android does
-
             if (!availableLocale.contains("${phoneLocale}_$phoneCountry")) {
                 availableLocale.forEach { l -> if (l.startsWith(phoneLocale)) interfaceLanguage = l }
             } else {
                 interfaceLanguage = "${phoneLocale}_$phoneCountry"
             }
-
             prefEditor.putString(resources.getString(R.string.pref_key_general_language_interface), interfaceLanguage)
-
             savedInterfaceLanguage = interfaceLanguage
         }
         if (savedInterfaceLanguage != resources.configuration.locale.language + "_" + resources.configuration.locale.country) {
@@ -254,37 +252,101 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
 
 
     private fun showTabs() {
+        val tag = "TABS_FRAGMENT"
+        var tabsFragment = this.supportFragmentManager.findFragmentByTag(tag)
+        if (tabsFragment == null) {
+            Log.d("QWANT_BROWSER", "showTabs - no tabs fragment available in fragment manager")
+            tabsFragment = TabsTrayFragment()
+        }
         this.supportFragmentManager.beginTransaction().apply {
-            var isPrivate = false
-            if (components.core.sessionManager.selectedSession != null)
-                isPrivate = components.core.sessionManager.selectedSession!!.private
-            replace(R.id.container, TabsTrayFragment(), "TABS_FRAGMENT")
+            this.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
+            replace(R.id.container, tabsFragment, tag)
+            addToBackStack(tag)
             commit()
         }
+        /* } else {
+            Log.d("QWANT_BROWSER", "showTabs - something else !")
+            this.supportFragmentManager.beginTransaction().show(tabsFragment).commit()
+        } */
+        this.supportFragmentManager.executePendingTransactions()
+        /* this.supportFragmentManager.beginTransaction().apply {
+            replace(R.id.container, TabsTrayFragment(), "TABS_FRAGMENT")
+            commit()
+        } */
         qwantbarSessionObserver?.setupHomeBar()
         qwantbar.setHighlight(QwantBar.QwantBarSelection.TABS)
     }
 
     private fun showBookmarks() {
+        // this.replaceFragment(BookmarksFragment)
+        var bookmarksFragment = this.supportFragmentManager.findFragmentByTag("BOOKMARKS_FRAGMENT")
+        if (bookmarksFragment == null) {
+            Log.d("QWANT_BROWSER", "showBookmarks - no bookmarks fragment available in fragment manager")
+            bookmarksFragment = BookmarksFragment()
+        }
         this.supportFragmentManager.beginTransaction().apply {
-            replace(R.id.container, BookmarksFragment(), "BOOKMARKS_FRAGMENT")
+            this.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
+            replace(R.id.container, bookmarksFragment, "BOOKMARKS_FRAGMENT")
+            addToBackStack("BOOKMARKS_FRAGMENT")
             commit()
         }
+        /* } else {
+            Log.d("QWANT_BROWSER", "showBookmarks - something else !")
+            this.supportFragmentManager.beginTransaction().show(bookmarksFragment).commit()
+        } */
+        this.supportFragmentManager.executePendingTransactions()
+        /* this.supportFragmentManager.beginTransaction().apply {
+            replace(R.id.container, BookmarksFragment(), "BOOKMARKS_FRAGMENT")
+            commit()
+        } */
         qwantbarSessionObserver?.setupHomeBar()
         qwantbar.setHighlight(QwantBar.QwantBarSelection.BOOKMARKS)
     }
 
-    private fun showBrowserFragment() {
+    fun showBrowserFragment() {
         var browserFragment = this.supportFragmentManager.findFragmentByTag("BROWSER_FRAGMENT")
-        if (browserFragment == null || browserFragment.isHidden) {
-            if (browserFragment == null) {
-                browserFragment = BrowserFragment.create()
-            }
-            this.supportFragmentManager.beginTransaction().apply {
-                replace(R.id.container, browserFragment, "BROWSER_FRAGMENT")
-                commit()
-            }
+        if (browserFragment == null) {
+            Log.d("QWANT_BROWSER", "showBrowserFragment - no browser fragment available in fragment manager")
+            browserFragment = BrowserFragment.create()
         }
+        this.supportFragmentManager.beginTransaction().apply {
+            this.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
+            replace(R.id.container, browserFragment, "BROWSER_FRAGMENT")
+            addToBackStack("BROWSER_FRAGMENT")
+            commit()
+        }
+        /* } else {
+            Log.d("QWANT_BROWSER", "showBrowserFragment - something else !")
+            this.supportFragmentManager.beginTransaction().show(browserFragment).commit()
+        } */
+        this.supportFragmentManager.executePendingTransactions()
+    }
+
+    fun showSettings() {
+        var settingsFragment = this.supportFragmentManager.findFragmentByTag("SETTINGS_FRAGMENT")
+        if (settingsFragment == null) {
+            Log.d("QWANT_BROWSER", "showSettings - no settings fragment available in fragment manager")
+            settingsFragment = SettingsContainerFragment.create()
+        }
+        this.supportFragmentManager.beginTransaction().apply {
+            this.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
+            replace(R.id.container, settingsFragment, "SETTINGS_FRAGMENT")
+            addToBackStack("SETTINGS_FRAGMENT")
+            commit()
+        }
+        /* } else {
+            Log.d("QWANT_BROWSER", "showSettings - something else !")
+            this.supportFragmentManager.beginTransaction().show(settingsFragment).commit()
+        } */
+        this.supportFragmentManager.executePendingTransactions()
+        // this.replaceFragment(SettingsContainerFragment)
+        /* this.supportFragmentManager.beginTransaction().apply {
+            this.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
+            replace(R.id.container, SettingsContainerFragment.create(), "SETTINGS_FRAGMENT")
+            commit()
+        } */
+        qwantbarSessionObserver?.setupHomeBar()
+        qwantbar.setHighlight(QwantBar.QwantBarSelection.MORE)
     }
 
     private fun showHome() {
@@ -307,16 +369,6 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         this.showBrowserFragment()
 
         qwantbar.setHighlight(QwantBar.QwantBarSelection.SEARCH)
-    }
-
-    fun showSettings() {
-        this.supportFragmentManager.beginTransaction().apply {
-            this.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
-            replace(R.id.container, SettingsContainerFragment.create(), "SETTINGS_FRAGMENT")
-            commit()
-        }
-        qwantbarSessionObserver?.setupHomeBar()
-        qwantbar.setHighlight(QwantBar.QwantBarSelection.MORE)
     }
 
     private fun bookmarksOrTabsOrSettingsClosed() {
@@ -345,5 +397,18 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         super.onRestoreInstanceState(savedInstanceState)
         components.core.historyStorage.run { this.restore() }
         this.bookmarksStorage?.restore()
+    }
+
+    private fun replaceFragment(fragment: Fragment) {
+        val backStateName = fragment.javaClass.name
+        val manager = supportFragmentManager
+        val fragmentPopped: Boolean = manager.popBackStackImmediate(backStateName, 0)
+        if (!fragmentPopped && manager.findFragmentByTag(backStateName) == null) { //fragment not in back stack, create it.
+            val ft = manager.beginTransaction()
+            ft.replace(R.id.container, fragment, backStateName)
+            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+            ft.addToBackStack(backStateName)
+            ft.commit()
+        }
     }
 }

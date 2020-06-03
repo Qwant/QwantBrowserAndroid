@@ -18,6 +18,7 @@ import mozilla.components.support.base.feature.UserInteractionHandler
 import mozilla.components.support.ktx.android.util.dpToPx
 import mozilla.components.support.utils.DrawableUtils
 import mozilla.components.ui.tabcounter.TabCounter
+import org.mozilla.reference.browser.BrowserActivity
 import org.mozilla.reference.browser.QwantUtils
 import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.browser.BrowserFragment
@@ -157,10 +158,11 @@ class TabsTrayFragment: Fragment(), UserInteractionHandler {
         context?.setTheme(if (isPrivate) R.style.ThemeQwantNoActionBarPrivacy else R.style.ThemeQwantNoActionBar)
         qwantbar?.setPrivacyMode(isPrivate)
 
-        activity?.supportFragmentManager?.beginTransaction()?.apply {
+        /* activity?.supportFragmentManager?.beginTransaction()?.apply {
             replace(R.id.container, BrowserFragment.create(), "BROWSER_FRAGMENT")
             commit()
-        }
+        } */
+        (activity as BrowserActivity).showBrowserFragment()
         tabsClosedCallback?.invoke()
     }
 

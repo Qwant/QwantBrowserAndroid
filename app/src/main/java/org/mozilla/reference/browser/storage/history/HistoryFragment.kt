@@ -14,6 +14,7 @@ import android.widget.ListView
 import androidx.appcompat.widget.Toolbar
 import mozilla.components.concept.storage.HistoryStorage
 import mozilla.components.support.base.feature.UserInteractionHandler
+import org.mozilla.reference.browser.BrowserActivity
 import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.browser.BrowserFragment
 
@@ -65,10 +66,11 @@ class HistoryFragment: Fragment(), UserInteractionHandler {
     } */
 
     private fun closeHistory() {
-        activity?.supportFragmentManager?.beginTransaction()?.apply {
+        /* activity?.supportFragmentManager?.beginTransaction()?.apply {
             replace(R.id.container, BrowserFragment.create(), "BROWSER_FRAGMENT")
             commit()
-        }
+        } */
+        (activity as BrowserActivity).showBrowserFragment()
         historyClosedCallback?.invoke()
     }
 
