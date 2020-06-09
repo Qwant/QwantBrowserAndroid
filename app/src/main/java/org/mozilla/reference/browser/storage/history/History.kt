@@ -114,6 +114,10 @@ class History(val context: Context) : HistoryStorage {
         }.take(limit).toList()
     }
 
+    override suspend fun getTopFrecentSites(numItems: Int): List<TopFrecentSiteInfo> {
+        throw UnsupportedOperationException("Pagination is not yet supported by the in-memory history storage")
+    }
+
     override fun getAutocompleteSuggestion(query: String): HistoryAutocompleteResult? = synchronized(pages) {
         segmentAwareDomainMatch(query, pages.keys)?.let { urlMatch ->
             return HistoryAutocompleteResult(
