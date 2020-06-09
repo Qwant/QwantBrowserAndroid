@@ -1,6 +1,5 @@
-package org.mozilla.reference.browser.storage.bookmarks
+package org.mozilla.reference.browser.storage
 
-import org.mozilla.reference.browser.storage.SerializableBitmap
 import java.io.Serializable
 
 class BookmarkItemV1(val title: String, val url: String, val icon: SerializableBitmap? = null) : Serializable {

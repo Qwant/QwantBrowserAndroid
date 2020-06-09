@@ -15,7 +15,7 @@ import androidx.appcompat.widget.Toolbar
 import mozilla.components.support.base.feature.UserInteractionHandler
 import org.mozilla.reference.browser.BrowserActivity
 import org.mozilla.reference.browser.R
-import org.mozilla.reference.browser.browser.BrowserFragment
+import org.mozilla.reference.browser.storage.BookmarkItemV1
 
 /**
  * A fragment for displaying the tabs tray.

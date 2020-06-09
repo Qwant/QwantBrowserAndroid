@@ -13,6 +13,7 @@ import mozilla.components.browser.menu.view.MenuButton
 import mozilla.components.support.ktx.android.content.res.resolveAttribute
 import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.ext.components
+import org.mozilla.reference.browser.storage.BookmarkItemV1
 
 class BookmarksAdapter(
         private val context: Context,
