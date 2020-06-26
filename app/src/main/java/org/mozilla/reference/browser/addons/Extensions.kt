@@ -6,6 +6,7 @@ package org.mozilla.reference.browser.addons
 
 import java.text.NumberFormat
 import java.util.Locale
+import androidx.fragment.app.Fragment
 
 /**
  * Try to find the default language on the map otherwise defaults to "en-US".
@@ -17,4 +18,16 @@ internal fun Map<String, String>.translate(): String {
 
 internal fun getFormattedAmount(amount: Int): String {
     return NumberFormat.getNumberInstance(Locale.getDefault()).format(amount)
+}
+
+
+/**
+ * Run the [block] only if the [Fragment] is attached.
+ *
+ * @param block A callback to be executed if the container [Fragment] is attached.
+ */
+internal inline fun Fragment.runIfFragmentIsAttached(block: () -> Unit) {
+    context?.let {
+        block()
+    }
 }

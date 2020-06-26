@@ -50,11 +50,15 @@ class Core(private val context: Context) {
 
         val defaultSettings = DefaultSettings(
             requestInterceptor = AppRequestInterceptor(context),
-            remoteDebuggingEnabled = prefs.getBoolean(context.getPreferenceKey(pref_key_remote_debugging), false),
+            remoteDebuggingEnabled = false, // prefs.getBoolean(context.getPreferenceKey(pref_key_remote_debugging), false),
             trackingProtectionPolicy = createTrackingProtectionPolicy(prefs),
-            historyTrackingDelegate = HistoryDelegate(lazy { historyStorage })
+            historyTrackingDelegate = HistoryDelegate(lazy { historyStorage }),
+            testingModeEnabled = false,
+            userAgentString = "DEFAULT SETTINGS"
         )
-        EngineProvider.createEngine(context, defaultSettings)
+        EngineProvider.createEngine(context, defaultSettings).apply {
+            clearSpeculativeSession()
+        }
     }
 
     /**
@@ -92,8 +96,7 @@ class Core(private val context: Context) {
             icons.install(engine, store = store)
 
             // Show an ongoing notification when recording devices (camera, microphone) are used by web content
-            RecordingDevicesNotificationFeature(context, sessionManager = this)
-                .enable()
+            RecordingDevicesNotificationFeature(context, sessionManager = this).enable()
 
             // MediaStateMachine.start(this)
 
@@ -101,8 +104,7 @@ class Core(private val context: Context) {
             // media in web content is playing.
             // MediaFeature(context).enable()
 
-            WebNotificationFeature(context, engine, icons, R.drawable.notification_icon,
-                BrowserActivity::class.java)
+            WebNotificationFeature(context, engine, icons, R.drawable.notification_icon, BrowserActivity::class.java)
         }
     }
 

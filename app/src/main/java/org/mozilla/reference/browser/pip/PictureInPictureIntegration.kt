@@ -10,14 +10,16 @@ import android.app.Activity
 import mozilla.components.browser.session.SelectionAwareSessionObserver
 import mozilla.components.browser.session.Session
 import mozilla.components.browser.session.SessionManager
+import mozilla.components.browser.state.store.BrowserStore
 import mozilla.components.feature.session.PictureInPictureFeature
 import mozilla.components.support.base.feature.LifecycleAwareFeature
 
 class PictureInPictureIntegration(
+    store: BrowserStore,
     sessionManager: SessionManager,
     activity: Activity
 ) : LifecycleAwareFeature {
-    private val pictureFeature = PictureInPictureFeature(sessionManager, activity)
+    private val pictureFeature = PictureInPictureFeature(store, activity)
     private val observer = PictureInPictureObserver(sessionManager) { whiteListed = it }
     private var whiteListed = false
 

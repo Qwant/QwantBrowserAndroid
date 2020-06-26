@@ -10,6 +10,7 @@ import mozilla.components.browser.session.SessionManager
 import mozilla.components.browser.state.store.BrowserStore
 import mozilla.components.browser.thumbnails.ThumbnailsUseCases
 import mozilla.components.browser.thumbnails.storage.ThumbnailStorage
+import mozilla.components.concept.engine.Engine
 import mozilla.components.concept.engine.Settings
 import mozilla.components.concept.fetch.Client
 import mozilla.components.feature.contextmenu.ContextMenuUseCases
@@ -29,7 +30,7 @@ class UseCases(
         private val context: Context,
         private val sessionManager: SessionManager,
         private val store: BrowserStore,
-        private val engineSettings: Settings,
+        private val engine: Engine,
         private val searchEngineManager: SearchEngineManager,
         private val client: Client,
         private val thumbnailStorage: ThumbnailStorage
@@ -52,7 +53,7 @@ class UseCases(
     /**
      * Use cases that provide settings management.
      */
-    val settingsUseCases by lazy { SettingsUseCases(engineSettings, sessionManager) }
+    val settingsUseCases by lazy { SettingsUseCases(engine, sessionManager) }
 
     /**
      * Use cases that provide shortcut and progressive web app management.

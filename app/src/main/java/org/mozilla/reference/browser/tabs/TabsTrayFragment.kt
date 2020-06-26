@@ -7,13 +7,18 @@ package org.mozilla.reference.browser.tabs
 import android.content.Context
 import android.content.res.Resources
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.core.content.ContextCompat
 import kotlinx.android.synthetic.main.fragment_tabstray.*
+import mozilla.components.browser.session.Session
 import mozilla.components.browser.session.SessionManager
+import mozilla.components.browser.session.ext.toCustomTabSessionState
+import mozilla.components.browser.session.ext.toTabSessionState
+import mozilla.components.concept.engine.EngineSession
 import mozilla.components.support.base.feature.UserInteractionHandler
 import mozilla.components.support.ktx.android.util.dpToPx
 import mozilla.components.support.utils.DrawableUtils
@@ -124,10 +129,43 @@ class TabsTrayFragment: Fragment(), UserInteractionHandler {
 
         button_new_tab.setOnClickListener((View.OnClickListener {
             if (applicationContext != null) {
+                Log.d("QWANT_BROWSER", "new tab ua top: ${context.components.core.engine.settings.userAgentString} ")
                 if (isPrivate) {
-                    context.components.useCases.tabsUseCases.addPrivateTab.invoke(QwantUtils.getHomepage(applicationContext!!), selectTab = true)
+                    context.components.useCases.tabsUseCases.addPrivateTab.invoke(QwantUtils.getHomepage(applicationContext!!), true, parentId = context.components.core.sessionManager.selectedSession?.id)
                 } else {
-                    context.components.useCases.tabsUseCases.addTab.invoke(QwantUtils.getHomepage(applicationContext!!), selectTab = true)
+                    context.components.useCases.tabsUseCases.addTab.invoke(QwantUtils.getHomepage(applicationContext!!))
+
+                    /* requireContext().components.core.engine.clearSpeculativeSession()
+
+                    val url = QwantUtils.getHomepage(requireContext().applicationContext)
+
+                    val session = Session(url, false)
+                    requireContext().components.core.sessionManager.add(session, selected = true, parent = context.components.core.sessionManager.selectedSession)
+
+                    context.components.core.sessionManager.sessions.forEach {
+                        val ua = context.components.core.sessionManager.getEngineSession(it)?.settings?.userAgentString ?: "no session"
+                        // val ua = it.toTabSessionState().engineState.engineSession?.settings?.userAgentString ?: "no session"
+                        Log.d("QWANT_BROWSER", "Checking UA for session (before) ${it.url} --- $ua")
+                    }
+
+                    val engineSession = requireContext().components.core.sessionManager.getOrCreateEngineSession(session)
+
+                    context.components.core.sessionManager.sessions.forEach {
+                        val ua = context.components.core.sessionManager.getEngineSession(it)?.settings?.userAgentString ?: "no session"
+                        // val ua = it.toTabSessionState().engineState.engineSession?.settings?.userAgentString ?: "no session"
+                        Log.d("QWANT_BROWSER", "Checking UA for session (after) ${it.url} --- $ua")
+                    }
+
+                    engineSession.loadUrl(url)
+                    Log.d("QWANT_BROWSER", "new tab ua bot: ${engineSession.settings.userAgentString}") */
+
+                    /* val url = QwantUtils.getHomepage(requireContext().applicationContext)
+                    val session = Session(url, false)
+
+                    requireContext().components.core.sessionManager.add(session, selected = true)
+                    val engineSession = requireContext().components.core.sessionManager.getOrCreateEngineSession(session)
+                    Log.d("QWANT_BROWSER", "new tab engine ua: ${engineSession.settings.userAgentString}")
+                    engineSession.loadUrl(url) */
                 }
                 this.closeTabsTray()
             }

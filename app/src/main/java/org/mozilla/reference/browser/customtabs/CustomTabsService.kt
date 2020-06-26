@@ -8,8 +8,11 @@ package org.mozilla.reference.browser.customtabs
 
 import mozilla.components.concept.engine.Engine
 import mozilla.components.feature.customtabs.AbstractCustomTabsService
+import mozilla.components.feature.customtabs.store.CustomTabsServiceStore
 import org.mozilla.reference.browser.ext.components
 
 class CustomTabsService : AbstractCustomTabsService() {
+    override val customTabsServiceStore: CustomTabsServiceStore
+        get() = TODO("Not yet implemented")
     override val engine: Engine by lazy { components.core.engine }
 }

@@ -5,6 +5,7 @@
 package org.mozilla.reference.browser
 
 import android.content.Context
+import android.util.Log
 import mozilla.components.browser.errorpages.ErrorPages
 import mozilla.components.browser.errorpages.ErrorType
 import mozilla.components.concept.engine.EngineSession
@@ -12,19 +13,14 @@ import mozilla.components.concept.engine.request.RequestInterceptor
 import org.mozilla.reference.browser.ext.components
 import org.mozilla.reference.browser.tabs.PrivatePage
 
-/**
- * NB, and FIXME: this class is consumed by a 'Core' component group, but itself relies on 'firefoxAccountsFeature'
- * component; this creates a circular dependency, since firefoxAccountsFeature relies on tabsUseCases
- * which in turn needs 'core' itself.
- */
 class AppRequestInterceptor(private val context: Context) : RequestInterceptor {
-    /* override fun onLoadRequest(
+    override fun onLoadRequest(
         engineSession: EngineSession,
         uri: String,
         hasUserGesture: Boolean,
         isSameDomain: Boolean
     ): RequestInterceptor.InterceptionResponse? {
-        return when (uri) {
+        /* return when (uri) {
             "about:privatebrowsing" -> {
                 val page = PrivatePage.createPrivateBrowsingPage(context, uri)
                 RequestInterceptor.InterceptionResponse.Content(page, encoding = "base64")
@@ -35,8 +31,15 @@ class AppRequestInterceptor(private val context: Context) : RequestInterceptor {
                     engineSession, uri, hasUserGesture, isSameDomain
                 )
             }
-        }
-    } */
+        } */
+        /* Log.d("QWANT_BROWSER", "intercept: $uri")
+        if (!engineSession.settings.userAgentString!!.contains("QwantMobile")) {
+            Log.d("QWANT_BROWSER", "rewrite ua for: $uri")
+            engineSession.settings.userAgentString += " INTERCEPT"
+        } */
+
+        return RequestInterceptor.InterceptionResponse.Url(uri)
+    }
 
     override fun onErrorRequest(
         session: EngineSession,

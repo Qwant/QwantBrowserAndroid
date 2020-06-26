@@ -127,12 +127,13 @@
     <string name="settings_privacy_policy">Privacy policy</string>
     <string name="settings_license">License (MPL 2.0)</string>
 
-    <string name="browser_client" translatable="false">brz-huawei</string>
+    <string name="browser_client" translatable="false">qwantbrowser</string>
     <string name="homepage_base" translatable="false">https://www.qwant.com/</string>
     <string name="homepage_startwith_filter" translatable="false">https://www.qwant.com/</string>
     <string name="settings_page_base" translatable="false">https://www.qwant.com/settings</string>
-    <string name="settings_page_startwith_filter" translatable="false">https://www.qwant.com/settings?client=brz-huawei</string>
+    <string name="settings_page_startwith_filter" translatable="false">https://www.qwant.com/settings?client=qwantbrowser</string>
     <string name="privacy_policy_url">https://about.qwant.com/privacy-happ/</string>
+    <!-- <string name="privacy_policy_url">https://about.qwant.com/legal/privacy/</string> -->
 
     <string name="settings_language_english">English</string>
     <string name="settings_language_french">French</string>
