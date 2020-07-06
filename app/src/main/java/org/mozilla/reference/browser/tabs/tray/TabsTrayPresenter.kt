@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.map
 import mozilla.components.browser.state.state.BrowserState
 import mozilla.components.browser.state.state.TabSessionState
 import mozilla.components.browser.state.store.BrowserStore
-import mozilla.components.browser.thumbnails.ThumbnailsUseCases
+// import mozilla.components.browser.thumbnails.ThumbnailsUseCases
 import mozilla.components.concept.tabstray.Tabs
 import mozilla.components.concept.tabstray.TabsTray
 import mozilla.components.lib.state.ext.flowScoped
@@ -23,7 +23,7 @@ import mozilla.components.support.ktx.kotlinx.coroutines.flow.ifChanged
 class TabsTrayPresenter(
         private val tabsTray: TabsTray,
         private val store: BrowserStore,
-        private val thumbnailsUseCases: ThumbnailsUseCases? = null,
+        // private val thumbnailsUseCases: ThumbnailsUseCases? = null,
         internal var tabsFilter: (TabSessionState) -> Boolean,
         private val closeTabsTray: () -> Unit
 ) {

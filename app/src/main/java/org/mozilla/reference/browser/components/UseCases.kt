@@ -8,7 +8,7 @@ import android.content.Context
 import mozilla.components.browser.search.SearchEngineManager
 import mozilla.components.browser.session.SessionManager
 import mozilla.components.browser.state.store.BrowserStore
-import mozilla.components.browser.thumbnails.ThumbnailsUseCases
+// import mozilla.components.browser.thumbnails.ThumbnailsUseCases
 import mozilla.components.browser.thumbnails.storage.ThumbnailStorage
 import mozilla.components.concept.engine.Engine
 import mozilla.components.concept.engine.Settings
@@ -68,10 +68,10 @@ class UseCases(
      */
     val contextMenuUseCases: ContextMenuUseCases by lazy { ContextMenuUseCases(sessionManager, store) }
 
-    val thumbnailUseCases: ThumbnailsUseCases by lazy {
+    /* val thumbnailUseCases: ThumbnailsUseCases by lazy {
         ThumbnailsUseCases(
                 store,
                 thumbnailStorage
         )
-    }
+    } */
 }

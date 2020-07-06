@@ -5,9 +5,7 @@
 package org.mozilla.reference.browser
 
 import android.content.Context
-import mozilla.components.browser.thumbnails.ThumbnailsUseCases
 import org.mozilla.reference.browser.components.Core
-import org.mozilla.reference.browser.components.Services
 import org.mozilla.reference.browser.components.Search
 import org.mozilla.reference.browser.components.Utilities
 import org.mozilla.reference.browser.components.UseCases

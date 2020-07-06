@@ -87,7 +87,7 @@ class TabsTrayFragment: Fragment(), UserInteractionHandler {
                 tabsTray,
                 requireComponents.core.store,
                 requireComponents.useCases.tabsUseCases,
-                requireComponents.useCases.thumbnailUseCases,
+                // requireComponents.useCases.thumbnailUseCases,
                 { it.content.private == isPrivate },
                 ::closeTabsTray)
 
@@ -131,7 +131,8 @@ class TabsTrayFragment: Fragment(), UserInteractionHandler {
             if (applicationContext != null) {
                 Log.d("QWANT_BROWSER", "new tab ua top: ${context.components.core.engine.settings.userAgentString} ")
                 if (isPrivate) {
-                    context.components.useCases.tabsUseCases.addPrivateTab.invoke(QwantUtils.getHomepage(applicationContext!!), true, parentId = context.components.core.sessionManager.selectedSession?.id)
+                    context.components.useCases.tabsUseCases.addPrivateTab.invoke(QwantUtils.getHomepage(applicationContext!!))
+                    // context.components.useCases.tabsUseCases.addPrivateTab.invoke(QwantUtils.getHomepage(applicationContext!!), true, parentId = context.components.core.sessionManager.selectedSession?.id)
                 } else {
                     context.components.useCases.tabsUseCases.addTab.invoke(QwantUtils.getHomepage(applicationContext!!))
 
