@@ -91,7 +91,7 @@ public class Assist extends Activity {
 
         webview = findViewById(R.id.webview);
         webview.getSettings().setJavaScriptEnabled(true);
-        webview.getSettings().setUserAgentString("Mozilla/5.0 (Android 9; Mobile; rv:77.0) Gecko/74.0 Firefox/77.0 h QwantMobile/4.0");
+        webview.getSettings().setUserAgentString("Mozilla/5.0 (Android 10; Mobile; rv:77.0) Gecko/77.0 Firefox/77.0 h QwantMobile/4.0");
 
         // MAPS SETTINGS
         webview.getSettings().setGeolocationEnabled(true);
