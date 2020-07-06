@@ -14,33 +14,6 @@ import org.mozilla.reference.browser.ext.components
 import org.mozilla.reference.browser.tabs.PrivatePage
 
 class AppRequestInterceptor(private val context: Context) : RequestInterceptor {
-    override fun onLoadRequest(
-        engineSession: EngineSession,
-        uri: String,
-        hasUserGesture: Boolean,
-        isSameDomain: Boolean
-    ): RequestInterceptor.InterceptionResponse? {
-        /* return when (uri) {
-            "about:privatebrowsing" -> {
-                val page = PrivatePage.createPrivateBrowsingPage(context, uri)
-                RequestInterceptor.InterceptionResponse.Content(page, encoding = "base64")
-            }
-
-            else -> {
-                context.components.services.appLinksInterceptor.onLoadRequest(
-                    engineSession, uri, hasUserGesture, isSameDomain
-                )
-            }
-        } */
-        /* Log.d("QWANT_BROWSER", "intercept: $uri")
-        if (!engineSession.settings.userAgentString!!.contains("QwantMobile")) {
-            Log.d("QWANT_BROWSER", "rewrite ua for: $uri")
-            engineSession.settings.userAgentString += " INTERCEPT"
-        } */
-
-        return RequestInterceptor.InterceptionResponse.Url(uri)
-    }
-
     override fun onErrorRequest(
         session: EngineSession,
         errorType: ErrorType,

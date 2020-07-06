@@ -135,38 +135,6 @@ class TabsTrayFragment: Fragment(), UserInteractionHandler {
                     // context.components.useCases.tabsUseCases.addPrivateTab.invoke(QwantUtils.getHomepage(applicationContext!!), true, parentId = context.components.core.sessionManager.selectedSession?.id)
                 } else {
                     context.components.useCases.tabsUseCases.addTab.invoke(QwantUtils.getHomepage(applicationContext!!))
-
-                    /* requireContext().components.core.engine.clearSpeculativeSession()
-
-                    val url = QwantUtils.getHomepage(requireContext().applicationContext)
-
-                    val session = Session(url, false)
-                    requireContext().components.core.sessionManager.add(session, selected = true, parent = context.components.core.sessionManager.selectedSession)
-
-                    context.components.core.sessionManager.sessions.forEach {
-                        val ua = context.components.core.sessionManager.getEngineSession(it)?.settings?.userAgentString ?: "no session"
-                        // val ua = it.toTabSessionState().engineState.engineSession?.settings?.userAgentString ?: "no session"
-                        Log.d("QWANT_BROWSER", "Checking UA for session (before) ${it.url} --- $ua")
-                    }
-
-                    val engineSession = requireContext().components.core.sessionManager.getOrCreateEngineSession(session)
-
-                    context.components.core.sessionManager.sessions.forEach {
-                        val ua = context.components.core.sessionManager.getEngineSession(it)?.settings?.userAgentString ?: "no session"
-                        // val ua = it.toTabSessionState().engineState.engineSession?.settings?.userAgentString ?: "no session"
-                        Log.d("QWANT_BROWSER", "Checking UA for session (after) ${it.url} --- $ua")
-                    }
-
-                    engineSession.loadUrl(url)
-                    Log.d("QWANT_BROWSER", "new tab ua bot: ${engineSession.settings.userAgentString}") */
-
-                    /* val url = QwantUtils.getHomepage(requireContext().applicationContext)
-                    val session = Session(url, false)
-
-                    requireContext().components.core.sessionManager.add(session, selected = true)
-                    val engineSession = requireContext().components.core.sessionManager.getOrCreateEngineSession(session)
-                    Log.d("QWANT_BROWSER", "new tab engine ua: ${engineSession.settings.userAgentString}")
-                    engineSession.loadUrl(url) */
                 }
                 this.closeTabsTray()
             }

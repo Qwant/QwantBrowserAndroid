@@ -54,31 +54,6 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         this.loadLocale()
         this.fixHuaweiDefaultContentFilter() // TODO remove this
 
-       /* Log.d("QWANT_BROWSER", "UA - on create")
-        val engineSettings = components.core.engine.settings
-        if (engineSettings.userAgentString != null) {
-            if (!engineSettings.userAgentString!!.contains("QwantMobile")) {
-                Log.d("QWANT_BROWSER", "UA - setting UA")
-                engineSettings.userAgentString += " h QwantMobile/4.0"
-                components.core.engine.clearSpeculativeSession()
-                Log.d("QWANT_BROWSER", "UA - session size: ${components.core.sessionManager.all.size}")
-                components.core.sessionManager.all.forEach {
-                    Log.d("QWANT_BROWSER", "UA - reloading: ${it.url}")
-                    val engineSession = components.core.sessionManager.getEngineSession(it)
-                    if (engineSession != null) engineSession.settings.userAgentString = engineSettings.userAgentString
-                    components.useCases.sessionUseCases.reload(it)
-                    components.useCases.tabsUseCases.addTab
-                }
-            } else {
-                Log.d("QWANT_BROWSER", "UA - 3")
-            }
-        } else {
-            Log.d("QWANT_BROWSER", "UA - 4")
-        } */
-
-        // engineSettings.remoteDebuggingEnabled = false
-        // engineSettings.testingModeEnabled = false
-
         setContentView(R.layout.activity_main)
 
         super.onCreate(savedInstanceState)
