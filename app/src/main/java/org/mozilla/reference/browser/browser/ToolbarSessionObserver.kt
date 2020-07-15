@@ -26,15 +26,12 @@ class ToolbarSessionObserver(
     }
 
     private fun checkSession(url: String) {
-        // Use layout_height instead of visibility to trigger onDependentViewChanged in behaviors !
         if (url.startsWith(toolbar.context.getString(R.string.homepage_base))) {
-            val toolbarParams = toolbar.layoutParams
-            toolbarParams.height = 0
-            toolbar.layoutParams = toolbarParams
+            toolbar.visibility = View.GONE
+            swipeRefresh.setPadding(0, 0, 0, 0)
         } else {
-            val toolbarParams = toolbar.layoutParams
-            toolbarParams.height = 56.dpToPx(Resources.getSystem().displayMetrics)
-            toolbar.layoutParams = toolbarParams
+            toolbar.visibility = View.VISIBLE
+            swipeRefresh.setPadding(0, 56.dpToPx(Resources.getSystem().displayMetrics), 0, 0)
         }
     }
 

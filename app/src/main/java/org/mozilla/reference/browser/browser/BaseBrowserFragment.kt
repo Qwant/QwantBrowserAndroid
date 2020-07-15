@@ -79,9 +79,12 @@ abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler {
         sessionFeature.set(
             feature = QwantSessionFeature(
                 requireContext(),
+                requireComponents.core.store,
                 requireComponents.core.sessionManager,
-                requireComponents.useCases.sessionUseCases,
-                requireComponents.useCases.tabsUseCases,
+                requireComponents.useCases,
+                // requireComponents.useCases.sessionUseCases.goBack,
+                // requireComponents.useCases.tabsUseCases,
+                // requireComponents.useCases.engineSessionUseCases,
                 engineView,
                 sessionId),
             owner = this,
@@ -148,7 +151,7 @@ abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler {
 
         fullScreenFeature.set(
             feature = FullScreenFeature(
-                requireComponents.core.sessionManager,
+                requireComponents.core.store,
                 requireComponents.useCases.sessionUseCases,
                 sessionId, fullScreenChanged = ::fullScreenChanged),
             owner = this,
@@ -189,7 +192,7 @@ abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler {
 
         swipeRefreshFeature.set(
             feature = SwipeRefreshFeature(
-                requireComponents.core.sessionManager,
+                requireComponents.core.store,
                 requireComponents.useCases.sessionUseCases.reload,
                 view.swipeRefresh
             ),

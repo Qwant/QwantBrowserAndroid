@@ -52,10 +52,16 @@ class EngineViewTopBehavior(
      * in/on the [EngineView] or its parent. Must be a direct descending child of [CoordinatorLayout].
      */
     override fun onDependentViewChanged(parent: CoordinatorLayout, child: View, dependency: View): Boolean {
-        if (dependency::class.java.simpleName == "BrowserToolbar") {
-            child.setPadding(0, dependency.layoutParams.height, 0, 0)
+        /* if (dependency::class.java.simpleName == "BrowserToolbar") {
+            if (dependency.visibility == View.GONE) {
+                Log.d("QWANT_BROWSER", "toolbar gone, padding 0")
+                child.setPadding(0, 0, 0, 0)
+            } else {
+                Log.d("QWANT_BROWSER", "toolbar visible, padding 56")
+                child.setPadding(0, 56, 0, 0)
+            }
             return true
-        }
+        } */
         return false
     }
 }
