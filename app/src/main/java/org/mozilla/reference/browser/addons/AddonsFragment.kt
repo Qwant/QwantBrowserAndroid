@@ -61,27 +61,28 @@ class AddonsFragment : Fragment(), AddonsManagerAdapterDelegate {
     }
 
     private fun bindRecyclerView(rootView: View) {
-        recyclerView = rootView.findViewById(R.id.add_ons_list)
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        scope.launch {
-            try {
-                val addons = requireContext().components.core.addonManager.getAddons()
-
-                scope.launch(Dispatchers.Main) {
-                    val adapter = AddonsManagerAdapter(
-                            requireContext().components.core.addonCollectionProvider,
-                            this@AddonsFragment,
-                            addons
-                    )
-                    recyclerView.adapter = adapter
-                }
-            } catch (e: AddonManagerException) {
-                scope.launch(Dispatchers.Main) {
-                    Toast.makeText(
-                            activity,
-                            R.string.mozac_feature_addons_failed_to_query_add_ons,
-                            Toast.LENGTH_SHORT
-                    ).show()
+        runIfFragmentIsAttached {
+            recyclerView = rootView.findViewById(R.id.add_ons_list)
+            recyclerView.layoutManager = LinearLayoutManager(requireContext())
+            scope.launch {
+                try {
+                        val addons = requireContext().components.core.addonManager.getAddons()
+                        scope.launch(Dispatchers.Main) {
+                            val adapter = AddonsManagerAdapter(
+                                    requireContext().components.core.addonCollectionProvider,
+                                    this@AddonsFragment,
+                                    addons
+                            )
+                            recyclerView.adapter = adapter
+                        }
+                } catch (e: AddonManagerException) {
+                    scope.launch(Dispatchers.Main) {
+                        Toast.makeText(
+                                activity,
+                                R.string.mozac_feature_addons_failed_to_query_add_ons,
+                                Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
             }
         }
@@ -131,53 +132,58 @@ class AddonsFragment : Fragment(), AddonsManagerAdapterDelegate {
             return
         }
 
-        val dialog = AddonInstallationDialogFragment.newInstance(
+        runIfFragmentIsAttached {
+            val dialog = AddonInstallationDialogFragment.newInstance(
                 addon = addon,
                 addonCollectionProvider = requireContext().components.core.addonCollectionProvider,
                 onConfirmButtonClicked = { _, allowInPrivateBrowsing ->
                     if (allowInPrivateBrowsing) {
-                        requireContext().components.core.addonManager.setAddonAllowedInPrivateBrowsing(
-                                addon,
-                                allowInPrivateBrowsing
-                        )
+                        runIfFragmentIsAttached {
+                            requireContext().components.core.addonManager.setAddonAllowedInPrivateBrowsing(
+                                    addon,
+                                    allowInPrivateBrowsing
+                            )
+                        }
                     }
                 }
-        )
-
-        if (!isAlreadyADialogCreated() && fragmentManager != null) {
-            dialog.show(requireFragmentManager(), INSTALLATION_DIALOG_FRAGMENT_TAG)
+            )
+            if (!isAlreadyADialogCreated() && fragmentManager != null) {
+                dialog.show(requireFragmentManager(), INSTALLATION_DIALOG_FRAGMENT_TAG)
+            }
         }
     }
 
     private val onPositiveButtonClicked: ((Addon) -> Unit) = { addon ->
-        addonProgressOverlay.visibility = View.VISIBLE
-        isInstallationInProgress = true
-        requireContext().components.core.addonManager.installAddon(
-                addon,
-                onSuccess = {
-                    runIfFragmentIsAttached {
-                        isInstallationInProgress = false
-                        this@AddonsFragment.view?.let { view ->
-                            bindRecyclerView(view)
-                            showInstallationDialog(it)
+        runIfFragmentIsAttached {
+            addonProgressOverlay.visibility = View.VISIBLE
+            isInstallationInProgress = true
+            requireContext().components.core.addonManager.installAddon(
+                    addon,
+                    onSuccess = {
+                        runIfFragmentIsAttached {
+                            isInstallationInProgress = false
+                            this@AddonsFragment.view?.let { view ->
+                                bindRecyclerView(view)
+                                showInstallationDialog(it)
+                            }
+
+                            addonProgressOverlay.visibility = View.GONE
                         }
+                    },
+                    onError = { _, _ ->
+                        runIfFragmentIsAttached {
+                            Toast.makeText(
+                                    requireContext(),
+                                    getString(R.string.mozac_feature_addons_failed_to_install, addon.translatedName),
+                                    Toast.LENGTH_SHORT
+                            ).show()
 
-                        addonProgressOverlay.visibility = View.GONE
+                            addonProgressOverlay.visibility = View.GONE
+                            isInstallationInProgress = false
+                        }
                     }
-                },
-                onError = { _, _ ->
-                    runIfFragmentIsAttached {
-                        Toast.makeText(
-                                requireContext(),
-                                getString(R.string.mozac_feature_addons_failed_to_install, addon.translatedName),
-                                Toast.LENGTH_SHORT
-                        ).show()
-
-                        addonProgressOverlay.visibility = View.GONE
-                        isInstallationInProgress = false
-                    }
-                }
-        )
+            )
+        }
     }
 
     /**
