@@ -7,7 +7,7 @@
     android:orientation="vertical"
     android:theme="@android:style/Theme.Light.NoTitleBar">
 
-    <!-- <androidx.appcompat.widget.Toolbar
+    <androidx.appcompat.widget.Toolbar
         android:id="@+id/history_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -34,7 +34,7 @@
             android:layout_height="100dp"
             android:layout_marginTop="50dp"
             android:layout_marginBottom="50dp"
-            app:srcCompat="@drawable/history_empty_image" />
+            app:srcCompat="@drawable/bookmarks_empty_image" />
 
         <TextView
             android:layout_width="match_parent"
@@ -65,5 +65,5 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="6dp"
-        android:src="@drawable/shadow_gradient" /> -->
+        android:src="@drawable/shadow_gradient" />
 </LinearLayout>

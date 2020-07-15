@@ -12,22 +12,24 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.ListView
 import androidx.appcompat.widget.Toolbar
-import mozilla.components.concept.storage.HistoryStorage
+import mozilla.components.concept.storage.VisitInfo
 import mozilla.components.support.base.feature.UserInteractionHandler
 import org.mozilla.reference.browser.BrowserActivity
 import org.mozilla.reference.browser.R
-import org.mozilla.reference.browser.browser.BrowserFragment
+import kotlinx.coroutines.*
+import org.mozilla.reference.browser.ext.components
 
 /**
  * A fragment for displaying the tabs tray.
  */
 class HistoryFragment: Fragment(), UserInteractionHandler {
-    private var historyStorage: HistoryStorage? = null
-    fun setHistoryStorage(historyStorage: HistoryStorage) { this.historyStorage = historyStorage }
     private var historyClosedCallback: (() -> Unit)? = null
     fun setHistoryClosedCallback(cb: () -> Unit) { this.historyClosedCallback = cb }
 
-   //  private var adapter: HistoryAdapter? = null
+    private val mainScope = MainScope()
+
+    private var visits = listOf<VisitInfo>()
+    private var adapter: HistoryAdapter? = null
 
     var listview: ListView? = null
     var layoutNoResult: LinearLayout? = null
@@ -35,7 +37,7 @@ class HistoryFragment: Fragment(), UserInteractionHandler {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val view: View = inflater.inflate(R.layout.fragment_history, container, false)
 
-        /* val toolbar: Toolbar = view.findViewById(R.id.history_toolbar)
+        val toolbar: Toolbar = view.findViewById(R.id.history_toolbar)
         toolbar.title = context?.getString(R.string.history)
         toolbar.setNavigationOnClickListener {
             this.onBackPressed()
@@ -44,16 +46,22 @@ class HistoryFragment: Fragment(), UserInteractionHandler {
         listview = view.findViewById(R.id.history_listview)
         layoutNoResult = view.findViewById(R.id.history_noresult_layout)
 
-        if (historyStorage != null) adapter = HistoryAdapter(this.context!!, bookmarksStorage!!, ::bookmarkSelected)
-        historyStorage?.onChange(::storageChanged)
+        adapter = HistoryAdapter(context!!, visits, ::historyItemSelected)
         listview!!.adapter = adapter
 
-        if (historyStorage?.count() == 0) {
-            listview!!.visibility = View.GONE
-            layoutNoResult!!.visibility = View.VISIBLE
-        } */
+        loadVisits(0, 100)
 
         return view
+    }
+
+    private fun loadVisits(min: Long, max: Long, append: Boolean = true) {
+        mainScope.launch {
+            if (context != null) {
+                val newVisits = context!!.components.core.historyStorage.getDetailedVisits(min, max)
+                visits = if (append) visits + newVisits else newVisits
+                storageChanged()
+            }
+        }
     }
 
     override fun onBackPressed(): Boolean {
@@ -61,27 +69,23 @@ class HistoryFragment: Fragment(), UserInteractionHandler {
         return true
     }
 
-    /* private fun bookmarkSelected(item: BookmarkItemV1) {
-        this.closeBookmarks()
-    } */
+    private fun historyItemSelected(item: VisitInfo) {
+        this.closeHistory()
+    }
 
     private fun closeHistory() {
-        /* activity?.supportFragmentManager?.beginTransaction()?.apply {
-            replace(R.id.container, BrowserFragment.create(), "BROWSER_FRAGMENT")
-            commit()
-        } */
         (activity as BrowserActivity).showBrowserFragment()
         historyClosedCallback?.invoke()
     }
 
     private fun storageChanged() {
-        /* adapter?.notifyDataSetChanged()
-        if (historyStorage == null || historyStorage!!.count() == 0) {
+        adapter?.notifyDataSetChanged()
+        if (visits.isEmpty()) {
             listview!!.visibility = View.GONE
             layoutNoResult!!.visibility = View.VISIBLE
         } else {
             listview!!.visibility = View.VISIBLE
             layoutNoResult!!.visibility = View.GONE
-        } */
+        }
     }
 }

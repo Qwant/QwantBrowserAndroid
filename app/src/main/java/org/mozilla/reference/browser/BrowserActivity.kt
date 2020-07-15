@@ -29,6 +29,7 @@ import org.mozilla.reference.browser.layout.QwantBar
 import org.mozilla.reference.browser.settings.SettingsContainerFragment
 import org.mozilla.reference.browser.storage.bookmarks.BookmarksFragment
 import org.mozilla.reference.browser.storage.bookmarks.BookmarksStorage
+import org.mozilla.reference.browser.storage.history.HistoryFragment
 import org.mozilla.reference.browser.tabs.TabsTrayFragment
 import org.mozilla.reference.browser.tabs.tray.BrowserTabsTray
 import java.util.*
@@ -70,6 +71,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         qwantbar.onHomeClicked(::showHome)
         qwantbar.onMenuClicked(::showSettings)
         qwantbar.onBackClicked(::onBackPressed)
+        qwantbar.onHistoryClicked(::showHistory)
 
         if (savedInstanceState == null) {
             if (intent.action == "CHANGED_LANGUAGE") {
@@ -197,11 +199,14 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
                     isPrivate = components.core.sessionManager.selectedSession!!.private
                 fragment.setPrivacy(isPrivate)
                 fragment.setQwantBar(qwantbar)
-                fragment.setTabsClosedCallback(::bookmarksOrTabsOrSettingsClosed)
+                fragment.setTabsClosedCallback(::fragmentClosed)
             }
             is BookmarksFragment -> {
                 if (bookmarksStorage != null) fragment.setBookmarkStorage(bookmarksStorage!!)
-                fragment.setBookmarksClosedCallback(::bookmarksOrTabsOrSettingsClosed)
+                fragment.setBookmarksClosedCallback(::fragmentClosed)
+            }
+            is HistoryFragment -> {
+                fragment.setHistoryClosedCallback(::fragmentClosed)
             }
         }
     }
@@ -322,6 +327,21 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         this.supportFragmentManager.executePendingTransactions()
     }
 
+    fun showHistory() {
+        var historyFragment = this.supportFragmentManager.findFragmentByTag("HISTORY_FRAGMENT")
+        if (historyFragment == null) {
+            Log.d("QWANT_BROWSER", "showHistoryFragment - no browser fragment available in fragment manager")
+            historyFragment = HistoryFragment()
+        }
+        this.supportFragmentManager.beginTransaction().apply {
+            this.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
+            replace(R.id.container, historyFragment, "HISTORY_FRAGMENT")
+            addToBackStack("HISTORY_FRAGMENT")
+            commit()
+        }
+        this.supportFragmentManager.executePendingTransactions()
+    }
+
     fun showSettings() {
         var settingsFragment = this.supportFragmentManager.findFragmentByTag("SETTINGS_FRAGMENT")
         if (settingsFragment == null) {
@@ -371,7 +391,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         qwantbar.setHighlight(QwantBar.QwantBarSelection.SEARCH)
     }
 
-    private fun bookmarksOrTabsOrSettingsClosed() {
+    private fun fragmentClosed() {
         val session: Session? = components.core.sessionManager.selectedSession
         if (session == null || session.url.startsWith(baseContext.getString(R.string.homepage_base))) {
             qwantbar.setHighlight(QwantBar.QwantBarSelection.SEARCH)
@@ -384,7 +404,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
     }
 
     override fun settingsClosed() {
-        bookmarksOrTabsOrSettingsClosed()
+        fragmentClosed()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

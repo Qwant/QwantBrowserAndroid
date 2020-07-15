@@ -49,6 +49,7 @@ class QwantBar @JvmOverloads constructor(
     private val homeCallbacks: MutableList<() -> Unit> = mutableListOf()
     private val menuCallbacks: MutableList<() -> Unit> = mutableListOf()
     private val backCallbacks: MutableList<() -> Unit> = mutableListOf()
+    private val historyCallbacks: MutableList<() -> Unit> = mutableListOf()
 
     private var tabButtonBox: ImageView? = null
     private var tabButtonBar: ImageView? = null
@@ -156,6 +157,14 @@ class QwantBar @JvmOverloads constructor(
                 this.emitOnBookmarksClicked()
             },
 
+            /* BrowserMenuImageText(
+                    context.getString(R.string.history),
+                    textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
+                    imageResource = R.drawable.ic_bookmark
+            ) {
+                this.emitOnHistoryClicked()
+            }, */
+
             BrowserMenuImageText(
                     context.getString(R.string.settings),
                     textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
@@ -222,6 +231,7 @@ class QwantBar @JvmOverloads constructor(
     fun onHomeClicked(callback: () -> Unit) { homeCallbacks.add(callback) }
     fun onMenuClicked(callback: () -> Unit) { menuCallbacks.add(callback) }
     fun onBackClicked(callback: () -> Unit) { backCallbacks.add(callback) }
+    fun onHistoryClicked(callback: () -> Unit) { historyCallbacks.add(callback) }
 
     private var currentSelection: QwantBarSelection = QwantBarSelection.SEARCH
 
@@ -305,6 +315,12 @@ class QwantBar @JvmOverloads constructor(
 
     private fun emitOnBookmarksClicked() {
         bookmarksCallbacks.forEach {
+            it.invoke()
+        }
+    }
+
+    private fun emitOnHistoryClicked() {
+        historyCallbacks.forEach {
             it.invoke()
         }
     }

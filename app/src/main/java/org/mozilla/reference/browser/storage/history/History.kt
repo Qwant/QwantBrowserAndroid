@@ -60,7 +60,32 @@ class History(val context: Context) : HistoryStorage {
     }
 
     override suspend fun getVisitsPaginated(offset: Long, count: Long, excludeTypes: List<VisitType>): List<VisitInfo> {
-        throw UnsupportedOperationException("Pagination is not yet supported by the in-memory history storage")
+        val visits = mutableListOf<VisitInfo>()
+
+        var i = 0
+        val endIndex = offset + count
+
+        val sortedPages = pages.toList().sortedBy { (_, allVisits) ->
+            allVisits.sortByDescending { visit -> visit.timestamp }
+            allVisits[0].timestamp
+        }.toMap()
+
+        sortedPages.forEach {
+            if (i in offset until endIndex) {
+                it.value.sortByDescending { visit -> visit.timestamp }
+                visits.add(VisitInfo(
+                    url = it.key,
+                    title = pageMeta[it.key]?.title,
+                    visitTime = it.value[0].timestamp,
+                    visitType = it.value[0].type
+                ))
+            } else if (i >= endIndex) {
+                return visits
+            }
+            i++
+        }
+
+        return visits
     }
 
     override suspend fun getDetailedVisits(

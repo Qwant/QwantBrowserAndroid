@@ -102,6 +102,10 @@
     <string name="context_menu_add_bookmark">Add to bookmarks</string>
     <string name="context_menu_del_bookmark">Delete bookmark</string>
 
+    <string name="history">History</string>
+    <string name="history_empty_1">History is empty</string>
+    <string name="history_empty_2">Visited pages will show up here</string>
+
     <string name="settings_main">Qwant Settings</string>
 
     <string name="settings_general">General</string>
