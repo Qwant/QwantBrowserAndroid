@@ -6,14 +6,21 @@ package org.mozilla.reference.browser
 
 import android.content.Context
 import android.util.Log
-import mozilla.components.browser.errorpages.ErrorPages
 import mozilla.components.browser.errorpages.ErrorType
 import mozilla.components.concept.engine.EngineSession
 import mozilla.components.concept.engine.request.RequestInterceptor
-import org.mozilla.reference.browser.ext.components
-import org.mozilla.reference.browser.tabs.PrivatePage
 
 class AppRequestInterceptor(private val context: Context) : RequestInterceptor {
+    /* override fun onLoadRequest(engineSession: EngineSession, uri: String, hasUserGesture: Boolean, isSameDomain: Boolean, isRedirect: Boolean, isDirectNavigation: Boolean): RequestInterceptor.InterceptionResponse? {
+        Log.d("QWANT_BROWSER", "INTERCEPT: ${engineSession.settings.userAgentString}")
+        /* if (!engineSession.settings.userAgentString!!.contains("QwantMobile")) {
+            Log.d("QWANT_BROWSER", "rewrite ua for: $uri")
+            engineSession.settings.userAgentString += " INTERCEPT"
+        } */
+        engineSession.settings.userAgentString += " INTERCEPT"
+        return super.onLoadRequest(engineSession, uri, hasUserGesture, isSameDomain, isRedirect, isDirectNavigation)
+    } */
+
     override fun onErrorRequest(
         session: EngineSession,
         errorType: ErrorType,
