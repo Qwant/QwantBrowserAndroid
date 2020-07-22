@@ -48,7 +48,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
      * Returns a new instance of [BrowserFragment] to display.
      */
     open fun createBrowserFragment(sessionId: String?): Fragment =
-        BrowserFragment.create(sessionId)
+            BrowserFragment.create(sessionId)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d("QWANT_BROWSER", "browser activity - onCreate")
@@ -160,7 +160,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
     }
 
     override fun onBackPressed() {
-        val sessionManager  = components.core.sessionManager
+        val sessionManager = components.core.sessionManager
         if (sessionManager.selectedSession != null) {
             val url = components.core.sessionManager.selectedSession!!.url
             if (!sessionManager.selectedSession!!.canGoBack && sessionManager.selectedSession!!.source.name == "ACTION_VIEW") {
@@ -228,10 +228,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         } else {
             sessionManager.selectedSession
         }) ?: return
-
-        if (session.source == Session.Source.ACTION_VIEW || session.source == Session.Source.CUSTOM_TAB) {
-            sessionManager.remove(session)
-        }
+        sessionManager.remove(session)
     }
 
     override fun onUserLeaveHint() {
@@ -255,6 +252,10 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
             else -> super.onCreateView(parent, name, context, attrs)
         }
 
+
+    fun fullScreenChanged(enabled: Boolean) {
+        qwantbar.visibility = if (enabled) View.GONE else View.VISIBLE
+    }
 
     private fun showTabs() {
         val tag = "TABS_FRAGMENT"

@@ -69,7 +69,7 @@ class UseCases(
     /**
      * Uses cases that provides context menu
      */
-    val contextMenuUseCases: ContextMenuUseCases by lazy { ContextMenuUseCases(sessionManager, store) }
+    val contextMenuUseCases: ContextMenuUseCases by lazy { ContextMenuUseCases(store) }
 
     /* val thumbnailUseCases: ThumbnailsUseCases by lazy {
         ThumbnailsUseCases(

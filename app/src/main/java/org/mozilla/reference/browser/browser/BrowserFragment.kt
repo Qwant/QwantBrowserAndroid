@@ -4,6 +4,7 @@
 
 package org.mozilla.reference.browser.browser
 
+import android.content.res.Resources
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -13,6 +14,7 @@ import mozilla.components.browser.search.SearchEngine
 import mozilla.components.browser.search.SearchEngineManager
 import mozilla.components.browser.search.SearchEngineParser
 import mozilla.components.browser.session.Session
+import mozilla.components.browser.state.selector.selectedTab
 import mozilla.components.feature.awesomebar.AwesomeBarFeature
 // import mozilla.components.feature.session.ThumbnailsFeature
 import mozilla.components.browser.thumbnails.BrowserThumbnails
@@ -20,7 +22,10 @@ import mozilla.components.concept.engine.EngineSession
 import mozilla.components.feature.toolbar.WebExtensionToolbarFeature
 import mozilla.components.support.base.feature.UserInteractionHandler
 import mozilla.components.support.base.feature.ViewBoundFeatureWrapper
+import mozilla.components.support.ktx.android.util.dpToPx
+import org.mozilla.reference.browser.BrowserActivity
 import org.mozilla.reference.browser.QwantUtils
+import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.ext.components
 import org.mozilla.reference.browser.ext.requireComponents
 
@@ -137,6 +142,27 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
     override fun onResume() {
         super.onResume()
         requireContext().components.core.sessionManager.register(this.toolbarSessionObserver!!)
+    }
+
+    override fun fullScreenChanged(enabled: Boolean) {
+        (activity as BrowserActivity).fullScreenChanged(enabled)
+        if (enabled) {
+            toolbar.visibility = View.GONE
+            swipeRefresh.setPadding(0, 0, 0, 0)
+        } else {
+            toolbar.visibility = View.VISIBLE
+            swipeRefresh.setPadding(0, 56.dpToPx(Resources.getSystem().displayMetrics), 0, 0)
+        }
+    }
+
+    override fun onPictureInPictureModeChanged(enabled: Boolean) {
+        val session = requireComponents.core.store.state.selectedTab
+        val fullScreenMode = session?.content?.fullScreen ?: false
+        // If we're exiting PIP mode and we're in fullscreen mode, then we should exit fullscreen mode as well.
+        if (!enabled && fullScreenMode) {
+            onBackPressed()
+            fullScreenChanged(false)
+        }
     }
 
     companion object {

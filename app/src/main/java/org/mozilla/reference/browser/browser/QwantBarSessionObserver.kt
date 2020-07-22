@@ -148,10 +148,6 @@ class QwantBarSessionObserver(
         checkSession(url)
     }
 
-    override fun onFullScreenChanged(session: Session, enabled: Boolean) {
-        qwantbar.visibility = if (enabled) View.GONE else View.VISIBLE
-    }
-
     override fun onNavigationStateChanged(session: Session, canGoBack: Boolean, canGoForward: Boolean) {
         super.onNavigationStateChanged(session, canGoBack, canGoForward)
         if (sessionManager.selectedSession != null && session.id == sessionManager.selectedSession!!.id) {

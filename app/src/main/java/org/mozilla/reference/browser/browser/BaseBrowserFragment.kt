@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
 import kotlinx.android.synthetic.main.fragment_browser.*
 import kotlinx.android.synthetic.main.fragment_browser.view.*
+import mozilla.components.browser.state.selector.selectedTab
 import mozilla.components.feature.downloads.DownloadsFeature
 import mozilla.components.feature.downloads.manager.FetchDownloadManager
 import mozilla.components.feature.findinpage.view.FindInPageView
@@ -201,8 +202,8 @@ abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler {
         )
     }
 
-    private fun fullScreenChanged(enabled: Boolean) {
-        if (enabled) {
+    open fun fullScreenChanged(enabled: Boolean) {
+        /* if (enabled) {
             val toolbarParams = toolbar.layoutParams
             toolbarParams.height = 0
             toolbar.layoutParams = toolbarParams
@@ -210,7 +211,7 @@ abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler {
             val toolbarParams = toolbar.layoutParams
             toolbarParams.height = 56.dpToPx(Resources.getSystem().displayMetrics)
             toolbar.layoutParams = toolbarParams
-        }
+        } */
     }
 
     @CallSuper
@@ -224,15 +225,15 @@ abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler {
         return pictureInPictureIntegration.get()?.onHomePressed() ?: false
     }
 
-    final override fun onPictureInPictureModeChanged(enabled: Boolean) {
-        val session = requireComponents.core.sessionManager.selectedSession
-        val fullScreenMode = session?.fullScreenMode ?: false
+    /* override fun onPictureInPictureModeChanged(enabled: Boolean) {
+        val session = requireComponents.core.store.state.selectedTab
+        val fullScreenMode = session?.content?.fullScreen ?: false
         // If we're exiting PIP mode and we're in fullscreen mode, then we should exit fullscreen mode as well.
         if (!enabled && fullScreenMode) {
             onBackPressed()
             fullScreenChanged(false)
         }
-    }
+    } */
 
     final override fun onRequestPermissionsResult(
         requestCode: Int,
