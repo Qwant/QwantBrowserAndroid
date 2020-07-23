@@ -65,10 +65,6 @@ class BookmarksFragment: Fragment(), UserInteractionHandler {
     }
 
     private fun closeBookmarks() {
-        /* activity?.supportFragmentManager?.beginTransaction()?.apply {
-            replace(R.id.container, BrowserFragment.create(), "BROWSER_FRAGMENT")
-            commit()
-        } */
         (activity as BrowserActivity).showBrowserFragment()
         bookmarksClosedCallback?.invoke()
     }

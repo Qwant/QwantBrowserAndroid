@@ -1,5 +1,7 @@
 package org.mozilla.reference.browser.storage.bookmarks
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -26,9 +28,6 @@ class BookmarksAdapter(
             private val selectedCallback: (bookmarkItem: BookmarkItemV1) -> Unit,
             private val context: Context
     ) : RecyclerView.ViewHolder(item_layout) {
-        private val MAX_TITLE_LENGTH = 35
-        private val MAX_URL_LENGTH = 40
-
         private var itemIcon: ImageView = item_layout.findViewById(R.id.bookmark_item_icon)
         private var itemTitle: TextView = item_layout.findViewById(R.id.bookmark_title)
         private var itemUrl: TextView = item_layout.findViewById(R.id.bookmark_url)
@@ -71,7 +70,9 @@ class BookmarksAdapter(
                         textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
                         imageResource = R.drawable.ic_ctmenu_clipboard
                 ) {
-                    // TODO Copy url to clipboard
+                    val clipboard: ClipboardManager? = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
+                    val clip = ClipData.newPlainText("Copied URL", bookmarkItem.url)
+                    clipboard?.primaryClip = clip
                 },
                 BrowserMenuImageText(
                         context.getString(R.string.bookmarks_delete),
@@ -81,6 +82,11 @@ class BookmarksAdapter(
                     bookmarkStorage.deleteBookmark(bookmarkItem)
                 }
             ))
+        }
+
+        companion object {
+            private const val MAX_TITLE_LENGTH = 35
+            private const val MAX_URL_LENGTH = 40
         }
     }
 
