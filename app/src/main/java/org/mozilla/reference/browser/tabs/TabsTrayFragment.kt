@@ -14,12 +14,15 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.core.content.ContextCompat
 import kotlinx.android.synthetic.main.fragment_tabstray.*
+import mozilla.components.browser.menu.BrowserMenuBuilder
+import mozilla.components.browser.menu.item.BrowserMenuImageText
 import mozilla.components.browser.session.Session
 import mozilla.components.browser.session.SessionManager
 import mozilla.components.browser.session.ext.toCustomTabSessionState
 import mozilla.components.browser.session.ext.toTabSessionState
 import mozilla.components.concept.engine.EngineSession
 import mozilla.components.support.base.feature.UserInteractionHandler
+import mozilla.components.support.ktx.android.content.res.resolveAttribute
 import mozilla.components.support.ktx.android.util.dpToPx
 import mozilla.components.support.utils.DrawableUtils
 import mozilla.components.ui.tabcounter.TabCounter
@@ -94,6 +97,7 @@ class TabsTrayFragment: Fragment(), UserInteractionHandler {
         // tabsFeature?.filterTabs { it.content.private == isPrivate }
 
         val context = requireContext()
+
         if (isPrivate) {
             button_new_tab.background = ContextCompat.getDrawable(context, R.drawable.purple_gradient)
             button_new_tab.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_privacy_mask_white, 0, 0, 0)
@@ -115,6 +119,17 @@ class TabsTrayFragment: Fragment(), UserInteractionHandler {
         }
 
         // tabsHeader.inflateMenu(R.menu.tabstray_menu)
+
+        tab_menu_more.setColorFilter(ContextCompat.getColor(context, R.color.menu_items))
+        tab_menu_more.menuBuilder = BrowserMenuBuilder(listOf(
+            BrowserMenuImageText(
+                context.getString(R.string.menu_action_close_tabs),
+                textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
+                imageResource = R.drawable.ic_del_bookmark
+            ) {
+                context.components.useCases.tabsUseCases.removeAllTabs.invoke()
+            }
+        ))
 
         back_tabs_button.setOnClickListener((View.OnClickListener {
             this.onBackPressed()

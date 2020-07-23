@@ -48,6 +48,7 @@
         app:navigationIcon="@drawable/ic_back" />
 
     <RelativeLayout
+        android:id="@+id/relative_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toTopOf="@+id/tabsTray"
@@ -97,6 +98,12 @@
             android:layout_alignEnd="@+id/tab_switch_button_background"
             app:srcCompat="@drawable/ic_privacy_mask_white" />
 
+        <mozilla.components.browser.menu.view.MenuButton
+            android:id="@+id/tab_menu_more"
+            android:layout_width="64dp"
+            android:layout_height="48dp"
+            android:layout_alignParentEnd="true"
+            android:src="@drawable/ic_nav_menu" />
     </RelativeLayout>
 
     <ImageView
