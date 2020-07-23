@@ -30,7 +30,6 @@ import org.mozilla.reference.browser.EngineProvider
 import org.mozilla.reference.browser.storage.history.History
 import org.mozilla.reference.browser.ext.getPreferenceKey
 import org.mozilla.reference.browser.R
-import org.mozilla.reference.browser.R.string.pref_key_remote_debugging
 import org.mozilla.reference.browser.R.string.pref_key_tracking_protection_normal
 import org.mozilla.reference.browser.R.string.pref_key_tracking_protection_private
 import java.util.concurrent.TimeUnit
@@ -54,7 +53,7 @@ class Core(private val context: Context) {
             trackingProtectionPolicy = createTrackingProtectionPolicy(prefs),
             historyTrackingDelegate = HistoryDelegate(lazy { historyStorage }),
             testingModeEnabled = false,
-            userAgentString = "Mozilla/5.0 (Android 10; Mobile; rv:77.0) Gecko/77.0 Firefox/77.0 h QwantMobile/4.0"
+            userAgentString = "Mozilla/5.0 (Android 10; Mobile; rv:77.0) Gecko/77.0 Firefox/77.0 QwantMobile/4.0"
         )
         EngineProvider.createEngine(context, defaultSettings).apply {
             clearSpeculativeSession()
@@ -119,7 +118,7 @@ class Core(private val context: Context) {
      */
     val historyStorage by lazy { History(context).apply {
         this.restore()
-        this.setup_auto_persist(30000)
+        this.setupAutoPersist(30000)
     } }
         /* val h = History(context)
         // h.load_from_storage()
