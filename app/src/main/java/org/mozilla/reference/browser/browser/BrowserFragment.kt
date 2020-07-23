@@ -11,21 +11,15 @@ import android.view.View
 import kotlinx.android.synthetic.main.fragment_browser.*
 import kotlinx.android.synthetic.main.fragment_browser.view.*
 import mozilla.components.browser.search.SearchEngine
-import mozilla.components.browser.search.SearchEngineManager
-import mozilla.components.browser.search.SearchEngineParser
-import mozilla.components.browser.session.Session
 import mozilla.components.browser.state.selector.selectedTab
 import mozilla.components.feature.awesomebar.AwesomeBarFeature
-// import mozilla.components.feature.session.ThumbnailsFeature
 import mozilla.components.browser.thumbnails.BrowserThumbnails
-import mozilla.components.concept.engine.EngineSession
 import mozilla.components.feature.toolbar.WebExtensionToolbarFeature
 import mozilla.components.support.base.feature.UserInteractionHandler
 import mozilla.components.support.base.feature.ViewBoundFeatureWrapper
 import mozilla.components.support.ktx.android.util.dpToPx
 import org.mozilla.reference.browser.BrowserActivity
 import org.mozilla.reference.browser.QwantUtils
-import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.ext.components
 import org.mozilla.reference.browser.ext.requireComponents
 
@@ -36,51 +30,15 @@ import org.mozilla.reference.browser.ext.requireComponents
 class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
     private val thumbnailsFeature = ViewBoundFeatureWrapper<BrowserThumbnails>()
     private val webExtToolbarFeature = ViewBoundFeatureWrapper<WebExtensionToolbarFeature>()
-    private var toolbarSessionObserver: ToolbarSessionObserver? = null
-
-    private var searchEngine: SearchEngine? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        // TODO move this to core initialisation
-        /*val engineSettings = requireContext().components.core.engine.settings
-        if (engineSettings.userAgentString != null)
-            if (!engineSettings.userAgentString!!.contains("QwantMobile")) {
-                engineSettings.userAgentString += " h QwantMobile/4.0"
-            }
-        engineSettings.remoteDebuggingEnabled = false
-        engineSettings.testingModeEnabled = false */
-
-        // searchEngine = SearchEngineParser().load("qwant", requireContext().assets.open("opensearch_qwant.xml"))
-    }
+    // private var toolbarSessionObserver: ToolbarSessionObserver? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        /* Log.d("QWANT_BROWSER", "UA - view created")
-        val engineSettings = requireContext().components.core.engine.settings
-        if (engineSettings.userAgentString != null) {
-            Log.d("QWANT_BROWSER", "UA - 1")
-            if (!engineSettings.userAgentString!!.contains("QwantMobile")) {
-                Log.d("QWANT_BROWSER", "UA - 2")
-                engineSettings.userAgentString += " h QwantMobile/4.0"
-            } else {
-                Log.d("QWANT_BROWSER", "UA - 3")
-            }
-        } else {
-            Log.d("QWANT_BROWSER", "UA - 4")
-        } */
-        // engineSettings.remoteDebuggingEnabled = false
-        // engineSettings.testingModeEnabled = false
-        // requireContext().components.core.sessionManager.getEngineSession(requireContext().components.core.sessionManager.selectedSession!!)!!.settings.userAgentString
 
         swipeRefresh.isEnabled = false
 
         // toolbarSessionObserver = ToolbarSessionObserver(requireContext().components.core.sessionManager, toolbar, swipeRefresh)
         // requireContext().components.core.sessionManager.register(this.toolbarSessionObserver!!)
-
-        // val searchEngine = SearchEngineParser().load("qwant", requireContext().assets.open("opensearch_qwant.xml"))
 
         AwesomeBarFeature(awesomeBar, toolbar, engineView)
             .addSearchProvider(
@@ -115,22 +73,6 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
 
         if (requireContext().components.core.sessionManager.sessions.none { !it.private }) {
             requireContext().components.useCases.tabsUseCases.addTab.invoke(QwantUtils.getHomepage(requireContext().applicationContext))
-
-            /* requireContext().components.useCases.tabsUseCases.addTab.invoke(QwantUtils.getHomepage(requireContext().applicationContext), selectTab = true)
-            val engineSession: EngineSession = requireContext().components.core.sessionManager.getOrCreateEngineSession()
-            Log.d("QWANT_BROWSER", "First tab engine ua: ${engineSession.settings.userAgentString}")
-            requireContext().components.useCases.sessionUseCases.reload()
-            Log.d("QWANT_BROWSER", "First tab reloaded") */
-
-            /* val url = QwantUtils.getHomepage(requireContext().applicationContext)
-            val session = Session(url, false)
-
-            requireContext().components.core.sessionManager.add(session, selected = true)
-            val engineSession = requireContext().components.core.sessionManager.getOrCreateEngineSession(session)
-            Log.d("QWANT_BROWSER", "First tab engine ua: ${engineSession.settings.userAgentString}")
-            engineSession.loadUrl(url) */
-
-            // engineSession.reload()
         }
     }
 
