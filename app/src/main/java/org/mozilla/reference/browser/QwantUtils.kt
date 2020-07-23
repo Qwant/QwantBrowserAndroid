@@ -36,9 +36,9 @@ class QwantUtils {
                 .append("&r=").append(r)
                 .append("&s=").append(s)
                 .append("&hc=").append(if (hc) "1" else "0")
+                .append("&b=").append("0")
                 // TODO
                 // .append("&a=").append(enableSuggest)
-                // .append("&b=").append("0")
                 // .append("&t=").append(theme)
 
             if (widget) builder.append("&widget=1")
