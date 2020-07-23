@@ -68,8 +68,8 @@
     <string name="addon_permissions_dialog_add">Añadir</string>
     <string name="addon_permissions_dialog_cancel">Cancelar</string>
 
-    <string name="privacy_policy_url">https://about.qwant.com/privacy-happ/</string>
-    <!-- <string name="privacy_policy_url">https://about.qwant.com/legal/privacy/</string> -->
+    <!-- <string name="privacy_policy_url">https://about.qwant.com/privacy-happ/</string> -->
+    <string name="privacy_policy_url">https://about.qwant.com/legal/privacy/</string>
 
     <string name="assist_recent_search">BUSQUEDAS RECIENTES</string>
     <string name="assist_on_this_device">EN ESTE DISPOSITIVO</string>

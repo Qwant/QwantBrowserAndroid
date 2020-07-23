@@ -77,8 +77,8 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
 
         swipeRefresh.isEnabled = false
 
-        toolbarSessionObserver = ToolbarSessionObserver(requireContext().components.core.sessionManager, toolbar, swipeRefresh)
-        requireContext().components.core.sessionManager.register(this.toolbarSessionObserver!!)
+        // toolbarSessionObserver = ToolbarSessionObserver(requireContext().components.core.sessionManager, toolbar, swipeRefresh)
+        // requireContext().components.core.sessionManager.register(this.toolbarSessionObserver!!)
 
         // val searchEngine = SearchEngineParser().load("qwant", requireContext().assets.open("opensearch_qwant.xml"))
 
@@ -134,7 +134,7 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
         }
     }
 
-    override fun onPause() {
+    /* override fun onPause() {
         super.onPause()
         requireContext().components.core.sessionManager.unregister(this.toolbarSessionObserver!!)
     }
@@ -142,7 +142,7 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
     override fun onResume() {
         super.onResume()
         requireContext().components.core.sessionManager.register(this.toolbarSessionObserver!!)
-    }
+    } */
 
     override fun fullScreenChanged(enabled: Boolean) {
         (activity as BrowserActivity).fullScreenChanged(enabled)
