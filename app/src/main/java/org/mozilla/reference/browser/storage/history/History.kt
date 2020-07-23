@@ -65,7 +65,7 @@ class History(val context: Context) : HistoryStorage {
         var i = 0
         val endIndex = offset + count
 
-        val sortedPages = pages.toList().sortedBy { (_, allVisits) ->
+        val sortedPages = pages.toList().sortedByDescending { (_, allVisits) ->
             allVisits.sortByDescending { visit -> visit.timestamp }
             allVisits[0].timestamp
         }.toMap()
@@ -200,7 +200,7 @@ class History(val context: Context) : HistoryStorage {
         // GC will take care of our internal data structures, so there's nothing to do here.
     }
 
-    fun setup_auto_persist(delayMs: Long = 20000) {
+    fun setupAutoPersist(delayMs: Long = 20000) {
         Log.d("QWANT_BROWSER", "autopersist history setup")
         val mainHandler = Handler(Looper.getMainLooper())
         mainHandler.post(object : Runnable {

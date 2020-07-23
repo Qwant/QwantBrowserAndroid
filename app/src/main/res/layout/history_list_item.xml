@@ -10,15 +10,15 @@
     android:paddingTop="8dp"
     android:paddingBottom="8dp">
 
-    <ImageView
-        android:id="@+id/bookmark_item_icon"
+    <!-- <ImageView
+        android:id="@+id/history_item_icon"
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_gravity="center"
-        android:src="@drawable/ic_bookmark_default_fav" />
+        android:src="@drawable/ic_bookmark_default_fav" /> -->
 
     <LinearLayout
-        android:id="@+id/bookmark_item_layout_text"
+        android:id="@+id/history_item_layout_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
@@ -27,7 +27,7 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/bookmark_title"
+            android:id="@+id/history_item_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
@@ -35,7 +35,7 @@
             android:textSize="15sp" />
 
         <TextView
-            android:id="@+id/bookmark_url"
+            android:id="@+id/history_item_url"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
@@ -44,19 +44,31 @@
 
     </LinearLayout>
 
-    <!-- <ImageButton
-        android:id="@+id/bookmark_item_delete"
+    <TextView
+        android:id="@+id/history_item_hour"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_weight="0"
-        android:background="@android:color/transparent"
-        android:src="@drawable/ic_trash"/> -->
+        android:gravity="center_vertical"
+        android:textColor="@color/menu_items"
+        android:paddingEnd="4dp"
+        android:textSize="12sp" />
 
     <mozilla.components.browser.menu.view.MenuButton
-        android:id="@+id/bookmark_item_menu_button"
+        android:id="@+id/history_item_menu_button"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:src="@drawable/ic_nav_menu"
         />
+
+    <TextView
+        android:id="@+id/history_item_date_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:textColor="@color/menu_items"
+        android:textSize="18sp"
+        android:fontFamily="@font/asap_bold"
+        android:visibility="gone" />
+
 
 </LinearLayout>

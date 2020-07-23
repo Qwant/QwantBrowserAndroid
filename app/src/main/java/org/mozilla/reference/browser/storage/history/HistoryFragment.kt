@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.ListView
+import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import mozilla.components.concept.storage.VisitInfo
 import mozilla.components.support.base.feature.UserInteractionHandler
@@ -18,6 +19,7 @@ import org.mozilla.reference.browser.BrowserActivity
 import org.mozilla.reference.browser.R
 import kotlinx.coroutines.*
 import org.mozilla.reference.browser.ext.components
+import java.util.*
 
 /**
  * A fragment for displaying the tabs tray.
@@ -28,13 +30,19 @@ class HistoryFragment: Fragment(), UserInteractionHandler {
 
     private val mainScope = MainScope()
 
-    private var visits = listOf<VisitInfo>()
+    private var visits = mutableListOf<HistoryAdapter.HistoryItem>()
     private var adapter: HistoryAdapter? = null
 
-    var listview: ListView? = null
-    var layoutNoResult: LinearLayout? = null
+    private var currentLoadedIndex: Long = 0
+
+    private var listview: ListView? = null
+    private var clearAll: TextView? = null
+    private var layoutNoResult: LinearLayout? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        loadVisits(0, HISTORY_PAGE_SIZE, false)
+        currentLoadedIndex = HISTORY_PAGE_SIZE
+
         val view: View = inflater.inflate(R.layout.fragment_history, container, false)
 
         val toolbar: Toolbar = view.findViewById(R.id.history_toolbar)
@@ -44,24 +52,85 @@ class HistoryFragment: Fragment(), UserInteractionHandler {
         }
 
         listview = view.findViewById(R.id.history_listview)
+        clearAll = view.findViewById(R.id.history_clear_all)
         layoutNoResult = view.findViewById(R.id.history_noresult_layout)
 
-        adapter = HistoryAdapter(context!!, visits, ::historyItemSelected)
+        adapter = HistoryAdapter(context!!, ::historyItemSelected, ::reload, ::loadMore)
         listview!!.adapter = adapter
 
-        loadVisits(0, 100)
+        val clearAll: TextView = view.findViewById(R.id.history_clear_all)
+        clearAll.setOnClickListener {
+            MainScope().launch {
+                context?.components?.core?.historyStorage?.deleteEverything()
+                reload()
+            }
+        }
 
         return view
     }
 
-    private fun loadVisits(min: Long, max: Long, append: Boolean = true) {
+    private fun loadVisits(min: Long, count: Long, append: Boolean = true) {
         mainScope.launch {
             if (context != null) {
-                val newVisits = context!!.components.core.historyStorage.getDetailedVisits(min, max)
-                visits = if (append) visits + newVisits else newVisits
-                storageChanged()
+                if (!append) visits = mutableListOf()
+                else {
+                    val last = visits.last()
+                    if (last.isLoadMore) {
+                        visits.remove(last)
+                    }
+                }
+
+                val newVisits = context!!.components.core.historyStorage.getVisitsPaginated(min, count)
+                val calendar = Calendar.getInstance()
+                calendar.time = Date()
+                val todayDayOfYear = calendar.get(Calendar.DAY_OF_YEAR)
+
+                val lastItem = visits.findLast { !it.isTitle }
+                var lastTitleDateOfYear = if (lastItem?.visit != null) {
+                    calendar.time = Date(lastItem.visit.visitTime)
+                    calendar.get(Calendar.DAY_OF_YEAR)
+                } else {
+                    null
+                }
+
+                newVisits.forEach {
+                    calendar.time = Date(it.visitTime)
+                    if (lastTitleDateOfYear == null || calendar.get(Calendar.DAY_OF_YEAR) != lastTitleDateOfYear) {
+                        val dateString = when (todayDayOfYear - calendar.get(Calendar.DAY_OF_YEAR)) {
+                            0 -> "Today"
+                            1 -> "Yesterday"
+                            else -> calendar.get(Calendar.DAY_OF_MONTH).toString() + "/" + calendar.get(Calendar.MONTH).toString()
+                        }
+                        visits.add(HistoryAdapter.HistoryItem(null, dateString, true))
+                        lastTitleDateOfYear = calendar.get(Calendar.DAY_OF_YEAR)
+                    }
+                    visits.add(HistoryAdapter.HistoryItem(it))
+                }
+
+                if (visits.isEmpty()) {
+                    listview?.visibility = View.GONE
+                    clearAll?.visibility = View.GONE
+                    layoutNoResult?.visibility = View.VISIBLE
+                } else {
+                    if (newVisits.size == count.toInt()) {
+                        visits.add(HistoryAdapter.HistoryItem(null, "Load more", isTitle = true, isLoadMore = true))
+                    }
+                    adapter?.setVisits(visits)
+                    listview?.visibility = View.VISIBLE
+                    clearAll?.visibility = View.VISIBLE
+                    layoutNoResult?.visibility = View.GONE
+                }
             }
         }
+    }
+
+    private fun loadMore() {
+        this.loadVisits(currentLoadedIndex, HISTORY_PAGE_SIZE, true)
+        currentLoadedIndex += HISTORY_PAGE_SIZE
+    }
+
+    private fun reload() {
+        this.loadVisits(0, currentLoadedIndex, false)
     }
 
     override fun onBackPressed(): Boolean {
@@ -78,14 +147,7 @@ class HistoryFragment: Fragment(), UserInteractionHandler {
         historyClosedCallback?.invoke()
     }
 
-    private fun storageChanged() {
-        adapter?.notifyDataSetChanged()
-        if (visits.isEmpty()) {
-            listview!!.visibility = View.GONE
-            layoutNoResult!!.visibility = View.VISIBLE
-        } else {
-            listview!!.visibility = View.VISIBLE
-            layoutNoResult!!.visibility = View.GONE
-        }
+    companion object {
+        private const val HISTORY_PAGE_SIZE: Long = 2
     }
 }
