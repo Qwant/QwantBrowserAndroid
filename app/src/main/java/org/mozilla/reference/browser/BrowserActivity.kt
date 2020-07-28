@@ -163,10 +163,11 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         val sessionManager = components.core.sessionManager
         if (sessionManager.selectedSession != null) {
             val url = components.core.sessionManager.selectedSession!!.url
+            Log.d("QWANT_BROWSER","back with intent ${sessionManager.selectedSession!!.source.name}")
             if (!sessionManager.selectedSession!!.canGoBack && sessionManager.selectedSession!!.source.name == "ACTION_VIEW") {
                 // Tab has been opened from external app, so we close the app to get back to it, after closing the tab
-                super.onBackPressed()
                 sessionManager.remove(sessionManager.selectedSession!!)
+                this.finish()
                 return
             } else if (url.startsWith(getString(R.string.homepage_startwith_filter)) && url.contains("&o=")) {
                 // Fix for closing qwant opened medias with back button
