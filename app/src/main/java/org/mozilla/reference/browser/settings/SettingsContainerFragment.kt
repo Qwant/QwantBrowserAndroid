@@ -30,6 +30,8 @@ class SettingsContainerFragment: Fragment(), UserInteractionHandler {
     override fun onAttachFragment(childFragment: Fragment) {
         if (childFragment is BaseSettingsFragment) {
             childFragment.setSettingsContainerFragment(this)
+        } else if (childFragment is ClearDataFragment) {
+            childFragment.setSettingsContainerFragment(this)
         }
     }
 

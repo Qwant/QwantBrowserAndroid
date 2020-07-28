@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="30dp">
+    <androidx.appcompat.widget.AppCompatCheckBox
+        android:id="@+id/cleardata_check_allsites"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/cleardata_allsites"
+        android:textSize="16sp"
+        android:fontFamily="@font/asap"
+        android:textColor="@color/qwant_main" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginStart="20dp" >
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/cleardata_check_cache"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/cleardata_cache"
+            android:textSize="16sp"
+            android:fontFamily="@font/asap"
+            android:textColor="@color/qwant_main" />
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/cleardata_check_cookies"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/cleardata_cookies"
+            android:textSize="16sp"
+            android:fontFamily="@font/asap"
+            android:textColor="@color/qwant_main" />
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/cleardata_check_sessions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/cleardata_sessions"
+            android:textSize="16sp"
+            android:fontFamily="@font/asap"
+            android:textColor="@color/qwant_main" />
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/cleardata_check_permissions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/cleardata_permissions"
+            android:textSize="16sp"
+            android:fontFamily="@font/asap"
+            android:textColor="@color/qwant_main" />
+    </LinearLayout>
+    <androidx.appcompat.widget.AppCompatCheckBox
+        android:id="@+id/cleardata_check_history"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/history"
+        android:textSize="16sp"
+        android:fontFamily="@font/asap"
+        android:textColor="@color/qwant_main" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/cleardata_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="@string/settings_privacy_clear_data"
+        android:textColor="@color/photonWhite"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:layout_marginTop="20dp"/>
+</LinearLayout>

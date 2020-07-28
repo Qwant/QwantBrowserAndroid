@@ -24,5 +24,16 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory
+        android:title="@string/settings_privacy_personal_data"
+        android:paddingLeft="0dp" >
+
+        <org.mozilla.reference.browser.settings.QwantPreference
+            android:key="@string/pref_key_privacy_cleardata"
+            android:title="@string/settings_privacy_clear_data"
+            android:widgetLayout="@layout/preference_arrowed_widget"
+            app:iconSpaceReserved="false" />
+
+    </PreferenceCategory>
 
 </androidx.preference.PreferenceScreen>

@@ -30,6 +30,8 @@ class PrivacySettingsFragment: BaseSettingsFragment(){
         prefTrackingProtectionPrivate.onPreferenceChangeListener = getChangeListenerForTrackingProtection { enabled ->
             requireComponents.core.createTrackingProtectionPolicy(privateMode = enabled)
         }
+
+        findPreference(context?.getPreferenceKey(R.string.pref_key_privacy_cleardata)).onPreferenceClickListener = getPreferenceLinkListener(ClearDataFragment(), "SETTINGS_PRIVACY_CLEARALL_FRAGMENT")
     }
 
     private fun getChangeListenerForTrackingProtection(
