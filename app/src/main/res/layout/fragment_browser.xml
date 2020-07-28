@@ -25,6 +25,7 @@
         android:id="@+id/swipeRefresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginTop="56dp"
         app:layout_behavior="org.mozilla.reference.browser.layout.EngineViewTopBehavior">
         <mozilla.components.concept.engine.EngineView
             android:id="@+id/engineView"
