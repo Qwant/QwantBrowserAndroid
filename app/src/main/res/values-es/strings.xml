@@ -165,6 +165,15 @@
     <string name="settings_privacy_policy">Política de privacidad</string>
     <string name="settings_license">Licencia (MPL 2.0)</string>
 
+    <string name="settings_privacy_clear_data">Borrar datos</string>
+    <string name="settings_privacy_personal_data">Información personal</string>
+    <string name="cleardata_allsites">Datos de todos los sitios</string>
+    <string name="cleardata_cache">Caché</string>
+    <string name="cleardata_cookies">Cookies</string>
+    <string name="cleardata_sessions">Sesión</string>
+    <string name="cleardata_permissions">Permisos</string>
+    <string name="cleardata_done">Los datos se han eliminado</string>
+
     <string name="context_menu_forward">Adelante</string>
     <string name="context_menu_refresh">Actualizar</string>
     <string name="context_menu_stop">Detener</string>
@@ -175,6 +184,14 @@
     <string name="context_menu_addons">Add-ons</string>
     <string name="context_menu_add_bookmark">Añadir marcador</string>
     <string name="context_menu_del_bookmark">Eliminar marcador</string>
+
+    <string name="history">Historial</string>
+    <string name="history_empty_1">El historial está vacío</string>
+    <string name="history_empty_2">Las páginas visitadas aparecerán aquí</string>
+    <string name="history_clear_all">Borrar todo</string>
+    <string name="history_today">Hoy</string>
+    <string name="history_yesterday">Ayer</string>
+    <string name="history_load_more">Cargar más</string>
 
     <!-- Text shown in the toolbar if it is empty -->
     <string name="toolbar_hint">@string/qwant_widget_text</string>

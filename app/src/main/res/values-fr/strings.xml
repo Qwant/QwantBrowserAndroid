@@ -176,6 +176,22 @@
     <string name="settings_privacy_policy">Politique de confidentialité</string>
     <string name="settings_license">Licence (MPL 2.0)</string>
 
+    <string name="settings_privacy_clear_data">Effacer les données</string>
+    <string name="settings_privacy_personal_data">Données personnelles</string>
+    <string name="cleardata_allsites">Données des sites</string>
+    <string name="cleardata_cache">Cache</string>
+    <string name="cleardata_cookies">Cookies</string>
+    <string name="cleardata_sessions">Sessions</string>
+    <string name="cleardata_permissions">Permissions</string>
+    <string name="cleardata_done">Les données ont été supprimées</string>
+
+    <string name="history">Historique</string>
+    <string name="history_empty_1">L\'historique est vide</string>
+    <string name="history_empty_2">Les pages visitées apparaîtrons ici</string>
+    <string name="history_clear_all">Tout supprimer</string>
+    <string name="history_today">Aujourd\'hui</string>
+    <string name="history_yesterday">Hier</string>
+    <string name="history_load_more">Plus de résultats</string>
 
     <!-- Text shown in the toolbar if it is empty -->
     <string name="toolbar_hint">@string/qwant_widget_text</string>

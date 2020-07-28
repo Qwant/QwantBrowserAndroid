@@ -133,8 +133,8 @@ class HistoryAdapter(
         }
 
         companion object {
-            private const val MAX_TITLE_LENGTH = 45
-            private const val MAX_URL_LENGTH = 50
+            private const val MAX_TITLE_LENGTH = 40
+            private const val MAX_URL_LENGTH = 45
         }
     }
 

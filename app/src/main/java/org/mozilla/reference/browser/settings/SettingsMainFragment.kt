@@ -5,6 +5,8 @@
 package org.mozilla.reference.browser.settings
 
 import android.os.Bundle
+import androidx.preference.Preference
+import org.mozilla.reference.browser.BrowserActivity
 import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.browser.BrowserFragment
 import org.mozilla.reference.browser.ext.getPreferenceKey
@@ -20,6 +22,11 @@ class SettingsMainFragment: BaseSettingsFragment() {
         findPreference(context?.getPreferenceKey(R.string.pref_key_general)).onPreferenceClickListener = getPreferenceLinkListener(SettingsGeneralFragment(), "SETTINGS_GENERAL_FRAGMENT")
         // findPreference(context?.getPreferenceKey(pref_key_interface)).onPreferenceClickListener = getPreferenceLinkListener(SettingsInterfaceFragment(), "SETTINGS_INTERFACE_FRAGMENT")
         findPreference(context?.getPreferenceKey(R.string.pref_key_about_menu)).onPreferenceClickListener = getPreferenceLinkListener(AboutMenuFragment(), "SETTINGS_ABOUTMENU_FRAGMENT")
+
+        findPreference(context?.getPreferenceKey(R.string.pref_key_history)).onPreferenceClickListener = Preference.OnPreferenceClickListener {
+            (activity as BrowserActivity).showHistory()
+            true
+        }
     }
 
     override fun onBackPressed(): Boolean {

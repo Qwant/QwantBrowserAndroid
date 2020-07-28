@@ -167,6 +167,22 @@
     <string name="settings_privacy_policy">Informativa sulla privacy</string>
     <string name="settings_license">Licenza (MPL 2.0)</string>
 
+    <string name="settings_privacy_clear_data">Cancella Dati</string>
+    <string name="settings_privacy_personal_data">Dati personali</string>
+    <string name="cleardata_allsites">Dati di tutti i siti</string>
+    <string name="cleardata_cache">Cache</string>
+    <string name="cleardata_cookies">Cookie</string>
+    <string name="cleardata_sessions">Sessione</string>
+    <string name="cleardata_permissions">Permessi</string>
+
+    <string name="history">Cronologia</string>
+    <string name="history_empty_1">La cronologia è vuota</string>
+    <string name="history_empty_2">Le pagine visitate verranno visualizzate qui</string>
+    <string name="history_clear_all">Elimina tutto</string>
+    <string name="history_today">Oggi</string>
+    <string name="history_yesterday">Ieri</string>
+    <string name="history_load_more">Carica altro</string>
+    <string name="cleardata_done">I dati sono stati cancellati</string>
 
     <string name="context_menu_forward">Inoltra</string>
     <string name="context_menu_refresh">Ricarica</string>

@@ -160,7 +160,7 @@ class QwantBar @JvmOverloads constructor(
             BrowserMenuImageText(
                     context.getString(R.string.history),
                     textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
-                    imageResource = R.drawable.ic_bookmark
+                    imageResource = R.drawable.ic_history
             ) {
                 this.emitOnHistoryClicked()
             },

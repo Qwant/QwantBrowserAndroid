@@ -97,8 +97,8 @@ class HistoryFragment: Fragment(), UserInteractionHandler {
                     calendar.time = Date(it.visitTime)
                     if (lastTitleDateOfYear == null || calendar.get(Calendar.DAY_OF_YEAR) != lastTitleDateOfYear) {
                         val dateString = when (todayDayOfYear - calendar.get(Calendar.DAY_OF_YEAR)) {
-                            0 -> "Today"
-                            1 -> "Yesterday"
+                            0 -> context?.getString(R.string.history_today)
+                            1 -> context?.getString(R.string.history_yesterday)
                             else -> calendar.get(Calendar.DAY_OF_MONTH).toString() + "/" + calendar.get(Calendar.MONTH).toString()
                         }
                         visits.add(HistoryAdapter.HistoryItem(null, dateString, true))
@@ -113,7 +113,7 @@ class HistoryFragment: Fragment(), UserInteractionHandler {
                     layoutNoResult?.visibility = View.VISIBLE
                 } else {
                     if (newVisits.size == count.toInt()) {
-                        visits.add(HistoryAdapter.HistoryItem(null, "Load more", isTitle = true, isLoadMore = true))
+                        visits.add(HistoryAdapter.HistoryItem(null, context?.getString(R.string.history_load_more), isTitle = true, isLoadMore = true))
                     }
                     adapter?.setVisits(visits)
                     listview?.visibility = View.VISIBLE
@@ -148,6 +148,6 @@ class HistoryFragment: Fragment(), UserInteractionHandler {
     }
 
     companion object {
-        private const val HISTORY_PAGE_SIZE: Long = 2
+        private const val HISTORY_PAGE_SIZE: Long = 50
     }
 }
