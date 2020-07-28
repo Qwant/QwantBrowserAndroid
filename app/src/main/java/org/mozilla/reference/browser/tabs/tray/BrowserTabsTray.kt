@@ -49,7 +49,7 @@ class BrowserTabsTray @JvmOverloads constructor(
                         attr.getColor(R.styleable.BrowserTabsTray_tabsTraySelectedItemBackgroundColor, DEFAULT_ITEM_BACKGROUND_SELECTED_COLOR),
                         attr.getColor(R.styleable.BrowserTabsTray_tabsTrayItemTextColor, DEFAULT_ITEM_TEXT_COLOR),
                         attr.getColor(R.styleable.BrowserTabsTray_tabsTraySelectedItemTextColor, DEFAULT_ITEM_TEXT_SELECTED_COLOR),
-                        attr.getDimensionPixelSize(R.styleable.BrowserTabsTray_tabsTrayItemElevation, 0).toFloat()
+                        4.dpToPx(resources.displayMetrics).toFloat()  // attr.getDimensionPixelSize(context.getat, 0).toFloat()
                 )
                 attr.recycle()
         }

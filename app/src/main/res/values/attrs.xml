@@ -28,4 +28,5 @@
     <attr name="toolbarBackgroundColor" format="reference|color" />
     <attr name="toolbarUrlBoxColor" format="reference|color" />
 
+    <attr name="tabsTrayItemElevation" format="reference|dimension" />
 </resources>
