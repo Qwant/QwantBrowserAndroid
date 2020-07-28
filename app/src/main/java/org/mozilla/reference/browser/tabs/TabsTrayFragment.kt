@@ -125,7 +125,7 @@ class TabsTrayFragment: Fragment(), UserInteractionHandler {
             BrowserMenuImageText(
                 context.getString(R.string.menu_action_close_tabs),
                 textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
-                imageResource = R.drawable.ic_del_bookmark
+                imageResource = R.drawable.icon_cross
             ) {
                 context.components.useCases.tabsUseCases.removeAllTabs.invoke()
             }
