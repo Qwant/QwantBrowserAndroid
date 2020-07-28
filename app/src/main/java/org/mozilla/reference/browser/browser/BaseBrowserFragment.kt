@@ -6,6 +6,7 @@ package org.mozilla.reference.browser.browser
 
 import android.content.Intent
 import android.content.res.Resources
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -154,7 +155,9 @@ abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler {
             feature = FullScreenFeature(
                 requireComponents.core.store,
                 requireComponents.useCases.sessionUseCases,
-                sessionId, fullScreenChanged = ::fullScreenChanged),
+                tabId = sessionId,
+                viewportFitChanged = ::viewportFitChanged,
+                fullScreenChanged = ::fullScreenChanged),
             owner = this,
             view = view)
 
@@ -202,17 +205,13 @@ abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler {
         )
     }
 
-    open fun fullScreenChanged(enabled: Boolean) {
-        /* if (enabled) {
-            val toolbarParams = toolbar.layoutParams
-            toolbarParams.height = 0
-            toolbar.layoutParams = toolbarParams
-        } else {
-            val toolbarParams = toolbar.layoutParams
-            toolbarParams.height = 56.dpToPx(Resources.getSystem().displayMetrics)
-            toolbar.layoutParams = toolbarParams
-        } */
+    private fun viewportFitChanged(viewportFit: Int) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            requireActivity().window.attributes.layoutInDisplayCutoutMode = viewportFit
+        }
     }
+
+    open fun fullScreenChanged(enabled: Boolean) {}
 
     @CallSuper
     override fun onBackPressed(): Boolean {

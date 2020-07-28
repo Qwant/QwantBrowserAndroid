@@ -5,21 +5,29 @@
 package org.mozilla.reference.browser.browser
 
 import android.content.res.Resources
+import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
+import androidx.core.view.WindowInsetsCompat
 import kotlinx.android.synthetic.main.fragment_browser.*
 import kotlinx.android.synthetic.main.fragment_browser.view.*
-import mozilla.components.browser.search.SearchEngine
 import mozilla.components.browser.state.selector.selectedTab
-import mozilla.components.feature.awesomebar.AwesomeBarFeature
 import mozilla.components.browser.thumbnails.BrowserThumbnails
+import mozilla.components.feature.awesomebar.AwesomeBarFeature
 import mozilla.components.feature.toolbar.WebExtensionToolbarFeature
 import mozilla.components.support.base.feature.UserInteractionHandler
 import mozilla.components.support.base.feature.ViewBoundFeatureWrapper
+import mozilla.components.support.ktx.android.content.getColorFromAttr
 import mozilla.components.support.ktx.android.util.dpToPx
+import mozilla.components.support.ktx.android.view.enterToImmersiveMode
+import mozilla.components.support.ktx.android.view.exitImmersiveModeIfNeeded
 import org.mozilla.reference.browser.BrowserActivity
 import org.mozilla.reference.browser.QwantUtils
+import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.ext.components
 import org.mozilla.reference.browser.ext.requireComponents
 
@@ -91,9 +99,22 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
         if (enabled) {
             toolbar.visibility = View.GONE
             swipeRefresh.setPadding(0, 0, 0, 0)
+            activity?.enterToImmersiveMode()
         } else {
             toolbar.visibility = View.VISIBLE
             swipeRefresh.setPadding(0, 56.dpToPx(Resources.getSystem().displayMetrics), 0, 0)
+            activity?.exitImmersiveModeIfNeeded()
+
+            // Restore system UI colors
+            activity?.window?.statusBarColor = requireContext().getColorFromAttr(R.attr.qwant_color_background_dark)
+            activity?.window?.navigationBarColor = requireContext().getColorFromAttr(R.attr.qwant_color_background_dark)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                var flags = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    flags = flags or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+                }
+                activity?.window?.decorView?.systemUiVisibility = flags
+            }
         }
     }
 
