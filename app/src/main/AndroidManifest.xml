@@ -153,6 +153,11 @@
         </service> -->
 
         <service android:name=".downloads.DownloadService" />
+
+        <provider android:name="org.mozilla.reference.browser.compat.BrowserProvider"
+            android:authorities="com.qwant.liberty.db.browser"
+            android:enabled="true"
+            android:exported="false" />
     </application>
 
 </manifest>

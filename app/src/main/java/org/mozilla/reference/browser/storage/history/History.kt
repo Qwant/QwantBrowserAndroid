@@ -5,9 +5,15 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import androidx.annotation.VisibleForTesting
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 import mozilla.components.concept.storage.*
 import mozilla.components.support.utils.StorageUtils.levenshteinDistance
 import mozilla.components.support.utils.segmentAwareDomainMatch
+import org.mozilla.gecko.GeckoProfile
+import org.mozilla.reference.browser.compat.BrowserContract
+import org.mozilla.reference.browser.compat.LocalBrowserDB
+import org.mozilla.reference.browser.ext.components
 import java.io.*
 import java.util.*
 
@@ -38,6 +44,24 @@ class History(val context: Context) : HistoryStorage {
                 pages[uri] = mutableListOf(Visit(now, visit.visitType))
             } else {
                 pages[uri]!!.add(Visit(now, visit.visitType))
+            }
+        }
+    }
+
+    fun recordVisit(uri: String, visit: PageVisit, timestamp: Long) {
+        if (visit.redirectSource != RedirectSource.NOT_A_SOURCE) {
+            return
+        }
+
+        if (uri.startsWith("https://www.qwant.com")) {
+            return
+        }
+
+        synchronized(pages) {
+            if (!pages.containsKey(uri)) {
+                pages[uri] = mutableListOf(Visit(timestamp, visit.visitType))
+            } else {
+                pages[uri]!!.add(Visit(timestamp, visit.visitType))
             }
         }
     }

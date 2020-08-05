@@ -236,6 +236,9 @@ dependencies {
     implementation Deps.androidx_work_runtime_ktx
     implementation Deps.androidx_fragment
     implementation Deps.google_material
+    implementation Deps.androidx_annotation
+    implementation Deps.androidx_loader
+    implementation Deps.androidx_localbroadcastmanager
 
     androidTestImplementation Deps.uiautomator
 

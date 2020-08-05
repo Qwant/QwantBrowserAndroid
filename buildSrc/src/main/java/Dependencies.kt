@@ -8,6 +8,9 @@ private object Versions {
     const val coroutines = "1.0.1"
 
     const val androidx_appcompat = "1.0.2"
+    const val androidx_annotation = "1.1.0"
+    const val androidx_loader = "1.1.0"
+    const val androidx_localbroadcastmanager = "1.0.0"
     const val androidx_constraintlayout = "1.1.3"
     const val androidx_preference = "1.0.0"
 
@@ -115,6 +118,9 @@ object Deps {
     const val androidx_work_runtime_ktx = "androidx.work:work-runtime-ktx:${Versions.workmanager}"
     const val androidx_fragment = "androidx.fragment:fragment:${Versions.AndroidX.core}"
     const val google_material = "com.google.android.material:material:${Versions.google_material}"
+    const val androidx_annotation = "androidx.annotation:annotation:${Versions.androidx_annotation}"
+    const val androidx_loader = "androidx.loader:loader:${Versions.androidx_loader}"
+    const val androidx_localbroadcastmanager = "androidx.localbroadcastmanager:localbroadcastmanager:${Versions.androidx_localbroadcastmanager}"
 
     const val tools_androidgradle = "com.android.tools.build:gradle:${Versions.android_gradle_plugin}"
     const val tools_kotlingradle = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlin}"

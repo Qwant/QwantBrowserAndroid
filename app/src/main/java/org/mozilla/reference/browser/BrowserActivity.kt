@@ -15,23 +15,35 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.preference.PreferenceManager
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 import mozilla.components.browser.session.Session
 import mozilla.components.concept.engine.EngineSession
 import mozilla.components.concept.engine.EngineView
+import mozilla.components.concept.storage.PageObservation
+import mozilla.components.concept.storage.PageVisit
+import mozilla.components.concept.storage.RedirectSource
+import mozilla.components.concept.storage.VisitType
 import mozilla.components.concept.tabstray.TabsTray
 import mozilla.components.feature.intent.ext.EXTRA_SESSION_ID
 import mozilla.components.support.base.feature.UserInteractionHandler
 import mozilla.components.support.utils.SafeIntent
+import org.mozilla.gecko.GeckoProfile
 import org.mozilla.reference.browser.browser.BrowserFragment
 import org.mozilla.reference.browser.browser.QwantBarSessionObserver
+import org.mozilla.reference.browser.compat.BrowserContract
+import org.mozilla.reference.browser.compat.BrowserContract.Bookmarks
+import org.mozilla.reference.browser.compat.LocalBrowserDB
 import org.mozilla.reference.browser.ext.components
 import org.mozilla.reference.browser.layout.QwantBar
 import org.mozilla.reference.browser.settings.SettingsContainerFragment
+import org.mozilla.reference.browser.storage.BookmarkItemV1
 import org.mozilla.reference.browser.storage.bookmarks.BookmarksFragment
 import org.mozilla.reference.browser.storage.bookmarks.BookmarksStorage
 import org.mozilla.reference.browser.storage.history.HistoryFragment
 import org.mozilla.reference.browser.tabs.TabsTrayFragment
 import org.mozilla.reference.browser.tabs.tray.BrowserTabsTray
+import java.io.File
 import java.util.*
 
 
@@ -51,9 +63,9 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
             BrowserFragment.create(sessionId)
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        Log.d("QWANT_BROWSER", "browser activity - onCreate")
+        PACKAGE_NAME = packageName
+
         this.loadLocale()
-        this.fixHuaweiDefaultContentFilter() // TODO remove this
 
         setContentView(R.layout.activity_main)
 
@@ -86,6 +98,18 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
                     replace(R.id.container, createBrowserFragment(sessionId), "BROWSER_FRAGMENT")
                     commit()
                 }
+            }
+        }
+
+        this.loadV35Db()
+    }
+
+    private fun listDir(dir: File, offset: String = "") {
+        if (dir.isDirectory) {
+            val subOffset = "$offset "
+            dir.listFiles().forEach {
+                Log.e("QWANT_BROWSER", "${offset}${it.name} dir: ${it.isDirectory} file: ${it.isFile}")
+                if (it.isDirectory) listDir(it, subOffset)
             }
         }
     }
@@ -143,19 +167,47 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         prefEditor.apply()
     }
 
-    fun fixHuaweiDefaultContentFilter() {
-        // TODO remove that at one point
-        // force content filter to moderate if set to none on first launch
+    fun loadV35Db() {
+        // load old db to new one on first launch
         val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         val firstLaunch = prefs.getBoolean(resources.getString(R.string.pref_key_first_launch), true)
         if (firstLaunch) {
             val editor: SharedPreferences.Editor = prefs.edit()
             editor.putBoolean(resources.getString(R.string.pref_key_first_launch), false)
-            val adultContentFilter = prefs.getString(resources.getString(R.string.pref_key_general_adultcontent), "undefined")
-            if (adultContentFilter == "undefined" || adultContentFilter == resources.getString(R.string.settings_adultcontent_none_code)) {
-                editor.putString(resources.getString(R.string.pref_key_general_adultcontent), resources.getString(R.string.settings_adultcontent_moderate_code))
-            }
             editor.apply()
+
+            val cr = applicationContext.contentResolver
+            val db = LocalBrowserDB.from(GeckoProfile.get(applicationContext, null))
+
+            val bookmarkCursor = db.getBookmarksInFolder(cr, Bookmarks.FIXED_ROOT_ID.toLong())
+            try {
+                if (bookmarkCursor != null) {
+                    while (bookmarkCursor.moveToNext()) {
+                        val title: String = bookmarkCursor.getString(bookmarkCursor.getColumnIndexOrThrow(Bookmarks.TITLE))
+                        val url: String = bookmarkCursor.getString(bookmarkCursor.getColumnIndexOrThrow(Bookmarks.URL))
+                        bookmarksStorage?.addBookmark(BookmarkItemV1(title, url))
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("QWANT_BROWSER", "exception: ${e.message}\n${e.stackTrace}")
+            }
+
+            val historyCursor = db.getAllVisitedHistory(cr)
+            try {
+                if (historyCursor != null) {
+                    while (historyCursor.moveToNext()) {
+                        val title: String = historyCursor.getString(historyCursor.getColumnIndexOrThrow(BrowserContract.History.TITLE))
+                        val url: String = historyCursor.getString(historyCursor.getColumnIndexOrThrow(BrowserContract.History.URL))
+                        val time: Long = historyCursor.getLong(historyCursor.getColumnIndexOrThrow(BrowserContract.History.DATE_LAST_VISITED))
+                        MainScope().launch {
+                            applicationContext.components.core.historyStorage.recordVisit(url, PageVisit(VisitType.LINK, RedirectSource.NOT_A_SOURCE), time)
+                            applicationContext.components.core.historyStorage.recordObservation(url, PageObservation(title = title))
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("QWANT_BROWSER", "exception: ${e.message}\n${e.stackTrace}")
+            }
         }
     }
 
@@ -432,5 +484,9 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
             ft.addToBackStack(backStateName)
             ft.commit()
         }
+    }
+
+    companion object {
+        lateinit var PACKAGE_NAME: String
     }
 }
