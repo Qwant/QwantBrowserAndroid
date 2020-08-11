@@ -9,6 +9,7 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.AttributeSet
 import android.util.Log
+import android.util.SparseIntArray
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -28,12 +29,14 @@ import mozilla.components.concept.tabstray.TabsTray
 import mozilla.components.feature.intent.ext.EXTRA_SESSION_ID
 import mozilla.components.support.base.feature.UserInteractionHandler
 import mozilla.components.support.utils.SafeIntent
+import org.json.JSONArray
+import org.json.JSONException
+import org.json.JSONObject
 import org.mozilla.gecko.GeckoProfile
 import org.mozilla.reference.browser.browser.BrowserFragment
 import org.mozilla.reference.browser.browser.QwantBarSessionObserver
-import org.mozilla.reference.browser.compat.BrowserContract
+import org.mozilla.reference.browser.compat.*
 import org.mozilla.reference.browser.compat.BrowserContract.Bookmarks
-import org.mozilla.reference.browser.compat.LocalBrowserDB
 import org.mozilla.reference.browser.ext.components
 import org.mozilla.reference.browser.layout.QwantBar
 import org.mozilla.reference.browser.settings.SettingsContainerFragment
@@ -44,6 +47,8 @@ import org.mozilla.reference.browser.storage.history.HistoryFragment
 import org.mozilla.reference.browser.tabs.TabsTrayFragment
 import org.mozilla.reference.browser.tabs.tray.BrowserTabsTray
 import java.io.File
+import java.io.FileReader
+import java.io.IOException
 import java.util.*
 
 
@@ -102,16 +107,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         }
 
         this.loadV35Db()
-    }
-
-    private fun listDir(dir: File, offset: String = "") {
-        if (dir.isDirectory) {
-            val subOffset = "$offset "
-            dir.listFiles().forEach {
-                Log.e("QWANT_BROWSER", "${offset}${it.name} dir: ${it.isDirectory} file: ${it.isFile}")
-                if (it.isDirectory) listDir(it, subOffset)
-            }
-        }
+        qwantbar.updateTabCount()
     }
 
     private fun loadLocale() {
@@ -170,16 +166,22 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
     fun loadV35Db() {
         // load old db to new one on first launch
         val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-        val firstLaunch = prefs.getBoolean(resources.getString(R.string.pref_key_first_launch), true)
+
+        val firstLaunch = prefs.getBoolean(resources.getString(R.string.pref_key_first_launch_40), true)
+        val firstLaunch_402 = prefs.getBoolean(resources.getString(R.string.pref_key_first_launch_402), true)
+
+        var db: BrowserDB? = null
+        val cr = applicationContext.contentResolver
+        if (firstLaunch || firstLaunch_402) {
+            db = LocalBrowserDB.from(GeckoProfile.get(applicationContext, null))
+        }
+
         if (firstLaunch) {
             val editor: SharedPreferences.Editor = prefs.edit()
-            editor.putBoolean(resources.getString(R.string.pref_key_first_launch), false)
+            editor.putBoolean(resources.getString(R.string.pref_key_first_launch_40), false)
             editor.apply()
 
-            val cr = applicationContext.contentResolver
-            val db = LocalBrowserDB.from(GeckoProfile.get(applicationContext, null))
-
-            val bookmarkCursor = db.getBookmarksInFolder(cr, Bookmarks.FIXED_ROOT_ID.toLong())
+            val bookmarkCursor = db?.getBookmarksInFolder(cr, Bookmarks.FIXED_ROOT_ID.toLong())
             try {
                 if (bookmarkCursor != null) {
                     while (bookmarkCursor.moveToNext()) {
@@ -192,7 +194,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
                 Log.e("QWANT_BROWSER", "exception: ${e.message}\n${e.stackTrace}")
             }
 
-            val historyCursor = db.getAllVisitedHistory(cr)
+            val historyCursor = db?.getAllVisitedHistory(cr)
             try {
                 if (historyCursor != null) {
                     while (historyCursor.moveToNext()) {
@@ -209,6 +211,60 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
                 Log.e("QWANT_BROWSER", "exception: ${e.message}\n${e.stackTrace}")
             }
         }
+
+
+        if (firstLaunch_402) {
+            Log.e("QWANT_BROWSER", "first launch 402")
+            val editor: SharedPreferences.Editor = prefs.edit()
+            editor.putBoolean(resources.getString(R.string.pref_key_first_launch_402), false)
+            editor.apply()
+
+            Log.e("QWANT_BROWSER", "restore session tabs")
+            restoreSessionTabs()
+        }
+    }
+
+
+    private val SESSION_FILE = "sessionstore.js"
+
+    private fun readSessionFile(): String? {
+        val sessionFile: File? = File(GeckoProfile.get(applicationContext, null).dir, SESSION_FILE)
+        try {
+            if (sessionFile != null && sessionFile.exists()) {
+                val fr = FileReader(sessionFile)
+
+                return fr.use { fr ->
+                    val sb = StringBuilder()
+                    val buf = CharArray(8192)
+                    var read = fr.read(buf)
+                    while (read >= 0) {
+                        sb.append(buf, 0, read)
+                        read = fr.read(buf)
+                    }
+                    sb.toString()
+                }
+            }
+        } catch (ioe: IOException) {
+            Log.e("QWANT_BROWSER", "Unable to read session file", ioe)
+        }
+        return null
+    }
+
+
+    private class LastSessionParser(private val context: Context) : SessionParser() {
+        override fun onTabRead(sessionTab: SessionTab) {
+            Log.e("QWANT_BROWSER", "parsed tab: ${sessionTab.url}")
+            if (sessionTab.url != null && sessionTab.url != "null" && !sessionTab.url.startsWith("https://www.qwant.com/?client=qwantbrowser")) {
+                Log.e("QWANT_BROWSER", "should reload tab for url: ${sessionTab.url}")
+                context.components.useCases.tabsUseCases.addTab(sessionTab.url, selectTab = false, startLoading = false)
+            }
+        }
+    }
+
+    private fun restoreSessionTabs() {
+        val sessionString = readSessionFile()
+        val parser = LastSessionParser(applicationContext)
+        parser.parse(sessionString)
     }
 
     override fun onBackPressed() {

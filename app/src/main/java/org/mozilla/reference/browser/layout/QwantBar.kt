@@ -337,7 +337,7 @@ class QwantBar @JvmOverloads constructor(
         }
     }
 
-    private fun updateTabCount() {
+    fun updateTabCount() {
         reference.get()?.setCountWithAnimation(sessionManager.sessions.size)
     }
 
