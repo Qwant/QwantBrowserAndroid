@@ -15,6 +15,7 @@ import mozilla.components.concept.engine.Engine
 import mozilla.components.concept.engine.Settings
 import mozilla.components.concept.fetch.Client
 import mozilla.components.feature.contextmenu.ContextMenuUseCases
+import mozilla.components.feature.downloads.DownloadsUseCases
 /* import mozilla.components.feature.pwa.ManifestStorage
 import mozilla.components.feature.pwa.WebAppShortcutManager
 import mozilla.components.feature.pwa.WebAppUseCases */
@@ -77,4 +78,6 @@ class UseCases(
                 thumbnailStorage
         )
     } */
+
+    val downloadsUseCases: DownloadsUseCases by lazy { DownloadsUseCases(store) }
 }

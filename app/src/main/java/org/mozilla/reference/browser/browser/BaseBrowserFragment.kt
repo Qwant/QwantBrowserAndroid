@@ -18,7 +18,8 @@ import androidx.preference.PreferenceManager
 import kotlinx.android.synthetic.main.fragment_browser.*
 import kotlinx.android.synthetic.main.fragment_browser.view.*
 import mozilla.components.browser.state.selector.selectedTab
-import mozilla.components.feature.downloads.DownloadsFeature
+// import mozilla.components.feature.downloads.DownloadsFeature
+import org.mozilla.reference.browser.downloads.DownloadsFeature
 import mozilla.components.feature.downloads.manager.FetchDownloadManager
 import mozilla.components.feature.findinpage.view.FindInPageView
 import mozilla.components.feature.prompts.PromptFeature
@@ -118,18 +119,18 @@ abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler {
 
         downloadsFeature.set(
             feature = DownloadsFeature(
-                requireContext(),
-                store = requireComponents.core.store,
-                useCases = requireComponents.core.downloadsUseCases,
-                fragmentManager = childFragmentManager,
-                downloadManager = FetchDownloadManager(
-                    requireContext().applicationContext,
-                    requireComponents.core.store,
-                    DownloadService::class
-                ),
-                onNeedToRequestPermissions = { permissions ->
-                    requestPermissions(permissions, REQUEST_CODE_DOWNLOAD_PERMISSIONS)
-                }),
+                    requireContext(),
+                    store = requireComponents.core.store,
+                    useCases = requireComponents.useCases.downloadsUseCases,
+                    fragmentManager = childFragmentManager,
+                    downloadManager = FetchDownloadManager(
+                            requireContext().applicationContext,
+                            requireComponents.core.store,
+                            DownloadService::class
+                    ),
+                    onNeedToRequestPermissions = { permissions ->
+                        requestPermissions(permissions, REQUEST_CODE_DOWNLOAD_PERMISSIONS)
+                    }),
             owner = this,
             view = view)
 
