@@ -64,10 +64,10 @@
 
     <string name="toast_copied">Copié!</string>
 
-    <!-- <string name="privacy_policy_url">https://about.qwant.com/fr/confidentialite-happ/</string> -->
-    <string name="privacy_policy_url">https://about.qwant.com/fr/legal/confidentialite/</string>
+   <string name="privacy_policy_url">https://about.qwant.com/fr/confidentialite-happ/</string>
+    <!-- <string name="privacy_policy_url">https://about.qwant.com/fr/legal/confidentialite/</string>-->
 
-    <!-- Addons -->
+   <!-- Addons -->
     <string name="addon_permissions_dialog_add">Ajouter</string>
     <string name="addon_permissions_dialog_cancel">Annuler</string>
 

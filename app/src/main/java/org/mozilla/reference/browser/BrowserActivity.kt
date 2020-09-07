@@ -170,11 +170,8 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         val firstLaunch = prefs.getBoolean(resources.getString(R.string.pref_key_first_launch_40), true)
         val firstLaunch_402 = prefs.getBoolean(resources.getString(R.string.pref_key_first_launch_402), true)
 
-        var db: BrowserDB? = null
+        val db: BrowserDB? = LocalBrowserDB.from(GeckoProfile.get(applicationContext, null))
         val cr = applicationContext.contentResolver
-        if (firstLaunch || firstLaunch_402) {
-            db = LocalBrowserDB.from(GeckoProfile.get(applicationContext, null))
-        }
 
         if (firstLaunch) {
             val editor: SharedPreferences.Editor = prefs.edit()
@@ -220,10 +217,9 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
             editor.apply()
 
             Log.e("QWANT_BROWSER", "restore session tabs")
-            restoreSessionTabs()
+            // restoreSessionTabs()
         }
     }
-
 
     private val SESSION_FILE = "sessionstore.js"
 
