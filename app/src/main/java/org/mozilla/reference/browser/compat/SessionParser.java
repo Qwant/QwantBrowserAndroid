@@ -108,7 +108,7 @@ public abstract class SessionParser {
                     final String url = entry.getString("url");
 
                     String title = entry.optString("title");
-                    if (title.length() == 0) {
+                    if (title == null || title.length() == 0) {
                         title = url;
                     }
 
