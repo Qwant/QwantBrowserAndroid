@@ -7,7 +7,7 @@ package org.mozilla.reference.browser.components
 import android.content.Context
 import mozilla.components.browser.search.SearchEngineManager
 import mozilla.components.browser.session.SessionManager
-import mozilla.components.browser.session.usecases.EngineSessionUseCases
+// import mozilla.components.browser.session.usecases.EngineSessionUseCases
 import mozilla.components.browser.state.store.BrowserStore
 // import mozilla.components.browser.thumbnails.ThumbnailsUseCases
 import mozilla.components.browser.thumbnails.storage.ThumbnailStorage
@@ -40,9 +40,9 @@ class UseCases(
     /**
      * Use cases that provide engine interactions for a given browser session.
      */
-    val sessionUseCases by lazy { SessionUseCases(sessionManager) }
+    val sessionUseCases by lazy { SessionUseCases(store, sessionManager) }
 
-    val engineSessionUseCases by lazy { EngineSessionUseCases(sessionManager) }
+    // val engineSessionUseCases by lazy { EngineSessionUseCases(sessionManager) }
 
     /**
      * Use cases that provide tab management.
@@ -52,7 +52,7 @@ class UseCases(
     /**
      * Use cases that provide search engine integration.
      */
-    val searchUseCases by lazy { SearchUseCases(context, searchEngineManager, sessionManager) }
+    val searchUseCases by lazy { SearchUseCases(context, store, searchEngineManager, sessionManager) }
 
     /**
      * Use cases that provide settings management.

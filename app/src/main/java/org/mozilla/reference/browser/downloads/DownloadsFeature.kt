@@ -46,8 +46,8 @@ import mozilla.components.browser.state.state.content.DownloadState
 import mozilla.components.browser.state.store.BrowserStore
 import mozilla.components.feature.downloads.DownloadDialogFragment.Companion.FRAGMENT_TAG
 import mozilla.components.feature.downloads.DownloadsFeature
-// import mozilla.components.feature.downloads.manager.AndroidDownloadManager
-import org.mozilla.reference.browser.downloads.AndroidDownloadManager
+import mozilla.components.feature.downloads.manager.AndroidDownloadManager
+// import org.mozilla.reference.browser.downloads.AndroidDownloadManager
 
 import mozilla.components.feature.downloads.manager.DownloadManager
 // import mozilla.components.feature.downloads.manager.noop
@@ -304,7 +304,7 @@ class DownloadsFeature(
     @Suppress("Unused")
     fun tryAgain(id: Long) {
         Log.e("QWANT_BROWSER", "DL try again")
-        downloadManager.tryAgain(id)
+        downloadManager.tryAgain(id.toString())
     }
 
     /**

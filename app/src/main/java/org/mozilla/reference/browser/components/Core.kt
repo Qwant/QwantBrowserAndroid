@@ -7,10 +7,13 @@ package org.mozilla.reference.browser.components
 import android.content.Context
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
+import mozilla.components.browser.session.Session
 import org.mozilla.reference.browser.browser.icons.BrowserIcons
 import mozilla.components.browser.session.SessionManager
+import mozilla.components.browser.session.engine.EngineMiddleware
 import mozilla.components.browser.session.storage.SessionStorage
 import mozilla.components.browser.state.store.BrowserStore
+import mozilla.components.browser.thumbnails.ThumbnailsMiddleware
 import mozilla.components.browser.thumbnails.storage.ThumbnailStorage
 import mozilla.components.concept.engine.DefaultSettings
 import mozilla.components.concept.engine.Engine
@@ -20,8 +23,14 @@ import mozilla.components.feature.addons.AddonManager
 import mozilla.components.feature.addons.amo.AddonCollectionProvider
 import mozilla.components.feature.addons.update.AddonUpdater
 import mozilla.components.feature.addons.update.DefaultAddonUpdater
+import mozilla.components.feature.customtabs.store.CustomTabsServiceStore
+import mozilla.components.feature.downloads.DownloadMiddleware
 import mozilla.components.feature.downloads.DownloadsUseCases
+import org.mozilla.reference.browser.downloads.DownloadService
+import org.mozilla.reference.browser.media.MediaService
+import mozilla.components.feature.readerview.ReaderViewMiddleware
 import mozilla.components.feature.media.RecordingDevicesNotificationFeature
+import mozilla.components.feature.media.middleware.MediaMiddleware
 import mozilla.components.feature.session.HistoryDelegate
 import org.mozilla.reference.browser.browser.WebNotificationFeature
 import org.mozilla.reference.browser.AppRequestInterceptor
@@ -71,8 +80,22 @@ class Core(private val context: Context) {
      * The [BrowserStore] holds the global [BrowserState].
      */
     val store by lazy {
-        BrowserStore()
+        BrowserStore(
+                middleware = listOf(
+                        MediaMiddleware(context, MediaService::class.java),
+                        DownloadMiddleware(context, DownloadService::class.java),
+                        ThumbnailsMiddleware(thumbnailStorage),
+                        ReaderViewMiddleware()
+                ) + EngineMiddleware.create(engine, ::findSessionById)
+        )
     }
+
+    private fun findSessionById(tabId: String): Session? {
+        return sessionManager.findSessionById(tabId)
+    }
+
+
+    // val customTabsStore by lazy { CustomTabsServiceStore() }
 
     /**
      * The session manager component provides access to a centralized registry of
@@ -86,7 +109,7 @@ class Core(private val context: Context) {
         SessionManager(engine, store).apply {
             sessionStorage.restore()?.let { snapshot -> restore(snapshot) }
 
-            sessionStorage.autoSave(this)
+            sessionStorage.autoSave(store)
                 .periodicallyInForeground(interval = 30, unit = TimeUnit.SECONDS)
                 .whenGoingToBackground()
                 .whenSessionsChange()

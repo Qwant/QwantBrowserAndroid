@@ -8,6 +8,7 @@ import android.app.Activity
 import android.app.Application
 import android.os.Bundle
 import mozilla.components.browser.session.Session
+import mozilla.components.browser.state.action.SystemAction
 import mozilla.components.support.base.log.Log
 import mozilla.components.support.base.log.sink.AndroidLogSink
 import mozilla.components.support.ktx.android.content.isMainProcess
@@ -61,7 +62,9 @@ open class BrowserApplication : Application(), Application.ActivityLifecycleCall
     override fun onTrimMemory(level: Int) {
         super.onTrimMemory(level)
         runOnlyInMainProcess {
-            components.core.sessionManager.onLowMemory()
+            // components.core.sessionManager.onLowMemory()
+            components.core.store.dispatch(SystemAction.LowMemoryAction(level))
+            components.core.icons.onTrimMemory(level)
         }
     }
 
