@@ -9,7 +9,6 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.AttributeSet
 import android.util.Log
-import android.util.SparseIntArray
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -29,9 +28,6 @@ import mozilla.components.concept.tabstray.TabsTray
 import mozilla.components.feature.intent.ext.EXTRA_SESSION_ID
 import mozilla.components.support.base.feature.UserInteractionHandler
 import mozilla.components.support.utils.SafeIntent
-import org.json.JSONArray
-import org.json.JSONException
-import org.json.JSONObject
 import org.mozilla.gecko.GeckoProfile
 import org.mozilla.reference.browser.browser.BrowserFragment
 import org.mozilla.reference.browser.browser.QwantBarSessionObserver
@@ -167,13 +163,13 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         // load old db to new one on first launch
         val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
 
-        val firstLaunch = prefs.getBoolean(resources.getString(R.string.pref_key_first_launch_40), true)
-        val firstLaunch_402 = prefs.getBoolean(resources.getString(R.string.pref_key_first_launch_402), true)
+        val firstLaunch40 = prefs.getBoolean(resources.getString(R.string.pref_key_first_launch_40), true)
+        val firstLaunch402 = prefs.getBoolean(resources.getString(R.string.pref_key_first_launch_402), true)
 
         val db: BrowserDB? = LocalBrowserDB.from(GeckoProfile.get(applicationContext, null))
         val cr = applicationContext.contentResolver
 
-        if (firstLaunch) {
+        if (firstLaunch40) {
             val editor: SharedPreferences.Editor = prefs.edit()
             editor.putBoolean(resources.getString(R.string.pref_key_first_launch_40), false)
             editor.apply()
@@ -209,15 +205,12 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
             }
         }
 
-
-        if (firstLaunch_402) {
-            Log.e("QWANT_BROWSER", "first launch 402")
+        if (firstLaunch402) {
             val editor: SharedPreferences.Editor = prefs.edit()
             editor.putBoolean(resources.getString(R.string.pref_key_first_launch_402), false)
             editor.apply()
 
-            Log.e("QWANT_BROWSER", "restore session tabs")
-            // restoreSessionTabs()
+            restoreSessionTabs()
         }
     }
 
@@ -249,9 +242,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
 
     private class LastSessionParser(private val context: Context) : SessionParser() {
         override fun onTabRead(sessionTab: SessionTab) {
-            Log.e("QWANT_BROWSER", "parsed tab: ${sessionTab.url}")
             if (sessionTab.url != null && sessionTab.url != "null" && !sessionTab.url.startsWith("https://www.qwant.com/?client=qwantbrowser")) {
-                Log.e("QWANT_BROWSER", "should reload tab for url: ${sessionTab.url}")
                 context.components.useCases.tabsUseCases.addTab(sessionTab.url, selectTab = false, startLoading = false)
             }
         }
@@ -259,8 +250,12 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
 
     private fun restoreSessionTabs() {
         val sessionString = readSessionFile()
-        val parser = LastSessionParser(applicationContext)
-        parser.parse(sessionString)
+        if (sessionString != null) {
+            val parser = LastSessionParser(applicationContext)
+            parser.parse(sessionString)
+        } else {
+            Log.e("QWANT_BROWSER", "restore tabs session file is null")
+        }
     }
 
     override fun onBackPressed() {
