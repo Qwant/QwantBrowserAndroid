@@ -5,11 +5,14 @@ import android.content.res.Resources
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
+import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat.getColor
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import mozilla.components.browser.session.Session
 import mozilla.components.browser.state.selector.selectedTab
 import mozilla.components.concept.tabstray.TabsTray
+import mozilla.components.support.ktx.android.content.res.resolveAttribute
 import mozilla.components.support.ktx.android.util.dpToPx
 import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.ext.components
@@ -41,17 +44,21 @@ class BrowserTabsTray @JvmOverloads constructor(
                 layoutManager = GridLayoutManager(context, 2)
                 adapter = tabsAdapter
 
-                val attr = context.obtainStyledAttributes(attrs, R.styleable.BrowserTabsTray, defStyleAttr, 0)
+                // val attr = context.obtainStyledAttributes(attrs, R.attr, defStyleAttr, 0)
                 styling = TabsTrayStyling(
                         R.drawable.background_tabstray_item,
                         R.drawable.background_tabstray_item_selected,
-                        attr.getColor(R.styleable.BrowserTabsTray_tabsTrayItemBackgroundColor, DEFAULT_ITEM_BACKGROUND_COLOR),
+                        context.theme.resolveAttribute(R.attr.tabsTrayItemBackgroundColor),
+                        context.theme.resolveAttribute(R.attr.tabsTraySelectedItemBackgroundColor),
+                        context.theme.resolveAttribute(R.attr.tabsTrayItemTextColor),
+                        context.theme.resolveAttribute(R.attr.tabsTraySelectedItemTextColor),
+                        /* R.attr.getColor(R.styleable.BrowserTabsTray_tabsTrayItemBackgroundColor, DEFAULT_ITEM_BACKGROUND_COLOR),
                         attr.getColor(R.styleable.BrowserTabsTray_tabsTraySelectedItemBackgroundColor, DEFAULT_ITEM_BACKGROUND_SELECTED_COLOR),
                         attr.getColor(R.styleable.BrowserTabsTray_tabsTrayItemTextColor, DEFAULT_ITEM_TEXT_COLOR),
-                        attr.getColor(R.styleable.BrowserTabsTray_tabsTraySelectedItemTextColor, DEFAULT_ITEM_TEXT_SELECTED_COLOR),
+                        attr.getColor(R.styleable.BrowserTabsTray_tabsTraySelectedItemTextColor, DEFAULT_ITEM_TEXT_SELECTED_COLOR), */
                         4.dpToPx(resources.displayMetrics).toFloat()  // attr.getDimensionPixelSize(context.getat, 0).toFloat()
                 )
-                attr.recycle()
+                // attr.recycle()
         }
 
         override fun onDetachedFromWindow() {
