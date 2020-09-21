@@ -13,6 +13,8 @@ import android.view.View
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import kotlinx.android.synthetic.main.fragment_browser.*
 import kotlinx.android.synthetic.main.fragment_browser.view.*
 import mozilla.components.browser.state.selector.selectedTab
@@ -25,6 +27,7 @@ import mozilla.components.support.ktx.android.content.getColorFromAttr
 import mozilla.components.support.ktx.android.util.dpToPx
 import mozilla.components.support.ktx.android.view.enterToImmersiveMode
 import mozilla.components.support.ktx.android.view.exitImmersiveModeIfNeeded
+import mozilla.components.support.ktx.android.view.hideKeyboard
 import org.mozilla.reference.browser.BrowserActivity
 import org.mozilla.reference.browser.QwantUtils
 import org.mozilla.reference.browser.R
@@ -128,9 +131,14 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
         }
     }
 
+    fun closeAwesomeBarIfOpen() {
+        if (awesomeBar != null && awesomeBar.isShown) {
+            this.onBackPressed()
+        }
+    }
+
     companion object {
         fun create(sessionId: String? = null) = BrowserFragment().apply {
-            Log.d("QWANT_BROWSER", "browser fragment - create")
             arguments = Bundle().apply {
                 putSessionId(sessionId)
             }

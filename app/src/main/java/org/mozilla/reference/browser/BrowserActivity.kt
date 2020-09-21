@@ -415,6 +415,9 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
             Log.d("QWANT_BROWSER", "showBrowserFragment - no browser fragment available in fragment manager")
             browserFragment = BrowserFragment.create()
         }
+
+        (browserFragment as BrowserFragment).closeAwesomeBarIfOpen()
+
         this.supportFragmentManager.beginTransaction().apply {
             this.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
             replace(R.id.container, browserFragment, "BROWSER_FRAGMENT")
