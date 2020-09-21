@@ -23,8 +23,7 @@ class Components(private val context: Context) {
             core.store,
             core.engine,
             search.searchEngineManager,
-            core.client,
-            core.thumbnailStorage
+            core.shortcutManager
         )
     }
     val utils by lazy {

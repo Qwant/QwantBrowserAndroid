@@ -10,6 +10,8 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import kotlinx.android.synthetic.main.component_qwantbar.view.*
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 import mozilla.components.browser.menu.BrowserMenuBuilder
 import mozilla.components.browser.menu.BrowserMenuItem
 import mozilla.components.browser.menu.item.BrowserMenuItemToolbar
@@ -17,6 +19,7 @@ import mozilla.components.browser.menu.item.BrowserMenuDivider
 import mozilla.components.browser.menu.item.BrowserMenuImageText
 import mozilla.components.browser.session.Session
 import mozilla.components.browser.session.SessionManager
+import mozilla.components.feature.pwa.WebAppUseCases
 // import mozilla.components.feature.pwa.WebAppUseCases
 import mozilla.components.feature.session.SessionUseCases
 import mozilla.components.support.ktx.android.content.res.resolveAttribute
@@ -41,7 +44,7 @@ class QwantBar @JvmOverloads constructor(
     private var reference: WeakReference<TabCounter> = WeakReference<TabCounter>(null)
     private val sessionManager: SessionManager = context.applicationContext.application.components.core.sessionManager
     private val sessionUseCases: SessionUseCases = context.applicationContext.application.components.useCases.sessionUseCases
-    // private val webAppUseCases: WebAppUseCases = context.applicationContext.application.components.useCases.webAppUseCases
+    private val webAppUseCases: WebAppUseCases = context.applicationContext.application.components.useCases.webAppUseCases
     private var bookmarksStorage: BookmarksStorage? = null
 
     private val tabCallbacks: MutableList<() -> Unit> = mutableListOf()
@@ -117,7 +120,7 @@ class QwantBar @JvmOverloads constructor(
                 visible = { sessionManager.selectedSession != null }
             },
 
-            /* BrowserMenuImageText(
+            BrowserMenuImageText(
                 context.getString(R.string.context_menu_add_homescreen),
                 textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
                 imageResource = R.drawable.ic_add_homescreen
@@ -125,7 +128,7 @@ class QwantBar @JvmOverloads constructor(
                 MainScope().launch { webAppUseCases.addToHomescreen() }
             }.apply {
                 visible = { webAppUseCases.isPinningSupported() }
-            }, */
+            },
 
             BrowserMenuImageText(
                 context.getString(R.string.context_menu_find),

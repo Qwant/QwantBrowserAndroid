@@ -42,6 +42,8 @@ import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.R.string.pref_key_tracking_protection_normal
 import org.mozilla.reference.browser.R.string.pref_key_tracking_protection_private
 import java.util.concurrent.TimeUnit
+import mozilla.components.feature.pwa.ManifestStorage
+import mozilla.components.feature.pwa.WebAppShortcutManager
 
 private const val DAY_IN_MINUTES = 24 * 60L
 
@@ -171,6 +173,11 @@ class Core(private val context: Context) {
             maxCacheAgeInMinutes = DAY_IN_MINUTES
         )
     }
+
+    /**
+     * Component for managing shortcuts (both regular and PWA).
+     */
+    val shortcutManager by lazy { WebAppShortcutManager(context, client, ManifestStorage(context)) }
 
     /**
      * Constructs a [TrackingProtectionPolicy] based on current preferences.

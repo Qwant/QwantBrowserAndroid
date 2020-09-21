@@ -16,6 +16,8 @@ import mozilla.components.concept.engine.Settings
 import mozilla.components.concept.fetch.Client
 import mozilla.components.feature.contextmenu.ContextMenuUseCases
 import mozilla.components.feature.downloads.DownloadsUseCases
+import mozilla.components.feature.pwa.WebAppShortcutManager
+import mozilla.components.feature.pwa.WebAppUseCases
 /* import mozilla.components.feature.pwa.ManifestStorage
 import mozilla.components.feature.pwa.WebAppShortcutManager
 import mozilla.components.feature.pwa.WebAppUseCases */
@@ -34,8 +36,7 @@ class UseCases(
         private val store: BrowserStore,
         private val engine: Engine,
         private val searchEngineManager: SearchEngineManager,
-        private val client: Client,
-        private val thumbnailStorage: ThumbnailStorage
+        private val shortcutManager: WebAppShortcutManager
 ) {
     /**
      * Use cases that provide engine interactions for a given browser session.
@@ -62,10 +63,7 @@ class UseCases(
     /**
      * Use cases that provide shortcut and progressive web app management.
      */
-    /* val webAppUseCases by lazy {
-        WebAppUseCases(context, sessionManager, client)
-        // TODO use directly this to fix deprecated: WebAppShortcutManager(context, client, ManifestStorage(context), true)
-    } */
+    val webAppUseCases by lazy { WebAppUseCases(context, sessionManager, shortcutManager) }
 
     /**
      * Uses cases that provides context menu
