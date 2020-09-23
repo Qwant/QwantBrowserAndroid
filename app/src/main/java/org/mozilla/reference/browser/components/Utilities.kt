@@ -30,8 +30,8 @@ class Utilities(
      */
     val externalIntentProcessors by lazy {
         listOf(
-            CustomTabIntentProcessor(sessionManager, sessionUseCases.loadUrl, context.resources),
-            WebAppIntentProcessor(sessionManager, sessionUseCases.loadUrl, ManifestStorage(context))
+            CustomTabIntentProcessor(sessionManager, sessionUseCases.loadUrl, context.resources)// ,
+            // WebAppIntentProcessor(sessionManager, sessionUseCases.loadUrl, ManifestStorage(context))
         )
     }
 

@@ -4,17 +4,22 @@
 
 package org.mozilla.reference.browser.browser
 
-/* import android.net.Uri
+import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.View
+import androidx.core.view.isVisible
 import kotlinx.android.synthetic.main.fragment_browser.*
 import mozilla.components.concept.engine.manifest.WebAppManifest
+import mozilla.components.feature.customtabs.CustomTabWindowFeature
 import mozilla.components.feature.pwa.ext.getWebAppManifest
 import mozilla.components.feature.pwa.ext.putWebAppManifest
+import org.mozilla.reference.browser.qwant.WebAppActivityFeature
 import mozilla.components.feature.pwa.feature.WebAppHideToolbarFeature
 import mozilla.components.feature.pwa.feature.WebAppSiteControlsFeature
 import mozilla.components.support.base.feature.UserInteractionHandler
 import mozilla.components.support.base.feature.ViewBoundFeatureWrapper
+import mozilla.components.support.ktx.android.arch.lifecycle.addObservers
 import org.mozilla.reference.browser.ext.requireComponents
 
 /**
@@ -22,6 +27,7 @@ import org.mozilla.reference.browser.ext.requireComponents
  */
 class ExternalAppBrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
     private val customTabsIntegration = ViewBoundFeatureWrapper<CustomTabsIntegration>()
+    private val windowFeature = ViewBoundFeatureWrapper<CustomTabWindowFeature>()
     private val hideToolbarFeature = ViewBoundFeatureWrapper<WebAppHideToolbarFeature>()
 
     private val manifest: WebAppManifest?
@@ -33,47 +39,65 @@ class ExternalAppBrowserFragment : BaseBrowserFragment(), UserInteractionHandler
         super.onViewCreated(view, savedInstanceState)
 
         val manifest = this.manifest
+        val sessionId = this.sessionId
 
         customTabsIntegration.set(
-            feature = CustomTabsIntegration(
-                requireContext(),
-                requireComponents.core.sessionManager,
-                toolbar,
-                engineView,
-                requireComponents.useCases.sessionUseCases,
-                sessionId!!,
-                activity
-            ),
-            owner = this,
-            view = view
+                feature = CustomTabsIntegration(
+                        requireContext(),
+                        requireComponents.core.sessionManager,
+                        toolbar,
+                        engineView,
+                        requireComponents.useCases.sessionUseCases,
+                        sessionId!!,
+                        activity
+                ),
+                owner = this,
+                view = view
+        )
+
+        windowFeature.set(
+                feature = CustomTabWindowFeature(
+                        requireActivity(),
+                        requireComponents.core.store,
+                        sessionId
+                ) { uri ->
+                    Log.e("QWANT_BROWSER", "Unknown scheme error $uri")
+                },
+                owner = this,
+                view = view
         )
 
         hideToolbarFeature.set(
-            feature = WebAppHideToolbarFeature(
-                requireComponents.core.sessionManager,
-                toolbar,
-                sessionId!!,
-                trustedScopes
-            ),
-            owner = this,
-            view = toolbar)
+                feature = WebAppHideToolbarFeature(
+                        requireComponents.core.store,
+                        requireComponents.core.customTabsStore,
+                        sessionId,
+                        manifest
+                ) { toolbarVisible ->
+                    toolbar.isVisible = toolbarVisible
+                    webAppToolbarShouldBeVisible = toolbarVisible
+                    if (!toolbarVisible) { engineView.setDynamicToolbarMaxHeight(0) }
+                },
+                owner = this,
+                view = toolbar
+        )
 
         if (manifest != null) {
-            activity?.lifecycle?.addObserver(
-                WebAppActivityFeature(
-                    activity!!,
-                    requireComponents.core.icons,
-                    manifest
-                )
-            )
-            activity?.lifecycle?.addObserver(
-                WebAppSiteControlsFeature(
-                    context?.applicationContext!!,
-                    requireComponents.core.sessionManager,
-                    requireComponents.useCases.sessionUseCases.reload,
-                    sessionId!!,
-                    manifest
-                )
+            val activity = requireActivity()
+
+            activity.lifecycle.addObservers(
+                    WebAppActivityFeature(
+                        activity,
+                        requireComponents.core.icons,
+                        manifest
+                    ),
+                    WebAppSiteControlsFeature(
+                        requireContext().applicationContext,
+                        requireComponents.core.sessionManager,
+                        requireComponents.useCases.sessionUseCases.reload,
+                        sessionId,
+                        manifest
+                    )
             )
         }
     }
@@ -101,4 +125,3 @@ class ExternalAppBrowserFragment : BaseBrowserFragment(), UserInteractionHandler
         }
     }
 }
- */

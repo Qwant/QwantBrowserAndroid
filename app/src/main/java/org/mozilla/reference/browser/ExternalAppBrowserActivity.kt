@@ -4,7 +4,7 @@
 
 package org.mozilla.reference.browser
 
-/* import android.net.Uri
+import android.net.Uri
 import androidx.fragment.app.Fragment
 import mozilla.components.concept.engine.manifest.WebAppManifest
 import mozilla.components.feature.pwa.ext.getWebAppManifest
@@ -37,4 +37,3 @@ class ExternalAppBrowserActivity : BrowserActivity() {
             super.createBrowserFragment(sessionId)
         }
 }
- */

@@ -5,6 +5,7 @@
 package org.mozilla.reference.browser
 
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.AttributeSet
@@ -18,6 +19,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import mozilla.components.browser.session.Session
+import mozilla.components.browser.state.state.WebExtensionState
 import mozilla.components.concept.engine.EngineSession
 import mozilla.components.concept.engine.EngineView
 import mozilla.components.concept.storage.PageObservation
@@ -28,6 +30,7 @@ import mozilla.components.concept.tabstray.TabsTray
 import mozilla.components.feature.intent.ext.EXTRA_SESSION_ID
 import mozilla.components.support.base.feature.UserInteractionHandler
 import mozilla.components.support.utils.SafeIntent
+import mozilla.components.support.webextensions.WebExtensionPopupFeature
 import org.mozilla.gecko.GeckoProfile
 import org.mozilla.reference.browser.browser.BrowserFragment
 import org.mozilla.reference.browser.browser.QwantBarSessionObserver
@@ -212,6 +215,8 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
 
             restoreSessionTabs()
         }
+
+        restoreShortcuts()
     }
 
     private val SESSION_FILE = "sessionstore.js"
@@ -256,6 +261,10 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         } else {
             Log.e("QWANT_BROWSER", "restore tabs session file is null")
         }
+    }
+
+    private fun restoreShortcuts() {
+        Log.e("QWANT_BROWSER", "restoring shortcuts")
     }
 
     override fun onBackPressed() {
@@ -351,7 +360,6 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
             }
             else -> super.onCreateView(parent, name, context, attrs)
         }
-
 
     fun fullScreenChanged(enabled: Boolean) {
         qwantbar.visibility = if (enabled) View.GONE else View.VISIBLE

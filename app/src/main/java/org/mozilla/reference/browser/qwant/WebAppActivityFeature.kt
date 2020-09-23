@@ -1,9 +1,9 @@
-package org.mozilla.reference.browser.browser
+package org.mozilla.reference.browser.qwant
 
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-/*
+
 import android.app.Activity
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.Lifecycle
@@ -55,4 +55,3 @@ class WebAppActivityFeature(
         activity.setTaskDescription(manifest.toTaskDescription(icon.bitmap))
     }
 }
-*/

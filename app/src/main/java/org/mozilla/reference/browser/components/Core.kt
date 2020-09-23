@@ -132,6 +132,8 @@ class Core(private val context: Context) {
         }
     }
 
+    val customTabsStore by lazy { CustomTabsServiceStore() }
+
     /**
      * Contains use cases related to the downloads feature.
      */

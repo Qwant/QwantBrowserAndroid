@@ -19,6 +19,7 @@ import kotlinx.android.synthetic.main.fragment_browser.*
 import kotlinx.android.synthetic.main.fragment_browser.view.*
 import mozilla.components.browser.state.selector.selectedTab
 // import mozilla.components.feature.downloads.DownloadsFeature
+import mozilla.components.feature.app.links.AppLinksFeature
 import org.mozilla.reference.browser.downloads.DownloadsFeature
 import mozilla.components.feature.downloads.manager.FetchDownloadManager
 import mozilla.components.feature.findinpage.view.FindInPageView
@@ -51,6 +52,7 @@ abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler {
     private val toolbarIntegration = ViewBoundFeatureWrapper<ToolbarIntegration>()
     private val contextMenuIntegration = ViewBoundFeatureWrapper<ContextMenuIntegration>()
     private val downloadsFeature = ViewBoundFeatureWrapper<DownloadsFeature>()
+    private val appLinksFeature = ViewBoundFeatureWrapper<AppLinksFeature>()
     private val promptsFeature = ViewBoundFeatureWrapper<PromptFeature>()
     private val fullScreenFeature = ViewBoundFeatureWrapper<FullScreenFeature>()
     private val findInPageIntegration = ViewBoundFeatureWrapper<FindInPageIntegration>()
@@ -69,6 +71,8 @@ abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler {
     protected val sessionId: String?
         get() = arguments?.getString(SESSION_ID)
 
+    protected var webAppToolbarShouldBeVisible = true
+
     final override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -79,6 +83,8 @@ abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler {
 
     @CallSuper
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        val prefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
+
         sessionFeature.set(
             feature = QwantSessionFeature(
                 requireContext(),
@@ -133,6 +139,21 @@ abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler {
                     }),
             owner = this,
             view = view)
+
+        appLinksFeature.set(
+                feature = AppLinksFeature(
+                        requireContext(),
+                        sessionManager = requireComponents.core.sessionManager,
+                        sessionId = sessionId,
+                        fragmentManager = requireFragmentManager(),
+                        launchInApp = { true }
+                        /* launchInApp = {
+                            prefs.getBoolean(requireContext().getPreferenceKey(R.string.pref_key_launch_external_app), false)
+                        } */
+                ),
+                owner = this,
+                view = view
+        )
 
         promptsFeature.set(
             feature = PromptFeature(

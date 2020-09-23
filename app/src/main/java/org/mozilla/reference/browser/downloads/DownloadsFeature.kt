@@ -285,13 +285,11 @@ class DownloadsFeature(
      */
     @Suppress("Deprecation")
     override fun start() {
-        Log.e("QWANT_BROWSER", "DL start")
         scope = store.flowScoped { flow ->
             flow.mapNotNull { state -> state.findTabOrCustomTabOrSelectedTab(tabId) }
                     .ifChanged { it.content.download }
                     .collect { state ->
                         state.content.download?.let { downloadState ->
-                            Log.e("QWANT_BROWSER", "DL start process")
                             processDownload(state, downloadState)
                         }
                     }
@@ -303,7 +301,6 @@ class DownloadsFeature(
      */
     @Suppress("Unused")
     fun tryAgain(id: Long) {
-        Log.e("QWANT_BROWSER", "DL try again")
         downloadManager.tryAgain(id.toString())
     }
 
@@ -311,7 +308,6 @@ class DownloadsFeature(
      * Stops observing downloads on the selected session.
      */
     override fun stop() {
-        Log.e("QWANT_BROWSER", "DL stop")
         scope?.cancel()
         downloadManager.unregisterListeners()
     }
@@ -321,31 +317,22 @@ class DownloadsFeature(
      */
     @VisibleForTesting
     internal fun processDownload(tab: SessionState, download: DownloadState): Boolean {
-        Log.e("QWANT_BROWSER", "DL process")
         return if (applicationContext.isPermissionGranted(downloadManager.permissions.asIterable())) {
 
-            Log.e("QWANT_BROWSER", "DL process 1")
             if (shouldForwardToThirdParties()) {
-                Log.e("QWANT_BROWSER", "DL process 2")
                 val apps = getDownloaderApps(applicationContext, download)
 
                 // We only show the dialog If we have multiple apps that can handle the download.
                 if (apps.size > 1) {
-                    Log.e("QWANT_BROWSER", "DL process 3")
                     showAppDownloaderDialog(tab, download, apps)
                     return false
                 }
-                Log.e("QWANT_BROWSER", "DL process 4")
             }
 
-            Log.e("QWANT_BROWSER", "DL process 5")
-
             if (fragmentManager != null && !download.skipConfirmation) {
-                Log.e("QWANT_BROWSER", "DL process 6")
                 showDownloadDialog(tab, download)
                 false
             } else {
-                Log.e("QWANT_BROWSER", "DL process 7")
                 useCases.consumeDownload(tab.id, download.id)
                 startDownload(download)
             }
@@ -357,17 +344,10 @@ class DownloadsFeature(
 
     @VisibleForTesting
     internal fun startDownload(download: DownloadState): Boolean {
-        Log.e("QWANT_BROWSER", "DL start")
         val id = downloadManager.download(download)
         return if (id != null) {
-            Log.e("QWANT_BROWSER", "DL start 1")
-            Log.e("QWANT_BROWSER", "DL started status: ${download.status}")
-            Log.e("QWANT_BROWSER", "DL started url: ${download.url}")
-            Log.e("QWANT_BROWSER", "DL started length: ${download.contentLength}")
-            Log.e("QWANT_BROWSER", "DL started download full: $download")
             true
         } else {
-            Log.e("QWANT_BROWSER", "DL start 2")
             showDownloadNotSupportedError()
             false
         }
@@ -378,23 +358,17 @@ class DownloadsFeature(
      * either trigger or clear the pending download.
      */
     override fun onPermissionsResult(permissions: Array<String>, grantResults: IntArray) {
-        Log.e("QWANT_BROWSER", "DL permission result 1")
         if (permissions.isEmpty()) {
-            Log.e("QWANT_BROWSER", "DL permission result 2")
             // If we are requesting permissions while a permission prompt is already being displayed
             // then Android seems to call `onPermissionsResult` immediately with an empty permissions
             // list. In this case just ignore it.
             return
         }
 
-        Log.e("QWANT_BROWSER", "DL permission result 3")
         withActiveDownload { (tab, download) ->
-            Log.e("QWANT_BROWSER", "DL permission result 4")
             if (applicationContext.isPermissionGranted(downloadManager.permissions.asIterable())) {
-                Log.e("QWANT_BROWSER", "DL permission result 5")
                 processDownload(tab, download)
             } else {
-                Log.e("QWANT_BROWSER", "DL permission result 6")
                 useCases.consumeDownload(tab.id, download.id)
             }
         }
@@ -402,7 +376,6 @@ class DownloadsFeature(
 
     @VisibleForTesting(otherwise = PRIVATE)
     internal fun showDownloadNotSupportedError() {
-        Log.e("QWANT_BROWSER", "DL not supported 1")
         Toast.makeText(
                 applicationContext,
                 applicationContext.getString(
@@ -418,28 +391,23 @@ class DownloadsFeature(
             download: DownloadState,
             dialog: DownloadDialogFragment = getDownloadDialog()
     ) {
-        Log.e("QWANT_BROWSER", "DL show dialog 1")
         dialog.setDownload(download)
 
         dialog.onStartDownload = {
-            Log.e("QWANT_BROWSER", "DL dialog onstart")
             startDownload(download)
             useCases.consumeDownload.invoke(tab.id, download.id)
         }
 
         dialog.onCancelDownload = {
-            Log.e("QWANT_BROWSER", "DL dialog oncancel")
             useCases.consumeDownload.invoke(tab.id, download.id)
         }
 
         if (!isAlreadyADownloadDialog() && fragmentManager != null) {
-            Log.e("QWANT_BROWSER", "DL dialog show now")
             dialog.showNow(fragmentManager, FRAGMENT_TAG)
         }
     }
 
     private fun getDownloadDialog(): DownloadDialogFragment {
-        Log.e("QWANT_BROWSER", "DL get dialog")
         return findPreviousDownloadDialogFragment() ?: SimpleDownloadDialogFragment.newInstance(
                 promptsStyling = promptsStyling
         )
@@ -452,19 +420,14 @@ class DownloadsFeature(
             apps: List<DownloaderApp>,
             appChooserDialog: DownloadAppChooserDialog = getAppDownloaderDialog()
     ) {
-        Log.e("QWANT_BROWSER", "DL app downloader")
         appChooserDialog.setApps(apps)
         appChooserDialog.onAppSelected = { app ->
-            Log.e("QWANT_BROWSER", "DL app downloader 1")
             if (app.packageName == applicationContext.packageName) {
-                Log.e("QWANT_BROWSER", "DL app downloader 2")
                 startDownload(download)
             } else {
                 try {
-                    Log.e("QWANT_BROWSER", "DL app downloader 3")
                     applicationContext.startActivity(app.toIntent())
                 } catch (error: ActivityNotFoundException) {
-                    Log.e("QWANT_BROWSER", "DL app downloader 4")
                     val errorMessage = applicationContext.getString(
                             R.string.mozac_feature_downloads_unable_to_open_third_party_app,
                             app.name
@@ -472,17 +435,14 @@ class DownloadsFeature(
                     Toast.makeText(applicationContext, errorMessage, Toast.LENGTH_SHORT).show()
                 }
             }
-            Log.e("QWANT_BROWSER", "DL app downloader 5")
             useCases.consumeDownload(tab.id, download.id)
         }
 
         appChooserDialog.onDismiss = {
-            Log.e("QWANT_BROWSER", "DL app downloader 6")
             useCases.consumeDownload.invoke(tab.id, download.id)
         }
 
         if (!isAlreadyAppDownloaderDialog() && fragmentManager != null) {
-            Log.e("QWANT_BROWSER", "DL app downloader 7")
             appChooserDialog.showNow(fragmentManager, DownloadAppChooserDialog.FRAGMENT_TAG)
         }
     }
@@ -495,28 +455,23 @@ class DownloadsFeature(
 
     @VisibleForTesting
     internal fun isAlreadyAppDownloaderDialog(): Boolean {
-        Log.e("QWANT_BROWSER", "DL dialog app already")
         return findPreviousAppDownloaderDialogFragment() != null
     }
 
     private fun findPreviousAppDownloaderDialogFragment(): DownloadAppChooserDialog? {
-        Log.e("QWANT_BROWSER", "DL find prev app")
         return fragmentManager?.findFragmentByTag(DownloadAppChooserDialog.FRAGMENT_TAG) as? DownloadAppChooserDialog
     }
 
     @VisibleForTesting(otherwise = PRIVATE)
     internal fun isAlreadyADownloadDialog(): Boolean {
-        Log.e("QWANT_BROWSER", "DL already dl")
         return findPreviousDownloadDialogFragment() != null
     }
 
     private fun findPreviousDownloadDialogFragment(): DownloadDialogFragment? {
-        Log.e("QWANT_BROWSER", "DL find prev dl")
         return fragmentManager?.findFragmentByTag(FRAGMENT_TAG) as? DownloadDialogFragment
     }
 
     private fun withActiveDownload(block: (Pair<SessionState, DownloadState>) -> Unit) {
-        Log.e("QWANT_BROWSER", "DL with active download")
         val state = store.state.findCustomTabOrSelectedTab(tabId) ?: return
         val download = state.content.download ?: return
         block(Pair(state, download))
@@ -527,7 +482,6 @@ class DownloadsFeature(
      */
     @VisibleForTesting
     internal fun getDownloaderApps(context: Context, download: DownloadState): List<DownloaderApp> {
-        Log.e("QWANT_BROWSER", "DL get dl apps")
         val packageManager = context.packageManager
 
         val browsers = Browsers.findResolvers(context, packageManager, includeThisApp = true)
@@ -552,7 +506,6 @@ class DownloadsFeature(
     private val ActivityInfo.identifier: String get() = packageName + name
 
     private fun DownloaderApp.toIntent(): Intent {
-        Log.e("QWANT_BROWSER", "DL app to intent")
         return Intent(Intent.ACTION_VIEW).apply {
             setDataAndTypeAndNormalize(url.toUri(), contentType)
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
