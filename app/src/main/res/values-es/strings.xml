@@ -184,6 +184,8 @@
     <string name="context_menu_addons">Add-ons</string>
     <string name="context_menu_add_bookmark">Añadir marcador</string>
     <string name="context_menu_del_bookmark">Eliminar marcador</string>
+    <string name="context_menu_quit_app">Cierra la aplicación Qwant</string>
+    <string name="context_menu_downloads">Descargas</string>
 
     <string name="history">Historial</string>
     <string name="history_empty_1">El historial está vacío</string>

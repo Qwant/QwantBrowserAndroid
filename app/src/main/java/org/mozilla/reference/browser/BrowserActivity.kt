@@ -49,6 +49,7 @@ import java.io.File
 import java.io.FileReader
 import java.io.IOException
 import java.util.*
+import kotlin.system.exitProcess
 
 
 /**
@@ -88,6 +89,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         qwantbar.onMenuClicked(::showSettings)
         qwantbar.onBackClicked(::onBackPressed)
         qwantbar.onHistoryClicked(::showHistory)
+        qwantbar.onQuitAppClicked(::quitApp)
 
         if (savedInstanceState == null) {
             if (intent.action == "CHANGED_LANGUAGE") {
@@ -542,6 +544,11 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
             ft.addToBackStack(backStateName)
             ft.commit()
         }
+    }
+
+    private fun quitApp() {
+        finishAffinity()
+        exitProcess(0)
     }
 
     companion object {

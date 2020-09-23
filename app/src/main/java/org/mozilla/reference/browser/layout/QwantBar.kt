@@ -1,5 +1,6 @@
 package org.mozilla.reference.browser.layout
 
+import android.app.DownloadManager
 import android.content.Context
 import android.content.Intent
 import android.util.AttributeSet
@@ -9,6 +10,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.startActivity
 import kotlinx.android.synthetic.main.component_qwantbar.view.*
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -53,6 +55,7 @@ class QwantBar @JvmOverloads constructor(
     private val menuCallbacks: MutableList<() -> Unit> = mutableListOf()
     private val backCallbacks: MutableList<() -> Unit> = mutableListOf()
     private val historyCallbacks: MutableList<() -> Unit> = mutableListOf()
+    private val quitAppCallbacks: MutableList<() -> Unit> = mutableListOf()
 
     private var tabButtonBox: ImageView? = null
     private var tabButtonBar: ImageView? = null
@@ -80,6 +83,14 @@ class QwantBar @JvmOverloads constructor(
             )),
 
             BrowserMenuDivider(),
+
+            BrowserMenuImageText(
+                    context.getString(R.string.context_menu_downloads),
+                    textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
+                    imageResource = R.drawable.ic_downloads
+            ) {
+                context.startActivity(Intent(DownloadManager.ACTION_VIEW_DOWNLOADS))
+            },
 
             BrowserMenuImageText(
                 context.getString(R.string.context_menu_add_bookmark),
@@ -174,6 +185,14 @@ class QwantBar @JvmOverloads constructor(
                     imageResource = R.drawable.ic_menu
             ) {
                 this.emitOnMenuClicked()
+            },
+
+            BrowserMenuImageText(
+                    context.getString(R.string.context_menu_quit_app),
+                    textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
+                    imageResource = R.drawable.ic_quit_app
+            ) {
+                quitAppCallbacks.forEach { it.invoke() }
             }
         )
     }
@@ -235,6 +254,7 @@ class QwantBar @JvmOverloads constructor(
     fun onMenuClicked(callback: () -> Unit) { menuCallbacks.add(callback) }
     fun onBackClicked(callback: () -> Unit) { backCallbacks.add(callback) }
     fun onHistoryClicked(callback: () -> Unit) { historyCallbacks.add(callback) }
+    fun onQuitAppClicked(callback: () -> Unit) { quitAppCallbacks.add(callback) }
 
     private var currentSelection: QwantBarSelection = QwantBarSelection.SEARCH
 

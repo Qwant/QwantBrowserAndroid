@@ -192,6 +192,8 @@
     <string name="context_menu_add_homescreen">Aggiungi alla schermata Home</string>
     <string name="context_menu_find">Trova nella Pagina</string>
     <string name="context_menu_addons">Add-ons</string>
+    <string name="context_menu_quit_app">Chiudi l\'app Qwant</string>
+    <string name="context_menu_downloads">Download</string>
 
     <!-- Text shown in the toolbar if it is empty -->
     <string name="toolbar_hint">@string/qwant_widget_text</string>

@@ -92,6 +92,8 @@
 
     <string name="context_menu_add_bookmark">Lesezeichen hinzufügen</string>
     <string name="context_menu_del_bookmark">Lesezeichen löschen</string>
+    <string name="context_menu_quit_app">Die Qwant-App schließen</string>
+    <string name="context_menu_downloads">Downloads</string>
 
     <string name="settings_main">Qwant Einstellungen</string>
 

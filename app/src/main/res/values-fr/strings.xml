@@ -102,6 +102,8 @@
     <string name="context_menu_addons">Add-ons</string>
     <string name="context_menu_add_bookmark">Ajouter aux favoris</string>
     <string name="context_menu_del_bookmark">Retirer des favoris</string>
+    <string name="context_menu_quit_app">Quitter l\'application Qwant</string>
+    <string name="context_menu_downloads">Téléchargements</string>
 
     <string name="settings_main">Paramètres Qwant</string>
 
