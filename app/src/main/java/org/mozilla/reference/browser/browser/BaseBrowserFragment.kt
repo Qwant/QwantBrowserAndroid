@@ -146,10 +146,10 @@ abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler {
                         sessionManager = requireComponents.core.sessionManager,
                         sessionId = sessionId,
                         fragmentManager = requireFragmentManager(),
-                        launchInApp = { true }
-                        /* launchInApp = {
-                            prefs.getBoolean(requireContext().getPreferenceKey(R.string.pref_key_launch_external_app), false)
-                        } */
+                        // launchInApp = { true }
+                        launchInApp = {
+                            prefs.getBoolean(requireContext().getPreferenceKey(R.string.pref_key_general_launchexternalapp), true)
+                        }
                 ),
                 owner = this,
                 view = view

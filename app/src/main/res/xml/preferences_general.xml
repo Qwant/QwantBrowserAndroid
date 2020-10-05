@@ -34,12 +34,12 @@
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" /> -->
 
-    <org.mozilla.reference.browser.settings.QwantPreferenceSwitch
+    <!-- <org.mozilla.reference.browser.settings.QwantPreferenceSwitch
         android:key="@string/pref_key_general_launchexternalapp"
         android:defaultValue="true"
         android:title="@string/settings_general_launchexternalapp"
         app:allowDividerAbove="true"
-        app:iconSpaceReserved="false" />
+        app:iconSpaceReserved="false" /> -->
 
     <org.mozilla.reference.browser.settings.QwantPreference
         android:key="@string/pref_key_general_makedefaultbrowser"

@@ -215,10 +215,8 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
             editor.putBoolean(resources.getString(R.string.pref_key_first_launch_402), false)
             editor.apply()
 
-            restoreSessionTabs()
+            // restoreSessionTabs()
         }
-
-        restoreShortcuts()
     }
 
     private val SESSION_FILE = "sessionstore.js"
@@ -263,10 +261,6 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         } else {
             Log.e("QWANT_BROWSER", "restore tabs session file is null")
         }
-    }
-
-    private fun restoreShortcuts() {
-        Log.e("QWANT_BROWSER", "restoring shortcuts")
     }
 
     override fun onBackPressed() {

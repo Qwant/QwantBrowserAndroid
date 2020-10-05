@@ -5,10 +5,7 @@
 package org.mozilla.reference.browser
 
 import android.content.Context
-import org.mozilla.reference.browser.components.Core
-import org.mozilla.reference.browser.components.Search
-import org.mozilla.reference.browser.components.Utilities
-import org.mozilla.reference.browser.components.UseCases
+import org.mozilla.reference.browser.components.*
 
 /**
  * Provides access to all components.
@@ -29,5 +26,5 @@ class Components(private val context: Context) {
     val utils by lazy {
         Utilities(context, core.sessionManager, useCases.sessionUseCases, useCases.searchUseCases)
     }
-    // val services by lazy { Services(context) }
+    val services by lazy { Services(context) }
 }

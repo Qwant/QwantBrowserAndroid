@@ -20,7 +20,7 @@ package mozilla.components.feature.session */
 import android.content.Context
 import android.util.Log
 import mozilla.components.browser.session.SessionManager
-import mozilla.components.browser.session.ext.toCustomTabSessionState
+// import mozilla.components.browser.session.ext.toCustomTabSessionState
 import mozilla.components.browser.session.ext.toTabSessionState
 // import mozilla.components.browser.session.usecases.EngineSessionUseCases
 import mozilla.components.browser.state.selector.findTabOrCustomTabOrSelectedTab
@@ -86,10 +86,8 @@ class QwantSessionFeature(
                             if (it.id == parentId) {
                                 sessionManager.select(it)
 
-                                // val engineSession = useCases.sessionUseCases.getOrCreateEngineSession(it.id)
+                                // val engineSession = it.toCustomTabSessionState().engineState.engineSession
                                 // if (engineSession != null) engineView.render(engineSession)
-                                val engineSession = it.toCustomTabSessionState().engineState.engineSession
-                                if (engineSession != null) engineView.render(engineSession)
 
                                 useCases.tabsUseCases.removeTab(session)
                                 return true
