@@ -5,7 +5,7 @@
 package org.mozilla.reference.browser.downloads
 
 import mozilla.components.browser.state.store.BrowserStore
-// import mozilla.components.feature.downloads.AbstractFetchDownloadService
+import mozilla.components.feature.downloads.AbstractFetchDownloadService
 import org.mozilla.reference.browser.ext.components
 
 class DownloadService : AbstractFetchDownloadService() {
