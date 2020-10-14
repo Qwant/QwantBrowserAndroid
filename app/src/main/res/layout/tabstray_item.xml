@@ -48,6 +48,7 @@
             android:layout_alignParentTop="true"
             android:contentDescription="@string/mozac_browser_tabstray_close_tab"
             android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:tint="@color/qwant_main"
             android:src="@drawable/mozac_ic_close" />
 
         <FrameLayout

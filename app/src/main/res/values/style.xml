@@ -3,7 +3,7 @@
    - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <style name="ThemeQwant" parent="Theme.AppCompat.Light">
+    <style name="ThemeQwant" parent="Theme.AppCompat.DayNight">
         <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
         <item name="actionOverflowButtonStyle">@style/QwantOverflowButtonStyle</item>
 
@@ -29,7 +29,7 @@
         <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
     </style>
 
-    <style name="ThemeQwantNoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="ThemeQwantNoActionBar" parent="Theme.AppCompat.DayNight.NoActionBar">
         <!-- <item name="preferenceTheme">@style/PreferenceThemeOverlay</item> -->
         <item name="android:spinnerDropDownItemStyle">@style/QwantSpinnerItemStyle</item>
         <item name="actionOverflowButtonStyle">@style/QwantOverflowButtonStyle</item>
@@ -44,7 +44,6 @@
         <item name="android:colorControlNormal">@color/qwant_main</item>
         <item name="android:colorSecondary" tools:targetApi="n_mr1">@color/qwant_main</item>
 
-
         <item name="android:navigationBarColor">@color/qwant_background_dark</item>
         <item name="android:windowBackground">@color/qwant_background</item>
         <!-- <item name="android:textColor">@color/qwant_main</item>
@@ -53,8 +52,8 @@
        <item name="android:actionMenuTextColor">@color/qwant_main</item> -->
 
         <item name="android:statusBarColor">@color/qwant_background_dark</item>
-        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
-        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">?attr/isLightTheme</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">?attr/isLightTheme</item>
 
         <item name="qwant_color_main">@color/qwant_main</item>
         <item name="qwant_color_background">@color/qwant_background</item>

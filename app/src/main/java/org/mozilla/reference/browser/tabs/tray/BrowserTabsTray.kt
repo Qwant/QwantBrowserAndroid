@@ -50,7 +50,7 @@ class BrowserTabsTray @JvmOverloads constructor(
                         R.drawable.background_tabstray_item_selected,
                         context.theme.resolveAttribute(R.attr.tabsTrayItemBackgroundColor),
                         context.theme.resolveAttribute(R.attr.tabsTraySelectedItemBackgroundColor),
-                        context.theme.resolveAttribute(R.attr.tabsTrayItemTextColor),
+                        R.color.close_tab_button,
                         context.theme.resolveAttribute(R.attr.tabsTraySelectedItemTextColor),
                         /* R.attr.getColor(R.styleable.BrowserTabsTray_tabsTrayItemBackgroundColor, DEFAULT_ITEM_BACKGROUND_COLOR),
                         attr.getColor(R.styleable.BrowserTabsTray_tabsTraySelectedItemBackgroundColor, DEFAULT_ITEM_BACKGROUND_SELECTED_COLOR),

@@ -130,6 +130,7 @@
     <string name="settings_general_language">Language</string>
     <string name="settings_general_adultcontent">Adult content filter</string>
     <string name="settings_general_newsonhome">News on homepage</string>
+    <string name="settings_general_dark_theme">Theme</string>
     <string name="settings_general_cleardata">Clear browsing data</string>
     <string name="settings_general_launchexternalapp">Open links in native app</string>
     <string name="settings_general_makedefaultbrowser">Set as default browser</string>
@@ -141,6 +142,13 @@
     <string name="settings_adultcontent_none">None</string>
     <string name="settings_adultcontent_moderate">Moderate</string>
     <string name="settings_adultcontent_strict">Strict</string>
+
+    <string name="settings_dark_theme_light">Light theme</string>
+    <string name="settings_dark_theme_dark">Dark theme</string>
+    <string name="settings_dark_theme_system">Use system settings</string>
+    <string name="settings_dark_theme_light_code" translatable="false">0</string>
+    <string name="settings_dark_theme_dark_code" translatable="false">1</string>
+    <string name="settings_dark_theme_system_code" translatable="false">2</string>
 
     <string name="settings_about_menu">About</string>
     <string name="settings_about">About Qwant Browser</string>

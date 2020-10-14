@@ -14,6 +14,14 @@
         app:iconSpaceReserved="false" />
 
     <org.mozilla.reference.browser.settings.QwantPreferenceDropdown
+        android:key="@string/pref_key_general_dark_theme"
+        android:title="@string/settings_general_dark_theme"
+        android:entries="@array/dark_theme_values"
+        android:entryValues="@array/dark_theme_keys"
+        android:defaultValue="@string/settings_dark_theme_system_code"
+        app:iconSpaceReserved="false"/>
+
+    <org.mozilla.reference.browser.settings.QwantPreferenceDropdown
         android:key="@string/pref_key_general_adultcontent"
         android:title="@string/settings_general_adultcontent"
         android:entries="@array/adult_content_values"

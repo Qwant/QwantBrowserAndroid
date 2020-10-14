@@ -5,10 +5,13 @@
 package org.mozilla.reference.browser.settings
 
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import android.provider.Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS
+import android.util.Log
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.Preference
 import mozilla.components.concept.engine.Engine
 import org.mozilla.reference.browser.QwantUtils
@@ -26,6 +29,9 @@ class SettingsGeneralFragment: BaseSettingsFragment() {
     override fun setupPreferences() {
         val adultContentKeys = resources.getStringArray(R.array.adult_content_keys)
         val adultContentValues = resources.getStringArray(R.array.adult_content_values)
+
+        val darkThemeKeys = resources.getStringArray(R.array.dark_theme_keys)
+        val darkThemeValues = resources.getStringArray(R.array.dark_theme_values)
 
         // Links
         findPreference(context?.getPreferenceKey(R.string.pref_key_general_language)).onPreferenceClickListener = this.getPreferenceLinkListener(
@@ -64,6 +70,31 @@ class SettingsGeneralFragment: BaseSettingsFragment() {
             }
 
             prefAdultContent.summary = adultContentValues[adultContentKeys.indexOf(value)]
+            true
+        }
+
+        val prefTheme = findPreference(context?.getPreferenceKey(R.string.pref_key_general_dark_theme)) as QwantPreferenceDropdown
+
+        Log.e("QWANT_BROWSER", "pref theme value: ${prefTheme.value}")
+
+        prefTheme.summary = darkThemeValues[darkThemeKeys.indexOf(prefTheme.value)]
+        prefTheme.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, value ->
+            requireComponents.core.sessionManager.sessions.forEach {
+                if (it.url.startsWith(requireContext().getString(R.string.homepage_startwith_filter))) {
+                    var query: String? = null
+                    if (it.url.contains("?q=") || it.url.contains("&q=")) {
+                        query = it.url.split("?q=", "&q=")[1].split("&")[0]
+                    }
+                    val reloadPage = QwantUtils.getHomepage(requireContext(), query = query, dark_theme = value as String)
+                    requireComponents.useCases.sessionUseCases.loadUrl(reloadPage, it)
+                }
+            }
+            when (value) {
+                "0" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                "1" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                "2" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+            }
+            prefTheme.summary = darkThemeValues[darkThemeKeys.indexOf(value)]
             true
         }
     }

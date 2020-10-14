@@ -18,6 +18,7 @@
     <string name="pref_key_general_language" translatable="false">pref_key_general_language</string>
     <string name="pref_key_general_adultcontent" translatable="false">pref_key_general_adultcontent</string>
     <string name="pref_key_general_newsonhome" translatable="false">pref_key_general_newsonhome</string>
+    <string name="pref_key_general_dark_theme" translatable="false">pref_key_general_dark_theme</string>
     <string name="pref_key_general_launchexternalapp" translatable="false">pref_key_general_launchexternalapp</string>
     <string name="pref_key_general_makedefaultbrowser" translatable="false">pref_key_general_makedefaultbrowser</string>
 

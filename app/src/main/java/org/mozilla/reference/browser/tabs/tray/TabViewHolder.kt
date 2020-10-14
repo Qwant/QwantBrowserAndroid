@@ -45,7 +45,7 @@ class TabViewHolder(
         }
 
         tabView.text = title
-        closeView.imageTintList = ColorStateList.valueOf(tabsTray.styling.itemTextColor)
+        // closeView.imageTintList = ColorStateList.valueOf(tabsTray.styling.itemTextColor)
         itemView.setOnClickListener {
             observable.notifyObservers { onTabSelected(tab) }
         }

@@ -5,6 +5,7 @@
 package org.mozilla.reference.browser.settings
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,6 +18,7 @@ import org.mozilla.reference.browser.browser.BrowserFragment
 
 class SettingsContainerFragment: Fragment(), UserInteractionHandler {
     private var languageChangedReload: Boolean = false
+    private var themeChangedReload: Boolean = false
     private var settingsClosedCallback: OnSettingsClosed? = null
 
     fun setOnSettingsClosed(callback: OnSettingsClosed) {
@@ -46,13 +48,23 @@ class SettingsContainerFragment: Fragment(), UserInteractionHandler {
         val tmp = arguments?.getBoolean(BUNDLE_LANGUAGE_CHANGE)
         if (tmp != null) languageChangedReload = tmp
 
+        val tmp2 = arguments?.getBoolean(BUNDLE_THEME_CHANGE)
+        if (tmp2 != null) themeChangedReload = tmp2
+
         settings_toolbar.setNavigationOnClickListener {
             this.onBackPressed()
         }
 
+        Log.d("QWANT_BROWSER", "Setting container loading $languageChangedReload / $themeChangedReload")
+
         if (languageChangedReload) {
             childFragmentManager.beginTransaction()
                     .replace(R.id.settings_fragment_container, SettingsGeneralLanguageFragment(), "SETTINGS_GENERAL_LANGUAGE_FRAGMENT")
+                    .addToBackStack(null)
+                    .commit()
+        } else if (themeChangedReload) {
+            childFragmentManager.beginTransaction()
+                    .replace(R.id.settings_fragment_container, SettingsGeneralFragment(), "SETTINGS_GENERAL_FRAGMENT")
                     .addToBackStack(null)
                     .commit()
         } else {
@@ -88,10 +100,12 @@ class SettingsContainerFragment: Fragment(), UserInteractionHandler {
 
     companion object {
         private const val BUNDLE_LANGUAGE_CHANGE: String = "LANGUAGE_CHANGE"
+        private const val BUNDLE_THEME_CHANGE: String = "THEME_CHANGE"
 
-        fun create(language_changed_reload: Boolean = false) = SettingsContainerFragment().apply {
+        fun create(language_changed_reload: Boolean = false, theme_changed_reload: Boolean = false) = SettingsContainerFragment().apply {
                arguments = Bundle().apply {
                    putBoolean(BUNDLE_LANGUAGE_CHANGE, language_changed_reload)
+                   putBoolean(BUNDLE_THEME_CHANGE, theme_changed_reload)
                }
         }
     }

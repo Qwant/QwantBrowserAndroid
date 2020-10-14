@@ -6,7 +6,10 @@ package org.mozilla.reference.browser
 
 import android.app.Activity
 import android.app.Application
+import android.content.SharedPreferences
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.preference.PreferenceManager
 import mozilla.components.browser.session.Session
 import mozilla.components.browser.state.action.SystemAction
 import mozilla.components.support.base.log.Log
@@ -25,6 +28,16 @@ open class BrowserApplication : Application(), Application.ActivityLifecycleCall
     override fun onCreate() {
 
         super.onCreate()
+
+        val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        val dayNightMode = prefs.getString(resources.getString(R.string.pref_key_general_dark_theme), "2")
+        var darkTheme = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+        when (dayNightMode) {
+            "0" -> darkTheme = AppCompatDelegate.MODE_NIGHT_NO
+            "1" -> darkTheme = AppCompatDelegate.MODE_NIGHT_YES
+            "2" -> darkTheme = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+        }
+        AppCompatDelegate.setDefaultNightMode(darkTheme)
 
         application.registerActivityLifecycleCallbacks(this)
 

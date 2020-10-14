@@ -7,11 +7,13 @@ package org.mozilla.reference.browser
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.res.Configuration
 import android.os.Bundle
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.preference.PreferenceManager
@@ -61,6 +63,8 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
     private val sessionId: String?
         get() = SafeIntent(intent).getStringExtra(EXTRA_SESSION_ID)
 
+    private var darkmode: Int = 0
+
     /**
      * Returns a new instance of [BrowserFragment] to display.
      */
@@ -68,9 +72,16 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
             BrowserFragment.create(sessionId)
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.e("QWANT_BROWSER", "browser activity creation !!")
         PACKAGE_NAME = packageName
 
         this.loadLocale()
+
+        darkmode = if (intent.hasExtra("newTheme")) {
+            intent.getIntExtra("newTheme", AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+        } else {
+            applicationContext.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+        }
 
         setContentView(R.layout.activity_main)
 
@@ -92,23 +103,53 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         qwantbar.onQuitAppClicked(::quitApp)
 
         if (savedInstanceState == null) {
-            if (intent.action == "CHANGED_LANGUAGE") {
-                qwantbar.setHighlight(QwantBar.QwantBarSelection.MORE)
-                supportFragmentManager.beginTransaction().apply {
-                    replace(R.id.container, SettingsContainerFragment.create(true), "SETTINGS_FRAGMENT")
-                    commit()
+            when (intent.action) {
+                "CHANGED_LANGUAGE" -> {
+                    Log.d("QWANT_BROWSER", "Browser activity recreated: changed language")
+
+                    qwantbar.setHighlight(QwantBar.QwantBarSelection.MORE)
+                    supportFragmentManager.beginTransaction().apply {
+                        replace(R.id.container, SettingsContainerFragment.create(language_changed_reload = true, theme_changed_reload = false), "SETTINGS_FRAGMENT")
+                        commit()
+                    }
+                    intent.action = null
                 }
-            } else {
-                Log.d("QWANT_BROWSER", "browser activity - onCreate - new browser fragment with session")
-                supportFragmentManager.beginTransaction().apply {
-                    replace(R.id.container, createBrowserFragment(sessionId), "BROWSER_FRAGMENT")
-                    commit()
+                "CHANGED_THEME" -> {
+                    Log.d("QWANT_BROWSER", "Browser activity recreated: changed theme")
+
+                    qwantbar.setHighlight(QwantBar.QwantBarSelection.MORE)
+                    supportFragmentManager.beginTransaction().apply {
+                        replace(R.id.container, SettingsContainerFragment.create(language_changed_reload = false, theme_changed_reload = true), "SETTINGS_FRAGMENT")
+                        commit()
+                    }
+                    intent.action = null
+                }
+                else -> {
+                    Log.d("QWANT_BROWSER", "Browser activity created, no subs")
+
+                    Log.d("QWANT_BROWSER", "browser activity - onCreate - new browser fragment with session")
+                    supportFragmentManager.beginTransaction().apply {
+                        replace(R.id.container, createBrowserFragment(sessionId), "BROWSER_FRAGMENT")
+                        commit()
+                    }
                 }
             }
         }
 
         this.loadV35Db()
         qwantbar.updateTabCount()
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+
+        if (darkmode != newConfig.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
+            val intent = Intent(applicationContext, BrowserActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
+            intent.action = "CHANGED_THEME"
+            intent.putExtra("newTheme", newConfig.uiMode and Configuration.UI_MODE_NIGHT_MASK);
+            startActivity(intent)
+        }
     }
 
     private fun loadLocale() {

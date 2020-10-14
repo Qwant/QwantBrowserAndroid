@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/qwantbar_container"
-    android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/photonWhite">
+    android:background="@color/qwant_background">
 
     <LinearLayout
         android:id="@+id/qwantbar_layout_nav_back"
@@ -12,16 +11,16 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:gravity="center"
-        android:visibility="gone"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="gone">
 
         <ImageView
             android:id="@+id/qwantbar_button_nav_back"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="?attr/qwant_color_main"
-            android:src="@drawable/ic_nav_back"
-            android:contentDescription="@string/menu_search" />
+            android:contentDescription="@string/menu_search"
+            android:src="@drawable/ic_nav_back" />
     </LinearLayout>
 
     <LinearLayout
@@ -30,16 +29,16 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:gravity="center"
-        android:visibility="gone"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="gone">
 
         <ImageView
             android:id="@+id/qwantbar_button_nav_forward"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="?attr/qwant_color_main"
-            android:src="@drawable/ic_nav_forward"
-            android:contentDescription="@string/menu_search" />
+            android:contentDescription="@string/menu_search"
+            android:src="@drawable/ic_nav_forward" />
     </LinearLayout>
 
     <LinearLayout
@@ -55,8 +54,8 @@
             android:layout_width="match_parent"
             android:layout_height="22dp"
             android:background="@android:color/transparent"
-            android:src="@drawable/ic_search"
-            android:contentDescription="@string/menu_search" />
+            android:contentDescription="@string/menu_search"
+            android:src="@drawable/ic_search" />
 
         <TextView
             android:id="@+id/qwantbar_text_home"
@@ -80,8 +79,8 @@
             android:layout_width="match_parent"
             android:layout_height="22dp"
             android:background="@android:color/transparent"
-            android:src="@drawable/ic_bookmark"
-            android:contentDescription="@string/menu_bookmarks" />
+            android:contentDescription="@string/menu_bookmarks"
+            android:src="@drawable/ic_bookmark" />
 
         <TextView
             android:id="@+id/qwantbar_text_bookmarks"
@@ -127,9 +126,9 @@
             android:layout_width="match_parent"
             android:layout_height="22dp"
             android:background="@android:color/transparent"
-            android:src="@drawable/ic_menu_selected"
+            android:contentDescription="@string/menu_bookmarks"
             android:scaleType="center"
-            android:contentDescription="@string/menu_bookmarks" />
+            android:src="@drawable/ic_menu_selected" />
 
         <TextView
             android:id="@+id/qwantbar_text_menu_qwant"
@@ -146,8 +145,8 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:gravity="center"
-        android:visibility="gone"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="gone">
 
         <mozilla.components.browser.menu.view.MenuButton
             android:id="@+id/qwantbar_button_menu_nav"
