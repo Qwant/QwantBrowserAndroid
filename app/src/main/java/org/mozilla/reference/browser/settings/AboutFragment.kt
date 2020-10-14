@@ -59,7 +59,7 @@ class AboutFragment: Fragment(), UserInteractionHandler {
 
         version_info.setOnTouchListener { _, _ ->
             val clipBoard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-            clipBoard.primaryClip = ClipData.newPlainText(aboutText, aboutText)
+            clipBoard.setPrimaryClip(ClipData.newPlainText(aboutText, aboutText))
 
             Toast.makeText(requireContext(), getString(R.string.toast_copied), Toast.LENGTH_SHORT).show()
             true

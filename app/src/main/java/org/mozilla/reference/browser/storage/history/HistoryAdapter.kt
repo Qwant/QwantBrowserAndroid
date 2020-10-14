@@ -116,7 +116,7 @@ class HistoryAdapter(
                     ) {
                         val clipboard: ClipboardManager? = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
                         val clip = ClipData.newPlainText("Copied URL", historyItem.visit.url)
-                        clipboard?.primaryClip = clip
+                        clipboard?.setPrimaryClip(clip)
                     },
                     BrowserMenuImageText(
                             context.getString(R.string.bookmarks_delete),

@@ -31,7 +31,7 @@ class QwantUtils {
             val builder = StringBuilder()
             builder.append(context.getString(R.string.homepage_base))
                 .append("?client=").append(client)
-                .append("&l=").append(l.toLowerCase())
+                .append("&l=").append(l?.toLowerCase())
                 .append("&sr=").append(sr)
                 .append("&r=").append(r)
                 .append("&s=").append(s)

@@ -72,7 +72,7 @@ class BookmarksAdapter(
                 ) {
                     val clipboard: ClipboardManager? = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
                     val clip = ClipData.newPlainText("Copied URL", bookmarkItem.url)
-                    clipboard?.primaryClip = clip
+                    clipboard?.setPrimaryClip(clip)
                 },
                 BrowserMenuImageText(
                         context.getString(R.string.bookmarks_delete),
