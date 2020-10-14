@@ -9,19 +9,25 @@ import android.content.res.Resources
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.CallSuper
+import androidx.annotation.ColorRes
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
 import kotlinx.android.synthetic.main.fragment_browser.*
 import kotlinx.android.synthetic.main.fragment_browser.view.*
 import mozilla.components.browser.state.selector.selectedTab
 // import mozilla.components.feature.downloads.DownloadsFeature
+
 import mozilla.components.feature.app.links.AppLinksFeature
 import org.mozilla.reference.browser.downloads.DownloadsFeature
-import mozilla.components.feature.downloads.manager.FetchDownloadManager
+// import mozilla.components.feature.downloads.manager.FetchDownloadManager
+import org.mozilla.reference.browser.downloads.FetchDownloadManager
+
 import mozilla.components.feature.findinpage.view.FindInPageView
 import mozilla.components.feature.prompts.PromptFeature
 import mozilla.components.feature.session.FullScreenFeature
@@ -31,6 +37,7 @@ import mozilla.components.feature.sitepermissions.SitePermissionsFeature
 import mozilla.components.support.base.feature.PermissionsFeature
 import mozilla.components.support.base.feature.UserInteractionHandler
 import mozilla.components.support.base.feature.ViewBoundFeatureWrapper
+import mozilla.components.support.ktx.android.content.getColorFromAttr
 import mozilla.components.support.ktx.android.util.dpToPx
 import org.mozilla.reference.browser.AppPermissionCodes.REQUEST_CODE_APP_PERMISSIONS
 import org.mozilla.reference.browser.AppPermissionCodes.REQUEST_CODE_DOWNLOAD_PERMISSIONS
@@ -136,7 +143,14 @@ abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler {
                     ),
                     onNeedToRequestPermissions = { permissions ->
                         requestPermissions(permissions, REQUEST_CODE_DOWNLOAD_PERMISSIONS)
-                    }),
+                    },
+                    promptsStyling = mozilla.components.feature.downloads.DownloadsFeature.PromptsStyling(
+                            gravity = Gravity.CENTER,
+                            shouldWidthMatchParent = false,
+                            positiveButtonBackgroundColor = R.color.download_button,
+                            positiveButtonTextColor = R.color.qwant_selected_text,
+                            positiveButtonRadius = 10.0f
+                    )),
             owner = this,
             view = view)
 
