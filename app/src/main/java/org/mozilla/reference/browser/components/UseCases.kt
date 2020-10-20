@@ -5,7 +5,9 @@
 package org.mozilla.reference.browser.components
 
 import android.content.Context
+import mozilla.components.browser.search.DefaultSearchEngineProvider
 import mozilla.components.browser.search.SearchEngineManager
+import mozilla.components.browser.search.ext.toDefaultSearchEngineProvider
 import mozilla.components.browser.session.SessionManager
 // import mozilla.components.browser.session.usecases.EngineSessionUseCases
 import mozilla.components.browser.state.store.BrowserStore
@@ -53,7 +55,7 @@ class UseCases(
     /**
      * Use cases that provide search engine integration.
      */
-    val searchUseCases by lazy { SearchUseCases(context, store, searchEngineManager, sessionManager) }
+    val searchUseCases by lazy { SearchUseCases(context, store, searchEngineManager.toDefaultSearchEngineProvider(context), sessionManager) }
 
     /**
      * Use cases that provide settings management.
