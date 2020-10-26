@@ -39,7 +39,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
-            android:textColor="#1b6e3c"
+            android:textColor="@color/qwant_url_green"
             android:textSize="12sp" />
 
     </LinearLayout>

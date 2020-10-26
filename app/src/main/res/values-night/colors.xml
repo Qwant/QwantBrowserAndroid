@@ -13,6 +13,7 @@
     <color name="qwant_light">#AAAAAA</color>
     <color name="qwant_selected">#4ba2ea</color>
     <color name="qwant_selected_text">@color/photonWhite</color>
+    <color name="qwant_url_green">#a8abb3</color>
 
     <color name="qwant_main_privacy">#c8cbd3</color>
     <color name="qwant_selected_privacy">#af27cc</color>
