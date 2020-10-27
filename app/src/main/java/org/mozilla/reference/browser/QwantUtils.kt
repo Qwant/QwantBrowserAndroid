@@ -31,7 +31,7 @@ class QwantUtils {
 
             var theme = dark_theme ?: prefs.getString(context.getString(R.string.pref_key_general_dark_theme), "2")
             if (theme == "2") {
-                theme = if (context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK > 0) "1" else "0"
+                theme = if ((context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES) "1" else "0"
             }
 
             // val localeSplit = sr.split("_")

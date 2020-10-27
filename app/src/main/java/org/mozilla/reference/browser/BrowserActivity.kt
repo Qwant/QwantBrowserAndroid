@@ -143,7 +143,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
 
-        if (darkmode != newConfig.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
+        if (darkmode != (newConfig.uiMode and Configuration.UI_MODE_NIGHT_MASK)) {
             val intent = Intent(applicationContext, BrowserActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
             intent.action = "CHANGED_THEME"
