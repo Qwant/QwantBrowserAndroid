@@ -44,6 +44,7 @@ import org.mozilla.reference.browser.R.string.pref_key_tracking_protection_priva
 import java.util.concurrent.TimeUnit
 import mozilla.components.feature.pwa.ManifestStorage
 import mozilla.components.feature.pwa.WebAppShortcutManager
+import mozilla.components.feature.sitepermissions.SitePermissionsStorage
 
 private const val DAY_IN_MINUTES = 24 * 60L
 
@@ -147,15 +148,16 @@ class Core(private val context: Context) {
         this.restore()
         this.setupAutoPersist(30000)
     } }
-        /* val h = History(context)
-        // h.load_from_storage()
-        h
-    } */
 
     /**
      * A storage component for persisting thumbnail images of tabs.
      */
     val thumbnailStorage by lazy { ThumbnailStorage(context) }
+
+    /**
+     * A storage component for site permissions.
+     */
+    val sitePermissionsStorage by lazy { SitePermissionsStorage(context) }
 
     /**
      * Icons component for loading, caching and processing website icons.

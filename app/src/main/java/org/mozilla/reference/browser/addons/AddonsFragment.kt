@@ -23,7 +23,7 @@ import mozilla.components.feature.addons.ui.AddonInstallationDialogFragment
 import mozilla.components.feature.addons.ui.AddonsManagerAdapter
 import mozilla.components.feature.addons.ui.AddonsManagerAdapterDelegate
 import mozilla.components.feature.addons.ui.PermissionsDialogFragment
-import mozilla.components.feature.addons.ui.translatedName
+// import mozilla.components.feature.addons.ui.translatedName
 import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.ext.components
 
@@ -174,7 +174,7 @@ class AddonsFragment : Fragment(), AddonsManagerAdapterDelegate {
                         runIfFragmentIsAttached {
                             Toast.makeText(
                                     requireContext(),
-                                    getString(R.string.mozac_feature_addons_failed_to_install, addon.translatedName),
+                                    "Fail to install addon",
                                     Toast.LENGTH_SHORT
                             ).show()
 
