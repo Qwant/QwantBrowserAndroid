@@ -412,7 +412,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         this.supportFragmentManager.beginTransaction().apply {
             this.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
             replace(R.id.container, tabsFragment, tag)
-            addToBackStack(tag)
+            // addToBackStack(tag)
             commit()
         }
         /* } else {
@@ -438,7 +438,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         this.supportFragmentManager.beginTransaction().apply {
             this.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
             replace(R.id.container, bookmarksFragment, "BOOKMARKS_FRAGMENT")
-            addToBackStack("BOOKMARKS_FRAGMENT")
+            // addToBackStack("BOOKMARKS_FRAGMENT")
             commit()
         }
         /* } else {
@@ -485,7 +485,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         this.supportFragmentManager.beginTransaction().apply {
             this.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
             replace(R.id.container, historyFragment, "HISTORY_FRAGMENT")
-            addToBackStack("HISTORY_FRAGMENT")
+            // addToBackStack("HISTORY_FRAGMENT")
             commit()
         }
         this.supportFragmentManager.executePendingTransactions()
@@ -500,7 +500,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         this.supportFragmentManager.beginTransaction().apply {
             this.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
             replace(R.id.container, settingsFragment, "SETTINGS_FRAGMENT")
-            addToBackStack("SETTINGS_FRAGMENT")
+            // addToBackStack("SETTINGS_FRAGMENT")
             commit()
         }
         /* } else {
@@ -576,7 +576,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
             val ft = manager.beginTransaction()
             ft.replace(R.id.container, fragment, backStateName)
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-            ft.addToBackStack(backStateName)
+            // ft.addToBackStack(backStateName)
             ft.commit()
         }
     }
