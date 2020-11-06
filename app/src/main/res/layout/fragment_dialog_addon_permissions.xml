@@ -74,6 +74,7 @@
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
             android:text="@string/addon_permissions_dialog_add"
+            android:textColor="@color/qwant_background"
             android:textAllCaps="false" />
 
 </RelativeLayout>
