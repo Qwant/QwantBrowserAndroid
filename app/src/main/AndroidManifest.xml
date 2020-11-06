@@ -159,6 +159,9 @@
             </intent-filter>
         </service> -->
 
+        <service android:name=".media.MediaService"
+            android:exported="false" />
+
         <service android:name=".downloads.DownloadService" />
 
         <provider android:name="org.mozilla.reference.browser.compat.BrowserProvider"

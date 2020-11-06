@@ -97,7 +97,6 @@ class Core(private val context: Context) {
         return sessionManager.findSessionById(tabId)
     }
 
-
     // val customTabsStore by lazy { CustomTabsServiceStore() }
 
     /**
@@ -122,12 +121,6 @@ class Core(private val context: Context) {
 
             // Show an ongoing notification when recording devices (camera, microphone) are used by web content
             RecordingDevicesNotificationFeature(context, sessionManager = this).enable()
-
-            // MediaStateMachine.start(this)
-
-            // Enable media features like showing an ongoing notification with media controls when
-            // media in web content is playing.
-            // MediaFeature(context).enable()
 
             WebNotificationFeature(context, engine, icons, R.drawable.notification_icon, BrowserActivity::class.java)
         }
