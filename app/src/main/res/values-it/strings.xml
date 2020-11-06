@@ -74,8 +74,8 @@
     <string name="assist_clipboard">APPUNTI</string>
 
     <string name="qwant_widget_text">Che cosa stai cercando ?</string>
-    <string name="privacy_policy_url">https://about.qwant.com/it/riservatezza-happ/</string>
-    <!-- <string name="privacy_policy_url">https://about.qwant.com/it/legal/riservatezza/</string>-->
+    <!-- <string name="privacy_policy_url">https://about.qwant.com/it/riservatezza-happ/</string> -->
+    <string name="privacy_policy_url">https://about.qwant.com/it/legal/riservatezza/</string>
 
     <string name="bookmarks">Segnalibri</string>
 
