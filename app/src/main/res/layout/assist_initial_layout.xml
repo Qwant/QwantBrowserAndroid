@@ -1,56 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/custom_notification_widget_layout_vert"
-    android:orientation="vertical"
+    android:id="@+id/custom_notification_widget_layout"
+    android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#F9F9FA">
-
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/custom_notification_widget_layout"
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" >
-
-        <ImageView
-            android:src="@drawable/flat_icon"
-            android:id="@+id/custom_notification_widget_logo"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:padding="10dp"
-        />
-
-        <ImageView
-            android:id="@+id/custom_notification_widget_separator"
-            android:src="@android:drawable/divider_horizontal_textfield"
-            android:layout_width="1dp"
-            android:layout_height="match_parent"
-            android:scaleType="fitXY"/>
-
-        <TextView
-            android:id="@+id/custom_notification_widget_text"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="match_parent"
-            android:text="@string/qwant_widget_text"
-            android:textColor="#737373"
-            android:textSize="16sp"
-            android:gravity="center"/>
-
-        <ImageView
-            android:src="@drawable/icon_search"
-            android:id="@+id/custom_notification_widget_magnifier"
-            android:layout_width="25dp"
-            android:layout_marginEnd="25dp"
-            android:layout_height="match_parent" />
-    </LinearLayout>
+    android:background="@drawable/background_assist_rounded">
 
     <ImageView
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/custom_notification_widget_gradient"
-        android:src="@drawable/qwant_gradient"
-        android:layout_width="match_parent"
-        android:layout_height="3dp"
-        android:scaleType="fitXY"
-        />
+        android:src="@drawable/flat_icon"
+        android:id="@+id/custom_notification_widget_logo"
+        android:layout_marginStart="2dp"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:padding="10dp" />
+
+    <TextView
+        android:id="@+id/custom_notification_widget_text"
+        android:layout_height="match_parent"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:text=""
+        android:gravity="center" />
+
+    <ImageView
+        android:src="@drawable/assist_icon_search"
+        android:id="@+id/custom_notification_widget_magnifier"
+        android:layout_height="match_parent"
+        android:layout_width="20dp"
+        android:layout_marginEnd="20dp"/>
 </LinearLayout>
