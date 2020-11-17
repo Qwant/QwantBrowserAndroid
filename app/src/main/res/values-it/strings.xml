@@ -101,7 +101,9 @@
 
     <string name="settings_general_language">Lingua</string>
     <string name="settings_general_adultcontent">Filtro contenuti per adulti</string>
+    <string name="settings_general_dark_theme">Tema</string>
     <string name="settings_general_newsonhome">Notizie sulla pagina iniziale</string>
+    <string name="settings_general_resultsinnewtab">Open results in new tab</string>
     <string name="settings_general_cleardata">Cancella i dati di navigazione</string>
     <string name="settings_general_launchexternalapp">Apri collegamenti nell\'app nativa</string>
     <string name="settings_general_makedefaultbrowser">Imposta come browser predefinito</string>
@@ -109,6 +111,10 @@
     <string name="settings_general_language_interface">Lingua dell\'interfaccia</string>
     <string name="settings_general_language_search">Lingua dei risultati di ricerca</string>
     <string name="settings_general_region_search">Area dei risultati della ricerca</string>
+
+    <string name="settings_dark_theme_light">Tema chiaro</string>
+    <string name="settings_dark_theme_dark">Tema scuro</string>
+    <string name="settings_dark_theme_system">Usa le impostazioni di sistema</string>
 
     <string name="settings_language_english">Inglese</string>
     <string name="settings_language_french">Francese</string>
