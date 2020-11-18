@@ -18,6 +18,7 @@ class QwantUtils {
                 search_region: String? = null,
                 adult_content: String? = null,
                 news_on_home: Boolean? = null,
+                results_in_new_tab: Boolean? = null,
                 dark_theme: String? = null
         ) : String {
             val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
@@ -28,6 +29,7 @@ class QwantUtils {
             val sr = search_region ?: prefs.getString(context.getString(R.string.pref_key_general_region_search), "GB")
             val s = adult_content ?: prefs.getString(context.getString(R.string.pref_key_general_adultcontent), "0")
             val hc = news_on_home ?: prefs.getBoolean(context.getString(R.string.pref_key_general_newsonhome), true)
+            val b = results_in_new_tab ?: prefs.getBoolean(context.getString(R.string.pref_key_general_resultsinnewtab), false)
 
             var theme = dark_theme ?: prefs.getString(context.getString(R.string.pref_key_general_dark_theme), "2")
             if (theme == "2") {
@@ -44,7 +46,7 @@ class QwantUtils {
                 .append("&r=").append(r)
                 .append("&s=").append(s)
                 .append("&hc=").append(if (hc) "1" else "0")
-                .append("&b=").append("0")
+                .append("&b=").append(if (b) "1" else "0")
                 .append("&theme=").append(theme)
                 // TODO
                 // .append("&a=").append(enableSuggest)

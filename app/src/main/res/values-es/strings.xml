@@ -101,7 +101,7 @@
     <string name="settings_general_adultcontent">Filtro de contenido para adultos</string>
     <string name="settings_general_dark_theme">Tema</string>
     <string name="settings_general_newsonhome">Noticias en la página de inicio</string>
-    <string name="settings_general_resultsinnewtab">Open results in new tab</string>
+    <string name="settings_general_resultsinnewtab">Abrir los resultados en una nueva pestaña</string>
     <string name="settings_general_cleardata">Borrar datos de navegación</string>
     <string name="settings_general_launchexternalapp">Abrir enlaces en la aplicación nativa</string>
     <string name="settings_general_makedefaultbrowser">Navegador predeterminado</string>

@@ -104,7 +104,7 @@
     <string name="settings_general_adultcontent">Filter für Erwachseneninhalte</string>
     <string name="settings_general_newsonhome">News auf Homepage</string>
     <string name="settings_general_dark_theme">Thema</string>
-    <string name="settings_general_resultsinnewtab">Open results in new tab</string>
+    <string name="settings_general_resultsinnewtab">Ergebnisse in neuer Registerkarte öffnen</string>
     <string name="settings_general_cleardata">Browsing-Daten zurücksetzen</string>
     <string name="settings_general_launchexternalapp">Links in nativer App öffnen</string>
     <string name="settings_general_makedefaultbrowser">Als Standardbrowser festlegen</string>
