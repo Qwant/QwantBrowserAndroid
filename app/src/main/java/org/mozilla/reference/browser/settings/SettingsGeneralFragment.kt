@@ -55,6 +55,21 @@ class SettingsGeneralFragment: BaseSettingsFragment() {
             true
         }
 
+        val prefResultInNewTabs = findPreference(context?.getPreferenceKey(R.string.pref_key_general_resultsinnewtab))
+        prefResultInNewTabs.onPreferenceChangeListener = Preference.OnPreferenceChangeListener {_, value ->
+            requireComponents.core.sessionManager.sessions.forEach {
+                if (it.url.startsWith(requireContext().getString(R.string.homepage_startwith_filter))) {
+                    var query: String? = null
+                    if (it.url.contains("?q=") || it.url.contains("&q=")) {
+                        query = it.url.split("?q=", "&q=")[1].split("&")[0]
+                    }
+                    val reloadPage = QwantUtils.getHomepage(requireContext(), query = query, results_in_new_tab = value as Boolean)
+                    requireComponents.useCases.sessionUseCases.loadUrl(reloadPage, it)
+                }
+            }
+            true
+        }
+
         val prefAdultContent = findPreference(context?.getPreferenceKey(R.string.pref_key_general_adultcontent)) as QwantPreferenceDropdown
         prefAdultContent.summary = adultContentValues[adultContentKeys.indexOf(prefAdultContent.value)]
         prefAdultContent.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, value ->
