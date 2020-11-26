@@ -274,7 +274,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
             editor.putBoolean(resources.getString(R.string.pref_key_first_launch_402), false)
             editor.apply()
 
-            restoreSessionTabs()
+            // restoreSessionTabs()
         }
     }
 

@@ -32,15 +32,15 @@ import org.mozilla.reference.browser.ext.requireComponents
 class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
     private val thumbnailsFeature = ViewBoundFeatureWrapper<BrowserThumbnails>()
     private val webExtToolbarFeature = ViewBoundFeatureWrapper<WebExtensionToolbarFeature>()
-    // private var toolbarSessionObserver: ToolbarSessionObserver? = null
+    private var toolbarSessionObserver: ToolbarSessionObserver? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         swipeRefresh.isEnabled = false
 
-        // toolbarSessionObserver = ToolbarSessionObserver(requireContext().components.core.sessionManager, toolbar, swipeRefresh)
-        // requireContext().components.core.sessionManager.register(this.toolbarSessionObserver!!)
+        toolbarSessionObserver = ToolbarSessionObserver(requireContext().components.core.sessionManager, toolbar, swipeRefresh)
+        requireContext().components.core.sessionManager.register(this.toolbarSessionObserver!!)
 
         AwesomeBarFeature(awesomeBar, toolbar, engineView)
             .addSearchProvider(
@@ -74,7 +74,7 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
         )
     }
 
-    /* override fun onPause() {
+    override fun onPause() {
         super.onPause()
         requireContext().components.core.sessionManager.unregister(this.toolbarSessionObserver!!)
     }
@@ -82,7 +82,7 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
     override fun onResume() {
         super.onResume()
         requireContext().components.core.sessionManager.register(this.toolbarSessionObserver!!)
-    } */
+    }
 
     override fun fullScreenChanged(enabled: Boolean) {
         (activity as BrowserActivity).fullScreenChanged(enabled)
