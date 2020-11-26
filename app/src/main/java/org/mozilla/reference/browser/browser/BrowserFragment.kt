@@ -25,6 +25,7 @@ import org.mozilla.reference.browser.BrowserActivity
 import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.ext.components
 import org.mozilla.reference.browser.ext.requireComponents
+import org.mozilla.reference.browser.qwant.ToolbarControlFeature
 
 
 /**
@@ -33,15 +34,12 @@ import org.mozilla.reference.browser.ext.requireComponents
 class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
     private val thumbnailsFeature = ViewBoundFeatureWrapper<BrowserThumbnails>()
     private val webExtToolbarFeature = ViewBoundFeatureWrapper<WebExtensionToolbarFeature>()
-    // private var toolbarSessionObserver: ToolbarSessionObserver? = null
+    // private var toolbarControlFeature = ViewBoundFeatureWrapper<ToolbarControlFeature>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         swipeRefresh.isEnabled = false
-
-        // toolbarSessionObserver = ToolbarSessionObserver(requireContext().components.core.sessionManager, toolbar, swipeRefresh)
-        // requireContext().components.core.sessionManager.register(this.toolbarSessionObserver!!)
 
         AwesomeBarFeature(awesomeBar, toolbar, engineView)
             .addSearchProvider(
@@ -78,17 +76,17 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
             owner = this,
             view = view
         )
-    }
 
-    /* override fun onPause() {
-        super.onPause()
-        requireContext().components.core.sessionManager.unregister(this.toolbarSessionObserver!!)
+        /* toolbarControlFeature.set(
+            feature = ToolbarControlFeature(
+                requireContext(),
+                requireComponents.core.store,
+                toolbar
+            ),
+            owner = this,
+            view = view
+        ) */
     }
-
-    override fun onResume() {
-        super.onResume()
-        requireContext().components.core.sessionManager.register(this.toolbarSessionObserver!!)
-    } */
 
     override fun fullScreenChanged(enabled: Boolean) {
         (activity as BrowserActivity).fullScreenChanged(enabled)

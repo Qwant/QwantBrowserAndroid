@@ -186,6 +186,7 @@
     <string name="homepage_startwith_filter" translatable="false">https://www.qwant.com/</string>
     <string name="settings_page_base" translatable="false">https://www.qwant.com/settings</string>
     <string name="settings_page_startwith_filter" translatable="false">https://www.qwant.com/settings?client=qwantbrowser</string>
+    <!-- <string name="privacy_policy_url">https://about.qwant.com/privacy-happ/</string> -->
     <string name="privacy_policy_url">https://about.qwant.com/legal/privacy/</string>
 
     <string name="settings_language_english">English</string>
