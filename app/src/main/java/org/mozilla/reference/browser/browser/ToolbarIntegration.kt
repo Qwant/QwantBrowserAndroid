@@ -101,7 +101,12 @@ class ToolbarIntegration(
         toolbar,
         context.components.core.store,
         context.components.useCases.sessionUseCases.loadUrl,
-        { searchTerms -> context.components.useCases.searchUseCases.defaultSearch.invoke(searchTerms, sessionManager.selectedSession) },
+        { searchTerms ->
+            context.components.useCases.searchUseCases.defaultSearch.invoke(
+                searchTerms = searchTerms,
+                searchEngine = null,
+                parentSessionId = null
+        ) },
         sessionId
     )
 

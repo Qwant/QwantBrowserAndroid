@@ -105,11 +105,11 @@ class TabsTrayFragment: Fragment(), UserInteractionHandler {
             tab_switch_normal_counter.elevation = 0F
 
             val tabCounterBox: ImageView = tab_switch_normal_counter.findViewById(R.id.counter_box)
-            val tabCounterBar: ImageView  = tab_switch_normal_counter.findViewById(R.id.counter_bar)
+            // val tabCounterBar: ImageView  = tab_switch_normal_counter.findViewById(R.id.counter_bar)
             val tabCounterText: TextView = tab_switch_normal_counter.findViewById(R.id.counter_text)
             val tabColor = ContextCompat.getColor(context, R.color.photonWhite)
             tabCounterBox.setImageDrawable(DrawableUtils.loadAndTintDrawable(context, R.drawable.mozac_ui_tabcounter_box, tabColor))
-            tabCounterBar.setImageDrawable(DrawableUtils.loadAndTintDrawable(context, R.drawable.mozac_ui_tabcounter_bar, tabColor))
+            // tabCounterBar.setImageDrawable(DrawableUtils.loadAndTintDrawable(context, R.drawable.mozac_ui_tabcounter_bar, tabColor))
             tabCounterText.setTextColor(tabColor)
 
             tab_switch_private_browsing_icon.background = ContextCompat.getDrawable(context, R.drawable.purple_gradient)

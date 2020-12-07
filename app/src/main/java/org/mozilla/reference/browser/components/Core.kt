@@ -29,7 +29,8 @@ import mozilla.components.feature.downloads.DownloadsUseCases
 import org.mozilla.reference.browser.downloads.DownloadService
 import org.mozilla.reference.browser.media.MediaService
 import mozilla.components.feature.readerview.ReaderViewMiddleware
-import mozilla.components.feature.media.RecordingDevicesNotificationFeature
+import mozilla.components.feature.media.middleware.RecordingDevicesMiddleware
+// import mozilla.components.feature.media.RecordingDevicesNotificationFeature
 import mozilla.components.feature.media.middleware.MediaMiddleware
 import mozilla.components.feature.session.HistoryDelegate
 import org.mozilla.reference.browser.browser.WebNotificationFeature
@@ -88,7 +89,8 @@ class Core(private val context: Context) {
                         MediaMiddleware(context, MediaService::class.java),
                         DownloadMiddleware(context, DownloadService::class.java),
                         ThumbnailsMiddleware(thumbnailStorage),
-                        ReaderViewMiddleware()
+                        ReaderViewMiddleware(),
+                        RecordingDevicesMiddleware(context)
                 ) + EngineMiddleware.create(engine, ::findSessionById)
         )
     }
@@ -120,7 +122,7 @@ class Core(private val context: Context) {
             icons.install(engine, store = store)
 
             // Show an ongoing notification when recording devices (camera, microphone) are used by web content
-            RecordingDevicesNotificationFeature(context, sessionManager = this).enable()
+            //  RecordingDevicesNotificationFeature(context, sessionManager = this).enable()
 
             WebNotificationFeature(context, engine, icons, R.drawable.notification_icon, BrowserActivity::class.java)
         }
