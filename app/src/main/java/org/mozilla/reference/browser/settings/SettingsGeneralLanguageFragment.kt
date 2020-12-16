@@ -86,7 +86,7 @@ class SettingsGeneralLanguageFragment: BaseSettingsFragment() {
                     query = it.url.split("?q=", "&q=")[1].split("&")[0]
                 }
                 val reloadPage = QwantUtils.getHomepage(requireContext(), query = query, interface_language = interfaceLanguage, search_language = searchLanguage, search_region = searchRegion)
-                requireComponents.useCases.sessionUseCases.loadUrl(reloadPage, it)
+                requireComponents.useCases.sessionUseCases.loadUrl(reloadPage, it.id)
             }
         }
     }

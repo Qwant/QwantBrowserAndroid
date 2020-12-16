@@ -69,6 +69,11 @@ class TabsAdapter(
         notifyItemRangeRemoved(position, count)
     override fun onTabsMoved(fromPosition: Int, toPosition: Int) =
         notifyItemMoved(fromPosition, toPosition)
+
+    override fun isTabSelected(tabs: Tabs, position: Int): Boolean {
+        return tabs.selectedIndex == position
+    }
+
     override fun onTabsChanged(position: Int, count: Int) =
         notifyItemChanged(position, null)
 }

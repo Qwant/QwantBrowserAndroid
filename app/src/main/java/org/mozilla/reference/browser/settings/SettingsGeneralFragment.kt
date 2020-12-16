@@ -49,7 +49,7 @@ class SettingsGeneralFragment: BaseSettingsFragment() {
                         query = it.url.split("?q=", "&q=")[1].split("&")[0]
                     }
                     val reloadPage = QwantUtils.getHomepage(requireContext(), query = query)
-                    requireComponents.useCases.sessionUseCases.loadUrl(reloadPage, it)
+                    requireComponents.useCases.sessionUseCases.loadUrl(reloadPage, it.id)
                 }
             }
             true
@@ -64,7 +64,7 @@ class SettingsGeneralFragment: BaseSettingsFragment() {
                         query = it.url.split("?q=", "&q=")[1].split("&")[0]
                     }
                     val reloadPage = QwantUtils.getHomepage(requireContext(), query = query, results_in_new_tab = value as Boolean)
-                    requireComponents.useCases.sessionUseCases.loadUrl(reloadPage, it)
+                    requireComponents.useCases.sessionUseCases.loadUrl(reloadPage, it.id)
                 }
             }
             true
@@ -80,7 +80,7 @@ class SettingsGeneralFragment: BaseSettingsFragment() {
                         query = it.url.split("?q=", "&q=")[1].split("&")[0]
                     }
                     val reloadPage = QwantUtils.getHomepage(requireContext(), query = query, adult_content = value as String)
-                    requireComponents.useCases.sessionUseCases.loadUrl(reloadPage, it)
+                    requireComponents.useCases.sessionUseCases.loadUrl(reloadPage, it.id)
                 }
             }
 
@@ -101,7 +101,7 @@ class SettingsGeneralFragment: BaseSettingsFragment() {
                         query = it.url.split("?q=", "&q=")[1].split("&")[0]
                     }
                     val reloadPage = QwantUtils.getHomepage(requireContext(), query = query, dark_theme = value as String)
-                    requireComponents.useCases.sessionUseCases.loadUrl(reloadPage, it)
+                    requireComponents.useCases.sessionUseCases.loadUrl(reloadPage, it.id)
                 }
             }
             when (value) {
