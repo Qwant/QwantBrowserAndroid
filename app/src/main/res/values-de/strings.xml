@@ -173,8 +173,8 @@
     <string name="settings_about">Über Qwant Browser</string>
     <string name="settings_privacy_policy">Datenschutzerklärung</string>
     <string name="settings_license">Lizenz (MPL 2.0)</string>
-    <string name="privacy_policy_url">https://about.qwant.com/de/datenschutzrichtlinie-happ/</string>
-    <!-- <string name="privacy_policy_url">https://about.qwant.com/de/rechtlich/datenschutzrichtlinie/</string> -->
+    <!-- <string name="privacy_policy_url">https://about.qwant.com/de/datenschutzrichtlinie-happ/</string> -->
+    <string name="privacy_policy_url">https://about.qwant.com/de/rechtlich/datenschutzrichtlinie/</string>
 
      <string name="settings_privacy_clear_data">Daten löschen</string>
      <string name="settings_privacy_personal_data">Personenbezogene Daten</string>
