@@ -60,7 +60,7 @@
         android:visibility="gone"
         app:layout_behavior="org.mozilla.reference.browser.browser.FindInPageBarBehavior" />
 
-    <mozilla.components.browser.toolbar.BrowserToolbar
+    <org.mozilla.reference.browser.compat.toolbar.BrowserToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="56dp"

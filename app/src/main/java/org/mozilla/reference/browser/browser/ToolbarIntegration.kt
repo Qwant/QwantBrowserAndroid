@@ -15,8 +15,10 @@ import mozilla.components.browser.menu.BrowserMenuItem
 import mozilla.components.browser.menu.item.BrowserMenuItemToolbar
 import mozilla.components.browser.menu.item.SimpleBrowserMenuItem
 import mozilla.components.browser.session.SessionManager
-import mozilla.components.browser.toolbar.BrowserToolbar
-import mozilla.components.browser.toolbar.display.DisplayToolbar
+// import mozilla.components.browser.toolbar.BrowserToolbar
+import org.mozilla.reference.browser.compat.toolbar.BrowserToolbar
+// import mozilla.components.browser.toolbar.display.DisplayToolbar
+import org.mozilla.reference.browser.compat.toolbar.DisplayToolbar
 import mozilla.components.concept.storage.HistoryStorage
 import mozilla.components.concept.toolbar.Toolbar
 // import mozilla.components.feature.pwa.WebAppUseCases
