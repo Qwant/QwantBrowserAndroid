@@ -12,6 +12,7 @@ import android.os.Bundle
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
@@ -92,6 +93,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
 
         qwantbarSessionObserver = QwantBarSessionObserver(this, components.core.sessionManager, qwantbar)
         components.core.sessionManager.register(this.qwantbarSessionObserver!!)
+        // TODO components.core.store.observe(...)
 
         qwantbar.setBookmarkStorage(bookmarksStorage!!)
         qwantbar.onTabsClicked(::showTabs)
@@ -285,6 +287,21 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         return null
     }
 
+    override fun onPause() {
+        super.onPause()
+        try {
+            val view = this.window.currentFocus
+            if (view != null) {
+                val wt = view.windowToken
+                if (wt != null) {
+                    val imm: InputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    imm.hideSoftInputFromWindow(wt, 0)
+                }
+            }
+        } catch(e: Exception) {
+            Log.e("QWANT_BROWSER", "fail closing keyboard: ${e.message}")
+        }
+    }
 
     private class LastSessionParser(private val context: Context) : SessionParser() {
         override fun onTabRead(sessionTab: SessionTab) {
