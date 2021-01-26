@@ -26,6 +26,7 @@ import androidx.core.view.isVisible
 import mozilla.components.browser.menu.BrowserMenuBuilder
 // import mozilla.components.browser.toolbar.BrowserToolbar
 import mozilla.components.browser.toolbar.R
+import mozilla.components.browser.toolbar.display.DisplayToolbar
 // import mozilla.components.browser.toolbar.internal.ActionContainer
 import mozilla.components.concept.menu.MenuController
 import mozilla.components.concept.toolbar.Toolbar
@@ -81,7 +82,7 @@ class DisplayToolbar internal constructor(
         SECURITY,
         TRACKING_PROTECTION,
         EMPTY,
-        PERMISSION_HIGHLIGHTS
+        HIGHLIGHT
     }
 
     /**
@@ -111,7 +112,7 @@ class DisplayToolbar internal constructor(
             @ColorInt val text: Int,
             @ColorInt val trackingProtection: Int?,
             @ColorInt val separator: Int,
-            @ColorInt val permissionHighlights: Int?
+            @ColorInt val highlight: Int?
     )
 
     /**
@@ -132,7 +133,7 @@ class DisplayToolbar internal constructor(
             val trackingProtectionTrackersBlocked: Drawable,
             val trackingProtectionNothingBlocked: Drawable,
             val trackingProtectionException: Drawable,
-            val permissionHighlights: PermissionHighlights
+            val highlight: Drawable
     ) {
         /**
          * Icons for site permission indicators.
@@ -180,7 +181,7 @@ class DisplayToolbar internal constructor(
                     }
                 }
             },
-            permissionIndicator = rootView.findViewById(R.id.mozac_browser_toolbar_permission_indicator)
+            highlight = rootView.findViewById(R.id.mozac_browser_toolbar_permission_indicator)
     )
 
     /**
@@ -196,7 +197,7 @@ class DisplayToolbar internal constructor(
             text = views.origin.textColor,
             trackingProtection = null,
             separator = ContextCompat.getColor(context, R.color.photonGrey80),
-            permissionHighlights = null
+            highlight = null
     )
         set(value) {
             field = value
@@ -214,8 +215,8 @@ class DisplayToolbar internal constructor(
                 views.trackingProtectionIndicator.setColorFilter(value.trackingProtection)
             }
 
-            if (value.permissionHighlights != null) {
-                views.permissionIndicator.setTint(value.permissionHighlights)
+            if (value.highlight != null) {
+                views.highlight.setTint(value.highlight)
             }
         }
 
@@ -233,9 +234,8 @@ class DisplayToolbar internal constructor(
             trackingProtectionException = requireNotNull(
                     getDrawable(context, TrackingProtectionIconView.DEFAULT_ICON_OFF_FOR_A_SITE)
             ),
-            permissionHighlights = Icons.PermissionHighlights(
-                    autoPlayBlocked =
-                    requireNotNull(getDrawable(context, R.drawable.mozac_ic_autoplay_blocked))
+            highlight = requireNotNull(
+                    getDrawable(context, R.drawable.mozac_dot_notification)
             )
     )
         set(value) {
@@ -248,7 +248,7 @@ class DisplayToolbar internal constructor(
                     value.trackingProtectionTrackersBlocked,
                     value.trackingProtectionException
             )
-            views.permissionIndicator.setIcons(value.permissionHighlights)
+            views.highlight.setIcon(value.highlight)
         }
 
     /**
@@ -302,10 +302,20 @@ class DisplayToolbar internal constructor(
         }
     }
 
+    internal fun setHighlight(state: Toolbar.Highlight): Int {
+        if (!indicators.contains(Indicators.HIGHLIGHT)) {
+            return views.highlight.visibility
+        }
+
+        views.highlight.state = state
+
+        return views.highlight.visibility
+    }
+
     /**
      * Sets a listener to be invoked when the site permission indicator icon is clicked.
      */
-    fun setOnPermissionIndicatorClickedListener(listener: (() -> Unit)?) {
+    /* fun setOnPermissionIndicatorClickedListener(listener: (() -> Unit)?) {
         if (listener == null) {
             views.permissionIndicator.setOnClickListener(null)
             views.permissionIndicator.background = null
@@ -323,7 +333,7 @@ class DisplayToolbar internal constructor(
 
             views.permissionIndicator.setBackgroundResource(outValue.resourceId)
         }
-    }
+    } */
 
     /**
      *  Sets a lambda to be invoked when the menu is dismissed
@@ -476,8 +486,8 @@ class DisplayToolbar internal constructor(
             View.GONE
         }
 
-        views.permissionIndicator.visibility = if (!urlEmpty && indicators.contains(Indicators.PERMISSION_HIGHLIGHTS)) {
-            setPermissionIndicator(toolbar.permissionHighlights)
+        views.highlight.visibility = if (!urlEmpty && indicators.contains(Indicators.HIGHLIGHT)) {
+            setHighlight(toolbar.highlight)
         } else {
             View.GONE
         }
@@ -559,7 +569,7 @@ class DisplayToolbar internal constructor(
         updateSeparatorVisibility()
     }
 
-    internal fun setPermissionIndicator(state: Toolbar.PermissionHighlights): Int {
+    /* internal fun setPermissionIndicator(state: Toolbar.PermissionHighlights): Int {
         Log.d("QWANT_BROWSER", "displaytoolbar - update permissions")
         if (!indicators.contains(Indicators.PERMISSION_HIGHLIGHTS)) {
             return views.permissionIndicator.visibility
@@ -568,7 +578,7 @@ class DisplayToolbar internal constructor(
         views.permissionIndicator.permissionHighlights = state
 
         return views.permissionIndicator.visibility
-    }
+    } */
 
     internal fun onStop() {
         views.menu.dismissMenu()
@@ -698,5 +708,5 @@ internal class DisplayToolbarViews(
         val trackingProtectionIndicator: TrackingProtectionIconView,
         val origin: OriginView,
         val progress: ProgressBar,
-        val permissionIndicator: PermissionHighlightsIconView
+        val highlight: HighlightView
 )

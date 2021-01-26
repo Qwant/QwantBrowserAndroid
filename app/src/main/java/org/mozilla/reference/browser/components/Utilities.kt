@@ -14,15 +14,19 @@ import mozilla.components.feature.pwa.intent.WebAppIntentProcessor
 import mozilla.components.feature.pwa.intent.WebAppIntentProcessor */
 import mozilla.components.feature.search.SearchUseCases
 import mozilla.components.feature.session.SessionUseCases
+import mozilla.components.feature.tabs.CustomTabsUseCases
+import mozilla.components.feature.tabs.TabsUseCases
 
 /**
  * Component group for miscellaneous components.
  */
 class Utilities(
-    private val context: Context,
-    private val sessionManager: SessionManager,
-    private val sessionUseCases: SessionUseCases,
-    private val searchUseCases: SearchUseCases
+        private val context: Context,
+        private val sessionManager: SessionManager,
+        private val sessionUseCases: SessionUseCases,
+        private val searchUseCases: SearchUseCases,
+        private val tabsUseCases: TabsUseCases,
+        private val customTabsUseCases: CustomTabsUseCases
 ) {
 
     /**
@@ -30,7 +34,7 @@ class Utilities(
      */
     val externalIntentProcessors by lazy {
         listOf(
-            CustomTabIntentProcessor(sessionManager, sessionUseCases.loadUrl, context.resources)// ,
+            CustomTabIntentProcessor(customTabsUseCases.add, context.resources)
             // WebAppIntentProcessor(sessionManager, sessionUseCases.loadUrl, ManifestStorage(context))
         )
     }
@@ -41,6 +45,6 @@ class Utilities(
      */
     val intentProcessors by lazy {
         externalIntentProcessors +
-            TabIntentProcessor(sessionManager, sessionUseCases.loadUrl, searchUseCases.newTabSearch)
+            TabIntentProcessor(tabsUseCases, sessionUseCases.loadUrl, searchUseCases.newTabSearch)
     }
 }

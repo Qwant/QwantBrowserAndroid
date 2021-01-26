@@ -43,7 +43,7 @@ class BookmarksFragment: Fragment(), UserInteractionHandler {
         listview = view.findViewById(R.id.bookmarks_listview)
         layoutNoResult = view.findViewById(R.id.bookmarks_noresult_layout)
 
-        if (bookmarksStorage != null) adapter = BookmarksAdapter(this.context!!, bookmarksStorage!!, ::bookmarkSelected)
+        if (bookmarksStorage != null) adapter = BookmarksAdapter(requireContext(), bookmarksStorage!!, ::bookmarkSelected)
         bookmarksStorage?.onChange(::storageChanged)
         listview!!.adapter = adapter
 

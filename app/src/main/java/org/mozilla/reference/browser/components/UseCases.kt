@@ -26,6 +26,7 @@ import mozilla.components.feature.pwa.WebAppUseCases */
 import mozilla.components.feature.search.SearchUseCases
 import mozilla.components.feature.session.SessionUseCases
 import mozilla.components.feature.session.SettingsUseCases
+import mozilla.components.feature.tabs.CustomTabsUseCases
 import mozilla.components.feature.tabs.TabsUseCases
 
 /**
@@ -80,4 +81,6 @@ class UseCases(
     } */
 
     val downloadsUseCases: DownloadsUseCases by lazy { DownloadsUseCases(store) }
+
+    val customTabsUseCases: CustomTabsUseCases by lazy { CustomTabsUseCases(sessionManager, sessionUseCases.loadUrl) }
 }

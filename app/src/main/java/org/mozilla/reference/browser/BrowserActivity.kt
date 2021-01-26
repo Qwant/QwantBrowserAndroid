@@ -31,7 +31,9 @@ import mozilla.components.concept.storage.RedirectSource
 import mozilla.components.concept.storage.VisitType
 import mozilla.components.concept.tabstray.TabsTray
 import mozilla.components.feature.intent.ext.EXTRA_SESSION_ID
+import mozilla.components.support.base.feature.ActivityResultHandler
 import mozilla.components.support.base.feature.UserInteractionHandler
+import mozilla.components.support.base.log.logger.Logger
 import mozilla.components.support.utils.SafeIntent
 import mozilla.components.support.webextensions.WebExtensionPopupFeature
 import org.mozilla.gecko.GeckoProfile
@@ -63,6 +65,10 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
     private var qwantbarSessionObserver: QwantBarSessionObserver? = null
     private val sessionId: String?
         get() = SafeIntent(intent).getStringExtra(EXTRA_SESSION_ID)
+
+    /* private val webExtensionPopupFeature by lazy {
+        WebExtensionPopupFeature(components.core.store, ::openPopup)
+    } */
 
     private var darkmode: Int = 0
 
@@ -598,10 +604,31 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         }
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        Logger.info("Activity onActivityResult received with " +
+                "requestCode: $requestCode, resultCode: $resultCode, data: $data")
+
+        supportFragmentManager.fragments.forEach {
+            if (it is ActivityResultHandler && it.onActivityResult(requestCode, data, resultCode)) {
+                return
+            }
+        }
+
+        super.onActivityResult(requestCode, resultCode, data)
+    }
+
     private fun quitApp() {
         finishAffinity()
         exitProcess(0)
     }
+
+    /* private fun openPopup(webExtensionState: WebExtensionState) {
+        val intent = Intent(this, WebExtensionActionPopupActivity::class.java)
+        intent.putExtra("web_extension_id", webExtensionState.id)
+        intent.putExtra("web_extension_name", webExtensionState.name)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(intent)
+    } */
 
     companion object {
         lateinit var PACKAGE_NAME: String

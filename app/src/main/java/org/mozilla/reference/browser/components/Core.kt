@@ -46,6 +46,7 @@ import java.util.concurrent.TimeUnit
 import mozilla.components.feature.pwa.ManifestStorage
 import mozilla.components.feature.pwa.WebAppShortcutManager
 import mozilla.components.feature.sitepermissions.SitePermissionsStorage
+import org.mozilla.reference.browser.addons.QwantAddonCollectionProvider
 
 private const val DAY_IN_MINUTES = 24 * 60L
 
@@ -99,7 +100,9 @@ class Core(private val context: Context) {
         return sessionManager.findSessionById(tabId)
     }
 
-    // val customTabsStore by lazy { CustomTabsServiceStore() }
+    val sessionStorage: SessionStorage by lazy {
+        SessionStorage(context, engine)
+    }
 
     /**
      * The session manager component provides access to a centralized registry of
@@ -108,15 +111,13 @@ class Core(private val context: Context) {
      * case all sessions/tabs are closed.
      */
     val sessionManager by lazy {
-        val sessionStorage = SessionStorage(context, engine)
-
         SessionManager(engine, store).apply {
-            sessionStorage.restore()?.let { snapshot -> restore(snapshot) }
+            // sessionStorage.restore()?.let { snapshot -> restore(snapshot) }
 
-            sessionStorage.autoSave(store)
+            /* sessionStorage.autoSave(store)
                 .periodicallyInForeground(interval = 30, unit = TimeUnit.SECONDS)
                 .whenGoingToBackground()
-                .whenSessionsChange()
+                .whenSessionsChange() */
 
             // Install the "icons" WebExtension to automatically load icons for every visited website.
             icons.install(engine, store = store)
@@ -171,7 +172,7 @@ class Core(private val context: Context) {
             client = client,
             maxCacheAgeInMinutes = DAY_IN_MINUTES
         )
-    }
+    } */
 
     /**
      * Component for managing shortcuts (both regular and PWA).
@@ -194,7 +195,6 @@ class Core(private val context: Context) {
         normalMode: Boolean = prefs.getBoolean(context.getPreferenceKey(pref_key_tracking_protection_normal), true),
         privateMode: Boolean = prefs.getBoolean(context.getPreferenceKey(pref_key_tracking_protection_private), true)
     ): TrackingProtectionPolicy {
-
         val trackingPolicy = TrackingProtectionPolicy.recommended()
         return when {
             normalMode && privateMode -> trackingPolicy

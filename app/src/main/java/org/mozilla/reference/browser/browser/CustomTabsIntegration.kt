@@ -21,8 +21,10 @@ import mozilla.components.feature.session.SessionUseCases
 import mozilla.components.support.base.feature.LifecycleAwareFeature
 import mozilla.components.support.base.feature.UserInteractionHandler
 import mozilla.components.support.base.log.logger.Logger
+import mozilla.components.support.ktx.android.content.res.resolveAttribute
 import org.mozilla.reference.browser.BrowserActivity
 import org.mozilla.reference.browser.R
+import org.mozilla.reference.browser.ext.components
 import org.mozilla.reference.browser.ext.share
 
 class CustomTabsIntegration(
@@ -49,21 +51,21 @@ class CustomTabsIntegration(
     private val menuToolbar by lazy {
         val forward = BrowserMenuItemToolbar.Button(
             mozilla.components.ui.icons.R.drawable.mozac_ic_forward,
-            iconTintColorResource = R.attr.qwant_color_main,
+            iconTintColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
             contentDescription = "Forward") {
             sessionUseCases.goForward.invoke(session)
         }
 
         val refresh = BrowserMenuItemToolbar.Button(
             mozilla.components.ui.icons.R.drawable.mozac_ic_refresh,
-            iconTintColorResource = R.attr.qwant_color_main,
+            iconTintColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
             contentDescription = "Refresh") {
             sessionUseCases.reload.invoke(session)
         }
 
         val stop = BrowserMenuItemToolbar.Button(
             mozilla.components.ui.icons.R.drawable.mozac_ic_stop,
-            iconTintColorResource = R.attr.qwant_color_main,
+            iconTintColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
             contentDescription = "Stop") {
             sessionUseCases.stopLoading.invoke(session)
         }
@@ -111,10 +113,11 @@ class CustomTabsIntegration(
     private val menuBuilder = BrowserMenuBuilder(menuItems)
 
     private val feature = CustomTabsToolbarFeature(
-        sessionManager,
-        toolbar,
-        sessionId,
-        menuBuilder,
+        store = context.components.core.store,
+        toolbar = toolbar,
+        sessionId = sessionId,
+        useCases = context.components.useCases.customTabsUseCases,
+        menuBuilder = menuBuilder,
         window = activity?.window,
         closeListener = { activity?.finish() }
     )

@@ -25,9 +25,11 @@ import mozilla.components.feature.session.FullScreenFeature
 import mozilla.components.feature.session.SwipeRefreshFeature
 import mozilla.components.feature.tabs.WindowFeature
 import mozilla.components.feature.sitepermissions.SitePermissionsFeature
+import mozilla.components.support.base.feature.ActivityResultHandler
 import mozilla.components.support.base.feature.PermissionsFeature
 import mozilla.components.support.base.feature.UserInteractionHandler
 import mozilla.components.support.base.feature.ViewBoundFeatureWrapper
+import mozilla.components.support.base.log.logger.Logger
 import org.mozilla.reference.browser.AppPermissionCodes.REQUEST_CODE_APP_PERMISSIONS
 import org.mozilla.reference.browser.AppPermissionCodes.REQUEST_CODE_DOWNLOAD_PERMISSIONS
 import org.mozilla.reference.browser.AppPermissionCodes.REQUEST_CODE_PROMPT_PERMISSIONS
@@ -43,7 +45,7 @@ import org.mozilla.reference.browser.pip.PictureInPictureIntegration
  * UI code specific to the app or to custom tabs can be found in the subclasses.
  */
 @Suppress("TooManyFunctions")
-abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler {
+abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler, ActivityResultHandler {
     private val sessionFeature = ViewBoundFeatureWrapper<QwantSessionFeature>()
     private val toolbarIntegration = ViewBoundFeatureWrapper<ToolbarIntegration>()
     private val contextMenuIntegration = ViewBoundFeatureWrapper<ContextMenuIntegration>()
@@ -62,6 +64,12 @@ abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler {
         findInPageIntegration,
         toolbarIntegration,
         sessionFeature
+    )
+    private val webAuthnFeature = ViewBoundFeatureWrapper<WebAuthnFeature>()
+
+    private val activityResultHandler: List<ViewBoundFeatureWrapper<*>> = listOf(
+            webAuthnFeature,
+            promptsFeature
     )
 
     protected val sessionId: String?
@@ -146,7 +154,7 @@ abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler {
         appLinksFeature.set(
                 feature = AppLinksFeature(
                         requireContext(),
-                        sessionManager = requireComponents.core.sessionManager,
+                        store = requireComponents.core.store,
                         sessionId = sessionId,
                         fragmentManager = requireFragmentManager(),
                         // launchInApp = { true }
@@ -283,7 +291,10 @@ abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler {
         }
     }
 
-    final override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        promptsFeature.withFeature { it.onActivityResult(requestCode, resultCode, data) }
+    override fun onActivityResult(requestCode: Int, data: Intent?, resultCode: Int): Boolean {
+        Logger.info("Fragment onActivityResult received with " +
+                "requestCode: $requestCode, resultCode: $resultCode, data: $data")
+
+        return activityResultHandler.any { it.onActivityResult(requestCode, data, resultCode) }
     }
 }

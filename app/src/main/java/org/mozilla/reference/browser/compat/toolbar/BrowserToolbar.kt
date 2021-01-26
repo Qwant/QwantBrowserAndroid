@@ -26,7 +26,7 @@ import kotlinx.coroutines.launch
 import mozilla.components.concept.toolbar.AutocompleteDelegate
 import mozilla.components.concept.toolbar.AutocompleteResult
 import mozilla.components.concept.toolbar.Toolbar
-import mozilla.components.concept.toolbar.Toolbar.PermissionHighlights
+// import mozilla.components.concept.toolbar.Toolbar.PermissionHighlights
 import mozilla.components.support.base.android.Padding
 import mozilla.components.support.base.log.logger.Logger
 import mozilla.components.ui.autocomplete.AutocompleteView
@@ -114,10 +114,10 @@ class BrowserToolbar @JvmOverloads constructor(
         get() = display.siteSecurity
         set(value) { display.siteSecurity = value }
 
-    override var permissionHighlights: PermissionHighlights = PermissionHighlights.NONE
+    override var highlight: Toolbar.Highlight = Toolbar.Highlight.NONE
         set(value) {
             if (field != value) {
-                display.setPermissionIndicator(value)
+                display.setHighlight(value)
                 field = value
             }
         }

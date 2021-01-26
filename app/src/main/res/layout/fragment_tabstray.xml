@@ -85,8 +85,7 @@
             android:layout_marginBottom="4dp"
             android:elevation="6dp"
             android:layout_alignStart="@id/tab_switch_button_background"
-            android:background="@drawable/tab_switch_foreground_normal"
-            app:drawableColor="?attr/qwant_color_tabpanel_tabcounter" />
+            android:background="@drawable/tab_switch_foreground_normal" />
 
         <ImageView
             android:id="@+id/tab_switch_private_browsing_icon"

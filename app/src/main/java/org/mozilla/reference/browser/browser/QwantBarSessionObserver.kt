@@ -144,9 +144,9 @@ class QwantBarSessionObserver(
         checkSession(session)
     }
 
-    override fun onLaunchIntentRequest(session: Session, url: String, appIntent: Intent?) {
+    /* override fun onLaunchIntentRequest(session: Session, url: String, appIntent: Intent?) {
         checkSession(url)
-    }
+    } */
 
     override fun onNavigationStateChanged(session: Session, canGoBack: Boolean, canGoForward: Boolean) {
         super.onNavigationStateChanged(session, canGoBack, canGoForward)

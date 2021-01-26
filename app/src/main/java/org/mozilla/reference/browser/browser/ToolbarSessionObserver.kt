@@ -63,9 +63,9 @@ class ToolbarSessionObserver(
         checkSession(url)
     }
 
-    override fun onLaunchIntentRequest(session: Session, url: String, appIntent: Intent?) {
+    /* override fun onLaunchIntentRequest(session: Session, url: String, appIntent: Intent?) {
         checkSession(url)
-    }
+    } */
 
     // override fun onProgress(session: Session, progress: Int) {
         /* if (session.url.startsWith(toolbar.context.getString(R.string.homepage_startwith_filter))) {
