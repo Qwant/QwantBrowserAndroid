@@ -18,6 +18,7 @@
     <attr name="qwant_color_light" format="reference|color" />
     <attr name="qwant_color_selected" format="reference|color" />
     <attr name="qwant_color_selected_text" format="reference|color" />
+    <attr name="qwant_color_url_green" format="reference|color" />
     <attr name="qwant_color_green" format="reference|color" />
     <attr name="qwant_color_red" format="reference|color" />
     <attr name="qwant_color_tabpanel_tabcounter" format="reference|color" />

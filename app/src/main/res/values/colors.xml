@@ -18,7 +18,9 @@
     <color name="qwant_light">#AAAAAA</color>
     <color name="qwant_selected">#4ba2ea</color>
     <color name="qwant_selected_text">@color/photonWhite</color>
-    <color name="qwant_url_green">#1b6e3c</color>
+    <color name="qwant_url_green">#5d9836</color>
+    <color name="qwant_black">#0c0c0e</color>
+    <color name="qwant_tab_selected">#e5eeff</color>
 
     <color name="qwant_main_privacy">#c8cbd3</color>
     <color name="qwant_selected_privacy">#af27cc</color>

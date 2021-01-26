@@ -48,7 +48,7 @@ import org.mozilla.reference.browser.storage.BookmarkItemV1
 import org.mozilla.reference.browser.storage.bookmarks.BookmarksFragment
 import org.mozilla.reference.browser.storage.bookmarks.BookmarksStorage
 import org.mozilla.reference.browser.storage.history.HistoryFragment
-import org.mozilla.reference.browser.tabs.TabsTrayFragment
+import org.mozilla.reference.browser.tabs.QwantTabsFragment
 import org.mozilla.reference.browser.tabs.tray.BrowserTabsTray
 import java.io.File
 import java.io.FileReader
@@ -362,7 +362,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
             is SettingsContainerFragment -> {
                 fragment.setOnSettingsClosed(this)
             }
-            is TabsTrayFragment -> {
+            is QwantTabsFragment -> {
                 var isPrivate = false
                 if (components.core.sessionManager.selectedSession != null)
                     isPrivate = components.core.sessionManager.selectedSession!!.private
@@ -430,7 +430,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         var tabsFragment = this.supportFragmentManager.findFragmentByTag(tag)
         if (tabsFragment == null) {
             Log.d("QWANT_BROWSER", "showTabs - no tabs fragment available in fragment manager")
-            tabsFragment = TabsTrayFragment()
+            tabsFragment = QwantTabsFragment() // TabsTrayFragment()
         }
         this.supportFragmentManager.beginTransaction().apply {
             this.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)

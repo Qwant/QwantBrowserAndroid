@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/tabsHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/tabsTray"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="@color/qwant_background_dark"
+        android:backgroundTint="?attr/qwant_color_background_dark"
+        app:titleTextColor="?attr/qwant_color_main"
+        android:theme="@style/ThemeQwantNoActionBar"
+        app:navigationIcon="@drawable/ic_back" />
+
+    <ListView
+        android:id="@+id/tabsList"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:divider="@null"
+        android:dividerHeight="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/relative_toolbar"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <Button
+        android:id="@+id/button_new_tab"
+        android:layout_width="140dp"
+        android:layout_height="40dp"
+        android:layout_marginBottom="48dp"
+        android:background="@drawable/blue_gradient"
+        android:drawableStart="@drawable/mozac_ic_tab_new"
+        android:gravity="center|center_horizontal"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:text="@string/menu_action_add_tab"
+        android:textColor="?attr/qwant_color_selected_text"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <RelativeLayout
+        android:id="@+id/relative_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/tabsTray"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:background="?attr/qwant_color_background_dark">
+
+        <ImageButton
+            android:id="@+id/back_tabs_button"
+            android:layout_width="64dp"
+            android:layout_height="48dp"
+            android:background="@android:color/transparent"
+            app:srcCompat="@drawable/ic_back" />
+
+        <ImageButton
+            android:id="@+id/tab_switch_button_background"
+            style="@style/Widget.AppCompat.ImageButton"
+            android:layout_width="140dp"
+            android:layout_height="40dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            android:background="@android:color/transparent"
+            app:srcCompat="@drawable/tab_switch_background" />
+
+        <mozilla.components.ui.tabcounter.TabCounter
+            android:id="@+id/tab_switch_normal_counter"
+            android:layout_width="70dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            android:elevation="6dp"
+            android:layout_alignStart="@id/tab_switch_button_background"
+            android:background="@drawable/tab_switch_foreground_normal"
+            app:tabCounterTintColor="#f5f5f7" />
+
+        <ImageView
+            android:id="@+id/tab_switch_private_browsing_icon"
+            android:layout_width="70dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            android:padding="6dp"
+            android:layout_alignEnd="@+id/tab_switch_button_background"
+            app:srcCompat="@drawable/ic_privacy_mask_white" />
+
+        <mozilla.components.browser.menu.view.MenuButton
+            android:id="@+id/tab_menu_more"
+            android:layout_width="64dp"
+            android:layout_height="48dp"
+            android:layout_alignParentEnd="true"
+            android:src="@drawable/ic_nav_menu" />
+    </RelativeLayout>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="6dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:src="@drawable/shadow_gradient" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
