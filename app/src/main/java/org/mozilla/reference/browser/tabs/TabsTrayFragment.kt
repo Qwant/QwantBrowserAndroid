@@ -58,8 +58,8 @@ class TabsTrayFragment: Fragment(), UserInteractionHandler {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         if (activity != null) {
-            applicationContext = activity!!.applicationContext
-            sessionManager = activity!!.application.components.core.sessionManager
+            applicationContext = requireActivity().applicationContext
+            sessionManager = requireActivity().application.components.core.sessionManager
         }
         super.onActivityCreated(savedInstanceState)
     }

@@ -918,7 +918,7 @@ public class BrowserDatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    /**
+    /*
      * We used to have a separate history extensions database which was used by Sync to store arrays
      * of visits for individual History GUIDs. It was only used by Sync.
      * This function migrates contents of that database over to the Visits table.
@@ -1051,11 +1051,7 @@ public class BrowserDatabaseHelper extends SQLiteOpenHelper {
     private void createSearchHistoryTable(SQLiteDatabase db) {
         debug("Creating " + SearchHistory.TABLE_NAME + " table");
 
-        db.execSQL("CREATE TABLE " + SearchHistory.TABLE_NAME + "(" +
-                    SearchHistory._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    SearchHistory.QUERY + " TEXT UNIQUE NOT NULL, " +
-                    SearchHistory.DATE_LAST_VISITED + " INTEGER, " +
-                    SearchHistory.VISITS + " INTEGER ) ");
+        db.execSQL(String.format("CREATE TABLE %s(%s INTEGER PRIMARY KEY AUTOINCREMENT, %s TEXT UNIQUE NOT NULL, %s INTEGER, %s INTEGER ) ", SearchHistory.TABLE_NAME, SearchHistory._ID, SearchHistory.QUERY, SearchHistory.DATE_LAST_VISITED, SearchHistory.VISITS));
 
         db.execSQL("CREATE INDEX idx_search_history_last_visited ON " +
                 SearchHistory.TABLE_NAME + "(" + SearchHistory.DATE_LAST_VISITED + ")");
@@ -1134,8 +1130,7 @@ public class BrowserDatabaseHelper extends SQLiteOpenHelper {
                 UrlAnnotations.SYNC_STATUS + " TINYINT NOT NULL DEFAULT " + UrlAnnotations.SyncStatus.NEW.getDBValue() +
                 " );");
 
-        db.execSQL("CREATE INDEX idx_url_annotations_url_key ON " +
-                UrlAnnotations.TABLE_NAME + "(" + UrlAnnotations.URL + ", " + UrlAnnotations.KEY + ")");
+        db.execSQL(String.format("CREATE INDEX idx_url_annotations_url_key ON %s(%s, %s)", UrlAnnotations.TABLE_NAME, UrlAnnotations.URL, UrlAnnotations.KEY));
     }
 
     private void createOrUpdateAllSpecialFolders(SQLiteDatabase db) {

@@ -18,7 +18,7 @@ class AboutMenuFragment: BaseSettingsFragment() {
         )
         findPreference(context?.getPreferenceKey(R.string.pref_key_privacy_policy)).onPreferenceClickListener = Preference.OnPreferenceClickListener {
             if (context != null) {
-                context!!.components.useCases.tabsUseCases.addTab(getString(R.string.privacy_policy_url), true)
+                requireContext().components.useCases.tabsUseCases.addTab(getString(R.string.privacy_policy_url), true)
                 settingsContainer?.closeSettings()
             }
             true

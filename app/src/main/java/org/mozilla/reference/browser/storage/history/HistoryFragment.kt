@@ -55,7 +55,7 @@ class HistoryFragment: Fragment(), UserInteractionHandler {
         clearAll = view.findViewById(R.id.history_clear_all)
         layoutNoResult = view.findViewById(R.id.history_noresult_layout)
 
-        adapter = HistoryAdapter(context!!, ::historyItemSelected, ::reload, ::loadMore)
+        adapter = HistoryAdapter(requireContext(), ::historyItemSelected, ::reload, ::loadMore)
         listview!!.adapter = adapter
 
         val clearAll: TextView = view.findViewById(R.id.history_clear_all)
@@ -80,7 +80,7 @@ class HistoryFragment: Fragment(), UserInteractionHandler {
                     }
                 }
 
-                val newVisits = context!!.components.core.historyStorage.getVisitsPaginated(min, count)
+                val newVisits = requireContext().components.core.historyStorage.getVisitsPaginated(min, count)
                 val calendar = Calendar.getInstance()
                 calendar.time = Date()
                 val todayDayOfYear = calendar.get(Calendar.DAY_OF_YEAR)

@@ -203,4 +203,108 @@
 
     <!-- Text shown in the toolbar if it is empty -->
     <string name="toolbar_hint">@string/qwant_widget_text</string>
+
+    <string name="privacy_policy_content"><![CDATA[
+        <div class="help_info_author">
+            <h5>Team Qwant</h5>
+        </div>
+        <div class="help_info_date">
+            Last update : 23/02/2017
+         </div>
+         <br/>
+        <p>Qwant ensures that your privacy is protected, and this is the cornerstone of our philosophy. We don’t use any cookie nor any tracking device that may allow us to track your browsing habits or to establish your profile. You are of course entitled to the rights provided by the EU General Data Protection Regulation (“GDPR”), but we also forbid ourselves from collecting an important amount of data that others collect, which are useless to provide you with the services you need. <strong>We never try to find out who you are or what you are personally doing when you use our search engine</strong>. When we do need to collect data, we do not disclose nor sell it for commercial or other uses. We use it exclusively to provide you with the services offered by Qwant.</p>
+        <p>This Privacy Policy is aimed at explaining in further details our ethical approach towards personal data, and at explaining the few cases where we have to collect information about you, the reasons why we collect such data, and the way we might use it. It also presents the security measures that we apply to protect their confidentiality, and reminds your rights and how to exercize them.</p>
+        <br/><h3>How does Qwant protect your privacy?</h3><br/>
+        <p>We should always ask our search engine what are the personal data that it does <em>not</em> collect <em>🙂</em></p>
+        <p>As a principle, <strong>Qwant does not collect data about its users when they search</strong>. Plain and simple.</p>
+        <p>When you use Qwant as a search engine, <strong>we don’t put any cookie</strong> on your browser that may allow us or others to recognize you or to follow you everywhere on the Internet. <strong>We don’t use any tracking device</strong> (pixel, fingerprinting…). We don’t collect and we don’t store any history or your searches. When you search, your query is instantly anonymized by being dissociated from your IP address, in accordance with what the French data controller advices. Long story short, what you are doing with Qwant is part of your privacy and we don’t want to know.</p>
+        <p>Qwant has a Privacy office dedicated to protecting your privacy. It also has a <strong>Data Protection Officer (DPO)</strong>. Both work closely with eachother to ensure that the relevant regulation regarding personal data is applied as strongly as it should.</p>
+        <p>The DPO keeps an updated register of all processing of personal data made by Qwant for his services. For instance, when you create an account on the site, you can choose to fill in your profile and this is a processing of personal data for which the register will say how data may be kept (and how long), and who can access it.</p>
+        <p>We commit to do anything we can to ensure the security and confidentiality of our users personal data, including by preventing data damage, loss, or access by unauthorized third parties. Qwant’s URL has the HTTPS header that shows users they communicate with Qwant through a secure channel using the TLS protocol. Technically, TLS ensures users that their data can’t be intercepted by fraud. Moreover, the green lock that you see on most browsers when using Qwant certifies that you are browsing a secure website.</p>
+        <br/><h3>When do we collect personal data, and why?</h3><br/>
+        <p>Qwant does not require any registration to use its search engine. However, you may want to register an account to sign-in and enjoy advanced functionalities such as the possibility to save search results in favorites, or create Boards.</p>
+        <p>In such cases, we collect some personal data such as your name, firstname and email address:</p>
+        <br/><ul>
+        <li>when you register to our services. You are free to manage yourself all the information related to your account (information changes, corrections, updates and deletion);</li>
+        <li>or when you use forms available on our website, so that Qwant can process your request.</li>
+        </ul><br/>
+        <p>Qwant also collects connection data, not associated with your search queries, only to ensure the security of its information system and, if you create or modify Boards, to respect the obligation to identify content creators mandated by law.</p>
+        <p><strong>Even when you are connected with an ID, we don’t use any cookie nor any other tracking device</strong> when you browse the site. The only technology that may be installed on your browser, called “local storage”, is used to locally save your settings (language, activation or deactivation of options…). You can delete personal data stored in your “local storage” by deactivating cookies in your browser. However, this deactivation may prevent you from accessing some functionalities of the site, such as your browsing preferences.</p>
+        <p>Users personal data are collected and processed by Qwant solely for the following purposes:</p>
+        <br/><ul>
+        <li>the technical management of the user’s account(s) and available services, in accordance with our Terms of Use ;</li>
+        <li>the management of information requests, in the context of the use of the services;</li>
+        <li>the management of job applications, in the context of Qwant’s recruitement processes;</li>
+        <li>the management of delisting requests, requests related to rights regarding personal data, and content removal requests, in the context of the compliance by Qwant of its legal obligations;</li>
+        <li>the security of Qwant’s information system, in the context of the management of the security and smooth operation of the services;</li>
+        </ul><br/>
+        <h3>What do we do with this personal data?</h3><br/>
+        <p>Personal data that you transmit are never disclosed or sold by Qwant to third parties, except for job applications that may be shared with recruiting partners, unless you ask us not to. Your data is stored on servers that belong to us and is never send to third-party technical parteners. Our host (as identified in our Terms) only provides a secure location for our servers, and can’t access it.</p>
+        <br/><h3>How long do we keep this personal data?</h3><br/>
+        <p>Users personal data is kept as long as you use the services provided by the site.</p>
+        <p>For Qwant and Qwant Junior accounts, your data is removed 7 days after you request that the account be deleted. During that time, you can reactivate your account by using your login information.</p>
+        <p>Regarding data collected for the processing of information requests, Qwant deletes them within 6 months after the receipt of the request.</p>
+        <p>For data that may be collected when you make a request (delisting, rights related to your personal data, content removal), the duration of retention depends on what the law prescribes for each of these rights. For more details, please refer to the next section of this Privacy Policy, entitled “What are your rights and how can you exercize them”.</p>
+        <p>For job applications, we retain the data for a maximum of two years, where they may be transmitted to partners, unless stated otherwise by the candidate.</p>
+        <p>For connection data, we do not collect directly identifiying information (we do not store your IP address). The information we process for user queries are a hashed IP address and approximate geolocation.</p>
+        <p><em>For Qwant Boards, <a href="https://www.legifrance.gouv.fr/affichTexte.do?cidTexte=JORFTEXT000023646013&amp;categorieLien=id" rel="noopener noreferrer" target="_blank">French law</a> makes it mandatory to keep some connection data (e.g. user ID used, URL or position, nature of the operation, time…) for one year. This delay starts when you create, modify of delete content on Qwant Boards, and for data related to the account, from the date you request the account removal. All data related to you account will be deleted 7 days after you request the removal, unless otherwise stated by legal obligations.</em></p>
+        <br/><h3>What are your rights and how can you exercize them?</h3><br/>
+        <p>Qwant is governed by the European General Data Protection Regulation (GDPR), which grants specific rights related to your personal data when processed by Qwant:</p>
+        <br/><ul>
+        <li>right to access, rectify, delete data under the conditions set forth by the regulation;</li>
+        <li>right the oppose the processing under the conditions set forth by the regulation;</li>
+        <li>right to limit the processing of personal data under the conditions set forth by the regulation;</li>
+        <li>right to data portability;</li>
+        <li>right to make a claim before a control authority;</li>
+        </ul><br/>
+        <p>You may exercize such rights by contacting us:</p>
+        <br/><ul>
+        <li>sending a postal mail to QWANT – Direction Ethique &amp; Affaires Juridiques, 7 rue Spontini, 75116 Paris, France ;</li>
+        <li>sending an electronic request to&nbsp;<a href="mailto:privacy@qwant.com">privacy@qwant.com</a>.</li>
+        </ul><br/>
+        <h4>Right to access</h4><br/>
+        <p>You can ask us if we have any information related to you, and ask us information regarding their processing (for instance, the categories of data we process). This right allows you to ask Qwant to give you all this information.</p>
+        <p>Information related to this right to access (such as your contact info) are kept one year after Qwant has answered, then removed when such delay is over.</p>
+        <br/><h4>Right to rectify or suppress</h4><br/>
+        <p>You can modify or delete information that you entered in your profile, in your Qwant account.</p>
+        <p>For job applications, you can request rectifications by replying to the automated e-mail you received when applying, or by sending a mail to privacy@qwant.com.</p>
+        <p>For forms for delisting requests and other rights exercizing requests, you can ask to rectify data by sending a mail to privacy@qwant.com.</p>
+        <p>Information associated to this right to rectify or suppress (such as your contact info) are kept for one year&nbsp;after Qwant has answered, then removed when such delay is over.</p>
+        <br/><h4>Right to erasure</h4><br/>
+        <p>This right allows you to have to data erased as soon as possible by Qwant.</p>
+        <p>You can erase your data by following the instructions <a href="https://help.qwant.com/help/qwant-search/my-account/how-close-qwant-account/#help_details">detailed here</a>. <em>From the date you ask for your account to be closed, the data will be deleted after 7 days, subject to our legal obligations.</em></p>
+        <p>You also can ask for your job application to be erased if you don’t want it to be processed by Qwant anymore. <em>From the day we receive your application, all data will be deleted at the latest 15 days after the receipt.</em></p>
+        <p>Information associated to the exercize of the right to erasure are stored for one year from the day Qwant answers, then deleted after this delay.</p>
+        <br/><h4>Right to be forgotten (right to delisting)</h4><br/>
+        <p>It is a specific right that the European Court of Justice (ECJ) has recognized, that Qwant applies fully. When the search query with your full name and firstname delivers results which are untrue, obsolete or excessive, you can <a href="https://help.qwant.com/help/overview/right-to-be-forgotten/#help_details">request that related web results be delisted</a>. Your request will be processed on a case by case basis, and referenced URLs will be delisted only if the balance of interests does not impose to have the public right of information prevail (for instance if you are an elected representative who is trying to make a controversial statement disappear).</p>
+        <p>Information about this right to be forgotten&nbsp;(such as&nbsp;your contact info) are kept for one year&nbsp;after Qwant has answered,&nbsp;and entirely removed&nbsp;when the legal delay is over (3 years).</p>
+        <br/><h4>Right to oppose</h4><br/>
+        <p>As the name says, the right to oppose allows you to oppose data processing by Qwant. You may, for instance, choose to delete your account.</p>
+        <p>For job applications, you are entitled to refuse that your data be transmitted or retained.</p>
+        <p>Information about this right to oppose (such as&nbsp;your contact info) are kept for one year&nbsp;after Qwant has answered,&nbsp;and entirely removed&nbsp;when the legal delay is over (3 years).</p>
+        <br/><h4>Right to restriction of processing</h4><br/>
+        <p>This right allows you to obtain the temporary withdrawal of published data when its accuracy is challenged, for a period that allows Qwant to procede with necessary checks.</p>
+        <p>Information related to the exercize of this right (for instance your data) are stored for a period of one year following the day Qwant answers, then deleted when this delay is over.</p>
+        <br/><h4>Right to data portability</h4><br/>
+        <p>This right allows to receive the data you have communicated, or to ask Qwant to transmit them to another data controller (another website for instance). In practice, following article 20 of the GDPR, the right to portability applies to your Boards.</p>
+        <p>Information related to the exercize of this right (for instance your contact info) are stored for one year from the day Qwant answers, then deleted when this delay is over.</p>
+        <p>You can get a copy of your data by connecting to your Qwant account and clicking “Receive a copy of my data” in your account.</p>
+        <br/><h3>How about ads? Aren’t they tracked?</h3><br/>
+        <p>Qwant is a free search engine open to anyone. Our main source of revenues comes from ads displayed on Qwant results page.<br>
+        But we take pride of doing it while respecting both your privacy and your search experience of Qwant.<br>
+        Qwant does not track people, and this is never going to change.</p>
+        <p>We believe you will possibly find commercials interesting when they are directly related to what you are searching.<br>
+        Through their numerous formats, ads have too often taken over the use experience. On Qwant, you will never see intrusive ads that get in the way of what are looking for.<br>
+        With such commitments, we hope to demonstrate that such responsible and respectful behavior is possible. We have been working for several month at identifying and designing solutions aligned with those principles. We believe we now have designed a simple and efficient offering by working with the Microsoft Bing ad network.</p>
+        <p>Therefore, every ad that Qwant displays fully adheres to the values we defend and our quality standards.<br>
+        When you use Qwant, no personal information whatsoever is neither captured or transmitted to advertisers.<br>
+        In details:<br>
+        – No third party cookies<br>
+        – No trackers<br>
+        – No behavioral targeting<br>
+        – No campaigns mixing legit and promotional content (native advertising)</p>
+        <p>We believe advertising can be a responsible business model.</p>
+        <br/><h3>How does Qwant index the web?</h3><br/>
+        <p>We continue our efforts to index all the Web diversity. Our crawlers relentlessly visit the global Web to refine our results. Nevertheless, this requires both a lot of resources and time: some parts of the Web are not yet perfectly indexed. In the meantime, our agreement with Microsoft Bing allows us to complement our own results with those of Microsoft Bing to offer the best possible results from all around the Web.</p>
+    ]]></string>
 </resources>
