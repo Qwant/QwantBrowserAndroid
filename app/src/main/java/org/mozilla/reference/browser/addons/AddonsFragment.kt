@@ -19,12 +19,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import mozilla.components.feature.addons.Addon
 import mozilla.components.feature.addons.AddonManagerException
-import mozilla.components.feature.addons.ui.AddonInstallationDialogFragment
-import mozilla.components.feature.addons.ui.AddonsManagerAdapter
+// import mozilla.components.feature.addons.ui.AddonInstallationDialogFragment
+// import mozilla.components.feature.addons.ui.AddonsManagerAdapter
 import mozilla.components.feature.addons.ui.AddonsManagerAdapterDelegate
 // import mozilla.components.feature.addons.ui.PermissionsDialogFragment
-import org.mozilla.reference.browser.addons.PermissionsDialogFragment
-
 // import mozilla.components.feature.addons.ui.translatedName
 import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.ext.components

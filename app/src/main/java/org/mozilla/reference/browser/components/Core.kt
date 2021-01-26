@@ -166,11 +166,21 @@ class Core(private val context: Context) {
         AddonManager(store, engine, addonCollectionProvider, addonUpdater)
     }
 
+    val addonUpdater by lazy {
+        DefaultAddonUpdater(context, AddonUpdater.Frequency(1, TimeUnit.DAYS))
+    }
+
+
     val addonCollectionProvider by lazy {
-        AddonCollectionProvider(
-            context = context,
-            client = client,
-            maxCacheAgeInMinutes = DAY_IN_MINUTES
+        QwantAddonCollectionProvider(client)
+    }
+
+    /* private fun provideDefaultAddonCollectionProvider(): AddonCollectionProvider {
+        return AddonCollectionProvider(
+                context = context,
+                client = client,
+                collectionName = "7dfae8669acc4312a65e8ba5553036",
+                maxCacheAgeInMinutes = DAY_IN_MINUTES
         )
     } */
 
