@@ -163,7 +163,7 @@ class History(val context: Context) : HistoryStorage {
         }.take(limit).toList()
     }
 
-    override suspend fun getTopFrecentSites(numItems: Int): List<TopFrecentSiteInfo> {
+    override suspend fun getTopFrecentSites(numItems: Int, frecencyThreshold: FrecencyThresholdOption): List<TopFrecentSiteInfo> {
         throw UnsupportedOperationException("Pagination is not yet supported by the in-memory history storage")
     }
 
