@@ -16,6 +16,8 @@ import org.mozilla.reference.browser.R;
 
 import java.util.ArrayList;
 
+import static org.mozilla.reference.browser.assist.SuggestItem.Type.QWANT_SUGGEST;
+
 class SuggestAdapter extends ArrayAdapter<SuggestItem> implements Filterable {
     private final static String LOGTAG = "QwantAssist";
 
@@ -34,7 +36,8 @@ class SuggestAdapter extends ArrayAdapter<SuggestItem> implements Filterable {
         return suggest_data.size();
     }
     @Override public SuggestItem getItem(int index) {
-        return suggest_data.get(index);
+        if (index < suggest_data.size()) return suggest_data.get(index);
+        return new SuggestItem(QWANT_SUGGEST, "");
     }
 
     @NotNull
@@ -43,20 +46,25 @@ class SuggestAdapter extends ArrayAdapter<SuggestItem> implements Filterable {
             listItemView = LayoutInflater.from(_context).inflate(R.layout.assist_suggestlist_item, parent, false);
         }
 
-        SuggestItem item = suggest_data.get(position);
-
-        ImageView image = listItemView.findViewById(R.id.suggest_icon);
-        if (item.type == SuggestItem.Type.QWANT_SUGGEST) {
-            image.setImageResource(R.drawable.icon_search);
-        } else if (item.type == SuggestItem.Type.HISTORY) {
-            image.setImageResource(R.drawable.icon_clock);
-        } else {
-            Log.w(LOGTAG, "unknown suggest type. Keeping default image");
-        }
-
         TextView name = listItemView.findViewById(R.id.suggest_text);
-        String display_text = (item.display_text.length() > Assist.MAX_SUGGEST_TEXT_LENGTH) ? item.display_text.substring(0, Assist.MAX_SUGGEST_TEXT_LENGTH) : item.display_text;
-        name.setText(display_text);
+
+        if (position < suggest_data.size()) {
+            SuggestItem item = suggest_data.get(position);
+
+            ImageView image = listItemView.findViewById(R.id.suggest_icon);
+            if (item.type == QWANT_SUGGEST) {
+                image.setImageResource(R.drawable.icon_search);
+            } else if (item.type == SuggestItem.Type.HISTORY) {
+                image.setImageResource(R.drawable.icon_clock);
+            } else {
+                Log.w(LOGTAG, "unknown suggest type. Keeping default image");
+            }
+
+            String display_text = (item.display_text.length() > Assist.MAX_SUGGEST_TEXT_LENGTH) ? item.display_text.substring(0, Assist.MAX_SUGGEST_TEXT_LENGTH) : item.display_text;
+            name.setText(display_text);
+        } else {
+            name.setText("");
+        }
 
         return listItemView;
     }
