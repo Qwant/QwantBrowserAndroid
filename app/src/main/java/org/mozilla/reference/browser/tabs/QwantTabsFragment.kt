@@ -2,6 +2,7 @@ package org.mozilla.reference.browser.tabs
 
 import android.content.Context
 import android.content.res.Resources
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -12,12 +13,19 @@ import android.widget.ListView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.fragment_tabstray.*
 import mozilla.components.browser.menu.BrowserMenuBuilder
 import mozilla.components.browser.menu.item.BrowserMenuImageText
 import mozilla.components.browser.session.SessionManager
 import mozilla.components.browser.state.state.TabSessionState
+import mozilla.components.browser.tabstray.DefaultTabViewHolder
+import mozilla.components.browser.tabstray.TabsTrayStyling
+import mozilla.components.browser.tabstray.ViewHolderProvider
+import mozilla.components.browser.thumbnails.loader.ThumbnailLoader
 import mozilla.components.concept.tabstray.Tab
+import mozilla.components.concept.tabstray.TabsTray
 import mozilla.components.support.base.feature.UserInteractionHandler
 import mozilla.components.support.ktx.android.content.res.resolveAttribute
 import mozilla.components.support.ktx.android.util.dpToPx
@@ -44,8 +52,11 @@ class QwantTabsFragment : Fragment(), UserInteractionHandler {
     private var applicationContext: Context? = null
     private var reference: WeakReference<TabCounter> = WeakReference<TabCounter>(null)
 
+    // private var tabsAdapter: mozilla.components.browser.tabstray.TabsAdapter? = null
     private var tabsAdapter: TabsAdapter? = null
+    // private var tabsAdapter: TabsRecyclerAdapter? = null
     private var tabsList: ListView? = null
+    // private var tabsList: RecyclerView? = null
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         if (activity != null) {
@@ -60,10 +71,30 @@ class QwantTabsFragment : Fragment(), UserInteractionHandler {
 
         tabsList = view.findViewById(R.id.tabsList)
 
+        // tabsAdapter = createAndSetupTabsTray(requireContext())
         tabsAdapter = TabsAdapter(requireContext(), isPrivate, ::tabSelected, ::tabDeleted)
-        tabsList!!.adapter = tabsAdapter
+        // tabsAdapter = TabsRecyclerAdapter(requireContext(), ThumbnailLoader(requireContext().components.core.thumbnailStorage), isPrivate, ::tabSelected, ::tabDeleted)
+
+        tabsList?.adapter = tabsAdapter
+        // tabsAdapter?.tabChanged()
 
         return view;
+    }
+
+    private fun createAndSetupTabsTray(context: Context): mozilla.components.browser.tabstray.TabsAdapter {
+        val thumbnailLoader = ThumbnailLoader(context.components.core.thumbnailStorage)
+        val viewHolderProvider: ViewHolderProvider = { viewGroup ->
+            val view = LayoutInflater.from(context).inflate(R.layout.tablist_item, viewGroup, false)
+            DefaultTabViewHolder(view, thumbnailLoader)
+        }
+        val tabsAdapter = mozilla.components.browser.tabstray.TabsAdapter(thumbnailLoader, viewHolderProvider)
+
+        // tabsTray.layoutManager = layoutManager
+        // tabsTray.adapter = tabsAdapter
+
+        // TabsTouchHelper(tabsAdapter).attachToRecyclerView(tabsTray)
+
+        return tabsAdapter
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

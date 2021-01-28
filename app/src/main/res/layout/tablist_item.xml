@@ -27,14 +27,14 @@
             android:layout_height="20dp"
             android:layout_gravity="center"
             android:scaleType="fitCenter"
-            android:src="@drawable/default_favicon" />
+            android:src="@drawable/default_favicon"
+            android:visibility="gone" />
 
-        <org.mozilla.reference.browser.tabs.TopCropImageView
+        <mozilla.components.browser.tabstray.thumbnail.TabThumbnailView
             android:id="@+id/tablist_item_preview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:visibility="gone" />
+            android:layout_gravity="center" />
     </androidx.cardview.widget.CardView>
 
     <LinearLayout
@@ -69,7 +69,7 @@
 
     </LinearLayout>
 
-    <ImageButton
+    <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/tablist_item_delete"
         android:layout_width="20dp"
         android:layout_height="match_parent"

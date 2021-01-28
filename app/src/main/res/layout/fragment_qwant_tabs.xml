@@ -18,6 +18,17 @@
         android:theme="@style/ThemeQwantNoActionBar"
         app:navigationIcon="@drawable/ic_back" />
 
+    <!-- <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/tabsList"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:divider="@null"
+        android:dividerHeight="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/relative_toolbar"
+        app:layout_constraintBottom_toBottomOf="parent" /> -->
+
     <ListView
         android:id="@+id/tabsList"
         android:layout_width="match_parent"
