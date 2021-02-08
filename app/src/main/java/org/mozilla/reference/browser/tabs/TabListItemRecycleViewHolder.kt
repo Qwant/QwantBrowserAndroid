@@ -28,11 +28,11 @@ class TabListItemRecycleViewHolder(
         private val deletedCallback: (tabSession: TabSessionState?) -> Unit
 ) : RecyclerView.ViewHolder(item_layout) {
     private var itemMainLayout: LinearLayout = item_layout.findViewById(R.id.tablist_item_layout)
-    private var itemIcon: ImageView = item_layout.findViewById(R.id.tablist_item_icon)
+    // private var itemIcon: ImageView = item_layout.findViewById(R.id.tablist_item_icon)
     private var itemPreview: TabThumbnailView = item_layout.findViewById(R.id.tablist_item_preview)
     private var itemTitle: TextView = item_layout.findViewById(R.id.tablist_item_title)
     private var itemUrl: TextView = item_layout.findViewById(R.id.tablist_item_url)
-    private var itemLayoutText: LinearLayout = item_layout.findViewById(R.id.tablist_item_layout_text)
+    // private var itemLayoutText: LinearLayout = item_layout.findViewById(R.id.tablist_item_layout_text)
     private var itemDelete: AppCompatImageButton = item_layout.findViewById(R.id.tablist_item_delete)
 
     // private val thumbnailLoader = ThumbnailLoader(context.components.core.thumbnailStorage)
@@ -47,7 +47,7 @@ class TabListItemRecycleViewHolder(
 
         this.itemTitle.text = title
         this.itemUrl.text = url
-        this.itemLayoutText.setOnClickListener { selectedCallback.invoke(tab) }
+        this.itemMainLayout.setOnClickListener { selectedCallback.invoke(tab) }
         this.itemDelete.setOnClickListener { deletedCallback.invoke(tabSession) }
 
         this.setThumbnail(tab)
@@ -75,7 +75,7 @@ class TabListItemRecycleViewHolder(
             this.itemPreview.setImageBitmap(tab.thumbnail)
         }
 
-        this.itemIcon.setImageBitmap(tab.icon)
+        // this.itemIcon.setImageBitmap(tab.icon)
     }
 
     companion object {

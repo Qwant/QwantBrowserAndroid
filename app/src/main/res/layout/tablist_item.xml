@@ -21,14 +21,14 @@
         card_view:cardCornerRadius="12dp"
         card_view:cardElevation="3dp">
 
-        <ImageView
+        <!-- <ImageView
             android:id="@+id/tablist_item_icon"
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_gravity="center"
             android:scaleType="fitCenter"
             android:src="@drawable/default_favicon"
-            android:visibility="gone" />
+            android:visibility="gone" /> -->
 
         <mozilla.components.browser.tabstray.thumbnail.TabThumbnailView
             android:id="@+id/tablist_item_preview"

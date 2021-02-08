@@ -130,6 +130,7 @@ class QwantTabsFragment : Fragment(), UserInteractionHandler {
                     imageResource = R.drawable.icon_cross
             ) {
                 context.components.useCases.tabsUseCases.removeAllTabs.invoke()
+                tabsAdapter?.tabChanged()
             }
         ))
 
