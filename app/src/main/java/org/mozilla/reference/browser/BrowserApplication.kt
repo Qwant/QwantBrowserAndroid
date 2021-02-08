@@ -78,7 +78,7 @@ open class BrowserApplication : Application(), Application.ActivityLifecycleCall
             },
             onSelectTabOverride = { _, sessionId ->
                 val selected = components.core.sessionManager.findSessionById(sessionId)
-                selected?.let { components.useCases.tabsUseCases.selectTab(it) }
+                selected?.let { components.useCases.tabsUseCases.selectTab(it.id) }
             }
         )
     }

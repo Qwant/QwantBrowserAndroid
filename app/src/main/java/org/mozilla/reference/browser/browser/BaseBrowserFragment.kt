@@ -221,8 +221,8 @@ abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler, Activit
         pictureInPictureIntegration.set(
             feature = PictureInPictureIntegration(
                 requireComponents.core.store,
-                requireComponents.core.sessionManager,
-                requireActivity()
+                requireActivity(),
+                sessionId
             ),
             owner = this,
             view = view

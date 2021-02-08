@@ -281,6 +281,10 @@ class BrowserToolbar @JvmOverloads constructor(
         display.addPageAction(action)
     }
 
+    override fun dismissMenu() {
+        TODO("Not yet implemented")
+    }
+
     /**
      * Adds an action to be display on the far left side of the toolbar. This area is usually used
      * on larger devices for navigation actions like "back" and "forward".

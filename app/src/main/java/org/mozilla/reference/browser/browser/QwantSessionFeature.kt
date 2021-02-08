@@ -89,7 +89,7 @@ class QwantSessionFeature(
                                 // val engineSession = it.toCustomTabSessionState().engineState.engineSession
                                 // if (engineSession != null) engineView.render(engineSession)
 
-                                useCases.tabsUseCases.removeTab(session)
+                                useCases.tabsUseCases.removeTab(session.id)
                                 return true
                             }
                         }
@@ -98,7 +98,7 @@ class QwantSessionFeature(
                         sessionManager.sessions.forEach {
                             if (it.private == currentSessionPrivate && it.url.startsWith(context.getString(R.string.homepage_startwith_filter))) {
                                 sessionManager.select(it)
-                                useCases.tabsUseCases.removeTab(session)
+                                useCases.tabsUseCases.removeTab(session.id)
                                 return true
                             }
                         }
