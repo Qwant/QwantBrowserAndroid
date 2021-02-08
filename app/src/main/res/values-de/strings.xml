@@ -83,6 +83,7 @@
     <string name="menu_more">@string/settings</string>
     <string name="menu_back">Rückseite</string>
 
+
     <string name="bookmarks_empty_1">Die Liste der Lesezeichen ist leer.</string>
     <string name="bookmarks_empty_2">Fügen Sie Lesezeichen über das Menü der Webseite hinzu.</string>
 
@@ -94,6 +95,8 @@
     <string name="context_menu_del_bookmark">Lesezeichen löschen</string>
     <string name="context_menu_quit_app">Die Qwant-App schließen</string>
     <string name="context_menu_downloads">Downloads</string>
+
+    <string name="context_menu_close_tab">Diesen Tab schließen</string>
 
     <string name="settings_main">Qwant Einstellungen</string>
 

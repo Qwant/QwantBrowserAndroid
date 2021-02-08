@@ -93,6 +93,7 @@
 
     <string name="context_menu_add_bookmark">Aggiungi segnalibro</string>
     <string name="context_menu_del_bookmark">Elimina segnalibro</string>
+    <string name="context_menu_close_tab">Chiudi questa scheda</string>
 
     <string name="settings_main">Impostazioni di Qwant</string>
 

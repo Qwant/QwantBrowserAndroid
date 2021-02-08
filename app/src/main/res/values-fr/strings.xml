@@ -104,6 +104,7 @@
     <string name="context_menu_del_bookmark">Retirer des favoris</string>
     <string name="context_menu_quit_app">Quitter l\'application Qwant</string>
     <string name="context_menu_downloads">Téléchargements</string>
+    <string name="context_menu_close_tab">Fermer cet onglet</string>
 
     <string name="settings_main">Paramètres Qwant</string>
 

@@ -32,6 +32,7 @@ import org.mozilla.reference.browser.addons.AddonsActivity
 import org.mozilla.reference.browser.browser.FindInPageIntegration
 import org.mozilla.reference.browser.browser.QwantBarSessionObserver
 import org.mozilla.reference.browser.ext.application
+import org.mozilla.reference.browser.ext.components
 import org.mozilla.reference.browser.ext.share
 import org.mozilla.reference.browser.storage.bookmarks.BookmarksStorage
 import java.lang.ref.WeakReference
@@ -185,6 +186,16 @@ class QwantBar @JvmOverloads constructor(
                     imageResource = R.drawable.ic_menu
             ) {
                 this.emitOnMenuClicked()
+            },
+
+            BrowserMenuImageText(
+                    context.getString(R.string.context_menu_close_tab),
+                    textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
+                    imageResource = R.drawable.ic_close_tab
+            ) {
+                if (sessionManager.selectedSession != null) {
+                    context.components.useCases.tabsUseCases.removeTab.invoke(sessionManager.selectedSession!!.id)
+                }
             },
 
             BrowserMenuImageText(

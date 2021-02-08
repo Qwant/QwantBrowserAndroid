@@ -103,6 +103,7 @@
     <string name="context_menu_addons">Add-ons</string>
     <string name="context_menu_add_bookmark">Add to bookmarks</string>
     <string name="context_menu_del_bookmark">Delete bookmark</string>
+    <string name="context_menu_close_tab">Close this tab</string>
     <string name="context_menu_quit_app">Close the Qwant app</string>
     <string name="context_menu_downloads">Downloads</string>
 
