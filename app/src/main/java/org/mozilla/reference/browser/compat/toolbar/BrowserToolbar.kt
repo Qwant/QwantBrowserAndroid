@@ -304,7 +304,6 @@ class BrowserToolbar @JvmOverloads constructor(
      * Switches to URL editing mode.
      */
     override fun editMode() {
-        Log.d("QWANT_BROWSER", "BrowserToolbar - enter edit")
         val urlValue = if (searchTerms.isEmpty()) url else searchTerms
         edit.updateUrl(urlValue.toString(), false)
         updateState(State.EDIT)

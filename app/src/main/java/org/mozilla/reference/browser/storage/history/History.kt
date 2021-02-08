@@ -225,11 +225,10 @@ class History(val context: Context) : HistoryStorage {
     }
 
     fun setupAutoPersist(delayMs: Long = 20000) {
-        Log.d("QWANT_BROWSER", "autopersist history setup")
         val mainHandler = Handler(Looper.getMainLooper())
         mainHandler.post(object : Runnable {
             override fun run() {
-                Log.d("QWANT_BROWSER", "autopersist history")
+                Log.d("QWANT_BROWSER", "set autopersist history")
                 this@History.persist()
                 mainHandler.postDelayed(this, delayMs)
             }

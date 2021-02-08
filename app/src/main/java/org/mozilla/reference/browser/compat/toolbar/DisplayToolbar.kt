@@ -168,7 +168,6 @@ class DisplayToolbar internal constructor(
                 it.toolbar = toolbar
             },
             progress = rootView.findViewById<ProgressBar>(R.id.mozac_browser_toolbar_progress).apply {
-                Log.d("QWANT_BROWSER", "displaytoolbar - internal views init")
                 accessibilityDelegate = object : View.AccessibilityDelegate() {
                     override fun onInitializeAccessibilityEvent(host: View?, event: AccessibilityEvent?) {
                         super.onInitializeAccessibilityEvent(host, event)
@@ -462,8 +461,6 @@ class DisplayToolbar internal constructor(
     fun setOnUrlLongClickListener(handler: ((View) -> Boolean)?) = views.origin.setOnUrlLongClickListener(handler)
 
     private fun updateIndicatorVisibility() {
-        Log.d("QWANT_BROWSER", "displaytoolbar - update indicators")
-
         val urlEmpty = url.isEmpty()
 
         views.securityIndicator.visibility = if (!urlEmpty && indicators.contains(Indicators.SECURITY)) {
@@ -520,7 +517,6 @@ class DisplayToolbar internal constructor(
     internal var title: String
         get() = views.origin.title
         set(value) {
-            Log.d("QWANT_BROWSER", "displaytoolbar - title update: $value")
             views.origin.title = value
         }
 
@@ -529,7 +525,6 @@ class DisplayToolbar internal constructor(
      */
     internal var url: CharSequence = ""
         set(value) {
-            Log.d("QWANT_BROWSER", "displaytoolbar - url update: $value")
             field = value
             views.origin.url = urlFormatter?.invoke(value) ?: value
             updateIndicatorVisibility()
@@ -545,7 +540,6 @@ class DisplayToolbar internal constructor(
         }
 
     private fun updateSiteSecurityIcon() {
-        Log.d("QWANT_BROWSER", "displaytoolbar - update site security")
         @ColorInt val color = when (siteSecurity) {
             Toolbar.SiteSecurity.INSECURE -> colors.securityIconInsecure
             Toolbar.SiteSecurity.SECURE -> colors.securityIconSecure
@@ -560,7 +554,6 @@ class DisplayToolbar internal constructor(
     }
 
     internal fun setTrackingProtectionState(state: Toolbar.SiteTrackingProtection) {
-        Log.d("QWANT_BROWSER", "displaytoolbar - update tracking protection")
         if (!indicators.contains(Indicators.TRACKING_PROTECTION)) {
             return
         }
@@ -609,7 +602,6 @@ class DisplayToolbar internal constructor(
      *
      */
     internal fun updateProgress(progress: Int) {
-        Log.d("QWANT_BROWSER", "displaytoolbar - update progress: $progress")
         if (!views.progress.isVisible && progress > 0) {
             // Loading has just started, make visible and announce "loading" for accessibility.
             views.progress.visibility = View.VISIBLE
@@ -631,7 +623,6 @@ class DisplayToolbar internal constructor(
      * should be updated if needed.
      */
     internal fun invalidateActions() {
-        Log.d("QWANT_BROWSER", "displaytoolbar - invalidate actions")
         views.menu.invalidateMenu()
 
         views.browserActions.invalidateActions()

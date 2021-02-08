@@ -121,7 +121,7 @@ class SettingsGeneralLanguageFragment: BaseSettingsFragment() {
             }
             prefRegionSearch.forceNotifyChange()
         } else {
-            Log.d("QWANT_BROWSER", "Error in language XML files")
+            Log.e("QWANT_BROWSER", "Error in language XML files")
         }
 
         listArrayKeys.recycle();

@@ -55,8 +55,6 @@ class SettingsContainerFragment: Fragment(), UserInteractionHandler {
             this.onBackPressed()
         }
 
-        Log.d("QWANT_BROWSER", "Setting container loading $languageChangedReload / $themeChangedReload")
-
         if (languageChangedReload) {
             childFragmentManager.beginTransaction()
                     .replace(R.id.settings_fragment_container, SettingsGeneralLanguageFragment(), "SETTINGS_GENERAL_LANGUAGE_FRAGMENT")

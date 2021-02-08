@@ -102,7 +102,6 @@ class EditToolbar internal constructor(
             url = rootView.findViewById<InlineAutocompleteEditText>(
                     R.id.mozac_browser_toolbar_edit_url_view
             ).apply {
-                Log.d("QWANT_BROWSER", "edittoolbar - internal views init")
                 setOnCommitListener {
                     // We emit the fact before notifying the listener because otherwise the listener may cause a focus
                     // change which may reset the autocomplete state that we want to report here.
@@ -204,7 +203,6 @@ class EditToolbar internal constructor(
      */
     fun setOnEditFocusChangeListener(listener: (Boolean) -> Unit) {
         views.url.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
-            Log.d("QWANT_BROWSER", "edittoolbar - focus changed listener: $hasFocus")
             listener.invoke(hasFocus)
         }
     }
@@ -213,7 +211,6 @@ class EditToolbar internal constructor(
      * Focuses the url input field and shows the virtual keyboard if needed.
      */
     fun focus() {
-        Log.d("QWANT_BROWSER", "edittoolbar - focus")
         views.url.run {
             showKeyboard(flags = InputMethodManager.SHOW_FORCED)
             requestFocus()
@@ -221,12 +218,10 @@ class EditToolbar internal constructor(
     }
 
     internal fun stopEditing() {
-        Log.d("QWANT_BROWSER", "edittoolbar - stop editing")
         editListener?.onStopEditing()
     }
 
     internal fun startEditing() {
-        Log.d("QWANT_BROWSER", "edittoolbar - start editing")
         editListener?.onStartEditing()
     }
 
@@ -239,7 +234,6 @@ class EditToolbar internal constructor(
     }
 
     internal fun invalidateActions() {
-        Log.d("QWANT_BROWSER", "edittoolbar - invalidate actions")
         views.editActions.invalidateActions()
     }
 
@@ -252,7 +246,6 @@ class EditToolbar internal constructor(
      * and is only a visual change
      */
     fun updateUrl(url: String, shouldAutoComplete: Boolean = false, shouldHighlight: Boolean = false) {
-        Log.d("QWANT_BROWSER", "edittoolbar - updateUrl: $url - $shouldAutoComplete - $shouldHighlight")
         views.url.setText(url, shouldAutoComplete)
         views.clear.isVisible = url.isNotBlank()
 
@@ -265,7 +258,6 @@ class EditToolbar internal constructor(
      * Select the entire text in the URL input field.
      */
     internal fun selectAll() {
-        Log.d("QWANT_BROWSER", "edittoolbar - select all")
         views.url.selectAll()
     }
 
@@ -273,7 +265,6 @@ class EditToolbar internal constructor(
      * Applies the given search terms for further editing, requesting new suggestions along the way.
      */
     internal fun editSuggestion(searchTerms: String) {
-        Log.d("QWANT_BROWSER", "edittoolbar - edit suggestions: $searchTerms")
         // updateUrl(searchTerms)
         // views.url.setSelection(views.url.text.length)
         // focus()
@@ -298,8 +289,7 @@ class EditToolbar internal constructor(
         }
 
     private fun onClear() {
-        // We set text to an empty string instead of using clear to avoid #3612.
-        Log.d("QWANT_BROWSER", "edittoolbar - on clear")
+        // We set text to an empty string instead of using clear to avoid #3612
         views.url.setText("")
     }
 
@@ -313,7 +303,6 @@ class EditToolbar internal constructor(
     }
 
     private fun onTextChanged(text: String) {
-        Log.d("QWANT_BROWSER", "edittoolbar - on text changed")
         views.clear.isVisible = text.isNotBlank()
         /*
         We use margin_gone instead of margin to take into account both the actionContainer(which in

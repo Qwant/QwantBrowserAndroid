@@ -114,17 +114,13 @@ class BookmarksStorage(private var context: Context) {
         val prefkey = context.resources.getString(R.string.pref_key_bookmarks_version)
         val bookmarksVersion = prefs.getInt(prefkey, 0)
 
-        Log.e("QWANT_BROWSER", "restore bookmarks - version $bookmarksVersion")
-
         val editor: SharedPreferences.Editor = prefs.edit()
         editor.putInt(prefkey, 1)
         editor.apply()
 
         if (bookmarksVersion == 0) {
-            Log.e("QWANT_BROWSER", "OLD restore bookmarks")
             do_restore_old()
         } else {
-            Log.e("QWANT_BROWSER", "NEW restore bookmarks")
             do_restore()
         }
     }

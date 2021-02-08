@@ -79,7 +79,9 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
             BrowserFragment.create(sessionId)
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        Log.e("QWANT_BROWSER", "browser activity creation !!")
+        // viewModel = ViewModelProvider(this)[MainViewModel::class.java]
+
+        Log.d("QWANT_BROWSER", "browser activity creation !!")
         PACKAGE_NAME = packageName
 
         this.loadLocale()
@@ -113,8 +115,6 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         if (savedInstanceState == null) {
             when (intent.action) {
                 "CHANGED_LANGUAGE" -> {
-                    Log.d("QWANT_BROWSER", "Browser activity recreated: changed language")
-
                     qwantbar.setHighlight(QwantBar.QwantBarSelection.MORE)
                     supportFragmentManager.beginTransaction().apply {
                         replace(R.id.container, SettingsContainerFragment.create(language_changed_reload = true, theme_changed_reload = false), "SETTINGS_FRAGMENT")
@@ -123,8 +123,6 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
                     intent.action = null
                 }
                 "CHANGED_THEME" -> {
-                    Log.d("QWANT_BROWSER", "Browser activity recreated: changed theme")
-
                     qwantbar.setHighlight(QwantBar.QwantBarSelection.MORE)
                     supportFragmentManager.beginTransaction().apply {
                         replace(R.id.container, SettingsContainerFragment.create(language_changed_reload = false, theme_changed_reload = true), "SETTINGS_FRAGMENT")
@@ -133,9 +131,6 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
                     intent.action = null
                 }
                 else -> {
-                    Log.d("QWANT_BROWSER", "Browser activity created, no subs")
-
-                    Log.d("QWANT_BROWSER", "browser activity - onCreate - new browser fragment with session")
                     supportFragmentManager.beginTransaction().apply {
                         replace(R.id.container, createBrowserFragment(sessionId), "BROWSER_FRAGMENT")
                         commit()
@@ -331,7 +326,6 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         val sessionManager = components.core.sessionManager
         if (sessionManager.selectedSession != null) {
             val url = components.core.sessionManager.selectedSession!!.url
-            Log.d("QWANT_BROWSER","back with intent ${sessionManager.selectedSession!!.source.name}")
             if (!sessionManager.selectedSession!!.canGoBack && sessionManager.selectedSession!!.source.name == "ACTION_VIEW") {
                 // Tab has been opened from external app, so we close the app to get back to it, after closing the tab
                 sessionManager.remove(sessionManager.selectedSession!!)
@@ -429,7 +423,6 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         val tag = "TABS_FRAGMENT"
         var tabsFragment = this.supportFragmentManager.findFragmentByTag(tag)
         if (tabsFragment == null) {
-            Log.d("QWANT_BROWSER", "showTabs - no tabs fragment available in fragment manager")
             tabsFragment = QwantTabsFragment() // TabsTrayFragment()
         }
         this.supportFragmentManager.beginTransaction().apply {
@@ -455,7 +448,6 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         // this.replaceFragment(BookmarksFragment)
         var bookmarksFragment = this.supportFragmentManager.findFragmentByTag("BOOKMARKS_FRAGMENT")
         if (bookmarksFragment == null) {
-            Log.d("QWANT_BROWSER", "showBookmarks - no bookmarks fragment available in fragment manager")
             bookmarksFragment = BookmarksFragment()
         }
         this.supportFragmentManager.beginTransaction().apply {
@@ -480,7 +472,6 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
     fun showBrowserFragment() {
         var browserFragment = this.supportFragmentManager.findFragmentByTag("BROWSER_FRAGMENT")
         if (browserFragment == null) {
-            Log.d("QWANT_BROWSER", "showBrowserFragment - no browser fragment available in fragment manager")
             browserFragment = BrowserFragment.create()
         }
 
@@ -502,7 +493,6 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
     fun showHistory() {
         var historyFragment = this.supportFragmentManager.findFragmentByTag("HISTORY_FRAGMENT")
         if (historyFragment == null) {
-            Log.d("QWANT_BROWSER", "showHistoryFragment - no browser fragment available in fragment manager")
             historyFragment = HistoryFragment()
         }
         this.supportFragmentManager.beginTransaction().apply {
@@ -517,7 +507,6 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
     fun showSettings() {
         var settingsFragment = this.supportFragmentManager.findFragmentByTag("SETTINGS_FRAGMENT")
         if (settingsFragment == null) {
-            Log.d("QWANT_BROWSER", "showSettings - no settings fragment available in fragment manager")
             settingsFragment = SettingsContainerFragment.create()
         }
         this.supportFragmentManager.beginTransaction().apply {
