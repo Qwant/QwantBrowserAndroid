@@ -140,8 +140,37 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         }
 
         this.loadV35Db()
+        this.checkFirstLaunch()
+
         qwantbar.updateTabCount()
     }
+
+    private fun checkFirstLaunch() {
+        val prefkey = resources.getString(R.string.pref_key_first_launch)
+        val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        val firstLaunch = prefs.getBoolean(prefkey, true)
+        if (firstLaunch) {
+            val prefEditor: SharedPreferences.Editor = prefs.edit()
+            prefEditor.putBoolean(prefkey, false)
+            prefEditor.apply()
+
+            components.useCases.tabsUseCases.addTab.invoke(QwantUtils.getHomepage(applicationContext))
+        }
+    }
+
+    /* override fun onPostCreate(savedInstanceState: Bundle?) {
+        super.onPostCreate(savedInstanceState)
+
+        Log.d("QWANT_BROWSER", "all tabs: ${components.core.store.state.tabs.size}")
+        Log.d("QWANT_BROWSER", "normal tabs: ${components.core.store.state.normalTabs.size}")
+        Log.d("QWANT_BROWSER", "getnormalorprivate tabs: ${components.core.store.state.getNormalOrPrivateTabs(false).size}")
+
+        // if (requireContext().components.core.sessionManager.sessions.none { !it.private }) {
+        if (components.core.store.state.getNormalOrPrivateTabs(false).isEmpty()) {
+            components.useCases.tabsUseCases.addTab.invoke(QwantUtils.getHomepage(applicationContext))
+        }
+        qwantbar.updateTabCount()
+    } */
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
@@ -299,7 +328,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
                     imm.hideSoftInputFromWindow(wt, 0)
                 }
             }
-        } catch(e: Exception) {
+        } catch (e: Exception) {
             Log.e("QWANT_BROWSER", "fail closing keyboard: ${e.message}")
         }
     }

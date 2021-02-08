@@ -69,9 +69,9 @@ class Core(private val context: Context) {
             testingModeEnabled = false,
             userAgentString = "Mozilla/5.0 (Android 10; Mobile; rv:77.0) Gecko/77.0 Firefox/77.0 QwantMobile/4.0"
         )
-        EngineProvider.createEngine(context, defaultSettings).apply {
+        EngineProvider.createEngine(context, defaultSettings)/*.apply {
             clearSpeculativeSession()
-        }
+        } */
     }
 
     /**

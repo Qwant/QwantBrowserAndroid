@@ -17,6 +17,8 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import kotlinx.android.synthetic.main.fragment_browser.*
 import kotlinx.android.synthetic.main.fragment_browser.view.*
+import mozilla.components.browser.state.selector.getNormalOrPrivateTabs
+import mozilla.components.browser.state.selector.normalTabs
 import mozilla.components.browser.state.selector.selectedTab
 import mozilla.components.browser.thumbnails.BrowserThumbnails
 import mozilla.components.feature.awesomebar.AwesomeBarFeature
@@ -87,11 +89,21 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
             owner = this,
             view = view
         )
+    }
 
-        if (requireContext().components.core.sessionManager.sessions.none { !it.private }) {
+    /* override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+
+        Log.d("QWANT_BROWSER", "all tabs: ${requireContext().components.core.store.state.tabs.size}")
+        Log.d("QWANT_BROWSER", "normal tabs: ${requireContext().components.core.store.state.normalTabs.size}")
+        Log.d("QWANT_BROWSER", "getnormalorprivate tabs: ${requireContext().components.core.store.state.getNormalOrPrivateTabs(false).size}")
+
+        // if (requireContext().components.core.sessionManager.sessions.none { !it.private }) {
+        if (requireContext().components.core.store.state.getNormalOrPrivateTabs(false).isEmpty()) {
             requireContext().components.useCases.tabsUseCases.addTab.invoke(QwantUtils.getHomepage(requireContext().applicationContext))
         }
-    }
+        (activity as BrowserActivity).updateTabCounter()
+    } */
 
     /* override fun onPause() {
         super.onPause()
