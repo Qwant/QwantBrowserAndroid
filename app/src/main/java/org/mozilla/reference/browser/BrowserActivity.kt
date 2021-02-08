@@ -17,12 +17,16 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
+import androidx.lifecycle.ViewModelProvider
 import androidx.preference.PreferenceManager
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import mozilla.components.browser.session.Session
-import mozilla.components.browser.state.state.WebExtensionState
+import mozilla.components.browser.state.action.EngineAction
+import mozilla.components.browser.state.action.RecentlyClosedAction
+import mozilla.components.browser.state.selector.getNormalOrPrivateTabs
+import mozilla.components.browser.state.selector.normalTabs
 import mozilla.components.concept.engine.EngineSession
 import mozilla.components.concept.engine.EngineView
 import mozilla.components.concept.storage.PageObservation
@@ -35,12 +39,14 @@ import mozilla.components.support.base.feature.ActivityResultHandler
 import mozilla.components.support.base.feature.UserInteractionHandler
 import mozilla.components.support.base.log.logger.Logger
 import mozilla.components.support.utils.SafeIntent
-import mozilla.components.support.webextensions.WebExtensionPopupFeature
 import org.mozilla.gecko.GeckoProfile
 import org.mozilla.reference.browser.browser.BrowserFragment
 import org.mozilla.reference.browser.browser.QwantBarSessionObserver
-import org.mozilla.reference.browser.compat.*
+import org.mozilla.reference.browser.compat.BrowserContract
 import org.mozilla.reference.browser.compat.BrowserContract.Bookmarks
+import org.mozilla.reference.browser.compat.BrowserDB
+import org.mozilla.reference.browser.compat.LocalBrowserDB
+import org.mozilla.reference.browser.compat.SessionParser
 import org.mozilla.reference.browser.ext.components
 import org.mozilla.reference.browser.layout.QwantBar
 import org.mozilla.reference.browser.settings.SettingsContainerFragment
@@ -69,6 +75,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
     /* private val webExtensionPopupFeature by lazy {
         WebExtensionPopupFeature(components.core.store, ::openPopup)
     } */
+    // private var viewModel: MainViewModel? = null
 
     private var darkmode: Int = 0
 
@@ -183,6 +190,24 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
             startActivity(intent)
         }
     }
+
+    /* override fun onDestroy() {
+        super.onDestroy()
+
+        Log.d("QWANT_BROWSER", "destroy  app closed, check cleaning")
+        val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        if (prefs.getBoolean(resources.getString(R.string.pref_key_privacy_cleardata_on_close), false)) {
+            Log.d("QWANT_BROWSER", "destroy Should clean")
+            MainScope().launch {
+                components.core.engine.clearData()
+                components.core.historyStorage.deleteEverything()
+                components.core.store.dispatch(EngineAction.PurgeHistoryAction)
+                components.core.store.dispatch(RecentlyClosedAction.RemoveAllClosedTabAction)
+            }
+        } else {
+            Log.d("QWANT_BROWSER", "destroy no cleaning")
+        }
+    } */
 
     private fun loadLocale() {
         val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
