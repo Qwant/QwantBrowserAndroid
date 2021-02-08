@@ -360,7 +360,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
 
     private class LastSessionParser(private val context: Context) : SessionParser() {
         override fun onTabRead(sessionTab: SessionTab) {
-            if (sessionTab.url != null && sessionTab.url != "null" && !sessionTab.url.startsWith("https://www.qwant.com/?client=qwantbrowser")) {
+            if (sessionTab.url != null && sessionTab.url != "null"/* && !sessionTab.url.startsWith("https://www.qwant.com/?client=qwantbrowser") */) {
                 context.components.useCases.tabsUseCases.addTab(sessionTab.url, selectTab = false, startLoading = false)
             }
         }
