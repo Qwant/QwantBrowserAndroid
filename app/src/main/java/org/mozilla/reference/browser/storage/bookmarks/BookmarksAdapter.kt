@@ -16,6 +16,7 @@ import mozilla.components.support.ktx.android.content.res.resolveAttribute
 import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.ext.components
 import org.mozilla.reference.browser.storage.BookmarkItemV1
+import org.mozilla.reference.browser.tabs.TabsAdapter
 
 class BookmarksAdapter(
         private val context: Context,
@@ -38,7 +39,11 @@ class BookmarksAdapter(
             if (bookmarkItem.icon != null) this.itemIcon.setImageBitmap(bookmarkItem.icon.bitmap)
 
             val title = if (bookmarkItem.title.length > MAX_TITLE_LENGTH) bookmarkItem.title.substring(0, MAX_TITLE_LENGTH - 3) + "..." else bookmarkItem.title
-            val url = if (bookmarkItem.url.length > MAX_URL_LENGTH) bookmarkItem.url.substring(0, MAX_URL_LENGTH - 3) + "..." else bookmarkItem.url
+
+            var url: String = bookmarkItem.url
+            if (url.startsWith("http://www.")) url = url.substring(11)
+            else if (url.startsWith("https://www.")) url = url.substring(12)
+            url = if (url.length > MAX_URL_LENGTH) url.substring(0, MAX_URL_LENGTH - 3) + "..." else url
 
             this.itemTitle.text = title
             this.itemUrl.text = url

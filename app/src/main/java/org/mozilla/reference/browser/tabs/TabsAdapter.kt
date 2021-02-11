@@ -50,7 +50,11 @@ class TabsAdapter(
             val tab = tabSession.toTab()
 
             val title = if (tab.title.length > MAX_TITLE_LENGTH) tab.title.substring(0, MAX_TITLE_LENGTH - 3) + "..." else tab.title
-            val url = if (tab.url.length > MAX_URL_LENGTH) tab.url.substring(0, MAX_URL_LENGTH - 3) + "..." else tab.url
+
+            var url: String = tab.url
+            if (url.startsWith("http://www.")) url = url.substring(11)
+            else if (url.startsWith("https://www.")) url = url.substring(12)
+            url = if (url.length > MAX_URL_LENGTH) url.substring(0, MAX_URL_LENGTH - 3) + "..." else url
 
             this.itemTitle.text = title
             this.itemUrl.text = url
