@@ -56,6 +56,7 @@ import org.mozilla.reference.browser.storage.bookmarks.BookmarksStorage
 import org.mozilla.reference.browser.storage.history.HistoryFragment
 import org.mozilla.reference.browser.tabs.QwantTabsFragment
 import org.mozilla.reference.browser.tabs.tray.BrowserTabsTray
+import org.mozilla.reference.browser.tabs.tray.toTab
 import java.io.File
 import java.io.FileReader
 import java.io.IOException
@@ -149,6 +150,10 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         this.loadV35Db()
         this.checkFirstLaunch()
 
+        qwantbar.updateTabCount()
+    }
+
+    fun updateTabCount() {
         qwantbar.updateTabCount()
     }
 
@@ -361,7 +366,8 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
     private class LastSessionParser(private val context: Context) : SessionParser() {
         override fun onTabRead(sessionTab: SessionTab) {
             if (sessionTab.url != null && sessionTab.url != "null"/* && !sessionTab.url.startsWith("https://www.qwant.com/?client=qwantbrowser") */) {
-                context.components.useCases.tabsUseCases.addTab(sessionTab.url, selectTab = false, startLoading = false)
+                val tabId = context.components.useCases.tabsUseCases.addTab(sessionTab.url, selectTab = sessionTab.isSelected, startLoading = false)
+                context.components.core.sessionManager.findSessionById(tabId)?.title = sessionTab.title
             }
         }
     }
@@ -371,6 +377,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         if (sessionString != null) {
             val parser = LastSessionParser(applicationContext)
             parser.parse(sessionString)
+            // qwantbar.updateTabCount()
         } else {
             Log.e("QWANT_BROWSER", "restore tabs session file is null")
         }
