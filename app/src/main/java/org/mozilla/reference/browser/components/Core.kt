@@ -20,18 +20,17 @@ import mozilla.components.concept.engine.Engine
 import mozilla.components.concept.engine.EngineSession.TrackingProtectionPolicy
 import mozilla.components.concept.fetch.Client
 import mozilla.components.feature.addons.AddonManager
-import mozilla.components.feature.addons.amo.AddonCollectionProvider
 import mozilla.components.feature.addons.update.AddonUpdater
 import mozilla.components.feature.addons.update.DefaultAddonUpdater
 import mozilla.components.feature.customtabs.store.CustomTabsServiceStore
 import mozilla.components.feature.downloads.DownloadMiddleware
-import mozilla.components.feature.downloads.DownloadsUseCases
+import mozilla.components.feature.media.MediaSessionFeature
 import org.mozilla.reference.browser.downloads.DownloadService
-import org.mozilla.reference.browser.media.MediaService
+import org.mozilla.reference.browser.media.MediaSessionService
 import mozilla.components.feature.readerview.ReaderViewMiddleware
 import mozilla.components.feature.media.middleware.RecordingDevicesMiddleware
 // import mozilla.components.feature.media.RecordingDevicesNotificationFeature
-import mozilla.components.feature.media.middleware.MediaMiddleware
+// import mozilla.components.feature.media.middleware.MediaMiddleware
 import mozilla.components.feature.session.HistoryDelegate
 import org.mozilla.reference.browser.browser.WebNotificationFeature
 import org.mozilla.reference.browser.AppRequestInterceptor
@@ -87,7 +86,6 @@ class Core(private val context: Context) {
     val store by lazy {
         BrowserStore(
                 middleware = listOf(
-                        MediaMiddleware(context, MediaService::class.java),
                         DownloadMiddleware(context, DownloadService::class.java),
                         ThumbnailsMiddleware(thumbnailStorage),
                         ReaderViewMiddleware(),
@@ -126,6 +124,8 @@ class Core(private val context: Context) {
             //  RecordingDevicesNotificationFeature(context, sessionManager = this).enable()
 
             WebNotificationFeature(context, engine, icons, R.drawable.notification_icon, BrowserActivity::class.java)
+
+            MediaSessionFeature(context, MediaSessionService::class.java, store).start()
         }
     }
 
