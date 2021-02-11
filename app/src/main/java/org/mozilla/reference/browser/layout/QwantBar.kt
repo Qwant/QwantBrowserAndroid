@@ -21,6 +21,7 @@ import mozilla.components.browser.menu.item.BrowserMenuDivider
 import mozilla.components.browser.menu.item.BrowserMenuImageText
 import mozilla.components.browser.session.Session
 import mozilla.components.browser.session.SessionManager
+import mozilla.components.browser.state.selector.getNormalOrPrivateTabs
 import mozilla.components.feature.pwa.WebAppUseCases
 // import mozilla.components.feature.pwa.WebAppUseCases
 import mozilla.components.feature.session.SessionUseCases
@@ -372,7 +373,8 @@ class QwantBar @JvmOverloads constructor(
     }
 
     fun updateTabCount() {
-        reference.get()?.setCountWithAnimation(sessionManager.sessions.size)
+        /* sessionManager.sessions.size */
+        reference.get()?.setCountWithAnimation(context.components.core.store.state.getNormalOrPrivateTabs(currentPrivacyEnabled).size)
     }
 
     fun updateHomeIcon(mode: QwantBarSessionObserver.QwantBarMode?) {

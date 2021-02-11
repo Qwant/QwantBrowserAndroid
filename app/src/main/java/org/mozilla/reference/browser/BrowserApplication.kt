@@ -89,6 +89,9 @@ open class BrowserApplication : Application(), Application.ActivityLifecycleCall
 
         components.useCases.tabsUseCases.restore(sessionStorage)
 
+        if (currentActivity != null)
+            (currentActivity as BrowserActivity).updateTabCount()
+
         // Now that we have restored our previous state (if there's one) let's setup auto saving the state while
         // the app is used.
         sessionStorage.autoSave(store)
