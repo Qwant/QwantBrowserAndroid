@@ -873,7 +873,7 @@ public class LocalBrowserDB extends BrowserDB {
         }
     }
 
-    private synchronized long getFolderIdFromGuid(final ContentResolver cr, final String guid) {
+    public synchronized long getFolderIdFromGuid(final ContentResolver cr, final String guid) {
         if (mFolderIdMap.containsKey(guid)) {
             return mFolderIdMap.get(guid);
         }

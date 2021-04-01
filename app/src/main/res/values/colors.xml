@@ -21,6 +21,7 @@
     <color name="qwant_url_green">#5d9836</color>
     <color name="qwant_black">#0c0c0e</color>
     <color name="qwant_tab_selected">#e5eeff</color>
+    <color name="qwant_new_selected_color">#1a6aff</color>
 
     <color name="qwant_main_privacy">#c8cbd3</color>
     <color name="qwant_selected_privacy">#af27cc</color>

@@ -92,6 +92,13 @@
 
     <string name="bookmarks_delete">Delete</string>
     <string name="bookmarks_add">Add bookmark</string>
+    <string name="bookmarks_modify">Edit bookmark</string>
+    <string name="bookmarks_modify_folder">Edit folder</string>
+    <string name="bookmark_edit_title">Title</string>
+    <string name="bookmark_edit_folder">Folder</string>
+    <string name="bookmark_edit_cancel">Cancel</string>
+    <string name="bookmark_edit_save">Save</string>
+    <string name="bookmark_edit_url" translatable="false">URL</string>
 
     <string name="context_menu_forward">Forward</string>
     <string name="context_menu_refresh">Refresh</string>

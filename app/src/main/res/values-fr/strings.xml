@@ -91,6 +91,12 @@
 
     <string name="bookmarks_delete">Supprimer</string>
     <string name="bookmarks_add">Ajouter aux favoris</string>
+    <string name="bookmarks_modify">Modifier le favoris</string>
+    <string name="bookmarks_modify_folder">Modifier le dossier</string>
+    <string name="bookmark_edit_title">Titre</string>
+    <string name="bookmark_edit_folder">Dossier</string>
+    <string name="bookmark_edit_cancel">Annuler</string>
+    <string name="bookmark_edit_save">Sauvegarder</string>
 
     <string name="context_menu_forward">Suivant</string>
     <string name="context_menu_refresh">Recharger</string>
@@ -196,7 +202,7 @@
 
     <string name="history">Historique</string>
     <string name="history_empty_1">L\'historique est vide</string>
-    <string name="history_empty_2">Les pages visitées apparaîtrons ici</string>
+    <string name="history_empty_2">Les pages visitées apparaîtront ici</string>
     <string name="history_clear_all">Tout supprimer</string>
     <string name="history_today">Aujourd\'hui</string>
     <string name="history_yesterday">Hier</string>

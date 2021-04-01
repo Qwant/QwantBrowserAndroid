@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingHorizontal="24dp"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/bookmark_form"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/bookmark_edit_title"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/bookmark_edit_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:ems="10"
+            android:inputType="text" />
+
+        <TextView
+            android:id="@+id/bookmark_edit_url_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/bookmark_edit_url"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/bookmark_edit_url"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:ems="10"
+            android:inputType="textUri" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/bookmark_edit_folder"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/bookmark_edit_folder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:ems="10"
+            android:focusable="false"
+            android:inputType="text" />
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/folders_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingVertical="20dp"
+        android:background="@color/qwant_background"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/bookmark_edit_button_cancel"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_background_light"
+            android:textColor="@color/qwant_new_selected_color"
+            android:layout_marginEnd="24dp"
+            android:text="@string/bookmark_edit_cancel">
+        </Button>
+
+        <Button
+            android:id="@+id/bookmark_edit_button_save"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:background="@drawable/blue_gradient"
+            android:textColor="?attr/qwant_color_selected_text"
+            android:layout_marginStart="24dp"
+            android:text="@string/bookmark_edit_save" >
+        </Button>
+    </LinearLayout>
+</LinearLayout>

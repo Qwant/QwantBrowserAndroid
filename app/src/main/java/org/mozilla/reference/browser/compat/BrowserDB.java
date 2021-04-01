@@ -119,6 +119,7 @@ public abstract class BrowserDB {
      * Can return <code>null</code>.
      */
     @Nullable public abstract Cursor getBookmarksInFolder(ContentResolver cr, long folderId);
+    public abstract long getFolderIdFromGuid(final ContentResolver cr, final String guid);
 
    // public abstract int getBookmarkCountForFolder(ContentResolver cr, long folderId);
 

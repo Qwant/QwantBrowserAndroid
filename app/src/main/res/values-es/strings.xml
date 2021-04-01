@@ -91,6 +91,12 @@
 
     <string name="bookmarks_delete">Eliminar</string>
     <string name="bookmarks_add">Añadir marcador</string>
+    <string name="bookmarks_modify">Editar marcador</string>
+    <string name="bookmarks_modify_folder">Editar carpeta</string>
+    <string name="bookmark_edit_title">Título</string>
+    <string name="bookmark_edit_folder">Carpeta</string>
+    <string name="bookmark_edit_cancel">Cancelar</string>
+    <string name="bookmark_edit_save">Guardar</string>
 
     <string name="settings_main">Ajustes de Qwant</string>
 

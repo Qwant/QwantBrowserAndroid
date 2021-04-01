@@ -89,6 +89,12 @@
 
     <string name="bookmarks_delete">Löschen</string>
     <string name="bookmarks_add">Lesezeichen hinzufügen</string>
+    <string name="bookmarks_modify">Lesezeichen bearbeiten</string>
+    <string name="bookmarks_modify_folder">Ordner bearbeiten</string>
+    <string name="bookmark_edit_title">Titel</string>
+    <string name="bookmark_edit_folder">Ordner</string>
+    <string name="bookmark_edit_cancel">Abbrechen</string>
+    <string name="bookmark_edit_save">Speichern</string>
 
 
     <string name="context_menu_add_bookmark">Lesezeichen hinzufügen</string>

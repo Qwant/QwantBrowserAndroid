@@ -91,6 +91,13 @@
     <string name="bookmarks_delete">Elimina</string>
     <string name="bookmarks_add">Aggiungi segnalibro</string>
 
+    <string name="bookmarks_modify">Modifica segnalibro</string>
+    <string name="bookmarks_modify_folder">Modifica cartella</string>
+    <string name="bookmark_edit_title">Titolo</string>
+    <string name="bookmark_edit_folder">Cartella</string>
+    <string name="bookmark_edit_cancel">Annulla</string>
+    <string name="bookmark_edit_save">Salva</string>
+
     <string name="context_menu_add_bookmark">Aggiungi segnalibro</string>
     <string name="context_menu_del_bookmark">Elimina segnalibro</string>
     <string name="context_menu_close_tab">Chiudi questa scheda</string>

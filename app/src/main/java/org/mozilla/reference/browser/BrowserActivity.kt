@@ -277,6 +277,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
 
         val firstLaunch40 = prefs.getBoolean(resources.getString(R.string.pref_key_first_launch_40), true)
         val firstLaunch402 = prefs.getBoolean(resources.getString(R.string.pref_key_first_launch_402), true)
+        val firstLaunch403 = prefs.getBoolean(resources.getString(R.string.pref_key_first_launch_403), true)
 
         val db: BrowserDB? = LocalBrowserDB.from(GeckoProfile.get(applicationContext, null))
         val cr = applicationContext.contentResolver
@@ -284,20 +285,10 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         if (firstLaunch40) {
             val editor: SharedPreferences.Editor = prefs.edit()
             editor.putBoolean(resources.getString(R.string.pref_key_first_launch_40), false)
+            editor.putBoolean(resources.getString(R.string.pref_key_first_launch_403), false)
             editor.apply()
 
-            val bookmarkCursor = db?.getBookmarksInFolder(cr, Bookmarks.FIXED_ROOT_ID.toLong())
-            try {
-                if (bookmarkCursor != null) {
-                    while (bookmarkCursor.moveToNext()) {
-                        val title: String = bookmarkCursor.getString(bookmarkCursor.getColumnIndexOrThrow(Bookmarks.TITLE))
-                        val url: String = bookmarkCursor.getString(bookmarkCursor.getColumnIndexOrThrow(Bookmarks.URL))
-                        bookmarksStorage?.addBookmark(BookmarkItemV1(title, url))
-                    }
-                }
-            } catch (e: Exception) {
-                Log.e("QWANT_BROWSER", "exception: ${e.message}\n${e.stackTrace}")
-            }
+            this.loadOldBookmarksForFolder(db, cr, Bookmarks.FIXED_ROOT_ID.toLong())
 
             val historyCursor = db?.getAllVisitedHistory(cr)
             try {
@@ -315,6 +306,11 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
             } catch (e: Exception) {
                 Log.e("QWANT_BROWSER", "exception: ${e.message}\n${e.stackTrace}")
             }
+        } else if (firstLaunch403 && oldBookmarksHasFolder(db, cr)) {
+            this.loadOldBookmarksForFolder(db, cr, Bookmarks.FIXED_ROOT_ID.toLong())
+            val editor: SharedPreferences.Editor = prefs.edit()
+            editor.putBoolean(resources.getString(R.string.pref_key_first_launch_403), false)
+            editor.apply()
         }
 
         if (firstLaunch402) {
@@ -323,6 +319,58 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
             editor.apply()
 
             restoreSessionTabs()
+        }
+    }
+
+    private fun oldBookmarksHasFolder(db: BrowserDB?, cr: ContentResolver): Boolean {
+        val bookmarkCursor = db?.getBookmarksInFolder(cr, Bookmarks.FIXED_ROOT_ID.toLong())
+        try {
+            if (bookmarkCursor != null) {
+                while (bookmarkCursor.moveToNext()) {
+                    if (bookmarkCursor.getInt(bookmarkCursor.getColumnIndexOrThrow(Bookmarks.TYPE)) == Bookmarks.TYPE_FOLDER) {
+                        return true
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("QWANT_BROWSER", "first launch 4.0 exception: ${e.message}\n${e.stackTrace}")
+        }
+        return false
+    }
+
+    private fun loadOldBookmarksForFolder(db: BrowserDB?, cr: ContentResolver, parentId: Long = Bookmarks.FIXED_ROOT_ID.toLong(), parentItem: BookmarkItemV2? = null) {
+        val bookmarkCursor = db?.getBookmarksInFolder(cr, parentId)
+        try {
+            if (bookmarkCursor != null) {
+                while (bookmarkCursor.moveToNext()) {
+                    var newItem: BookmarkItemV2
+
+                    val type: Int = bookmarkCursor.getInt(bookmarkCursor.getColumnIndexOrThrow(Bookmarks.TYPE))
+                    val title: String = bookmarkCursor.getString(bookmarkCursor.getColumnIndexOrThrow(Bookmarks.TITLE))
+
+                    if (type == Bookmarks.TYPE_FOLDER) {
+                        val subfolderGuid: String = bookmarkCursor.getString(bookmarkCursor.getColumnIndexOrThrow(Bookmarks.GUID))
+                        val subfolderId: Long = db.getFolderIdFromGuid(cr, subfolderGuid)
+
+                        Log.e("QWANT_BROWSER", "folder found - recurse into: $title - ($subfolderGuid - $subfolderId)")
+
+                        newItem = BookmarkItemV2(BookmarkItemV2.BookmarkType.FOLDER, title, parent = parentItem)
+                        this.loadOldBookmarksForFolder(db, cr, subfolderId, newItem)
+                    } else {
+                        // TODO Bookmarks.FAVICON
+                        val url: String = bookmarkCursor.getString(bookmarkCursor.getColumnIndexOrThrow(Bookmarks.URL))
+                        newItem = BookmarkItemV2(BookmarkItemV2.BookmarkType.BOOKMARK, title, url, parent = parentItem)
+                    }
+
+                    if (parentItem == null) {
+                        bookmarksStorage?.addBookmark(newItem)
+                    } else {
+                        parentItem.addChild(newItem)
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("QWANT_BROWSER", "first launch 4.0 exception: ${e.message}\n${e.stackTrace}")
         }
     }
 
