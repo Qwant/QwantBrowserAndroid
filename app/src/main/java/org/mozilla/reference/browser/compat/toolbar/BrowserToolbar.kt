@@ -15,12 +15,14 @@ import android.widget.ImageButton
 import androidx.annotation.DrawableRes
 import androidx.annotation.VisibleForTesting
 import androidx.annotation.VisibleForTesting.PRIVATE
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.forEach
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import mozilla.components.browser.toolbar.behavior.BrowserToolbarBehavior
 // import mozilla.components.browser.toolbar.display.DisplayToolbar
 // import mozilla.components.browser.toolbar.edit.EditToolbar
 import mozilla.components.concept.toolbar.AutocompleteDelegate
@@ -281,8 +283,22 @@ class BrowserToolbar @JvmOverloads constructor(
         display.addPageAction(action)
     }
 
+    override fun enableScrolling() {
+        // Behavior can be changed without us knowing. Not safe to use a memoized value.
+        (layoutParams as? CoordinatorLayout.LayoutParams)?.apply {
+            (behavior as? BrowserToolbarBehavior)?.enableScrolling()
+        }
+    }
+
+    override fun disableScrolling() {
+        // Behavior can be changed without us knowing. Not safe to use a memoized value.
+        (layoutParams as? CoordinatorLayout.LayoutParams)?.apply {
+            (behavior as? BrowserToolbarBehavior)?.disableScrolling()
+        }
+    }
+
     override fun dismissMenu() {
-        TODO("Not yet implemented")
+        display.views.menu.dismissMenu()
     }
 
     /**

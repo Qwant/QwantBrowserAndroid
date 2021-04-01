@@ -33,6 +33,7 @@ private object Versions {
 
     object AndroidX {
         const val core = "1.2.0"
+        const val fragment_ktx = "1.3.0"
     }
 }
 
@@ -118,6 +119,7 @@ object Deps {
     const val androidx_preference_ktx = "androidx.preference:preference-ktx:${Versions.androidx_preference}"
     const val androidx_work_runtime_ktx = "androidx.work:work-runtime-ktx:${Versions.workmanager}"
     const val androidx_fragment = "androidx.fragment:fragment:${Versions.AndroidX.core}"
+    const val androidx_fragment_ktx = "androidx.fragment:fragment-ktx:${Versions.AndroidX.fragment_ktx}"
     const val google_material = "com.google.android.material:material:${Versions.google_material}"
     const val androidx_annotation = "androidx.annotation:annotation:${Versions.androidx_annotation}"
     const val androidx_loader = "androidx.loader:loader:${Versions.androidx_loader}"

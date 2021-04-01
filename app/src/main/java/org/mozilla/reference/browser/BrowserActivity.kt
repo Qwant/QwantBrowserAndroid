@@ -4,11 +4,13 @@
 
 package org.mozilla.reference.browser
 
+import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
@@ -20,13 +22,11 @@ import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.ViewModelProvider
 import androidx.preference.PreferenceManager
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.fragment_browser.*
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import mozilla.components.browser.session.Session
-import mozilla.components.browser.state.action.EngineAction
-import mozilla.components.browser.state.action.RecentlyClosedAction
-import mozilla.components.browser.state.selector.getNormalOrPrivateTabs
-import mozilla.components.browser.state.selector.normalTabs
+import mozilla.components.browser.state.selector.selectedTab
 import mozilla.components.concept.engine.EngineSession
 import mozilla.components.concept.engine.EngineView
 import mozilla.components.concept.storage.PageObservation
@@ -37,11 +37,11 @@ import mozilla.components.concept.tabstray.TabsTray
 import mozilla.components.feature.intent.ext.EXTRA_SESSION_ID
 import mozilla.components.support.base.feature.ActivityResultHandler
 import mozilla.components.support.base.feature.UserInteractionHandler
+import mozilla.components.support.base.feature.ViewBoundFeatureWrapper
 import mozilla.components.support.base.log.logger.Logger
 import mozilla.components.support.utils.SafeIntent
 import org.mozilla.gecko.GeckoProfile
 import org.mozilla.reference.browser.browser.BrowserFragment
-import org.mozilla.reference.browser.browser.QwantBarSessionObserver
 import org.mozilla.reference.browser.compat.BrowserContract
 import org.mozilla.reference.browser.compat.BrowserContract.Bookmarks
 import org.mozilla.reference.browser.compat.BrowserDB
@@ -49,27 +49,27 @@ import org.mozilla.reference.browser.compat.LocalBrowserDB
 import org.mozilla.reference.browser.compat.SessionParser
 import org.mozilla.reference.browser.ext.components
 import org.mozilla.reference.browser.layout.QwantBar
+import org.mozilla.reference.browser.layout.QwantBarFeature
 import org.mozilla.reference.browser.settings.SettingsContainerFragment
 import org.mozilla.reference.browser.storage.BookmarkItemV1
+import org.mozilla.reference.browser.storage.BookmarkItemV2
 import org.mozilla.reference.browser.storage.bookmarks.BookmarksFragment
 import org.mozilla.reference.browser.storage.bookmarks.BookmarksStorage
 import org.mozilla.reference.browser.storage.history.HistoryFragment
 import org.mozilla.reference.browser.tabs.QwantTabsFragment
 import org.mozilla.reference.browser.tabs.tray.BrowserTabsTray
-import org.mozilla.reference.browser.tabs.tray.toTab
 import java.io.File
 import java.io.FileReader
 import java.io.IOException
 import java.util.*
 import kotlin.system.exitProcess
 
-
 /**
  * Activity that holds the [BrowserFragment].
  */
 open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSettingsClosed {
     private var bookmarksStorage: BookmarksStorage? = null
-    private var qwantbarSessionObserver: QwantBarSessionObserver? = null
+    // private var qwantbarSessionObserver: QwantBarSessionObserver? = null
     private val sessionId: String?
         get() = SafeIntent(intent).getStringExtra(EXTRA_SESSION_ID)
 
@@ -79,6 +79,8 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
     // private var viewModel: MainViewModel? = null
 
     private var darkmode: Int = 0
+
+    private val qwantBarFeature = ViewBoundFeatureWrapper<QwantBarFeature>()
 
     /**
      * Returns a new instance of [BrowserFragment] to display.
@@ -107,9 +109,11 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         bookmarksStorage = BookmarksStorage(applicationContext)
         bookmarksStorage?.restore()
 
-        qwantbarSessionObserver = QwantBarSessionObserver(this, components.core.sessionManager, qwantbar)
-        components.core.sessionManager.register(this.qwantbarSessionObserver!!)
-        // TODO components.core.store.observe(...)
+        qwantBarFeature.set(
+                feature = QwantBarFeature(components.core.store, qwantbar),
+                owner = this,
+                view = qwantbar
+        )
 
         qwantbar.setBookmarkStorage(bookmarksStorage!!)
         qwantbar.onTabsClicked(::showTabs)
@@ -387,7 +391,8 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         val sessionManager = components.core.sessionManager
         if (sessionManager.selectedSession != null) {
             val url = components.core.sessionManager.selectedSession!!.url
-            if (!sessionManager.selectedSession!!.canGoBack && sessionManager.selectedSession!!.source.name == "ACTION_VIEW") {
+            val canGoBack = components.core.store.state.selectedTab?.content?.canGoBack ?: false
+            if (!canGoBack && sessionManager.selectedSession!!.source.name == "ACTION_VIEW") {
                 // Tab has been opened from external app, so we close the app to get back to it, after closing the tab
                 sessionManager.remove(sessionManager.selectedSession!!)
                 this.finish()
@@ -501,7 +506,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
             replace(R.id.container, TabsTrayFragment(), "TABS_FRAGMENT")
             commit()
         } */
-        qwantbarSessionObserver?.setupHomeBar()
+        qwantbar.setupHomeBar()
         qwantbar.setHighlight(QwantBar.QwantBarSelection.TABS)
     }
 
@@ -526,7 +531,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
             replace(R.id.container, BookmarksFragment(), "BOOKMARKS_FRAGMENT")
             commit()
         } */
-        qwantbarSessionObserver?.setupHomeBar()
+        qwantbar.setupHomeBar()
         qwantbar.setHighlight(QwantBar.QwantBarSelection.BOOKMARKS)
     }
 
@@ -587,7 +592,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
             replace(R.id.container, SettingsContainerFragment.create(), "SETTINGS_FRAGMENT")
             commit()
         } */
-        qwantbarSessionObserver?.setupHomeBar()
+        qwantbar.setupHomeBar()
         qwantbar.setHighlight(QwantBar.QwantBarSelection.MORE)
     }
 
@@ -617,12 +622,12 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         val session: Session? = components.core.sessionManager.selectedSession
         if (session == null || session.url.startsWith(baseContext.getString(R.string.homepage_base))) {
             qwantbar.setHighlight(QwantBar.QwantBarSelection.SEARCH)
-            qwantbarSessionObserver?.setupHomeBar()
+            qwantbar.setupHomeBar()
         } else {
             qwantbar.setHighlight(QwantBar.QwantBarSelection.NONE)
-            qwantbarSessionObserver?.setupNavigationBar()
+            qwantbar.setupNavigationBar()
         }
-        qwantbar.updateHomeIcon(qwantbarSessionObserver?.getCurrentMode())
+        qwantbar.updateHomeIcon(qwantbar.getCurrentMode())
     }
 
     override fun settingsClosed() {
@@ -635,7 +640,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         this.bookmarksStorage?.persist()
     }
 
-    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
         components.core.historyStorage.run { this.restore() }
         this.bookmarksStorage?.restore()

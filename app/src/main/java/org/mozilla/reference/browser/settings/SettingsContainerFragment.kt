@@ -5,7 +5,6 @@
 package org.mozilla.reference.browser.settings
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,7 +13,6 @@ import kotlinx.android.synthetic.main.fragment_settings.*
 import mozilla.components.support.base.feature.UserInteractionHandler
 import org.mozilla.reference.browser.BrowserActivity
 import org.mozilla.reference.browser.R
-import org.mozilla.reference.browser.browser.BrowserFragment
 
 class SettingsContainerFragment: Fragment(), UserInteractionHandler {
     private var languageChangedReload: Boolean = false
@@ -89,9 +87,6 @@ class SettingsContainerFragment: Fragment(), UserInteractionHandler {
     }
 
     fun closeSettings() {
-        /* parentFragmentManager.beginTransaction()
-                .replace(R.id.container, BrowserFragment.create(), "BROWSER_FRAGMENT")
-                .commit() */
         (activity as BrowserActivity).showBrowserFragment()
         settingsClosedCallback?.settingsClosed()
     }
