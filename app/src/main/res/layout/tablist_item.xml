@@ -6,7 +6,6 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:paddingStart="10dp"
-    android:paddingEnd="20dp"
     android:clipToPadding="false"
     android:background="@color/qwant_background">
 
@@ -55,6 +54,7 @@
             android:gravity="center_vertical"
             android:textColor="@color/qwant_black"
             android:layout_marginBottom="4dp"
+            android:maxLines="2"
             android:text="kdhjkdshq khdkqjhd ksqjhdss kjqhd kjqshdkjqhsdkhqsdsq..."
             android:textSize="18sp" />
 
@@ -64,6 +64,7 @@
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:textColor="@color/qwant_url_green"
+            android:maxLines="1"
             android:text="kdhjkdshqkhdkqjhdksqjhdkjqhdsqdsqdsq"
             android:textSize="12sp" />
 
@@ -71,10 +72,11 @@
 
     <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/tablist_item_delete"
-        android:layout_width="20dp"
+        android:layout_width="40dp"
         android:layout_height="match_parent"
         android:layout_weight="0"
         android:scaleType="fitCenter"
+        android:paddingHorizontal="7dp"
         android:background="@android:color/transparent"
         android:src="@drawable/close_cross"
         android:tint="@color/qwant_black" />

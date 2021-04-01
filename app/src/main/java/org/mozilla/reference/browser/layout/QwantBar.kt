@@ -409,8 +409,13 @@ class QwantBar @JvmOverloads constructor(
         reference.get()?.setCountWithAnimation(context.components.core.store.state.getNormalOrPrivateTabs(currentPrivacyEnabled).size)
     }
 
-    fun updateHomeIcon(mode: QwantBarSessionObserver.QwantBarMode?) {
-        if (mode == QwantBarSessionObserver.QwantBarMode.NAVIGATION) {
+    fun updateTabCount(isPrivate: Boolean) {
+        /* sessionManager.sessions.size */
+        reference.get()?.setCountWithAnimation(context.components.core.store.state.getNormalOrPrivateTabs(isPrivate).size)
+    }
+
+    fun updateHomeIcon(mode: QwantBarMode?) {
+        if (mode == QwantBarMode.NAVIGATION) {
             qwantbar_button_home.setImageResource(this.getIcon(QwantBarIcons.HOME, false))
         } else {
             val selected = (sessionManager.selectedSession == null || sessionManager.selectedSession!!.url.startsWith(context.getString(R.string.homepage_startwith_filter)))

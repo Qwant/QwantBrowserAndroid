@@ -52,11 +52,8 @@ class QwantTabsFragment : Fragment(), UserInteractionHandler {
     private var applicationContext: Context? = null
     private var reference: WeakReference<TabCounter> = WeakReference<TabCounter>(null)
 
-    // private var tabsAdapter: mozilla.components.browser.tabstray.TabsAdapter? = null
     private var tabsAdapter: TabsAdapter? = null
-    // private var tabsAdapter: TabsRecyclerAdapter? = null
     private var tabsList: ListView? = null
-    // private var tabsList: RecyclerView? = null
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         if (activity != null) {
@@ -71,36 +68,63 @@ class QwantTabsFragment : Fragment(), UserInteractionHandler {
 
         tabsList = view.findViewById(R.id.tabsList)
 
-        // tabsAdapter = createAndSetupTabsTray(requireContext())
-        tabsAdapter = TabsAdapter(requireContext(), isPrivate, ::tabSelected, ::tabDeleted)
-        // tabsAdapter = TabsRecyclerAdapter(requireContext(), ThumbnailLoader(requireContext().components.core.thumbnailStorage), isPrivate, ::tabSelected, ::tabDeleted)
-
-        tabsList?.adapter = tabsAdapter
-        // tabsAdapter?.tabChanged()
-
         return view;
-    }
-
-    private fun createAndSetupTabsTray(context: Context): mozilla.components.browser.tabstray.TabsAdapter {
-        val thumbnailLoader = ThumbnailLoader(context.components.core.thumbnailStorage)
-        val viewHolderProvider: ViewHolderProvider = { viewGroup ->
-            val view = LayoutInflater.from(context).inflate(R.layout.tablist_item, viewGroup, false)
-            DefaultTabViewHolder(view, thumbnailLoader)
-        }
-        val tabsAdapter = mozilla.components.browser.tabstray.TabsAdapter(thumbnailLoader, viewHolderProvider)
-
-        // tabsTray.layoutManager = layoutManager
-        // tabsTray.adapter = tabsAdapter
-
-        // TabsTouchHelper(tabsAdapter).attachToRecyclerView(tabsTray)
-
-        return tabsAdapter
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val context = requireContext()
 
         reference = WeakReference(tab_switch_normal_counter)
+
+        val tabCounterBox: ImageView = tab_switch_normal_counter.findViewById(R.id.counter_box)
+        val tabCounterText: TextView = tab_switch_normal_counter.findViewById(R.id.counter_text)
+        val tabColor = ContextCompat.getColor(context, R.color.photonWhite)
+        tabCounterBox.setImageDrawable(DrawableUtils.loadAndTintDrawable(context, R.drawable.mozac_ui_tabcounter_box, tabColor))
+        tabCounterText.setTextColor(tabColor)
+
+        back_tabs_button.setOnClickListener((View.OnClickListener {
+            this.onBackPressed()
+        }))
+
+        tab_switch_button_background.setOnClickListener((View.OnClickListener {
+            Log.d("QWANT_BROWSER", "Tab privacy switch")
+            this.isPrivate = !isPrivate
+            context.setTheme(if (isPrivate) R.style.ThemeQwantNoActionBarPrivacy else R.style.ThemeQwantNoActionBar)
+            qwantbar?.setPrivacyMode(isPrivate)
+            this.setupPrivacyUi()
+        }))
+
+        button_new_tab.setOnClickListener((View.OnClickListener {
+            if (applicationContext != null) {
+                if (isPrivate) {
+                    Log.d("QWANT_BROWSER", "TabFragment Add normal tab")
+                    context.components.useCases.tabsUseCases.addPrivateTab.invoke(QwantUtils.getHomepage(applicationContext!!))
+                } else {
+                    Log.d("QWANT_BROWSER", "TabFragment Add private tab")
+                    context.components.useCases.tabsUseCases.addTab.invoke(QwantUtils.getHomepage(applicationContext!!))
+                }
+                this.closeTabsTray()
+            }
+        }))
+
+        tab_menu_more.setColorFilter(ContextCompat.getColor(context, R.color.menu_items))
+        tab_menu_more.menuBuilder = BrowserMenuBuilder(listOf(
+                BrowserMenuImageText(
+                        context.getString(R.string.menu_action_close_tabs),
+                        textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
+                        imageResource = R.drawable.icon_cross
+                ) {
+                    context.components.useCases.tabsUseCases.removeAllTabs.invoke()
+                    tabsAdapter?.tabChanged()
+                }
+        ))
+        this.setupPrivacyUi()
+    }
+
+    private fun setupPrivacyUi() {
+        tabsAdapter = TabsAdapter(requireContext(), isPrivate, ::tabSelected, ::tabDeleted)
+        tabsList?.adapter = tabsAdapter
 
         val context = requireContext()
 
@@ -109,52 +133,16 @@ class QwantTabsFragment : Fragment(), UserInteractionHandler {
             button_new_tab.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_privacy_mask_white, 0, 0, 0)
             tab_switch_normal_counter.background = null
             tab_switch_normal_counter.elevation = 0F
-
-            val tabCounterBox: ImageView = tab_switch_normal_counter.findViewById(R.id.counter_box)
-            val tabCounterText: TextView = tab_switch_normal_counter.findViewById(R.id.counter_text)
-            val tabColor = ContextCompat.getColor(context, R.color.photonWhite)
-            tabCounterBox.setImageDrawable(DrawableUtils.loadAndTintDrawable(context, R.drawable.mozac_ui_tabcounter_box, tabColor))
-            tabCounterText.setTextColor(tabColor)
-
             tab_switch_private_browsing_icon.background = ContextCompat.getDrawable(context, R.drawable.purple_gradient)
             tab_switch_private_browsing_icon.elevation = 6.dpToPx(Resources.getSystem().displayMetrics).toFloat()
         } else {
-            button_new_tab.setTextColor(ContextCompat.getColor(context, R.color.qwant_selected_text))
+            button_new_tab.background = ContextCompat.getDrawable(context, R.drawable.blue_gradient)
+            button_new_tab.setCompoundDrawablesWithIntrinsicBounds(R.drawable.mozac_ic_tab_new, 0, 0, 0)
+            tab_switch_normal_counter.background = ContextCompat.getDrawable(context, R.drawable.tab_switch_foreground_normal)
+            tab_switch_normal_counter.elevation = 6.dpToPx(Resources.getSystem().displayMetrics).toFloat()
+            tab_switch_private_browsing_icon.background = null
+            tab_switch_private_browsing_icon.elevation = 0F
         }
-
-        tab_menu_more.setColorFilter(ContextCompat.getColor(context, R.color.menu_items))
-        tab_menu_more.menuBuilder = BrowserMenuBuilder(listOf(
-            BrowserMenuImageText(
-                    context.getString(R.string.menu_action_close_tabs),
-                    textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
-                    imageResource = R.drawable.icon_cross
-            ) {
-                context.components.useCases.tabsUseCases.removeAllTabs.invoke()
-                tabsAdapter?.tabChanged()
-            }
-        ))
-
-        back_tabs_button.setOnClickListener((View.OnClickListener {
-            this.onBackPressed()
-        }))
-
-        tab_switch_button_background.setOnClickListener((View.OnClickListener {
-            this.isPrivate = !isPrivate
-            context.setTheme(if (isPrivate) R.style.ThemeQwantNoActionBarPrivacy else R.style.ThemeQwantNoActionBar)
-            qwantbar?.setPrivacyMode(isPrivate)
-            activity?.supportFragmentManager?.beginTransaction()?.setReorderingAllowed(false)?.detach(this)?.attach(this)?.commit()
-        }))
-
-        button_new_tab.setOnClickListener((View.OnClickListener {
-            if (applicationContext != null) {
-                if (isPrivate) {
-                    context.components.useCases.tabsUseCases.addPrivateTab.invoke(QwantUtils.getHomepage(applicationContext!!))
-                } else {
-                    context.components.useCases.tabsUseCases.addTab.invoke(QwantUtils.getHomepage(applicationContext!!))
-                }
-                this.closeTabsTray()
-            }
-        }))
 
         this.updateTabCount()
     }
@@ -185,6 +173,7 @@ class QwantTabsFragment : Fragment(), UserInteractionHandler {
         isPrivate = (sessionManager != null && sessionManager!!.selectedSession != null && sessionManager!!.selectedSession!!.private)
         context?.setTheme(if (isPrivate) R.style.ThemeQwantNoActionBarPrivacy else R.style.ThemeQwantNoActionBar)
         qwantbar?.setPrivacyMode(isPrivate)
+        qwantbar?.updateTabCount()
         (activity as BrowserActivity).showBrowserFragment()
         tabsClosedCallback?.invoke()
     }
@@ -192,5 +181,6 @@ class QwantTabsFragment : Fragment(), UserInteractionHandler {
     private fun updateTabCount() {
         if (sessionManager != null)
             reference.get()?.setCountWithAnimation(sessionManager!!.sessions.filter { it.private == isPrivate }.size)
+        qwantbar?.updateTabCount(isPrivate)
     }
 }
