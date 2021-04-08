@@ -1,65 +1,52 @@
-#  Reference Browser
+#  Qwant Browser
 
-[![Task Status](https://github.taskcluster.net/v1/repository/mozilla-mobile/reference-browser/master/badge.svg)](https://github.taskcluster.net/v1/repository/mozilla-mobile/reference-browser/master/latest)
+A web browser implementation using [Mozilla Android Components](https://github.com/mozilla-mobile/android-components).
 
-A web browser reference implementation using [Mozilla Android Components](https://github.com/mozilla-mobile/android-components).
-
-*The Reference Browser is not a product intended to ship to end users. Instead it is a Technology Preview for many new mobile components that multiple teams at Mozilla are currently working on*
-
-It includes the Mozilla Web Platform via GeckoView, a new modern Firefox Accounts and Cloud Sync implementation and the new "Glean" telemetry library. All these components will be foundational for Mozilla's existing and upcoming Android products.
-
-The Reference Browser can also be a starting point for your own new browser-like applications. It depends heavily on the [Android Components](https://github.com/mozilla-mobile/android-components) project where most of the actual implementation lives. That project also includes many smaller sample applications.
-
-# Getting Involved
-
-We encourage you to participate in this open source project. We love pull requests, bug reports, ideas, (security) code reviews or any kind of positive contribution.
-
-Before you attempt to make a contribution please read the [Community Participation Guidelines](https://www.mozilla.org/en-US/about/governance/policies/participation/).
-
-* [View current Issues](https://github.com/mozilla-mobile/reference-browser/issues) or [View current Pull Requests](https://github.com/mozilla-mobile/reference-browser/pulls).
-
-* IRC: [#android-components (irc.mozilla.org)](https://wiki.mozilla.org/IRC) | [view logs](https://mozilla.logbot.info/android-components/)
-
-* Subscribe to our mailing list [android-components@](https://lists.mozilla.org/listinfo/android-components) to keep up to date ([Archives](https://lists.mozilla.org/pipermail/android-components/)).
+Code is strongly inspired from [Mozilla Reference Browser](https://github.com/mozilla-mobile/reference-browser).
+It uses the Gecko engine through GeckoView.
 
 
-# Test Channel on Google Play Store
+Enjoy the first European search engine directly on your mobile phone. Qwant gives you a neutral access to the whole Web, the latest news and social media content. We do not collect your personal data, we truly respect your privacy. No cookie, no behavorial profiling. You can browse the web without being tracked.
 
-To get the Reference Browser on your device, follow these two steps:
+### Instant answers on top of your search results
 
-1) Visit https://groups.google.com/forum/#!forum/mozilla-reference-browser and join the Google Group
-2) Visit https://play.google.com/apps/testing/org.mozilla.reference.browser on your device to join the test program and to install the app
+With Qwant Search, get the exact answers to your queries displayed instantly below the search bar. Weather forecasting or the next movie screening are all available on the top of the search results.
+No need to scroll anymore to find the right information. Find everything at first glance.
 
-Make sure you use the same Google Account for both steps.
+### The first search engine dedicated to music
 
-# Download Nightly Builds Directly
+Be aware of the latest news and releases from your favourite band instantly by using Qwant Search. To go further, Qwant Music offers an intuitive interface entirely dedicated to artists and their fans. You will never miss the live concert of the year anymore.
 
-Signed Nightly builds can be downloaded from:
+### The search engine for videogames
 
-* [⬇️ ARM64/Aarch64 devices (64 bit; Android 5+)](https://firefox-ci-tc.services.mozilla.com/api/index/v1/task/project.mobile.reference-browser.v3.nightly.latest/artifacts/public/target.arm64-v8a.apk)
-* [⬇️ ARM devices (32 bit; Android 5+)](https://firefox-ci-tc.services.mozilla.com/api/index/v1/task/project.mobile.reference-browser.v3.nightly.latest/artifacts/public/target.armeabi-v7a.apk)
-* [⬇️ x86_64  devices (64 bit; Android 5+)](https://firefox-ci-tc.services.mozilla.com/api/index/v1/task/project.mobile.reference-browser.v3.nightly.latest/artifacts/public/target.x86_64.apk)
-* [⬇️ x86  devices (32 bit; Android 5+)](https://firefox-ci-tc.services.mozilla.com/api/index/v1/task/project.mobile.reference-browser.v3.nightly.latest/artifacts/public/target.x86.apk)
+Qwant Search displays the latest news and information about your trendy favourite video game on the top of the search results. Qwant Games gives you the opportunity to discover exclusive content :detailed description, ratings, live Twitch videos, etc. This is the perfect place to become the games master.
 
-> Please note that these builds do not auto-update, you will have to keep up to date manually.
+### A tool respectful of your digital privacy
 
-The latest Nightly build task can be found [here](https://firefox-ci-tc.services.mozilla.com/tasks/index/project.mobile.reference-browser.v3.nightly/latest).
+Choosing Qwant is using a search engine that respects its users. We do not keep any track of your queries. No one is able to know what you are looking for on the Internet. Your search results are not tracked. You browse the web without filters and any targeted ads.
+
+# Google Play Store and Test Channel
+
+[Download from Playstore](https://play.google.com/store/apps/details?id=com.qwant.liberty)
+
+You can join the Beta test channel 
+
+# Download APK Directly
+
+Signed builds can be downloaded for every released version from our [Release page](https://github.com/qwant/qwantbrowser/releases):
 
 # Getting Involved
 
 We encourage you to participate in this open source project. We love pull requests, bug reports, ideas, (security) code reviews or any kind of positive contribution.
 
-Before you attempt to make a contribution please read the [Community Participation Guidelines](https://www.mozilla.org/en-US/about/governance/policies/participation/).
-
-* [View current Issues](https://github.com/mozilla-mobile/reference-browser/issues) or [View current Pull Requests](https://github.com/mozilla-mobile/reference-browser/pulls).
-
-* [List of good first issues](https://github.com/mozilla-mobile/reference-browser/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) (**New contributors start here!**) and [List of "help wanted" issues](https://github.com/mozilla-mobile/reference-browser/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22).
-
-* IRC: [#android-components (irc.mozilla.org)](https://wiki.mozilla.org/IRC) | [view logs](https://mozilla.logbot.info/android-components/)
-
-* Subscribe to our mailing list [android-components@](https://lists.mozilla.org/listinfo/android-components) to keep up to date ([Archives](https://lists.mozilla.org/pipermail/android-components/)).
+* [View current Issues](https://github.com/qwant/qwantbrowser/issues) or [View current Pull Requests](https://github.com/qwant/qwantbrowser/pulls).
 
 # Local Development
+
+Building the sources is all done within Android studio:
+- Checkout the code
+- Open the root folder as an existing project with android-studio
+- DO IT AND CHECK !!! build
 
 ## Dependency substitutions
 
