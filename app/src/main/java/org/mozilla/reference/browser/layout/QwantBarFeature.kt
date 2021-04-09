@@ -62,9 +62,6 @@ class QwantBarFeature(
                 qwantBar.changeBackwardButton(it)
             }
         } */
-
-        // TODO fullscreen
-        // TODO Ailleurs: open/close tab, history, settings, ...
     }
 
     override fun stop() {

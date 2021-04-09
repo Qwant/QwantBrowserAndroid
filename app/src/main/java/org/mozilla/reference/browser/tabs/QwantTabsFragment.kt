@@ -2,9 +2,7 @@ package org.mozilla.reference.browser.tabs
 
 import android.content.Context
 import android.content.res.Resources
-import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,19 +11,12 @@ import android.widget.ListView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.fragment_tabstray.*
 import mozilla.components.browser.menu.BrowserMenuBuilder
 import mozilla.components.browser.menu.item.BrowserMenuImageText
 import mozilla.components.browser.session.SessionManager
 import mozilla.components.browser.state.state.TabSessionState
-import mozilla.components.browser.tabstray.DefaultTabViewHolder
-import mozilla.components.browser.tabstray.TabsTrayStyling
-import mozilla.components.browser.tabstray.ViewHolderProvider
-import mozilla.components.browser.thumbnails.loader.ThumbnailLoader
 import mozilla.components.concept.tabstray.Tab
-import mozilla.components.concept.tabstray.TabsTray
 import mozilla.components.support.base.feature.UserInteractionHandler
 import mozilla.components.support.ktx.android.content.res.resolveAttribute
 import mozilla.components.support.ktx.android.util.dpToPx
@@ -36,8 +27,6 @@ import org.mozilla.reference.browser.QwantUtils
 import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.ext.components
 import org.mozilla.reference.browser.layout.QwantBar
-import org.mozilla.reference.browser.storage.BookmarkItemV1
-import org.mozilla.reference.browser.storage.bookmarks.BookmarksAdapter
 import java.lang.ref.WeakReference
 
 class QwantTabsFragment : Fragment(), UserInteractionHandler {
@@ -88,7 +77,6 @@ class QwantTabsFragment : Fragment(), UserInteractionHandler {
         }))
 
         tab_switch_button_background.setOnClickListener((View.OnClickListener {
-            Log.d("QWANT_BROWSER", "Tab privacy switch")
             this.isPrivate = !isPrivate
             context.setTheme(if (isPrivate) R.style.ThemeQwantNoActionBarPrivacy else R.style.ThemeQwantNoActionBar)
             qwantbar?.setPrivacyMode(isPrivate)
@@ -98,10 +86,8 @@ class QwantTabsFragment : Fragment(), UserInteractionHandler {
         button_new_tab.setOnClickListener((View.OnClickListener {
             if (applicationContext != null) {
                 if (isPrivate) {
-                    Log.d("QWANT_BROWSER", "TabFragment Add normal tab")
                     context.components.useCases.tabsUseCases.addPrivateTab.invoke(QwantUtils.getHomepage(applicationContext!!))
                 } else {
-                    Log.d("QWANT_BROWSER", "TabFragment Add private tab")
                     context.components.useCases.tabsUseCases.addTab.invoke(QwantUtils.getHomepage(applicationContext!!))
                 }
                 this.closeTabsTray()

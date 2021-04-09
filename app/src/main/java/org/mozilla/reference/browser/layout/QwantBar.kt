@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
 import android.util.AttributeSet
-import android.util.Log
 import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
 import android.view.View
@@ -13,14 +12,9 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleOwner
 import kotlinx.android.synthetic.main.activity_main.view.*
 import kotlinx.android.synthetic.main.component_qwantbar.view.*
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapNotNull
 import mozilla.components.browser.menu.BrowserMenuBuilder
 import mozilla.components.browser.menu.BrowserMenuItem
 import mozilla.components.browser.menu.item.BrowserMenuItemToolbar
@@ -28,27 +22,12 @@ import mozilla.components.browser.menu.item.BrowserMenuDivider
 import mozilla.components.browser.menu.item.BrowserMenuImageText
 import mozilla.components.browser.session.Session
 import mozilla.components.browser.session.SessionManager
-import mozilla.components.browser.state.action.BrowserAction
-import mozilla.components.browser.state.selector.findTabOrCustomTabOrSelectedTab
 import mozilla.components.browser.state.selector.getNormalOrPrivateTabs
-import mozilla.components.browser.state.selector.selectedTab
-import mozilla.components.browser.state.state.BrowserState
-import mozilla.components.browser.state.state.ContentState
-import mozilla.components.browser.state.state.LoadRequestState
-import mozilla.components.browser.state.state.SessionState
 import mozilla.components.feature.pwa.WebAppUseCases
-// import mozilla.components.feature.pwa.WebAppUseCases
 import mozilla.components.feature.session.SessionUseCases
-import mozilla.components.lib.state.Action
-import mozilla.components.lib.state.Observer
-import mozilla.components.lib.state.ext.flowScoped
-import mozilla.components.lib.state.ext.observe
-import mozilla.components.support.base.feature.LifecycleAwareFeature
 import mozilla.components.support.ktx.android.content.getColorFromAttr
 import mozilla.components.support.ktx.android.content.res.resolveAttribute
 import mozilla.components.support.ktx.android.util.dpToPx
-import mozilla.components.support.ktx.kotlinx.coroutines.flow.ifAnyChanged
-import mozilla.components.support.ktx.kotlinx.coroutines.flow.ifChanged
 import mozilla.components.support.utils.DrawableUtils
 import mozilla.components.ui.tabcounter.TabCounter
 import org.mozilla.gecko.util.ThreadUtils
@@ -235,13 +214,6 @@ class QwantBar @JvmOverloads constructor(
 
     private val menuBuilder = BrowserMenuBuilder(menuItems)
 
-    /* private val sessionManagerObserver = object : SessionManager.Observer {
-        override fun onSessionAdded(session: Session) { updateTabCount() }
-        override fun onSessionRemoved(session: Session) { updateTabCount() }
-        override fun onSessionsRestored() { updateTabCount() }
-        override fun onAllSessionsRemoved() { updateTabCount() }
-    } */
-
     /* private val qwantbarSessionObserver = QwantBarSessionObserver(this, sessionManager)
     private val qwantbarBrowserObserver = QwantBarBrowserObserver(this, sessionManager)
     private val qwantbarContentObserver = QwantBarContentObserver(this, sessionManager)
@@ -258,12 +230,10 @@ class QwantBar @JvmOverloads constructor(
         reference = WeakReference(qwantbar_button_tabs)
 
         tabButtonBox = qwantbar_button_tabs.findViewById(R.id.counter_box)
-        // tabButtonBar = qwantbar_button_tabs.findViewById(R.id.counter_bar)
         tabButtonText = qwantbar_button_tabs.findViewById(R.id.counter_text)
 
         val colorDefault = ContextCompat.getColor(context, this.getIconColor(false))
         tabButtonBox?.setImageDrawable(DrawableUtils.loadAndTintDrawable(context, R.drawable.mozac_ui_tabcounter_box, colorDefault))
-        // tabButtonBar?.setImageDrawable(DrawableUtils.loadAndTintDrawable(context, R.drawable.mozac_ui_tabcounter_bar, colorDefault))
         tabButtonText?.setTextColor(colorDefault)
 
         qwantbar_button_tabs.setCount(sessionManager.sessions.size)
@@ -328,7 +298,6 @@ class QwantBar @JvmOverloads constructor(
 
     fun setPrivacyMode(enabled: Boolean) {
         if (enabled != currentPrivacyEnabled) {
-            // qwantbar_container.setBackgroundColor(resources.getColor(if (enabled) R.color.qwantbar_background_privacy else R.color.photonWhite))
             currentPrivacyEnabled = enabled
             this.setHighlight(currentSelection)
         }
@@ -405,12 +374,10 @@ class QwantBar @JvmOverloads constructor(
     }
 
     fun updateTabCount() {
-        /* sessionManager.sessions.size */
-        reference.get()?.setCountWithAnimation(context.components.core.store.state.getNormalOrPrivateTabs(currentPrivacyEnabled).size)
+        this.updateTabCount(currentPrivacyEnabled)
     }
 
     fun updateTabCount(isPrivate: Boolean) {
-        /* sessionManager.sessions.size */
         reference.get()?.setCountWithAnimation(context.components.core.store.state.getNormalOrPrivateTabs(isPrivate).size)
     }
 
@@ -461,7 +428,6 @@ class QwantBar @JvmOverloads constructor(
         val selected = (sessionManager.selectedSession == null || sessionManager.selectedSession!!.url.startsWith("https://www.qwant.com"))
         qwantbar_button_home.setImageResource(this.getIcon(QwantBarIcons.SEARCH, selected))
         if (selected) this.setHighlight(QwantBarSelection.SEARCH)
-        // qwantbar.setBookmarkButton(QwantBar.BookmarkButtonType.OPEN)
 
         qwantbar_layout_nav_back.visibility = View.GONE
         qwantbar_layout_nav_forward.visibility = View.GONE

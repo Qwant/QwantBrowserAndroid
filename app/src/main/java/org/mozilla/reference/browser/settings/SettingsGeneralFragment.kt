@@ -5,18 +5,14 @@
 package org.mozilla.reference.browser.settings
 
 import android.content.Intent
-import android.content.res.Configuration
 import android.os.Bundle
 import android.provider.Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS
-import android.util.Log
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.Preference
-import mozilla.components.concept.engine.Engine
 import org.mozilla.reference.browser.QwantUtils
 import org.mozilla.reference.browser.R
-import org.mozilla.reference.browser.ext.components
 import org.mozilla.reference.browser.ext.getPreferenceKey
 import org.mozilla.reference.browser.ext.requireComponents
 
@@ -89,9 +85,6 @@ class SettingsGeneralFragment: BaseSettingsFragment() {
         }
 
         val prefTheme = findPreference(context?.getPreferenceKey(R.string.pref_key_general_dark_theme)) as QwantPreferenceDropdown
-
-        Log.e("QWANT_BROWSER", "pref theme value: ${prefTheme.value}")
-
         prefTheme.summary = darkThemeValues[darkThemeKeys.indexOf(prefTheme.value)]
         prefTheme.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, value ->
             requireComponents.core.sessionManager.sessions.forEach {

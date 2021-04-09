@@ -21,7 +21,6 @@ class BookmarksStorage(private var context: Context) {
     }
 
     fun addBookmark(item: BookmarkItemV2) {
-        Log.e("QWANT_BROWSER","add bookmark: ${item.title} in ${item.parent?.title}")
         if (item.parent != null) {
             item.parent?.addChild(item)
         } else {
@@ -39,7 +38,6 @@ class BookmarksStorage(private var context: Context) {
     }
 
     fun deleteBookmarkChildren(item: BookmarkItemV2) {
-        Log.e("QWANT_BROWSER", "DELETE bookmark ${item.title}")
         item.children?.forEach { this.deleteBookmarkChildren(it) }
     }
 
@@ -112,7 +110,6 @@ class BookmarksStorage(private var context: Context) {
             fileInputStream.close()
 
             oldBookmarks.forEach {
-                Log.e("QWANT_BROWSER", "restore old old bookmarks: ${it.title} - ${it.url}")
                 this.bookmarksList.add(BookmarkItemV2(BookmarkItemV2.BookmarkType.BOOKMARK, it.title, it.url))
             }
 
@@ -139,7 +136,6 @@ class BookmarksStorage(private var context: Context) {
             fileInputStream.close()
 
             oldBookmarks.forEach {
-                Log.e("QWANT_BROWSER", "restore old bookmarks: ${it.title} - ${it.url}")
                 this.bookmarksList.add(BookmarkItemV2(BookmarkItemV2.BookmarkType.BOOKMARK, it.title, it.url))
             }
 

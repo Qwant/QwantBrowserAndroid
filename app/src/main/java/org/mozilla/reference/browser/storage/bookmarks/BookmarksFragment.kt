@@ -4,9 +4,7 @@
 
 package org.mozilla.reference.browser.storage.bookmarks
 
-import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.ImageButton
 import android.widget.LinearLayout
@@ -14,7 +12,6 @@ import android.widget.ListView
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
-import mozilla.components.browser.engine.gecko.permission.GeckoPermissionRequest.*
 import mozilla.components.support.base.feature.UserInteractionHandler
 import org.mozilla.reference.browser.BrowserActivity
 import org.mozilla.reference.browser.R
@@ -46,15 +43,12 @@ class BookmarksFragment: Fragment(), UserInteractionHandler {
         super.onCreate(savedInstanceState)
 
         setFragmentResultListener("EditBookmarkResult") { _, bundle ->
-            Log.e("QWANT_BROWSER", "Edit bookmark result")
             toolbar?.title = folder?.title ?: context?.getString(R.string.bookmarks)
             val result = bundle.getBoolean("bookmark_updated")
             if (result) {
-                Log.e("QWANT_BROWSER", "persist")
                 bookmarksStorage?.persist()
                 editAfterCreation = null
             } else if (editAfterCreation != null) {
-                Log.e("QWANT_BROWSER", "bookmark creation cancelled")
                 bookmarksStorage?.deleteBookmark(editAfterCreation!!)
                 editAfterCreation = null
             }
@@ -88,7 +82,6 @@ class BookmarksFragment: Fragment(), UserInteractionHandler {
 
         val addFolderButton: ImageButton = view.findViewById(R.id.bookmarks_add_folder)
         addFolderButton.setOnClickListener {
-            Log.e("QWANT_BROWSER", "Creating new folder in ${folder?.title ?: "root"}")
             val newFolder = BookmarkItemV2(BookmarkItemV2.BookmarkType.FOLDER, "", parent = folder)
             bookmarksStorage?.addBookmark(newFolder)
             bookmarkEdit(newFolder)
@@ -120,7 +113,6 @@ class BookmarksFragment: Fragment(), UserInteractionHandler {
                 folder = null
                 toolbar?.title = context?.getString(R.string.bookmarks)
                 listview?.adapter = BookmarksAdapter(requireContext(), bookmarksStorage!!, ::bookmarkSelected, ::bookmarkEdit)
-                // adapter?.setParent(null)
             }
         }
         return true
@@ -139,7 +131,6 @@ class BookmarksFragment: Fragment(), UserInteractionHandler {
 
     private fun bookmarkSelected(item: BookmarkItemV2, private: Boolean = false) {
         if (item.type == BookmarkItemV2.BookmarkType.BOOKMARK) {
-            Log.d("QWANT_BROWSER", "Bookmark open with private: $private")
             if (private) {
                 requireContext().components.useCases.tabsUseCases.addPrivateTab.invoke(item.url!!, selectTab = true)
             } else {

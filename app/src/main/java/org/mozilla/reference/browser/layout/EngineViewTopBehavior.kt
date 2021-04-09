@@ -8,12 +8,9 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Resources
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import mozilla.components.concept.engine.EngineView
-import mozilla.components.support.ktx.android.util.dpToPx
-import mozilla.components.support.ktx.android.view.findViewInHierarchy
 
 /**
  * A [CoordinatorLayout.Behavior] implementation to be used with [EngineView] when placing a toolbar at the
@@ -27,8 +24,6 @@ import mozilla.components.support.ktx.android.view.findViewInHierarchy
  * This implementation will update the vertical clipping of the [EngineView] so that bottom-aligned web content will
  * be drawn above the qwant toolbar.
  */
-
-fun Int.toDp() : Int = (this / Resources.getSystem().displayMetrics.density).toInt()
 
 class EngineViewTopBehavior(
         context: Context?,
@@ -54,10 +49,8 @@ class EngineViewTopBehavior(
     override fun onDependentViewChanged(parent: CoordinatorLayout, child: View, dependency: View): Boolean {
         /* if (dependency::class.java.simpleName == "BrowserToolbar") {
             if (dependency.visibility == View.GONE) {
-                Log.d("QWANT_BROWSER", "toolbar gone, padding 0")
                 child.setPadding(0, 0, 0, 0)
             } else {
-                Log.d("QWANT_BROWSER", "toolbar visible, padding 56")
                 child.setPadding(0, 56, 0, 0)
             }
             return true

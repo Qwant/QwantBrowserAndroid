@@ -5,7 +5,6 @@ import androidx.annotation.VisibleForTesting
 import mozilla.components.browser.state.state.BrowserState
 import mozilla.components.browser.state.state.TabSessionState
 import mozilla.components.browser.state.store.BrowserStore
-// import mozilla.components.browser.thumbnails.ThumbnailsUseCases
 import mozilla.components.concept.tabstray.Tab
 import mozilla.components.concept.tabstray.Tabs
 import mozilla.components.concept.tabstray.TabsTray

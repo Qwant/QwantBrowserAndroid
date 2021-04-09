@@ -1,12 +1,10 @@
 package org.mozilla.reference.browser.settings
 
-import android.R.array
+
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import androidx.preference.Preference
-import androidx.preference.PreferenceManager
 import org.mozilla.reference.browser.BrowserActivity
 import org.mozilla.reference.browser.QwantUtils
 import org.mozilla.reference.browser.R

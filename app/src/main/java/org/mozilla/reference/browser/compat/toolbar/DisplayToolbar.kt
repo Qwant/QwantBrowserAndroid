@@ -10,7 +10,6 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
-import android.util.Log
 import android.util.TypedValue
 import android.view.View
 import android.view.accessibility.AccessibilityEvent
@@ -24,10 +23,7 @@ import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import mozilla.components.browser.menu.BrowserMenuBuilder
-// import mozilla.components.browser.toolbar.BrowserToolbar
 import mozilla.components.browser.toolbar.R
-import mozilla.components.browser.toolbar.display.DisplayToolbar
-// import mozilla.components.browser.toolbar.internal.ActionContainer
 import mozilla.components.concept.menu.MenuController
 import mozilla.components.concept.toolbar.Toolbar
 
@@ -561,17 +557,6 @@ class DisplayToolbar internal constructor(
         views.trackingProtectionIndicator.siteTrackingProtection = state
         updateSeparatorVisibility()
     }
-
-    /* internal fun setPermissionIndicator(state: Toolbar.PermissionHighlights): Int {
-        Log.d("QWANT_BROWSER", "displaytoolbar - update permissions")
-        if (!indicators.contains(Indicators.PERMISSION_HIGHLIGHTS)) {
-            return views.permissionIndicator.visibility
-        }
-
-        views.permissionIndicator.permissionHighlights = state
-
-        return views.permissionIndicator.visibility
-    } */
 
     internal fun onStop() {
         views.menu.dismissMenu()

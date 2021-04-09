@@ -294,22 +294,17 @@ class AddonsManagerAdapter(
         val unsupportedAddons = ArrayList<Addon>()
 
         addons.forEach { addon ->
-            Log.d("QWANT_BROWSER", "addon filter: $addon")
             when {
                 addon.inUnsupportedSection() -> {
-                    Log.d("QWANT_BROWSER", "addon filter: unsupported")
                     unsupportedAddons.add(addon)
                 }
                 addon.inRecommendedSection() -> {
-                    Log.d("QWANT_BROWSER", "addon filter: recommended")
                     recommendedAddons.add(addon)
                 }
                 addon.inInstalledSection() -> {
-                    Log.d("QWANT_BROWSER", "addon filter: installed")
                     installedAddons.add(addon)
                 }
                 addon.inDisabledSection() -> {
-                    Log.d("QWANT_BROWSER", "addon filter: disabled")
                     disabledAddons.add(addon)
                 }
             }

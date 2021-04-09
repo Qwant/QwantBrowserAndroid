@@ -5,20 +5,11 @@
 package org.mozilla.reference.browser.browser
 
 import android.content.res.Resources
-import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.View
-import androidx.annotation.RequiresApi
-import androidx.core.content.ContextCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.isGone
-import androidx.core.view.isVisible
 import kotlinx.android.synthetic.main.fragment_browser.*
 import kotlinx.android.synthetic.main.fragment_browser.view.*
-import mozilla.components.browser.state.selector.getNormalOrPrivateTabs
-import mozilla.components.browser.state.selector.normalTabs
 import mozilla.components.browser.state.selector.selectedTab
 import mozilla.components.browser.thumbnails.BrowserThumbnails
 import mozilla.components.feature.awesomebar.AwesomeBarFeature
@@ -29,9 +20,7 @@ import mozilla.components.support.ktx.android.content.getColorFromAttr
 import mozilla.components.support.ktx.android.util.dpToPx
 import mozilla.components.support.ktx.android.view.enterToImmersiveMode
 import mozilla.components.support.ktx.android.view.exitImmersiveModeIfNeeded
-import mozilla.components.support.ktx.android.view.hideKeyboard
 import org.mozilla.reference.browser.BrowserActivity
-import org.mozilla.reference.browser.QwantUtils
 import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.ext.components
 import org.mozilla.reference.browser.ext.requireComponents
@@ -52,12 +41,6 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
 
         // toolbarSessionObserver = ToolbarSessionObserver(requireContext().components.core.sessionManager, toolbar, swipeRefresh)
         // requireContext().components.core.sessionManager.register(this.toolbarSessionObserver!!)
-
-        // toolbar.onFocusChangeListener()
-        // awesomeBar.onFocusChangeListener()
-
-        // toolbar.onFocusChangeListener()
-        // awesomeBar.onFocusChangeListener()
 
         AwesomeBarFeature(awesomeBar, toolbar, engineView)
             .addSearchProvider(
@@ -90,20 +73,6 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
             view = view
         )
     }
-
-    /* override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-
-        Log.d("QWANT_BROWSER", "all tabs: ${requireContext().components.core.store.state.tabs.size}")
-        Log.d("QWANT_BROWSER", "normal tabs: ${requireContext().components.core.store.state.normalTabs.size}")
-        Log.d("QWANT_BROWSER", "getnormalorprivate tabs: ${requireContext().components.core.store.state.getNormalOrPrivateTabs(false).size}")
-
-        // if (requireContext().components.core.sessionManager.sessions.none { !it.private }) {
-        if (requireContext().components.core.store.state.getNormalOrPrivateTabs(false).isEmpty()) {
-            requireContext().components.useCases.tabsUseCases.addTab.invoke(QwantUtils.getHomepage(requireContext().applicationContext))
-        }
-        (activity as BrowserActivity).updateTabCounter()
-    } */
 
     /* override fun onPause() {
         super.onPause()

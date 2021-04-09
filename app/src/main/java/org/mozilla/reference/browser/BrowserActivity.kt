@@ -10,7 +10,6 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
@@ -19,10 +18,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
-import androidx.lifecycle.ViewModelProvider
 import androidx.preference.PreferenceManager
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.fragment_browser.*
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import mozilla.components.browser.session.Session
@@ -51,7 +48,6 @@ import org.mozilla.reference.browser.ext.components
 import org.mozilla.reference.browser.layout.QwantBar
 import org.mozilla.reference.browser.layout.QwantBarFeature
 import org.mozilla.reference.browser.settings.SettingsContainerFragment
-import org.mozilla.reference.browser.storage.BookmarkItemV1
 import org.mozilla.reference.browser.storage.BookmarkItemV2
 import org.mozilla.reference.browser.storage.bookmarks.BookmarksFragment
 import org.mozilla.reference.browser.storage.bookmarks.BookmarksStorage
@@ -69,7 +65,6 @@ import kotlin.system.exitProcess
  */
 open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSettingsClosed {
     private var bookmarksStorage: BookmarksStorage? = null
-    // private var qwantbarSessionObserver: QwantBarSessionObserver? = null
     private val sessionId: String?
         get() = SafeIntent(intent).getStringExtra(EXTRA_SESSION_ID)
 
@@ -89,9 +84,6 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
             BrowserFragment.create(sessionId)
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // viewModel = ViewModelProvider(this)[MainViewModel::class.java]
-
-        Log.d("QWANT_BROWSER", "browser activity creation !!")
         PACKAGE_NAME = packageName
 
         this.loadLocale()
@@ -157,10 +149,6 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         qwantbar.updateTabCount()
     }
 
-    fun updateTabCount() {
-        qwantbar.updateTabCount()
-    }
-
     private fun checkFirstLaunch() {
         val prefkey = resources.getString(R.string.pref_key_first_launch)
         val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
@@ -174,20 +162,6 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         }
     }
 
-    /* override fun onPostCreate(savedInstanceState: Bundle?) {
-        super.onPostCreate(savedInstanceState)
-
-        Log.d("QWANT_BROWSER", "all tabs: ${components.core.store.state.tabs.size}")
-        Log.d("QWANT_BROWSER", "normal tabs: ${components.core.store.state.normalTabs.size}")
-        Log.d("QWANT_BROWSER", "getnormalorprivate tabs: ${components.core.store.state.getNormalOrPrivateTabs(false).size}")
-
-        // if (requireContext().components.core.sessionManager.sessions.none { !it.private }) {
-        if (components.core.store.state.getNormalOrPrivateTabs(false).isEmpty()) {
-            components.useCases.tabsUseCases.addTab.invoke(QwantUtils.getHomepage(applicationContext))
-        }
-        qwantbar.updateTabCount()
-    } */
-
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
 
@@ -199,24 +173,6 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
             startActivity(intent)
         }
     }
-
-    /* override fun onDestroy() {
-        super.onDestroy()
-
-        Log.d("QWANT_BROWSER", "destroy  app closed, check cleaning")
-        val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-        if (prefs.getBoolean(resources.getString(R.string.pref_key_privacy_cleardata_on_close), false)) {
-            Log.d("QWANT_BROWSER", "destroy Should clean")
-            MainScope().launch {
-                components.core.engine.clearData()
-                components.core.historyStorage.deleteEverything()
-                components.core.store.dispatch(EngineAction.PurgeHistoryAction)
-                components.core.store.dispatch(RecentlyClosedAction.RemoveAllClosedTabAction)
-            }
-        } else {
-            Log.d("QWANT_BROWSER", "destroy no cleaning")
-        }
-    } */
 
     private fun loadLocale() {
         val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
@@ -352,8 +308,6 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
                         val subfolderGuid: String = bookmarkCursor.getString(bookmarkCursor.getColumnIndexOrThrow(Bookmarks.GUID))
                         val subfolderId: Long = db.getFolderIdFromGuid(cr, subfolderGuid)
 
-                        Log.e("QWANT_BROWSER", "folder found - recurse into: $title - ($subfolderGuid - $subfolderId)")
-
                         newItem = BookmarkItemV2(BookmarkItemV2.BookmarkType.FOLDER, title, parent = parentItem)
                         this.loadOldBookmarksForFolder(db, cr, subfolderId, newItem)
                     } else {
@@ -429,7 +383,6 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         if (sessionString != null) {
             val parser = LastSessionParser(applicationContext)
             parser.parse(sessionString)
-            // qwantbar.updateTabCount()
         } else {
             Log.e("QWANT_BROWSER", "restore tabs session file is null")
         }
@@ -521,11 +474,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
     override fun onCreateView(parent: View?, name: String, context: Context, attrs: AttributeSet): View? =
         when (name) {
             EngineView::class.java.name -> components.core.engine.createView(context, attrs).asView()
-            TabsTray::class.java.name -> {
-                BrowserTabsTray(context, attrs)/* .also { tray ->
-                    TabsTouchHelper(tray.tabsAdapter).attachToRecyclerView(tray)
-                } */
-            }
+            TabsTray::class.java.name -> { BrowserTabsTray(context, attrs) }
             else -> super.onCreateView(parent, name, context, attrs)
         }
 
@@ -542,24 +491,14 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         this.supportFragmentManager.beginTransaction().apply {
             this.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
             replace(R.id.container, tabsFragment, tag)
-            // addToBackStack(tag)
             commit()
         }
-        /* } else {
-            Log.d("QWANT_BROWSER", "showTabs - something else !")
-            this.supportFragmentManager.beginTransaction().show(tabsFragment).commit()
-        } */
         this.supportFragmentManager.executePendingTransactions()
-        /* this.supportFragmentManager.beginTransaction().apply {
-            replace(R.id.container, TabsTrayFragment(), "TABS_FRAGMENT")
-            commit()
-        } */
         qwantbar.setupHomeBar()
         qwantbar.setHighlight(QwantBar.QwantBarSelection.TABS)
     }
 
     private fun showBookmarks() {
-        // this.replaceFragment(BookmarksFragment)
         var bookmarksFragment = this.supportFragmentManager.findFragmentByTag("BOOKMARKS_FRAGMENT")
         if (bookmarksFragment == null) {
             bookmarksFragment = BookmarksFragment()
@@ -567,18 +506,9 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         this.supportFragmentManager.beginTransaction().apply {
             this.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
             replace(R.id.container, bookmarksFragment, "BOOKMARKS_FRAGMENT")
-            // addToBackStack("BOOKMARKS_FRAGMENT")
             commit()
         }
-        /* } else {
-            Log.d("QWANT_BROWSER", "showBookmarks - something else !")
-            this.supportFragmentManager.beginTransaction().show(bookmarksFragment).commit()
-        } */
         this.supportFragmentManager.executePendingTransactions()
-        /* this.supportFragmentManager.beginTransaction().apply {
-            replace(R.id.container, BookmarksFragment(), "BOOKMARKS_FRAGMENT")
-            commit()
-        } */
         qwantbar.setupHomeBar()
         qwantbar.setHighlight(QwantBar.QwantBarSelection.BOOKMARKS)
     }
@@ -597,10 +527,6 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
             addToBackStack("BROWSER_FRAGMENT")
             commit()
         }
-        /* } else {
-            Log.d("QWANT_BROWSER", "showBrowserFragment - something else !")
-            this.supportFragmentManager.beginTransaction().show(browserFragment).commit()
-        } */
         this.supportFragmentManager.executePendingTransactions()
     }
 
@@ -612,7 +538,6 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         this.supportFragmentManager.beginTransaction().apply {
             this.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
             replace(R.id.container, historyFragment, "HISTORY_FRAGMENT")
-            // addToBackStack("HISTORY_FRAGMENT")
             commit()
         }
         this.supportFragmentManager.executePendingTransactions()
@@ -626,20 +551,9 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         this.supportFragmentManager.beginTransaction().apply {
             this.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
             replace(R.id.container, settingsFragment, "SETTINGS_FRAGMENT")
-            // addToBackStack("SETTINGS_FRAGMENT")
             commit()
         }
-        /* } else {
-            Log.d("QWANT_BROWSER", "showSettings - something else !")
-            this.supportFragmentManager.beginTransaction().show(settingsFragment).commit()
-        } */
         this.supportFragmentManager.executePendingTransactions()
-        // this.replaceFragment(SettingsContainerFragment)
-        /* this.supportFragmentManager.beginTransaction().apply {
-            this.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
-            replace(R.id.container, SettingsContainerFragment.create(), "SETTINGS_FRAGMENT")
-            commit()
-        } */
         qwantbar.setupHomeBar()
         qwantbar.setHighlight(QwantBar.QwantBarSelection.MORE)
     }
@@ -724,14 +638,6 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         finishAffinity()
         exitProcess(0)
     }
-
-    /* private fun openPopup(webExtensionState: WebExtensionState) {
-        val intent = Intent(this, WebExtensionActionPopupActivity::class.java)
-        intent.putExtra("web_extension_id", webExtensionState.id)
-        intent.putExtra("web_extension_name", webExtensionState.name)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        startActivity(intent)
-    } */
 
     companion object {
         lateinit var PACKAGE_NAME: String

@@ -5,15 +5,9 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import androidx.annotation.VisibleForTesting
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
 import mozilla.components.concept.storage.*
 import mozilla.components.support.utils.StorageUtils.levenshteinDistance
 import mozilla.components.support.utils.segmentAwareDomainMatch
-import org.mozilla.gecko.GeckoProfile
-import org.mozilla.reference.browser.compat.BrowserContract
-import org.mozilla.reference.browser.compat.LocalBrowserDB
-import org.mozilla.reference.browser.ext.components
 import java.io.*
 import java.util.*
 
@@ -251,7 +245,6 @@ class History(val context: Context) : HistoryStorage {
     }
 
     fun restore() {
-        Log.d("QWANT_BROWSER", "restore history !")
         try {
             val fileInputStream: FileInputStream = context.openFileInput(QWANT_HISTORY_FILENAME)
             val objectInputStream = ObjectInputStream(fileInputStream)
