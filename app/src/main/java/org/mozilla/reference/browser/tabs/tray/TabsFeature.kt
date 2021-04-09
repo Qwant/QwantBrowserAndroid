@@ -71,13 +71,20 @@ internal fun TabSessionState.toTab() = Tab(
         id,
         content.url,
         content.title,
+        content.private,
         content.icon,
-        content.thumbnail
+        content.thumbnail,
+        mediaSessionState?.playbackState,
+        mediaSessionState?.controller
 )
 
 internal fun BrowserState.toTabs(
         tabsFilter: (TabSessionState) -> Boolean = { true }
-): Tabs {
-    val list = tabs.filter(tabsFilter).map { it.toTab() }
-    return Tabs(list, list.indexOfFirst { it.id == selectedTabId })
-}
+) = Tabs(
+        list = tabs
+                .filter(tabsFilter)
+                .map { it.toTab() },
+        selectedIndex = tabs
+                .filter(tabsFilter)
+                .indexOfFirst { it.id == selectedTabId }
+)

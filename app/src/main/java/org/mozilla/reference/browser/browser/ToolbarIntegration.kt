@@ -34,7 +34,7 @@ import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.addons.AddonsActivity
 import org.mozilla.reference.browser.ext.components
 import org.mozilla.reference.browser.ext.share
-import org.mozilla.reference.browser.view.BrowserMenuSwitch
+// import org.mozilla.reference.browser.view.BrowserMenuSwitch
 
 class ToolbarIntegration(
     context: Context,
