@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit
 open class BrowserApplication : Application(), Application.ActivityLifecycleCallbacks {
     val components by lazy { Components(this) }
 
-    var currentActivity: Activity? = null
+    private var currentActivity: Activity? = null
 
     override fun onCreate() {
 

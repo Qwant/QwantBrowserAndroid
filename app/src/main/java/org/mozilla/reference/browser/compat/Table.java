@@ -14,7 +14,7 @@ import android.net.Uri;
 // If you create a new Table type, make sure to add it to the sTables list in BrowserProvider to ensure it is queried.
 interface Table {
     // Provides information to BrowserProvider about the type of URIs this Table can handle.
-    public static class ContentProviderInfo {
+    class ContentProviderInfo {
         public final int id; // A number of ID for this table. Used by the UriMatcher in BrowserProvider
         public final String name; // A name for this table. Will be appended onto uris querying this table
                                   // This is also used to define the mimetype of data returned from this db, i.e.
@@ -44,4 +44,4 @@ interface Table {
     int update(SQLiteDatabase db, Uri uri, int dbId, ContentValues values, String selection, String[] selectionArgs);
     long insert(SQLiteDatabase db, Uri uri, int dbId, ContentValues values);
     int delete(SQLiteDatabase db, Uri uri, int dbId, String selection, String[] selectionArgs);
-};
+}

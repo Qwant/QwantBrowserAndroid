@@ -6,8 +6,8 @@ class SuggestItem {
         HISTORY
     }
 
-    Type type;
-    String display_text;
+    final Type type;
+    final String display_text;
 
     SuggestItem(Type type, String display_text) {
         this.type = type;

@@ -7,7 +7,6 @@ package org.mozilla.reference.browser.compat.toolbar
 import android.content.Context
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
-import android.util.Log
 import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
@@ -24,18 +23,9 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.asCoroutineDispatcher
 import mozilla.components.browser.toolbar.AsyncFilterListener
-// import mozilla.components.browser.toolbar.BrowserToolbar
 import mozilla.components.browser.toolbar.R
-// import mozilla.components.browser.toolbar.facts.ToolbarFacts
-// import mozilla.components.browser.toolbar.facts.emitCommitFact
-// import mozilla.components.browser.toolbar.facts.emitToolbarFact
-// import mozilla.components.browser.toolbar.internal.ActionContainer
 import mozilla.components.concept.toolbar.AutocompleteDelegate
 import mozilla.components.concept.toolbar.Toolbar
-import mozilla.components.support.base.Component
-import mozilla.components.support.base.facts.Action
-import mozilla.components.support.base.facts.Fact
-import mozilla.components.support.base.facts.collect
 import mozilla.components.support.base.log.logger.Logger
 import mozilla.components.support.ktx.android.view.showKeyboard
 import mozilla.components.ui.autocomplete.InlineAutocompleteEditText
@@ -91,9 +81,9 @@ class EditToolbar internal constructor(
 
     @VisibleForTesting(otherwise = PRIVATE)
     internal val views = EditToolbarViews(
-            background = rootView.findViewById<ImageView>(R.id.mozac_browser_toolbar_background),
-            icon = rootView.findViewById<ImageView>(R.id.mozac_browser_toolbar_edit_icon),
-            editActions = rootView.findViewById<ActionContainer>(R.id.mozac_browser_toolbar_edit_actions),
+            background = rootView.findViewById(R.id.mozac_browser_toolbar_background),
+            icon = rootView.findViewById(R.id.mozac_browser_toolbar_edit_icon),
+            editActions = rootView.findViewById(R.id.mozac_browser_toolbar_edit_actions),
             clear = rootView.findViewById<ImageView>(R.id.mozac_browser_toolbar_clear_view).apply {
                 setOnClickListener {
                     onClear()
@@ -264,13 +254,13 @@ class EditToolbar internal constructor(
     /**
      * Applies the given search terms for further editing, requesting new suggestions along the way.
      */
-    internal fun editSuggestion(searchTerms: String) {
+    // internal fun editSuggestion(searchTerms: String) {
         // updateUrl(searchTerms)
         // views.url.setSelection(views.url.text.length)
         // focus()
 
         // editListener?.onTextChanged(searchTerms)
-    }
+    // }
 
     /**
      * Sets/gets private mode.

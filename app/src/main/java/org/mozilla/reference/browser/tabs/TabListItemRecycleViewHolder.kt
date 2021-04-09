@@ -3,7 +3,6 @@ package org.mozilla.reference.browser.tabs
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.view.View
-import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageButton
@@ -17,7 +16,6 @@ import mozilla.components.concept.base.images.ImageLoadRequest
 import mozilla.components.concept.tabstray.Tab
 import mozilla.components.support.ktx.android.util.dpToPx
 import org.mozilla.reference.browser.R
-import org.mozilla.reference.browser.ext.components
 import org.mozilla.reference.browser.tabs.tray.toTab
 
 class TabListItemRecycleViewHolder(
@@ -28,16 +26,10 @@ class TabListItemRecycleViewHolder(
         private val deletedCallback: (tabSession: TabSessionState?) -> Unit
 ) : RecyclerView.ViewHolder(item_layout) {
     private var itemMainLayout: LinearLayout = item_layout.findViewById(R.id.tablist_item_layout)
-    // private var itemIcon: ImageView = item_layout.findViewById(R.id.tablist_item_icon)
     private var itemPreview: TabThumbnailView = item_layout.findViewById(R.id.tablist_item_preview)
     private var itemTitle: TextView = item_layout.findViewById(R.id.tablist_item_title)
     private var itemUrl: TextView = item_layout.findViewById(R.id.tablist_item_url)
-    // private var itemLayoutText: LinearLayout = item_layout.findViewById(R.id.tablist_item_layout_text)
     private var itemDelete: AppCompatImageButton = item_layout.findViewById(R.id.tablist_item_delete)
-
-    // private val thumbnailLoader = ThumbnailLoader(context.components.core.thumbnailStorage)
-
-    private var thumbnailLoaded = false
 
     fun bind(tabSession: TabSessionState, isSelected: Boolean) {
         val tab = tabSession.toTab()
@@ -54,7 +46,7 @@ class TabListItemRecycleViewHolder(
         this.setSelected(isSelected)
     }
 
-    fun setSelected(isSelected: Boolean) {
+    private fun setSelected(isSelected: Boolean) {
         if (isSelected) {
             this.itemMainLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.qwant_tab_selected))
         } else {
@@ -62,7 +54,7 @@ class TabListItemRecycleViewHolder(
         }
     }
 
-    fun setThumbnail(tab: Tab) {
+    private fun setThumbnail(tab: Tab) {
         if (tab.thumbnail == null) {
             val placeholder: Drawable? = tab.icon?.toDrawable(context.resources) ?: ContextCompat.getDrawable(context, R.drawable.default_favicon)
             val thumbnailSize = 100.dpToPx(this.itemPreview.context.resources.displayMetrics)
@@ -74,8 +66,6 @@ class TabListItemRecycleViewHolder(
         } else if (tab.thumbnail != null) {
             this.itemPreview.setImageBitmap(tab.thumbnail)
         }
-
-        // this.itemIcon.setImageBitmap(tab.icon)
     }
 
     companion object {

@@ -75,7 +75,7 @@ public class BrowserContract {
     public static final String METHOD_PARAM_OBJECT = "object";
     public static final String METHOD_PARAM_DATA = "data";
 
-    static public enum ExpirePriority {
+    public enum ExpirePriority {
         NORMAL,
         AGGRESSIVE
     }
@@ -151,13 +151,13 @@ public class BrowserContract {
 
     @RobocopTarget
     public interface CommonColumns {
-        public static final String _ID = "_id";
+        String _ID = "_id";
     }
 
     @RobocopTarget
     public interface DateSyncColumns {
-        public static final String DATE_CREATED = "created";
-        public static final String DATE_MODIFIED = "modified";
+        String DATE_CREATED = "created";
+        String DATE_MODIFIED = "modified";
     }
 
     @RobocopTarget
@@ -172,55 +172,55 @@ public class BrowserContract {
 
     @RobocopTarget
     public interface SyncColumns extends DateSyncColumns {
-        public static final String GUID = "guid";
-        public static final String IS_DELETED = "deleted";
+        String GUID = "guid";
+        String IS_DELETED = "deleted";
     }
 
     @RobocopTarget
     public interface URLColumns {
-        public static final String URL = "url";
-        public static final String TITLE = "title";
+        String URL = "url";
+        String TITLE = "title";
     }
 
     @RobocopTarget
     public interface FaviconColumns {
-        public static final String FAVICON = "favicon";
-        public static final String FAVICON_ID = "favicon_id";
-        public static final String FAVICON_URL = "favicon_url";
+        String FAVICON = "favicon";
+        String FAVICON_ID = "favicon_id";
+        String FAVICON_URL = "favicon_url";
     }
 
     @RobocopTarget
     public interface HistoryColumns {
-        public static final String DATE_LAST_VISITED = "date";
-        public static final String VISITS = "visits";
+        String DATE_LAST_VISITED = "date";
+        String VISITS = "visits";
         // Aggregates used to speed up top sites and search frecency-powered queries
-        public static final String LOCAL_VISITS = "visits_local";
-        public static final String REMOTE_VISITS = "visits_remote";
-        public static final String LOCAL_DATE_LAST_VISITED = "date_local";
-        public static final String REMOTE_DATE_LAST_VISITED = "date_remote";
+        String LOCAL_VISITS = "visits_local";
+        String REMOTE_VISITS = "visits_remote";
+        String LOCAL_DATE_LAST_VISITED = "date_local";
+        String REMOTE_DATE_LAST_VISITED = "date_remote";
     }
 
     @RobocopTarget
     public interface VisitsColumns {
-        public static final String HISTORY_GUID = "history_guid";
-        public static final String VISIT_TYPE = "visit_type";
-        public static final String DATE_VISITED = "date";
+        String HISTORY_GUID = "history_guid";
+        String VISIT_TYPE = "visit_type";
+        String DATE_VISITED = "date";
         // Used to distinguish between visits that were generated locally vs those that came in from Sync.
         // Since we don't track "origin clientID" for visits, this is the best we can do for now.
-        public static final String IS_LOCAL = "is_local";
+        String IS_LOCAL = "is_local";
     }
 
     public interface PageMetadataColumns {
-        public static final String HISTORY_GUID = "history_guid";
-        public static final String DATE_CREATED = "created";
-        public static final String HAS_IMAGE = "has_image";
-        public static final String JSON = "json";
+        String HISTORY_GUID = "history_guid";
+        String DATE_CREATED = "created";
+        String HAS_IMAGE = "has_image";
+        String JSON = "json";
     }
 
     public interface DeletedColumns {
-        public static final String ID = "id";
-        public static final String GUID = "guid";
-        public static final String TIME_DELETED = "timeDeleted";
+        String ID = "id";
+        String GUID = "guid";
+        String TIME_DELETED = "timeDeleted";
     }
 
     @RobocopTarget

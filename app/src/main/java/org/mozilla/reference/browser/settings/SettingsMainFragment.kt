@@ -8,7 +8,6 @@ import android.os.Bundle
 import androidx.preference.Preference
 import org.mozilla.reference.browser.BrowserActivity
 import org.mozilla.reference.browser.R
-import org.mozilla.reference.browser.browser.BrowserFragment
 import org.mozilla.reference.browser.ext.getPreferenceKey
 
 class SettingsMainFragment: BaseSettingsFragment() {

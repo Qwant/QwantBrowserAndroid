@@ -52,7 +52,6 @@ class TabsTrayPresenter(
                 } */
                 .ifChanged()
                 .collect { tabs ->
-
                     // Do not invoke the callback on start if this is the initial state.
                     /* if (tabs.list.isEmpty() && this.tabs != null) {
                         closeTabsTray.invoke()

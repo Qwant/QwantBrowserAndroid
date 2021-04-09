@@ -36,7 +36,7 @@ class SettingsContainerFragment: Fragment(), UserInteractionHandler {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        context?.theme?.applyStyle(R.style.ThemeQwantNoActionBar, true);
+        context?.theme?.applyStyle(R.style.ThemeQwantNoActionBar, true)
         return inflater.inflate(R.layout.fragment_settings, container, false)
     }
 
@@ -53,21 +53,25 @@ class SettingsContainerFragment: Fragment(), UserInteractionHandler {
             this.onBackPressed()
         }
 
-        if (languageChangedReload) {
-            childFragmentManager.beginTransaction()
-                    .replace(R.id.settings_fragment_container, SettingsGeneralLanguageFragment(), "SETTINGS_GENERAL_LANGUAGE_FRAGMENT")
-                    .addToBackStack(null)
-                    .commit()
-        } else if (themeChangedReload) {
-            childFragmentManager.beginTransaction()
-                    .replace(R.id.settings_fragment_container, SettingsGeneralFragment(), "SETTINGS_GENERAL_FRAGMENT")
-                    .addToBackStack(null)
-                    .commit()
-        } else {
-            childFragmentManager.beginTransaction()
-                    .replace(R.id.settings_fragment_container, SettingsMainFragment(), "SETTINGS_MAIN_FRAGMENT")
-                    .addToBackStack(null)
-                    .commit()
+        when {
+            languageChangedReload -> {
+                childFragmentManager.beginTransaction()
+                        .replace(R.id.settings_fragment_container, SettingsGeneralLanguageFragment(), "SETTINGS_GENERAL_LANGUAGE_FRAGMENT")
+                        .addToBackStack(null)
+                        .commit()
+            }
+            themeChangedReload -> {
+                childFragmentManager.beginTransaction()
+                        .replace(R.id.settings_fragment_container, SettingsGeneralFragment(), "SETTINGS_GENERAL_FRAGMENT")
+                        .addToBackStack(null)
+                        .commit()
+            }
+            else -> {
+                childFragmentManager.beginTransaction()
+                        .replace(R.id.settings_fragment_container, SettingsMainFragment(), "SETTINGS_MAIN_FRAGMENT")
+                        .addToBackStack(null)
+                        .commit()
+            }
         }
     }
 

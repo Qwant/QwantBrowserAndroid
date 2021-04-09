@@ -29,10 +29,10 @@ class AboutMenuFragment: BaseSettingsFragment() {
     }
 
     override fun onBackPressed(): Boolean {
-        fragmentManager?.beginTransaction()
-                ?.replace(R.id.settings_fragment_container, SettingsMainFragment(), "SETTINGS_MAIN_FRAGMENT")
-                ?.addToBackStack(null)
-                ?.commit()
+        parentFragmentManager.beginTransaction()
+                .replace(R.id.settings_fragment_container, SettingsMainFragment(), "SETTINGS_MAIN_FRAGMENT")
+                .addToBackStack(null)
+                .commit()
         return true
     }
 }

@@ -57,8 +57,7 @@
         mozac:findInPageQueryHintTextColor="#dddddd"
         mozac:findInPageResultCountTextColor="#ff88ff"
         mozac:findInPageButtonsTint="#ff88ff"
-        android:visibility="gone"
-        app:layout_behavior="org.mozilla.reference.browser.browser.FindInPageBarBehavior" />
+        android:visibility="gone" />
 
     <org.mozilla.reference.browser.compat.toolbar.BrowserToolbar
         android:id="@+id/toolbar"

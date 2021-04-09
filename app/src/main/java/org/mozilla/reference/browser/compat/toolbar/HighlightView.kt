@@ -3,14 +3,12 @@ package org.mozilla.reference.browser.compat.toolbar
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
-import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.view.isVisible
 import mozilla.components.concept.toolbar.Toolbar
 import org.mozilla.reference.browser.R
-import org.mozilla.reference.browser.compat.toolbar.Update
 
 
 internal class HighlightView @JvmOverloads constructor(
@@ -66,7 +64,7 @@ internal class HighlightView @JvmOverloads constructor(
     }
 
     companion object {
-        val DEFAULT_ICON = R.drawable.mozac_dot_notification
+        const val DEFAULT_ICON = R.drawable.mozac_dot_notification
     }
 
     private fun Toolbar.Highlight.toUpdate(): Update = when (this) {

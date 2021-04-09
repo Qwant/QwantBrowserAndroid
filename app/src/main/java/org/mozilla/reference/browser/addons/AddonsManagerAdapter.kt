@@ -9,7 +9,6 @@ import android.graphics.Bitmap
 import android.graphics.Typeface
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.TransitionDrawable
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -253,11 +252,11 @@ class AddonsManagerAdapter(
                 // We calculate how much time takes to fetch an icon,
                 // if takes less than a second, we assume it comes
                 // from a cache and we don't show any transition animation.
-                val startTime = System.currentTimeMillis()
+                /*  val startTime = System.currentTimeMillis()
                 val iconBitmap = null //addonCollectionProvider.getAddonIconBitmap(addon)
                 val timeToFetch: Double = (System.currentTimeMillis() - startTime) / 1000.0
                 val isFromCache = timeToFetch < 1
-                /* if (iconBitmap != null) {
+                if (iconBitmap != null) {
                     scope.launch(Main) {
                         if (isFromCache) {
                             iconView.setImageDrawable(BitmapDrawable(iconView.resources, iconBitmap))

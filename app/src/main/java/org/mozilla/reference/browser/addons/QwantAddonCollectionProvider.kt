@@ -44,7 +44,7 @@ class QwantAddonCollectionProvider(private val client: Client) : AddonsProvider 
     } */
 
     @Throws(IOException::class)
-    suspend fun getAddonIconBitmap(addon: Addon): Bitmap? {
+    fun getAddonIconBitmap(addon: Addon): Bitmap? {
         var bitmap: Bitmap? = null
         if (addon.iconUrl != "") {
             client.fetch(

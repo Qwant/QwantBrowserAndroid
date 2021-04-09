@@ -129,7 +129,7 @@
     <string name="settings_interface">Interface</string>
 
     <string name="settings_privacy_clear_data">Clear Data</string>
-    <string name="settings_privacy_clear_data_on_close">Clear Data on quit</string>
+    <!-- <string name="settings_privacy_clear_data_on_close">Clear Data on quit</string> -->
     <string name="settings_privacy_personal_data">Personal data</string>
     <string name="cleardata_allsites">All sites data</string>
     <string name="cleardata_cache">Cache</string>

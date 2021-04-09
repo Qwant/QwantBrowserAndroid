@@ -13,7 +13,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -26,6 +25,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import org.jetbrains.annotations.NotNull;
 import org.mozilla.reference.browser.IntentReceiverActivity;
 import org.mozilla.reference.browser.QwantUtils;
 import org.mozilla.reference.browser.R;
@@ -264,12 +264,12 @@ public class Assist extends Activity {
         }
     }
 
-    @Override protected void onSaveInstanceState(Bundle outState) {
+    @Override protected void onSaveInstanceState(@NotNull Bundle outState) {
         super.onSaveInstanceState(outState);
         history_adapter.write_on_disk();
     }
 
-    @Override protected void onRestoreInstanceState(Bundle savedInstanceState) {
+    @Override protected void onRestoreInstanceState(@NotNull Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         history_adapter.read_from_disk();
     }
@@ -278,7 +278,7 @@ public class Assist extends Activity {
         search_text.setText("");
         search_text.requestFocus();
         InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
-        imm.showSoftInput(search_text, 0);
+        if (imm != null) imm.showSoftInput(search_text, 0);
     }
 
     void reload_clipboard(ClipboardManager clipboard) {

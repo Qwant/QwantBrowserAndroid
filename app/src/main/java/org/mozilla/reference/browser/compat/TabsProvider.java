@@ -114,11 +114,11 @@ public class TabsProvider extends SharedBrowserDatabaseProvider {
         CLIENTS_RECENCY_PROJECTION_MAP = Collections.unmodifiableMap(map);
     }
 
-    private static final String projectColumn(String table, String column) {
+    private static String projectColumn(String table, String column) {
         return table + "." + column;
     }
 
-    private static final String selectColumn(String table, String column) {
+    private static String selectColumn(String table, String column) {
         return projectColumn(table, column) + " = ?";
     }
 

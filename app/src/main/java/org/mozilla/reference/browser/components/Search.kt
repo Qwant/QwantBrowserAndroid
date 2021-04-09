@@ -5,7 +5,6 @@
 package org.mozilla.reference.browser.components
 
 import android.content.Context
-import android.util.Log
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import mozilla.components.browser.search.SearchEngineManager

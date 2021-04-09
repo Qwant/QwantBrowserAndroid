@@ -1,21 +1,17 @@
 package org.mozilla.reference.browser.tabs.tray
 
-import android.content.res.ColorStateList
 import android.view.View
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageButton
-import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import mozilla.components.browser.session.Session
-import mozilla.components.browser.session.ext.toTabSessionState
 import mozilla.components.browser.tabstray.thumbnail.TabThumbnailView
 import mozilla.components.concept.tabstray.Tab
 import mozilla.components.concept.tabstray.TabsTray
 import mozilla.components.support.base.observer.Observable
 import org.mozilla.reference.browser.R
-import org.mozilla.reference.browser.ext.requireComponents
 
 /**
  * A RecyclerView ViewHolder implementation for "tab" items.
@@ -45,7 +41,6 @@ class TabViewHolder(
         }
 
         tabView.text = title
-        // closeView.imageTintList = ColorStateList.valueOf(tabsTray.styling.itemTextColor)
         itemView.setOnClickListener {
             observable.notifyObservers { onTabSelected(tab) }
         }

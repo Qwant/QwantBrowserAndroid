@@ -55,7 +55,6 @@
             android:textColor="@color/qwant_black"
             android:layout_marginBottom="4dp"
             android:maxLines="2"
-            android:text="kdhjkdshq khdkqjhd ksqjhdss kjqhd kjqshdkjqhsdkhqsdsq..."
             android:textSize="18sp" />
 
         <TextView
@@ -65,7 +64,6 @@
             android:gravity="center_vertical"
             android:textColor="@color/qwant_url_green"
             android:maxLines="1"
-            android:text="kdhjkdshqkhdkqjhdksqjhdkjqhdsqdsqdsq"
             android:textSize="12sp" />
 
     </LinearLayout>

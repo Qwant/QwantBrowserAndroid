@@ -27,11 +27,6 @@ class BookmarksAdapter(
 ) : BaseAdapter() {
     private var list: ArrayList<BookmarkItemV2>? = if (parent == null) bookmarkStorage.root() else parent.children
 
-    fun setParent(parent: BookmarkItemV2?) {
-        list = if (parent == null) bookmarkStorage.root() else parent.children
-        this.notifyDataSetChanged()
-    }
-
     internal class BookmarkItemViewHolder(
             item_layout: View,
             private val bookmarksAdapter: BookmarksAdapter,

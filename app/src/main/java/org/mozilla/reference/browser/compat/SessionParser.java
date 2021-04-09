@@ -56,7 +56,7 @@ public abstract class SessionParser {
             JSONArray entries = mTabObject.optJSONArray("entries");
             return entries != null && entries.length() == 1;
         }
-    };
+    }
 
     abstract public void onTabRead(SessionTab tab);
 

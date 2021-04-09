@@ -1,39 +1,16 @@
 package org.mozilla.reference.browser.browser
 
-/* import android.content.Context
-import mozilla.components.browser.session.SessionManager
-import mozilla.components.browser.session.ext.toTabSessionState
-import mozilla.components.concept.engine.EngineView
-import mozilla.components.feature.session.SessionUseCases
-import mozilla.components.feature.tabs.TabsUseCases
-import mozilla.components.support.base.feature.UserInteractionHandler
-import mozilla.components.support.base.feature.LifecycleAwareFeature
-import org.mozilla.reference.browser.QwantUtils
-import org.mozilla.reference.browser.R
-
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-
-package mozilla.components.feature.session */
-
 import android.content.Context
-import android.util.Log
 import mozilla.components.browser.session.SessionManager
-// import mozilla.components.browser.session.ext.toCustomTabSessionState
 import mozilla.components.browser.session.ext.toTabSessionState
-// import mozilla.components.browser.session.usecases.EngineSessionUseCases
 import mozilla.components.browser.state.selector.findTabOrCustomTabOrSelectedTab
 import mozilla.components.browser.state.store.BrowserStore
 import mozilla.components.concept.engine.EngineView
-import mozilla.components.feature.session.SessionUseCases
-import mozilla.components.feature.tabs.TabsUseCases
 import mozilla.components.support.base.feature.LifecycleAwareFeature
 import mozilla.components.support.base.feature.UserInteractionHandler
 import org.mozilla.reference.browser.QwantUtils
 import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.components.UseCases
-import org.mozilla.reference.browser.tabs.tray.toTab
 
 /**
  * Feature implementation for connecting the engine module with the session module.
@@ -43,14 +20,10 @@ class QwantSessionFeature(
         private val store: BrowserStore,
         private val sessionManager: SessionManager,
         private val useCases: UseCases,
-        /* private val sessionUseCases: SessionUseCases,
-        private val goBackUseCase: SessionUseCases.GoBackUseCase,
-        private val tabsUseCases: TabsUseCases,
-        engineSessionUseCases: EngineSessionUseCases, */
         private val engineView: EngineView,
         private val tabId: String? = null
 ) : LifecycleAwareFeature, UserInteractionHandler {
-    internal val presenter = EngineViewPresenter(store, engineView, tabId)
+    private val presenter = EngineViewPresenter(store, engineView, tabId)
 
     /**
      * Start feature: App is in the foreground.

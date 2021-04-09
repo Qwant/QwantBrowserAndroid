@@ -1,7 +1,6 @@
 package org.mozilla.reference.browser.settings
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.preference.Preference
@@ -40,10 +39,10 @@ abstract class BaseSettingsFragment: PreferenceFragmentCompat(), UserInteraction
     }
 
     override fun onBackPressed(): Boolean {
-        fragmentManager?.beginTransaction()
-                ?.replace(R.id.settings_fragment_container, SettingsMainFragment(), "SETTINGS_MAIN_FRAGMENT")
-                ?.addToBackStack(null)
-                ?.commit()
+        parentFragmentManager.beginTransaction()
+                .replace(R.id.settings_fragment_container, SettingsMainFragment(), "SETTINGS_MAIN_FRAGMENT")
+                .addToBackStack(null)
+                .commit()
         return true
     }
 

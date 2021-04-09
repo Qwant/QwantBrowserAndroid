@@ -5,24 +5,15 @@
 package org.mozilla.reference.browser.components
 
 import android.content.Context
-import mozilla.components.browser.search.DefaultSearchEngineProvider
 import mozilla.components.browser.search.SearchEngineManager
 import mozilla.components.browser.search.ext.toDefaultSearchEngineProvider
 import mozilla.components.browser.session.SessionManager
-// import mozilla.components.browser.session.usecases.EngineSessionUseCases
 import mozilla.components.browser.state.store.BrowserStore
-// import mozilla.components.browser.thumbnails.ThumbnailsUseCases
-import mozilla.components.browser.thumbnails.storage.ThumbnailStorage
 import mozilla.components.concept.engine.Engine
-import mozilla.components.concept.engine.Settings
-import mozilla.components.concept.fetch.Client
 import mozilla.components.feature.contextmenu.ContextMenuUseCases
 import mozilla.components.feature.downloads.DownloadsUseCases
 import mozilla.components.feature.pwa.WebAppShortcutManager
 import mozilla.components.feature.pwa.WebAppUseCases
-/* import mozilla.components.feature.pwa.ManifestStorage
-import mozilla.components.feature.pwa.WebAppShortcutManager
-import mozilla.components.feature.pwa.WebAppUseCases */
 import mozilla.components.feature.search.SearchUseCases
 import mozilla.components.feature.session.SessionUseCases
 import mozilla.components.feature.session.SettingsUseCases
@@ -45,8 +36,6 @@ class UseCases(
      * Use cases that provide engine interactions for a given browser session.
      */
     val sessionUseCases by lazy { SessionUseCases(store, sessionManager) }
-
-    // val engineSessionUseCases by lazy { EngineSessionUseCases(sessionManager) }
 
     /**
      * Use cases that provide tab management.
@@ -72,13 +61,6 @@ class UseCases(
      * Uses cases that provides context menu
      */
     val contextMenuUseCases: ContextMenuUseCases by lazy { ContextMenuUseCases(store) }
-
-    /* val thumbnailUseCases: ThumbnailsUseCases by lazy {
-        ThumbnailsUseCases(
-                store,
-                thumbnailStorage
-        )
-    } */
 
     val downloadsUseCases: DownloadsUseCases by lazy { DownloadsUseCases(store) }
 

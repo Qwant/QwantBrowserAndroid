@@ -33,7 +33,7 @@ class AppRequestInterceptor(private val context: Context) : RequestInterceptor {
             errorType: ErrorType,
             uri: String?
     ): RequestInterceptor.ErrorResponse? {
-        val errorPage = ErrorPages.createUrlEncodedErrorPage(context, errorType, uri)
+        // val errorPage = ErrorPages.createUrlEncodedErrorPage(context, errorType, uri)
         return null // RequestInterceptor.ErrorResponse.Content(errorPage)
     }
 

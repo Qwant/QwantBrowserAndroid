@@ -69,10 +69,10 @@ class SettingsGeneralLanguageFragment: BaseSettingsFragment() {
     }
 
     override fun onBackPressed(): Boolean {
-        fragmentManager?.beginTransaction()
-                ?.replace(R.id.settings_fragment_container, SettingsGeneralFragment(), "SETTINGS_GENERAL_FRAGMENT")
-                ?.addToBackStack(null)
-                ?.commit()
+        parentFragmentManager.beginTransaction()
+                .replace(R.id.settings_fragment_container, SettingsGeneralFragment(), "SETTINGS_GENERAL_FRAGMENT")
+                .addToBackStack(null)
+                .commit()
         return true
     }
 
@@ -122,7 +122,7 @@ class SettingsGeneralLanguageFragment: BaseSettingsFragment() {
             Log.e("QWANT_BROWSER", "Error in language XML files")
         }
 
-        listArrayKeys.recycle();
-        listArrayValues.recycle();
+        listArrayKeys.recycle()
+        listArrayValues.recycle()
     }
 }

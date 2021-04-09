@@ -3,24 +3,18 @@ package org.mozilla.reference.browser.tabs.tray
 import android.content.Context
 import android.content.res.Resources
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
-import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat.getColor
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import mozilla.components.browser.session.Session
-import mozilla.components.browser.state.selector.selectedTab
 import mozilla.components.concept.tabstray.TabsTray
 import mozilla.components.support.ktx.android.content.res.resolveAttribute
 import mozilla.components.support.ktx.android.util.dpToPx
 import org.mozilla.reference.browser.R
-import org.mozilla.reference.browser.ext.components
 
-const val DEFAULT_ITEM_BACKGROUND_COLOR = 0xFFFFFFFF.toInt()
+/* const val DEFAULT_ITEM_BACKGROUND_COLOR = 0xFFFFFFFF.toInt()
 const val DEFAULT_ITEM_BACKGROUND_SELECTED_COLOR = 0xFFFF45A1FF.toInt()
 const val DEFAULT_ITEM_TEXT_COLOR = 0xFF111111.toInt()
-const val DEFAULT_ITEM_TEXT_SELECTED_COLOR = 0xFFFFFFFF.toInt()
+const val DEFAULT_ITEM_TEXT_SELECTED_COLOR = 0xFFFFFFFF.toInt() */
 
 /**
  * A customizable tabs tray for browsers.
@@ -29,7 +23,7 @@ class BrowserTabsTray @JvmOverloads constructor(
         context: Context,
         attrs: AttributeSet? = null,
         defStyleAttr: Int = 0,
-        val tabsAdapter: TabsAdapter = TabsAdapter(context)
+        private val tabsAdapter: TabsAdapter = TabsAdapter(context)
 ) : RecyclerView(context, attrs, defStyleAttr),
         TabsTray by tabsAdapter {
 

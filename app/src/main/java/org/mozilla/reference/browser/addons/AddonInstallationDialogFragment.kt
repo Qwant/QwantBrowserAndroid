@@ -74,31 +74,31 @@ class AddonInstallationDialogFragment : AppCompatDialogFragment() {
 
     private val safeArguments get() = requireNotNull(arguments)
 
-    internal val addon get() = requireNotNull(safeArguments.getParcelable<Addon>(KEY_ADDON))
+    private val addon get() = requireNotNull(safeArguments.getParcelable<Addon>(KEY_ADDON))
     private var allowPrivateBrowsing: Boolean = false
 
-    internal val confirmButtonRadius
+    private val confirmButtonRadius
         get() =
             safeArguments.getFloat(KEY_CONFIRM_BUTTON_RADIUS, DEFAULT_VALUE.toFloat())
 
-    internal val dialogGravity: Int
+    private val dialogGravity: Int
         get() =
             safeArguments.getInt(
                     KEY_DIALOG_GRAVITY,
                     DEFAULT_VALUE
             )
-    internal val dialogShouldWidthMatchParent: Boolean
+    private val dialogShouldWidthMatchParent: Boolean
         get() =
             safeArguments.getBoolean(KEY_DIALOG_WIDTH_MATCH_PARENT)
 
-    internal val confirmButtonBackgroundColor
+    private val confirmButtonBackgroundColor
         get() =
             safeArguments.getInt(
                     KEY_CONFIRM_BUTTON_BACKGROUND_COLOR,
                     DEFAULT_VALUE
             )
 
-    internal val confirmButtonTextColor
+    private val confirmButtonTextColor
         get() =
             safeArguments.getInt(
                     KEY_CONFIRM_BUTTON_TEXT_COLOR,

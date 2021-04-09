@@ -7,7 +7,6 @@ package org.mozilla.reference.browser.compat.toolbar
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,12 +22,9 @@ import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import mozilla.components.browser.toolbar.behavior.BrowserToolbarBehavior
-// import mozilla.components.browser.toolbar.display.DisplayToolbar
-// import mozilla.components.browser.toolbar.edit.EditToolbar
 import mozilla.components.concept.toolbar.AutocompleteDelegate
 import mozilla.components.concept.toolbar.AutocompleteResult
 import mozilla.components.concept.toolbar.Toolbar
-// import mozilla.components.concept.toolbar.Toolbar.PermissionHighlights
 import mozilla.components.support.base.android.Padding
 import mozilla.components.support.base.log.logger.Logger
 import mozilla.components.ui.autocomplete.AutocompleteView
@@ -211,9 +207,9 @@ class BrowserToolbar @JvmOverloads constructor(
     }
 
     override fun setSearchTerms(searchTerms: String) {
-        if (state == State.EDIT) {
+        /* if (state == State.EDIT) {
             edit.editSuggestion(searchTerms)
-        }
+        } */
 
         this.searchTerms = searchTerms
     }
@@ -465,7 +461,7 @@ class BrowserToolbar @JvmOverloads constructor(
     }
 
     companion object {
-        internal const val ACTION_PADDING_DP = 16
+        private const val ACTION_PADDING_DP = 16
         internal val DEFAULT_PADDING =
                 Padding(ACTION_PADDING_DP, ACTION_PADDING_DP, ACTION_PADDING_DP, ACTION_PADDING_DP)
     }

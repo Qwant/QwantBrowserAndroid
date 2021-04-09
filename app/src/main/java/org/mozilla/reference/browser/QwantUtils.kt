@@ -3,9 +3,8 @@ package org.mozilla.reference.browser
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.Configuration
-import android.util.Log
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.PreferenceManager
+import java.util.*
 
 class QwantUtils {
     companion object {
@@ -41,7 +40,7 @@ class QwantUtils {
             val builder = StringBuilder()
             builder.append(context.getString(R.string.homepage_base))
                 .append("?client=").append(client)
-                .append("&l=").append(l?.toLowerCase())
+                .append("&l=").append(l?.toLowerCase(Locale.getDefault()))
                 .append("&sr=").append(sr)
                 .append("&r=").append(r)
                 .append("&s=").append(s)
@@ -50,7 +49,6 @@ class QwantUtils {
                 .append("&theme=").append(theme)
                 // TODO
                 // .append("&a=").append(enableSuggest)
-                // .append("&t=").append(theme)
 
             if (widget) builder.append("&widget=1")
             if (query != null) builder.append("&q=").append(query)

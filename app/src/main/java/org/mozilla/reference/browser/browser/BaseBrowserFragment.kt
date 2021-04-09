@@ -109,8 +109,6 @@ abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler, Activit
                 toolbar,
                 requireComponents.core.historyStorage,
                 requireComponents.core.sessionManager,
-                requireComponents.useCases.sessionUseCases,
-                // requireComponents.useCases.webAppUseCases,
                 sessionId),
             owner = this,
             view = view)
@@ -118,7 +116,7 @@ abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler, Activit
         contextMenuIntegration.set(
             feature = ContextMenuIntegration(
                 requireContext(),
-                requireFragmentManager(),
+                parentFragmentManager,
                 requireComponents.core.store,
                 requireComponents.useCases.tabsUseCases,
                 requireComponents.useCases.contextMenuUseCases,
@@ -156,7 +154,7 @@ abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler, Activit
                         requireContext(),
                         store = requireComponents.core.store,
                         sessionId = sessionId,
-                        fragmentManager = requireFragmentManager(),
+                        fragmentManager = parentFragmentManager,
                         // launchInApp = { true }
                         launchInApp = {
                             prefs.getBoolean(requireContext().getPreferenceKey(R.string.pref_key_general_launchexternalapp), true)
@@ -171,7 +169,7 @@ abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler, Activit
                 fragment = this,
                 store = requireComponents.core.store,
                 customTabId = sessionId,
-                fragmentManager = requireFragmentManager(),
+                fragmentManager = parentFragmentManager,
                 onNeedToRequestPermissions = { permissions ->
                     requestPermissions(permissions, REQUEST_CODE_PROMPT_PERMISSIONS)
                 }),
@@ -206,7 +204,7 @@ abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler, Activit
         sitePermissionFeature.set(
                 feature = SitePermissionsFeature(
                     context = requireContext(),
-                    fragmentManager = requireFragmentManager(),
+                    fragmentManager = parentFragmentManager,
                     sessionId = sessionId,
                     storage = requireComponents.core.sitePermissionsStorage,
                     onNeedToRequestPermissions = { permissions ->

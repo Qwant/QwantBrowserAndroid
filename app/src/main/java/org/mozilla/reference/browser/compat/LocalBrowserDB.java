@@ -16,16 +16,11 @@ import android.database.DatabaseUtils;
 import android.database.MatrixCursor;
 import android.database.MergeCursor;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.RemoteException;
 import android.os.SystemClock;
 
-/* import android.support.annotation.CheckResult;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.content.CursorLoader; */
 import androidx.annotation.CheckResult;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -34,16 +29,11 @@ import androidx.loader.content.CursorLoader;
 import android.text.TextUtils;
 import android.util.Log;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-// import org.mozilla.gecko.AppConstants;
-
-// import org.mozilla.gecko.R;
 
 import org.mozilla.gecko.annotation.RobocopTarget;
-import org.mozilla.gecko.media.Utils;
 import org.mozilla.reference.browser.R;
 import org.mozilla.reference.browser.compat.BrowserContract.ActivityStreamBlocklist;
 import org.mozilla.reference.browser.compat.BrowserContract.Bookmarks;
@@ -56,14 +46,6 @@ import org.mozilla.reference.browser.compat.BrowserContract.SyncColumns;
 import org.mozilla.reference.browser.compat.BrowserContract.Thumbnails;
 import org.mozilla.reference.browser.compat.BrowserContract.TopSites;
 
-/* import org.mozilla.gecko.distribution.Distribution;
-import org.mozilla.gecko.icons.decoders.FaviconDecoder;
-import org.mozilla.gecko.icons.decoders.LoadFaviconResult;
-import org.mozilla.gecko.restrictions.Restrictions;
-import org.mozilla.gecko.sync.Utils;
-import org.mozilla.gecko.util.BitmapUtils;
-import org.mozilla.gecko.util.GeckoJarReader; */
-
 import org.mozilla.gecko.util.IOUtils;
 import org.mozilla.gecko.util.StringUtils;
 
@@ -72,14 +54,11 @@ import java.io.InputStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static org.mozilla.gecko.util.IOUtils.ConsumedInputStream;
 
@@ -703,16 +682,12 @@ public class LocalBrowserDB extends BrowserDB {
 
             // We'll add a fake "Desktop Bookmarks" folder to the root view if desktop
             // bookmarks exist, so that the user can still access non-mobile bookmarks.
-            addDesktopFolder = false;
-            addScreenshotsFolder = false;
 
             // final int readingListItemCount = getBookmarkCountForFolder(cr, Bookmarks.FAKE_READINGLIST_SMARTFOLDER_ID);
-            addReadingListFolder = false; // (readingListItemCount > 0);
-        } else {
-            addDesktopFolder = false;
-            addScreenshotsFolder = false;
-            addReadingListFolder = false;
         }
+        addDesktopFolder = false;
+        addScreenshotsFolder = false;
+        addReadingListFolder = false; // (readingListItemCount > 0);
 
         final Cursor c;
 

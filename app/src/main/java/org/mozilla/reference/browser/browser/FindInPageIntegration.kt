@@ -90,6 +90,6 @@ class FindInPageBarBehavior(
     }
 
     private fun repositionFindInPageBar(findInPageView: FindInPageBar, toolbar: BrowserToolbar) {
-        // findInPageView.translationY = (toolbar.translationY + toolbar.height * -1.0).toFloat()
+        findInPageView.translationY = (toolbar.translationY + toolbar.height * -1.0).toFloat()
     }
 }

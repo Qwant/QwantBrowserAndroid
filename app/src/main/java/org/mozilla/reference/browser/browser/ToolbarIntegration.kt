@@ -5,15 +5,9 @@
 package org.mozilla.reference.browser.browser
 
 import android.content.Context
-import android.content.Intent
 import androidx.core.content.ContextCompat
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
+import androidx.core.content.res.ResourcesCompat
 import mozilla.components.browser.domains.autocomplete.ShippedDomainsProvider
-import mozilla.components.browser.menu.BrowserMenuBuilder
-import mozilla.components.browser.menu.BrowserMenuItem
-import mozilla.components.browser.menu.item.BrowserMenuItemToolbar
-import mozilla.components.browser.menu.item.SimpleBrowserMenuItem
 import mozilla.components.browser.session.SessionManager
 // import mozilla.components.browser.toolbar.BrowserToolbar
 import org.mozilla.reference.browser.compat.toolbar.BrowserToolbar
@@ -21,7 +15,6 @@ import org.mozilla.reference.browser.compat.toolbar.BrowserToolbar
 import org.mozilla.reference.browser.compat.toolbar.DisplayToolbar
 import mozilla.components.concept.storage.HistoryStorage
 import mozilla.components.concept.toolbar.Toolbar
-// import mozilla.components.feature.pwa.WebAppUseCases
 import mozilla.components.feature.session.SessionUseCases
 import mozilla.components.feature.toolbar.ToolbarAutocompleteFeature
 import mozilla.components.feature.toolbar.ToolbarFeature
@@ -29,20 +22,14 @@ import mozilla.components.support.base.android.Padding
 import mozilla.components.support.base.feature.LifecycleAwareFeature
 import mozilla.components.support.base.feature.UserInteractionHandler
 import mozilla.components.support.ktx.android.content.getColorFromAttr
-import mozilla.components.support.ktx.android.content.res.resolveAttribute
 import org.mozilla.reference.browser.R
-import org.mozilla.reference.browser.addons.AddonsActivity
 import org.mozilla.reference.browser.ext.components
-import org.mozilla.reference.browser.ext.share
-// import org.mozilla.reference.browser.view.BrowserMenuSwitch
 
 class ToolbarIntegration(
     context: Context,
     toolbar: BrowserToolbar,
     historyStorage: HistoryStorage,
     sessionManager: SessionManager,
-    sessionUseCases: SessionUseCases,
-    // webAppUseCases: WebAppUseCases,
     sessionId: String? = null
 ) : LifecycleAwareFeature, UserInteractionHandler {
     private val shippedDomainsProvider = ShippedDomainsProvider().also {
@@ -83,7 +70,7 @@ class ToolbarIntegration(
             suggestionBackground = context.getColorFromAttr(R.attr.qwant_color_selected),
             suggestionForeground = context.getColorFromAttr(R.attr.qwant_color_selected_text)
         )
-        toolbar.display.setUrlBackground(context.resources.getDrawable(R.drawable.url_background, context.theme))
+        toolbar.display.setUrlBackground(ResourcesCompat.getDrawable(context.resources, R.drawable.url_background, context.theme))
 
         toolbar.display.colors = toolbar.display.colors.copy(
             securityIconSecure = context.getColorFromAttr(R.attr.qwant_color_green),
@@ -96,8 +83,8 @@ class ToolbarIntegration(
             trackingProtection = context.getColorFromAttr(R.attr.qwant_color_main),
             separator = context.getColorFromAttr(R.attr.qwant_color_main)
         )
-        toolbar.display.setUrlBackground(context.resources.getDrawable(R.drawable.url_background, context.theme))
-1    }
+        toolbar.display.setUrlBackground(ResourcesCompat.getDrawable(context.resources, R.drawable.url_background, context.theme))
+    }
 
     private val toolbarFeature: ToolbarFeature = ToolbarFeature(
         toolbar,

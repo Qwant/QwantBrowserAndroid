@@ -116,7 +116,7 @@ class History(val context: Context) : HistoryStorage {
 
         pages.forEach {
             it.value.forEach { visit ->
-                if (visit.timestamp >= start && visit.timestamp <= end && !excludeTypes.contains(visit.type)) {
+                if (visit.timestamp in start..end && !excludeTypes.contains(visit.type)) {
                     visits.add(VisitInfo(
                             url = it.key,
                             title = pageMeta[it.key]?.title,
@@ -183,7 +183,7 @@ class History(val context: Context) : HistoryStorage {
     override suspend fun deleteVisitsBetween(startTime: Long, endTime: Long) = synchronized(pages) {
         pages.entries.forEach {
             it.setValue(it.value.filterNot { visit ->
-                visit.timestamp >= startTime && visit.timestamp <= endTime
+                visit.timestamp in startTime..endTime
             }.toMutableList())
         }
         pages = pages.filter { it.value.isNotEmpty() } as HashMap<String, MutableList<Visit>>

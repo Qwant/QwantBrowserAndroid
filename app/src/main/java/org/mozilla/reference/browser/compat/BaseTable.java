@@ -63,4 +63,4 @@ public abstract class BaseTable implements Table {
         log("delete " + selection + " = " + deleted);
         return deleted;
     }
-};
+}

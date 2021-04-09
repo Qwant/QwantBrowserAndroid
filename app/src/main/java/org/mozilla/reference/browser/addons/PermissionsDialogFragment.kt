@@ -52,30 +52,30 @@ class PermissionsDialogFragment : AppCompatDialogFragment() {
 
     private val safeArguments get() = requireNotNull(arguments)
 
-    internal val addon get() = requireNotNull(safeArguments.getParcelable<Addon>(KEY_ADDON))
+    private val addon get() = requireNotNull(safeArguments.getParcelable<Addon>(KEY_ADDON))
 
-    internal val positiveButtonRadius
+    private val positiveButtonRadius
         get() =
             safeArguments.getFloat(KEY_POSITIVE_BUTTON_RADIUS, DEFAULT_VALUE.toFloat())
 
-    internal val dialogGravity: Int
+    private val dialogGravity: Int
         get() =
             safeArguments.getInt(
                     KEY_DIALOG_GRAVITY,
                     DEFAULT_VALUE
             )
-    internal val dialogShouldWidthMatchParent: Boolean
+    private val dialogShouldWidthMatchParent: Boolean
         get() =
             safeArguments.getBoolean(KEY_DIALOG_WIDTH_MATCH_PARENT)
 
-    internal val positiveButtonBackgroundColor
+    private val positiveButtonBackgroundColor
         get() =
             safeArguments.getInt(
                     KEY_POSITIVE_BUTTON_BACKGROUND_COLOR,
                     DEFAULT_VALUE
             )
 
-    internal val positiveButtonTextColor
+    private val positiveButtonTextColor
         get() =
             safeArguments.getInt(
                     KEY_POSITIVE_BUTTON_TEXT_COLOR,

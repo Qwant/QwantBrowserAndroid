@@ -20,16 +20,11 @@ import android.database.DatabaseUtils;
 import android.database.MatrixCursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteConstraintException;
-import android.database.sqlite.SQLiteCursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.database.sqlite.SQLiteStatement;
 import android.net.Uri;
 import android.os.Bundle;
-
-/* import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.content.LocalBroadcastManager; */
 
 import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
@@ -38,9 +33,6 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Log;
 
-/* import org.mozilla.gecko.AboutPages;
-import org.mozilla.gecko.GeckoProfile;
-import org.mozilla.gecko.R; */
 import org.mozilla.reference.browser.compat.BrowserContract.ActivityStreamBlocklist;
 import org.mozilla.reference.browser.compat.BrowserContract.Bookmarks;
 import org.mozilla.reference.browser.compat.BrowserContract.Combined;
@@ -53,13 +45,9 @@ import org.mozilla.reference.browser.compat.BrowserContract.RemoteDevices;
 import org.mozilla.reference.browser.compat.BrowserContract.Schema;
 import org.mozilla.reference.browser.compat.BrowserContract.Tabs;
 import org.mozilla.reference.browser.compat.BrowserContract.Thumbnails;
-import org.mozilla.reference.browser.compat.BrowserContract.TopSites;
 import org.mozilla.reference.browser.compat.BrowserContract.UrlAnnotations;
 import org.mozilla.reference.browser.compat.BrowserContract.Visits;
 import org.mozilla.reference.browser.compat.DBUtils.UpdateOperation;
-/* import org.mozilla.gecko.icons.IconsHelper;
-import org.mozilla.gecko.sync.Utils;
-import org.mozilla.gecko.sync.repositories.android.BrowserContractHelpers; */
 import org.mozilla.gecko.util.ThreadUtils;
 
 import java.io.Serializable;
@@ -3081,8 +3069,7 @@ public class BrowserProvider extends SharedBrowserDatabaseProvider {
         return null;
     }
 
-    private static void addTablesToMatcher(Table[] tables, final UriMatcher matcher) {
-    }
+    private static void addTablesToMatcher(Table[] tables, final UriMatcher matcher) {}
 
     private static String getContentItemType(final int match) {
         for (Table table : sTables) {

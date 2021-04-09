@@ -93,7 +93,7 @@ class CustomTabsToolbarFeature(
     private var initialized: Boolean = false
     private val titleObserver = CustomTabSessionTitleObserver(toolbar)
     private val context get() = toolbar.context
-    internal var readableColor = Color.WHITE
+    private var readableColor = Color.WHITE
     private var scope: CoroutineScope? = null
 
     /**

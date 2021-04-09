@@ -14,7 +14,7 @@ import mozilla.components.support.ktx.kotlinx.coroutines.flow.ifChanged
 
 class QwantBarFeature(
         val store: BrowserStore,
-        val qwantBar: QwantBar
+        private val qwantBar: QwantBar
 ): LifecycleAwareFeature {
     private var urlChangedScope: CoroutineScope? = null
     private var tabCountChangedScope: CoroutineScope? = null

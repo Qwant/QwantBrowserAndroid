@@ -28,13 +28,13 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
     private static final int QWANT_MAX_HISTORY = 100;
     private static final int QWANT_MAX_HISTORY_DISPLAY = 10;
 
-    private Assist assist_activity;
+    private final Assist assist_activity;
     private ArrayList<String> history_data = new ArrayList<>(QWANT_MAX_HISTORY);
-    private LinearLayout history_layout;
+    private final LinearLayout history_layout;
 
     static class HistoryViewHolder extends RecyclerView.ViewHolder {
-        LinearLayout item_layout;
-        TextView item_text;
+        final LinearLayout item_layout;
+        final TextView item_text;
 
         HistoryViewHolder(LinearLayout v) {
             super(v);
@@ -149,6 +149,6 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
     }
 
     @Override public int getItemCount() {
-        return (history_data.size() > QWANT_MAX_HISTORY_DISPLAY) ? QWANT_MAX_HISTORY_DISPLAY : history_data.size();
+        return Math.min(history_data.size(), QWANT_MAX_HISTORY_DISPLAY);
     }
 }

@@ -46,9 +46,6 @@ class TabsTrayFragment : Fragment(), UserInteractionHandler {
                 requireComponents.useCases.tabsUseCases.removeTab,
                 { !it.content.private },
                 ::closeTabsTray)
-
-        // tabsPanel.initialize(tabsFeature, updateTabsToolbar = ::updateTabsToolbar)
-        // tabsToolbar.initialize(tabsFeature) { closeTabsTray() }
     }
 
     override fun onStart() {
@@ -75,27 +72,15 @@ class TabsTrayFragment : Fragment(), UserInteractionHandler {
         }
     }
 
-    private fun updateTabsToolbar(isPrivate: Boolean) {
-        // tabsToolbar.updateToolbar(isPrivate)
-    }
-
     private fun createAndSetupTabsTray(context: Context): TabsTray {
-        val layoutManager = LinearLayoutManager(context)
         val thumbnailLoader = ThumbnailLoader(context.components.core.thumbnailStorage)
         val trayStyling = TabsTrayStyling(itemBackgroundColor = Color.TRANSPARENT, itemTextColor = Color.WHITE)
         val viewHolderProvider: ViewHolderProvider = { viewGroup ->
             val view = LayoutInflater.from(context).inflate(R.layout.tablist_item, viewGroup, false)
             DefaultTabViewHolder(view, thumbnailLoader)
         }
-        val tabsAdapter = TabsAdapter(thumbnailLoader, viewHolderProvider).apply {
+        return TabsAdapter(thumbnailLoader, viewHolderProvider).apply {
             styling = trayStyling
         }
-
-        // tabsTray.layoutManager = layoutManager
-        // tabsTray.adapter = tabsAdapter
-
-        // TabsTouchHelper(tabsAdapter).attachToRecyclerView(tabsTray)
-
-        return tabsAdapter
     }
 }

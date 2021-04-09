@@ -59,7 +59,7 @@ internal class QwantMenuButton @JvmOverloads constructor(
         addView(notificationIconView)
     }
 
-    var menuBuilder: BrowserMenuBuilder? = null
+    private var menuBuilder: BrowserMenuBuilder? = null
         set(value) {
             field = value
             menu?.dismiss()

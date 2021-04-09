@@ -249,7 +249,7 @@ class DisplayToolbar internal constructor(
     /**
      * Allows customization of URL for display purposes.
      */
-    var urlFormatter: ((CharSequence) -> CharSequence)? = null
+    private var urlFormatter: ((CharSequence) -> CharSequence)? = null
 
     /**
      * Sets a listener to be invoked when the site security indicator icon is clicked.

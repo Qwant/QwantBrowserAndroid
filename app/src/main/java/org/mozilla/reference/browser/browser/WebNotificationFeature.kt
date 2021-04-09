@@ -114,7 +114,7 @@ internal class NativeNotificationBridge(
      */
     private suspend fun loadIcon(url: Uri?, size: Size): Bitmap? {
         url ?: return null
-        val icon = icons.loadIcon(IconRequest(
+        val icon = icons.loadIconAsync(IconRequest(
                 url = url.toString(),
                 size = size,
                 resources = listOf(IconRequest.Resource(
@@ -129,8 +129,8 @@ internal class NativeNotificationBridge(
 
 class WebNotificationFeature(
         private val context: Context,
-        private val engine: Engine,
-        private val browserIcons: BrowserIcons,
+        engine: Engine,
+        browserIcons: BrowserIcons,
         @DrawableRes private val smallIcon: Int,
         private val activityClass: Class<out Activity>?
 ) : WebNotificationDelegate {
@@ -163,7 +163,7 @@ class WebNotificationFeature(
     }
 
     private fun ensureNotificationGroupAndChannelExists() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                     NOTIFICATION_CHANNEL_ID,
                     context.getString(R.string.mozac_feature_notification_channel_name),

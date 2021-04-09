@@ -1,8 +1,6 @@
 package org.mozilla.reference.browser.browser
 
-import android.content.Intent
 import android.content.res.Resources
-import android.util.Log
 import android.view.View
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import mozilla.components.browser.session.Session
@@ -79,8 +77,8 @@ class ToolbarSessionObserver(
         } */
     // }
 
-    private fun toggleSplash(is_shown: Boolean) {
-        /* swipeRefresh.visibility = if (is_shown) View.INVISIBLE else View.VISIBLE
-        shownSplash = is_shown */
-    }
+    /* private fun toggleSplash(is_shown: Boolean) {
+        swipeRefresh.visibility = if (is_shown) View.INVISIBLE else View.VISIBLE
+        shownSplash = is_shown
+    } */
 }

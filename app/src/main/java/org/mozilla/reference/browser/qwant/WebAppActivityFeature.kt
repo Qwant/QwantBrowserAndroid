@@ -50,7 +50,7 @@ class WebAppActivityFeature(
 
     @VisibleForTesting
     internal suspend fun updateRecentEntry() {
-        val icon = icons.loadIcon(manifest.toIconRequest()).await()
+        val icon = icons.loadIconAsync(manifest.toIconRequest()).await()
 
         activity.setTaskDescription(manifest.toTaskDescription(icon.bitmap))
     }

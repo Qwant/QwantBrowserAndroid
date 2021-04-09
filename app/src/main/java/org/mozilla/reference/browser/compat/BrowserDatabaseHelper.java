@@ -5,10 +5,8 @@
 
 package org.mozilla.reference.browser.compat;
 
-import android.accounts.Account;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.SQLException;
@@ -17,8 +15,6 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
 import android.net.Uri;
-import android.os.Build;
-// import android.support.annotation.VisibleForTesting;
 import androidx.annotation.VisibleForTesting;
 import android.util.Log;
 
@@ -42,7 +38,6 @@ import org.mozilla.gecko.util.FileUtils;
 import org.mozilla.gecko.util.StringUtils;
 
 import java.io.File;
-import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -2424,16 +2419,6 @@ public class BrowserDatabaseHelper extends SQLiteOpenHelper {
             if (cursor != null)
                 cursor.close();
         }
-
-        // From Honeycomb on, it's possible to run several db
-        // commands in parallel using multiple connections.
-        // Modern Android allows WAL to be enabled through a mode flag.
-        if (Build.VERSION.SDK_INT < 16) {
-            db.enableWriteAheadLogging();
-
-            // This does nothing on 16+.
-            db.setLockingEnabled(false);
-        }
     }
 
     // Calculate these once, at initialization. isLoggable is too expensive to
@@ -2473,7 +2458,7 @@ public class BrowserDatabaseHelper extends SQLiteOpenHelper {
     }
 
     private interface BookmarkMigrator {
-        public void updateForNewTable(ContentValues bookmark);
+        void updateForNewTable(ContentValues bookmark);
     }
 
     private static final class BookmarkMigrator3to4 implements BookmarkMigrator {

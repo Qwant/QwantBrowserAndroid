@@ -13,17 +13,11 @@ import android.database.Cursor;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 
-// import android.support.annotation.Nullable;
-// import android.support.v4.content.CursorLoader;
 import androidx.annotation.Nullable;
 import androidx.loader.content.CursorLoader;
 
 import org.mozilla.gecko.GeckoProfile;
-import org.mozilla.gecko.annotation.RobocopTarget;
 import org.mozilla.reference.browser.compat.BrowserContract.ExpirePriority;
-
-// import org.mozilla.gecko.distribution.Distribution;
-// import org.mozilla.gecko.icons.decoders.LoadFaviconResult;
 
 import java.util.Collection;
 import java.util.EnumSet;
@@ -35,7 +29,7 @@ import java.util.List;
  * <code>BrowserDB.from(context)</code>.
  */
 public abstract class BrowserDB {
-    public static enum FilterFlags {
+    public enum FilterFlags {
         EXCLUDE_PINNED_SITES
     }
 

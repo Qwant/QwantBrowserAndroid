@@ -27,7 +27,7 @@ public class DBUtils {
 
     public static final int SQLITE_MAX_VARIABLE_NUMBER = 999;
 
-    public static final String qualifyColumn(String table, String column) {
+    public static String qualifyColumn(String table, String column) {
         return table + "." + column;
     }
 

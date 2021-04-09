@@ -58,7 +58,7 @@ class TabsFeature(
      * @param tabsFilter A filter function returning `true` for all tabs that should be displayed in
      * the tabs tray. Uses the [defaultTabsFilter] if none is provided.
      */
-    fun filterTabs(tabsFilter: (TabSessionState) -> Boolean = defaultTabsFilter) {
+    private fun filterTabs(tabsFilter: (TabSessionState) -> Boolean = defaultTabsFilter) {
         presenter.tabsFilter = tabsFilter
 
         val state = store.state

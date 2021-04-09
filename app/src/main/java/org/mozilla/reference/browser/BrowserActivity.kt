@@ -169,7 +169,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
             val intent = Intent(applicationContext, BrowserActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
             intent.action = "CHANGED_THEME"
-            intent.putExtra("newTheme", newConfig.uiMode and Configuration.UI_MODE_NIGHT_MASK);
+            intent.putExtra("newTheme", newConfig.uiMode and Configuration.UI_MODE_NIGHT_MASK)
             startActivity(intent)
         }
     }
@@ -227,7 +227,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         prefEditor.apply()
     }
 
-    fun loadV35Db() {
+    private fun loadV35Db() {
         // load old db to new one on first launch
         val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
 
@@ -331,18 +331,18 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
     private val SESSION_FILE = "sessionstore.js"
 
     private fun readSessionFile(): String? {
-        val sessionFile: File? = File(GeckoProfile.get(applicationContext, null).dir, SESSION_FILE)
+        val sessionFile = File(GeckoProfile.get(applicationContext, null).dir, SESSION_FILE)
         try {
-            if (sessionFile != null && sessionFile.exists()) {
+            if (sessionFile.exists()) {
                 val fr = FileReader(sessionFile)
 
-                return fr.use { fr ->
+                return fr.use { reader ->
                     val sb = StringBuilder()
                     val buf = CharArray(8192)
-                    var read = fr.read(buf)
+                    var read = reader.read(buf)
                     while (read >= 0) {
                         sb.append(buf, 0, read)
-                        read = fr.read(buf)
+                        read = reader.read(buf)
                     }
                     sb.toString()
                 }
@@ -543,7 +543,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         this.supportFragmentManager.executePendingTransactions()
     }
 
-    fun showSettings() {
+    private fun showSettings() {
         var settingsFragment = this.supportFragmentManager.findFragmentByTag("SETTINGS_FRAGMENT")
         if (settingsFragment == null) {
             settingsFragment = SettingsContainerFragment.create()

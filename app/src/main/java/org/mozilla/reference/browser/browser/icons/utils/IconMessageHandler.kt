@@ -54,7 +54,7 @@ internal class IconMessageHandler(
 
     private fun loadRequest(request: IconRequest) {
         lastJob = scope.launch {
-            val icon = icons.loadIcon(request).await()
+            val icon = icons.loadIconAsync(request).await()
 
             store.dispatch(ContentAction.UpdateIconAction(sessionId, request.url, icon.bitmap))
         }

@@ -10,10 +10,7 @@ import androidx.core.view.isVisible
 import mozilla.components.browser.menu.BrowserMenuBuilder
 import mozilla.components.browser.menu.ext.asCandidateList
 import mozilla.components.browser.menu.ext.getHighlight
-import mozilla.components.browser.toolbar.facts.ToolbarFacts
-// import mozilla.components.browser.toolbar.facts.emitOpenMenuFact
 import mozilla.components.concept.menu.MenuController
-import mozilla.components.support.base.facts.Action
 
 
 

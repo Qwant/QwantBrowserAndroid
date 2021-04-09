@@ -307,7 +307,7 @@ class QwantBar @JvmOverloads constructor(
         SEARCH, HOME, BOOKMARKS, MENU_QWANT
     }
 
-    fun getIcon(icon: QwantBarIcons, selected: Boolean) : Int {
+    private fun getIcon(icon: QwantBarIcons, selected: Boolean) : Int {
         return when (icon) {
             QwantBarIcons.SEARCH -> {
                 if (currentPrivacyEnabled && selected) R.drawable.ic_search_privacy_selected
@@ -455,15 +455,15 @@ class QwantBar @JvmOverloads constructor(
     fun checkSession(url: String?) {
         if (url == null || url.startsWith(context.getString(R.string.homepage_base))) { // todo do not include results page
             if (currentMode != QwantBarMode.HOME) {
-                ThreadUtils.runOnUiThread(Runnable {
+                ThreadUtils.runOnUiThread {
                     setupHomeBar()
-                })
+                }
             }
         } else {
             if (currentMode != QwantBarMode.NAVIGATION) {
-                ThreadUtils.runOnUiThread(Runnable {
+                ThreadUtils.runOnUiThread {
                     setupNavigationBar()
-                })
+                }
             }
         }
     }
@@ -478,13 +478,13 @@ class QwantBar @JvmOverloads constructor(
         qwantbar_button_nav_back.setBackgroundColor(backwardColor)
     }
 
-    fun checkSession(session: Session) {
+    private fun checkSession(session: Session) {
         checkSession(session.url)
         this.setPrivacyMode(session.private)
         context.setTheme(if (session.private) R.style.ThemeQwantNoActionBarPrivacy else R.style.ThemeQwantNoActionBar)
     }
 
-    fun checkSession() {
+    private fun checkSession() {
         if (sessionManager.selectedSession != null) this.checkSession(sessionManager.selectedSession!!)
     }
 

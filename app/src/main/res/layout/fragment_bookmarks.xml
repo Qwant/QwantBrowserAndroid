@@ -27,7 +27,7 @@
             android:id="@+id/bookmarks_add_folder"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical|right"
+            android:layout_gravity="center_vertical|end"
             android:padding="15dp"
             android:background="@android:color/transparent"
             android:src="@drawable/icon_folder_add"/>

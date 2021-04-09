@@ -3,7 +3,8 @@
     android:id="@+id/qwantbar_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/qwant_background">
+    android:background="@color/qwant_background"
+    android:baselineAligned="false">
 
     <LinearLayout
         android:id="@+id/qwantbar_layout_nav_back"

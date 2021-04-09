@@ -1,8 +1,6 @@
 package org.mozilla.reference.browser.compat.toolbar
 
-import android.graphics.drawable.Drawable
 import android.view.View
-import androidx.annotation.StringRes
 import mozilla.components.browser.toolbar.facts.ToolbarFacts
 import mozilla.components.concept.toolbar.Toolbar
 import mozilla.components.support.base.Component

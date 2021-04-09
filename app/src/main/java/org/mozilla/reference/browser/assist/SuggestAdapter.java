@@ -22,8 +22,8 @@ class SuggestAdapter extends ArrayAdapter<SuggestItem> implements Filterable {
     private final static String LOGTAG = "QwantAssist";
 
     private ArrayList<SuggestItem> suggest_data;
-    private HistoryAdapter history_adapter;
-    private Context _context;
+    private final HistoryAdapter history_adapter;
+    private final Context _context;
 
     SuggestAdapter(Context context, int resource, HistoryAdapter history_adapter) {
         super(context, resource);

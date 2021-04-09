@@ -6,7 +6,7 @@ package org.mozilla.reference.browser.components
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.preference.PreferenceManager
+import androidx.preference.PreferenceManager
 import mozilla.components.browser.session.Session
 import org.mozilla.reference.browser.browser.icons.BrowserIcons
 import mozilla.components.browser.session.SessionManager
@@ -29,8 +29,6 @@ import org.mozilla.reference.browser.downloads.DownloadService
 import org.mozilla.reference.browser.media.MediaSessionService
 import mozilla.components.feature.readerview.ReaderViewMiddleware
 import mozilla.components.feature.media.middleware.RecordingDevicesMiddleware
-// import mozilla.components.feature.media.RecordingDevicesNotificationFeature
-// import mozilla.components.feature.media.middleware.MediaMiddleware
 import mozilla.components.feature.session.HistoryDelegate
 import org.mozilla.reference.browser.browser.WebNotificationFeature
 import org.mozilla.reference.browser.AppRequestInterceptor
@@ -47,7 +45,6 @@ import mozilla.components.feature.pwa.WebAppShortcutManager
 import mozilla.components.feature.sitepermissions.SitePermissionsStorage
 import org.mozilla.reference.browser.addons.QwantAddonCollectionProvider
 
-private const val DAY_IN_MINUTES = 24 * 60L
 
 /**
  * Component group for all core browser functionality.
@@ -68,9 +65,7 @@ class Core(private val context: Context) {
             testingModeEnabled = false,
             userAgentString = "Mozilla/5.0 (Android 10; Mobile; rv:77.0) Gecko/77.0 Firefox/77.0 QwantMobile/4.0"
         )
-        EngineProvider.createEngine(context, defaultSettings)/*.apply {
-            clearSpeculativeSession()
-        } */
+        EngineProvider.createEngine(context, defaultSettings)
     }
 
     /**
@@ -110,13 +105,6 @@ class Core(private val context: Context) {
      */
     val sessionManager by lazy {
         SessionManager(engine, store).apply {
-            // sessionStorage.restore()?.let { snapshot -> restore(snapshot) }
-
-            /* sessionStorage.autoSave(store)
-                .periodicallyInForeground(interval = 30, unit = TimeUnit.SECONDS)
-                .whenGoingToBackground()
-                .whenSessionsChange() */
-
             // Install the "icons" WebExtension to automatically load icons for every visited website.
             icons.install(engine, store = store)
 
@@ -130,11 +118,6 @@ class Core(private val context: Context) {
     }
 
     val customTabsStore by lazy { CustomTabsServiceStore() }
-
-    /**
-     * Contains use cases related to the downloads feature.
-     */
-    // val downloadsUseCases: DownloadsUseCases by lazy { DownloadsUseCases(store) }
 
     /**
      * The storage component to persist browsing history (with the exception of

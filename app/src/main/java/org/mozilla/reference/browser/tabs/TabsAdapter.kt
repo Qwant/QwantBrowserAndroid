@@ -10,7 +10,6 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import mozilla.components.browser.state.selector.getNormalOrPrivateTabs
 import mozilla.components.browser.state.state.TabSessionState
-import mozilla.components.browser.tabstray.DefaultTabViewHolder
 import mozilla.components.browser.tabstray.thumbnail.TabThumbnailView
 import mozilla.components.browser.thumbnails.loader.ThumbnailLoader
 import mozilla.components.concept.base.images.ImageLoadRequest
@@ -35,16 +34,12 @@ class TabsAdapter(
             private val deletedCallback: (tabSession: TabSessionState?) -> Unit
     ) : RecyclerView.ViewHolder(item_layout) {
         private var itemMainLayout: LinearLayout = item_layout.findViewById(R.id.tablist_item_layout)
-        // private var itemIcon: ImageView = item_layout.findViewById(R.id.tablist_item_icon)
         private var itemPreview: TabThumbnailView = item_layout.findViewById(R.id.tablist_item_preview)
         private var itemTitle: TextView = item_layout.findViewById(R.id.tablist_item_title)
         private var itemUrl: TextView = item_layout.findViewById(R.id.tablist_item_url)
-        // private var itemLayoutText: LinearLayout = item_layout.findViewById(R.id.tablist_item_layout_text)
         private var itemDelete: AppCompatImageButton = item_layout.findViewById(R.id.tablist_item_delete)
 
         private val thumbnailLoader = ThumbnailLoader(context.components.core.thumbnailStorage)
-
-        // private var thumbnailLoaded = false
 
         fun setup(tabSession: TabSessionState, isSelected: Boolean) {
             val tab = tabSession.toTab()
@@ -65,7 +60,7 @@ class TabsAdapter(
             this.setSelected(isSelected)
         }
 
-        fun setSelected(isSelected: Boolean) {
+        private fun setSelected(isSelected: Boolean) {
             if (isSelected) {
                 this.itemMainLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.qwant_tab_selected))
             } else {
@@ -73,7 +68,7 @@ class TabsAdapter(
             }
         }
 
-        fun setThumbnail(tab: Tab) {
+        private fun setThumbnail(tab: Tab) {
             if (tab.thumbnail == null) {
                 val thumbnailSize = 100.dpToPx(this.itemPreview.context.resources.displayMetrics)
                 thumbnailLoader.loadIntoView(
@@ -83,8 +78,6 @@ class TabsAdapter(
             } else if (tab.thumbnail != null) {
                 this.itemPreview.setImageBitmap(tab.thumbnail)
             }
-
-            // this.itemIcon.setImageBitmap(tab.icon)
         }
 
         companion object {

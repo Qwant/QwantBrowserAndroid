@@ -57,7 +57,7 @@ class QwantTabsFragment : Fragment(), UserInteractionHandler {
 
         tabsList = view.findViewById(R.id.tabsList)
 
-        return view;
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -155,7 +155,7 @@ class QwantTabsFragment : Fragment(), UserInteractionHandler {
         return true
     }
 
-    private fun closeTabsTray(): Unit {
+    private fun closeTabsTray() {
         isPrivate = (sessionManager != null && sessionManager!!.selectedSession != null && sessionManager!!.selectedSession!!.private)
         context?.setTheme(if (isPrivate) R.style.ThemeQwantNoActionBarPrivacy else R.style.ThemeQwantNoActionBar)
         qwantbar?.setPrivacyMode(isPrivate)

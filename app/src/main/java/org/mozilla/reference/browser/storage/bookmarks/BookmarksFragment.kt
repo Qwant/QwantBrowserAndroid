@@ -32,8 +32,8 @@ class BookmarksFragment: Fragment(), UserInteractionHandler {
 
     private var adapter: BookmarksAdapter? = null
 
-    var listview: ListView? = null
-    var layoutNoResult: LinearLayout? = null
+    private var listview: ListView? = null
+    private var layoutNoResult: LinearLayout? = null
 
     private var folder: BookmarkItemV2? = null
 

@@ -6,7 +6,6 @@ package org.mozilla.reference.browser.layout
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.res.Resources
 import android.util.AttributeSet
 import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout

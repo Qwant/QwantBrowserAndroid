@@ -7,10 +7,10 @@ package org.mozilla.reference.browser.addons
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SwitchCompat
 import mozilla.components.feature.addons.Addon
 import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.ext.components
@@ -46,7 +46,7 @@ class InstalledAddonDetailsActivity : AppCompatActivity() {
     }
 
     private fun bindEnableSwitch(addon: Addon) {
-        val switch = findViewById<Switch>(R.id.enable_switch)
+        val switch = findViewById<SwitchCompat>(R.id.enable_switch)
         switch.setState(addon.isEnabled())
         switch.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
@@ -140,7 +140,7 @@ class InstalledAddonDetailsActivity : AppCompatActivity() {
         }
     }
 
-    private fun Switch.setState(checked: Boolean) {
+    private fun SwitchCompat.setState(checked: Boolean) {
         val text = if (checked) {
             R.string.mozac_feature_addons_settings_on
         } else {

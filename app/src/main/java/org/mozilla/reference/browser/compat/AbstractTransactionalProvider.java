@@ -44,7 +44,6 @@ import java.util.Arrays;
  * * {@link SharedBrowserDatabaseProvider} is an example of a per-profile provider
  *   that allows for multiple providers to safely work with the same databases.
  */
-@SuppressWarnings("javadoc")
 public abstract class AbstractTransactionalProvider extends ContentProvider {
     private static final String LOGTAG = "GeckoTransProvider";
 

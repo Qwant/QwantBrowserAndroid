@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -32,7 +33,7 @@ class SuggestRequest {
             ArrayList<SuggestItem> result = new ArrayList<>();
             InputStream inputStream = getHttpStream(new URL(BASE_URL + filter_string + "&lang=" + Locale.getDefault().toString()));
             if (inputStream != null) {
-                JsonReader reader = new JsonReader(new InputStreamReader(inputStream, "UTF-8"));
+                JsonReader reader = new JsonReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
                 try {
                     reader.beginArray();
                     reader.skipValue();

@@ -107,7 +107,7 @@ class BrowserIcons(
     /**
      * Asynchronously loads an [Icon] for the given [IconRequest].
      */
-    fun loadIcon(request: IconRequest): Deferred<Icon> = scope.async {
+    fun loadIconAsync(request: IconRequest): Deferred<Icon> = scope.async {
         loadIconInternal(request).also { loadedIcon ->
             logger.debug("Loaded icon (source = ${loadedIcon.source}): ${request.url}")
         }
@@ -182,7 +182,7 @@ class BrowserIcons(
         view.get()?.setImageDrawable(placeholder)
 
         // Create a loading job
-        val deferredIcon = loadIcon(request)
+        val deferredIcon = loadIconAsync(request)
 
         view.get()?.setTag(R.id.mozac_browser_icons_tag_job, deferredIcon)
         val onAttachStateChangeListener = CancelOnDetach(deferredIcon).also {

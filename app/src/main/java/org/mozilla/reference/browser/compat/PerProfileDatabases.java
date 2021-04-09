@@ -38,7 +38,7 @@ public class PerProfileDatabases<T extends SQLiteOpenHelper> {
     }
 
     public interface DatabaseHelperFactory<T> {
-        public T makeDatabaseHelper(Context context, String databasePath);
+        T makeDatabaseHelper(Context context, String databasePath);
     }
 
     public PerProfileDatabases(final Context context, final String databaseName, final DatabaseHelperFactory<T> helperFactory) {

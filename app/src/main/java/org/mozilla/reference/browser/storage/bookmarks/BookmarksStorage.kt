@@ -12,6 +12,7 @@ import org.mozilla.reference.browser.storage.BookmarkItemV2
 import org.mozilla.reference.browser.storage.SerializableBitmap
 import java.io.*
 
+@Suppress("UNCHECKED_CAST")
 class BookmarksStorage(private var context: Context) {
     private var bookmarksList: ArrayList<BookmarkItemV2> = arrayListOf()
     private var onChangeCallbacks: ArrayList<() -> Unit> = arrayListOf()
@@ -37,7 +38,7 @@ class BookmarksStorage(private var context: Context) {
         }
     }
 
-    fun deleteBookmarkChildren(item: BookmarkItemV2) {
+    private fun deleteBookmarkChildren(item: BookmarkItemV2) {
         item.children?.forEach { this.deleteBookmarkChildren(it) }
     }
 
@@ -101,7 +102,7 @@ class BookmarksStorage(private var context: Context) {
         }
     }
 
-    private fun do_restore_old_old() {
+    private fun doRestoreOldOld() {
         try {
             val fileInputStream: FileInputStream = context.openFileInput(QWANT_BOOKMARKS_FILENAME)
             val objectInputStream = ObjectInputStream(fileInputStream)
@@ -127,7 +128,7 @@ class BookmarksStorage(private var context: Context) {
         }
     }
 
-    private fun do_restore_old() {
+    private fun doRestoreOld() {
         try {
             val fileInputStream: FileInputStream = context.openFileInput(QWANT_BOOKMARKS_FILENAME)
             val objectInputStream = ObjectInputStream(fileInputStream)
@@ -153,7 +154,7 @@ class BookmarksStorage(private var context: Context) {
         }
     }
 
-    private fun do_restore() {
+    private fun doRestore() {
         try {
             val fileInputStream: FileInputStream = context.openFileInput(QWANT_BOOKMARKS_FILENAME)
             val objectInputStream = ObjectInputStream(fileInputStream)
@@ -198,9 +199,9 @@ class BookmarksStorage(private var context: Context) {
         editor.apply()
 
         when (bookmarksVersion) {
-            0 -> do_restore_old_old()
-            1 -> do_restore_old()
-            else -> do_restore()
+            0 -> doRestoreOldOld()
+            1 -> doRestoreOld()
+            else -> doRestore()
         }
     }
 

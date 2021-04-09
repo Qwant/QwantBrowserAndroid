@@ -1,6 +1,6 @@
 package org.mozilla.reference.browser.browser
 
-import android.content.Context
+/* import android.content.Context
 import android.content.res.Resources
 import android.view.View
 import android.widget.ImageView
@@ -15,7 +15,7 @@ import org.mozilla.gecko.util.ThreadUtils.runOnUiThread
 import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.layout.QwantBar
 
-/* class QwantBarSessionObserver(
+class QwantBarSessionObserver(
         private val context: Context,
         private val sessionManager: SessionManager,
         private val qwantbar: QwantBar

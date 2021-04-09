@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -27,7 +28,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:ems="10"
-            android:inputType="text" />
+            android:inputType="text"
+            android:importantForAutofill="no" />
 
         <TextView
             android:id="@+id/bookmark_edit_url_label"
@@ -43,7 +45,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:ems="10"
-            android:inputType="textUri" />
+            android:inputType="textUri"
+            android:importantForAutofill="no" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -59,7 +62,8 @@
             android:layout_marginTop="4dp"
             android:ems="10"
             android:focusable="false"
-            android:inputType="text" />
+            android:inputType="text"
+            android:importantForAutofill="no" />
     </LinearLayout>
 
     <ListView
@@ -84,7 +88,8 @@
             android:background="@drawable/button_background_light"
             android:textColor="@color/qwant_new_selected_color"
             android:layout_marginEnd="24dp"
-            android:text="@string/bookmark_edit_cancel">
+            android:text="@string/bookmark_edit_cancel"
+            tools:ignore="ButtonStyle">
         </Button>
 
         <Button
@@ -95,7 +100,8 @@
             android:background="@drawable/blue_gradient"
             android:textColor="?attr/qwant_color_selected_text"
             android:layout_marginStart="24dp"
-            android:text="@string/bookmark_edit_save" >
+            android:text="@string/bookmark_edit_save"
+            tools:ignore="ButtonStyle">
         </Button>
     </LinearLayout>
 </LinearLayout>

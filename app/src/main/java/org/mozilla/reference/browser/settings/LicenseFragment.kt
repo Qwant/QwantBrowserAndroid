@@ -7,6 +7,7 @@ import android.text.method.ScrollingMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.fragment_license.*
 import mozilla.components.support.base.feature.UserInteractionHandler
@@ -24,7 +25,7 @@ class LicenseFragment: Fragment(), UserInteractionHandler {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             license_content.text = Html.fromHtml(resources.getString(R.string.mpl_license_content), Html.FROM_HTML_MODE_COMPACT)
         } else {
-            license_content.text = Html.fromHtml(resources.getString(R.string.mpl_license_content))
+            license_content.text = HtmlCompat.fromHtml(resources.getString(R.string.mpl_license_content), HtmlCompat.FROM_HTML_MODE_LEGACY)
         }
         license_content.movementMethod = ScrollingMovementMethod()
     }
