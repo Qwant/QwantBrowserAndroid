@@ -13,7 +13,7 @@ class BookmarkItemV2(
         var icon: SerializableBitmap? = null,
 
         // folder only
-        var children: ArrayList<BookmarkItemV2>? = null,
+        var children: ArrayList<BookmarkItemV2> = arrayListOf(),
 
         var order: Int = -1,
 
@@ -32,35 +32,36 @@ class BookmarkItemV2(
         val a: Array<BookmarkItemV2> = arrayOf()
         parcel.readTypedArray<BookmarkItemV2>(a, CREATOR)
         if (a.isNotEmpty()) {
-            children = arrayListOf()
+            // children = arrayListOf()
             a.forEach {
                 it.parent = this
-                children!!.add(it)
+                children.add(it)
                 reloadChildren(it)
             }
         }
     }
 
     private fun reloadChildren(forBookmark: BookmarkItemV2) {
-        if (forBookmark.children?.isNotEmpty() == true) {
-            forBookmark.children?.forEach {
+        // if (forBookmark.children.isNotEmpty()) {
+            forBookmark.children.forEach {
                 it.parent = forBookmark
                 children!!.add(it)
                 reloadChildren(it)
             }
-        }
+        // }
     }
 
     fun addChild(item: BookmarkItemV2) {
         if (type == BookmarkType.FOLDER) {
-            if (children == null) children = arrayListOf(item)
-            else children!!.add(item)
+            // if (children == null) children = arrayListOf(item)
+            // else children!!.add(item)
+            children.add(item)
         }
     }
 
     fun removeChild(item: BookmarkItemV2) {
-        if (type == BookmarkType.FOLDER && children != null){
-            children?.remove(item)
+        if (type == BookmarkType.FOLDER){
+            children.remove(item)
         }
     }
 
@@ -77,7 +78,11 @@ class BookmarkItemV2(
         // parcel.writeParcelable(icon)
         parcel.writeInt(order)
         val a: Array<BookmarkItemV2> = arrayOf()
-        parcel.writeTypedArray<BookmarkItemV2>(children!!.toArray(a), 0)
+        if (children != null) {
+            parcel.writeTypedArray<BookmarkItemV2>(children.toArray(a), 0)
+        } else {
+            parcel.writeTypedArray<BookmarkItemV2>(arrayOf<BookmarkItemV2>(), 0)
+        }
     }
 
     override fun describeContents(): Int {

@@ -64,7 +64,7 @@ class BookmarksStorage(private var context: Context) {
         (list ?: this.bookmarksList).forEach {
             if (it.type == BookmarkItemV2.BookmarkType.BOOKMARK) {
                 if (it.url == url) return it
-            } else {
+            } else if (it.children != null){
                 val b = getBookmark(url, it.children)
                 if (b != null) return b
             }
