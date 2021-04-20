@@ -3,8 +3,6 @@
    - License, v. 2.0. If a copy of the MPL was not distributed with this
    - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 <resources>
-    <string name="huawei_preinstalled_versioncode" translatable="false">4000009</string>
-
     <string name="app_name">Qwant</string>
 
     <!-- Menu option on the toolbar to open a new tab-->
@@ -172,7 +170,6 @@
     <string name="homepage_startwith_filter" translatable="false">https://www.qwant.com/</string>
     <string name="settings_page_base" translatable="false">https://www.qwant.com/settings</string>
     <string name="settings_page_startwith_filter" translatable="false">https://www.qwant.com/settings?client=qwantbrowser</string>
-    <!-- <string name="privacy_policy_url">https://about.qwant.com/privacy-happ/</string> -->
     <string name="privacy_policy_url">https://about.qwant.com/legal/privacy/</string>
 
     <string name="settings_language_english">English</string>
