@@ -34,8 +34,8 @@ import org.mozilla.reference.browser.compat.BrowserContract.Thumbnails;
 import org.mozilla.reference.browser.compat.BrowserContract.UrlAnnotations;
 import org.mozilla.reference.browser.compat.BrowserContract.Visits;
 
-import org.mozilla.gecko.util.FileUtils;
-import org.mozilla.gecko.util.StringUtils;
+// import org.mozilla.gecko.util.FileUtils;
+// import org.mozilla.gecko.util.StringUtils;
 
 import java.io.File;
 import java.security.MessageDigest;
@@ -1670,7 +1670,7 @@ public class BrowserDatabaseHelper extends SQLiteOpenHelper {
         createReadingListIndices(db, TABLE_READING_LIST);
     }
 
-    private void upgradeDatabaseFrom23to24(SQLiteDatabase db) {
+    /* private void upgradeDatabaseFrom23to24(SQLiteDatabase db) {
         // Version 24 consolidates the tabs and clients table into browser.db.  Before, they lived in tabs.db.
         // It's easier to copy the existing data than to arrange for Sync to re-populate it.
         try {
@@ -1689,7 +1689,7 @@ public class BrowserDatabaseHelper extends SQLiteOpenHelper {
                 Log.e(LOGTAG, "Exception occurred while trying to delete " + file.getPath() + "; ignoring.", e);
             }
         }
-    }
+    } */
 
     private void upgradeDatabaseFrom24to25(SQLiteDatabase db) {
         if (didCreateTabsTable) {
@@ -1759,7 +1759,7 @@ public class BrowserDatabaseHelper extends SQLiteOpenHelper {
     // to migrate the SavedReaderViewHelper implementation at some point, it seems safest to have a local
     // implementation here - moreover this is probably faster than calling into JS.
     // This is public only to allow for testing.
-    @RobocopTarget
+    /* @RobocopTarget
     public static String getReaderCacheFileNameForURL(String url) {
         try {
             byte[] utf8 = url.getBytes(StringUtils.UTF_8);
@@ -1773,13 +1773,13 @@ public class BrowserDatabaseHelper extends SQLiteOpenHelper {
             // This should also never happen
             throw new IllegalStateException("MD5 digester unavailable - can't process readercache filename");
         }
-    }
+    } */
 
     /*
      * Moves reading list items from the 'reading_list' table back into the 'bookmarks' table. This time the
      * reading list items are placed into a "Reading List" folder, which is a subfolder of the mobile-bookmarks table.
      */
-    private void upgradeDatabaseFrom30to31(SQLiteDatabase db) {
+    /* private void upgradeDatabaseFrom30to31(SQLiteDatabase db) {
         // We only need to do the migration if reading-list items already exist. We could do a query of count(*) on
         // TABLE_READING_LIST, however if we are doing the migration, we'll need to query all items in the reading-list,
         // hence we might as well just query all items, and proceed with the migration if cursor.count > 0.
@@ -1905,8 +1905,8 @@ public class BrowserDatabaseHelper extends SQLiteOpenHelper {
                     }
                 }
             }
-        } */
-    }
+        }
+    } */
 
     private void upgradeDatabaseFrom31to32(final SQLiteDatabase db) {
         debug("Adding visits table");
@@ -2317,7 +2317,7 @@ public class BrowserDatabaseHelper extends SQLiteOpenHelper {
                     break;
 
                 case 24:
-                    upgradeDatabaseFrom23to24(db);
+                    // upgradeDatabaseFrom23to24(db);
                     break;
 
                 case 25:
@@ -2343,7 +2343,7 @@ public class BrowserDatabaseHelper extends SQLiteOpenHelper {
                     break;
 
                 case 31:
-                    upgradeDatabaseFrom30to31(db);
+                    // upgradeDatabaseFrom30to31(db);
                     break;
 
                 case 32:

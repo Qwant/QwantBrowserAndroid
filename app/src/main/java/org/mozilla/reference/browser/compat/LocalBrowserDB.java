@@ -46,8 +46,8 @@ import org.mozilla.reference.browser.compat.BrowserContract.SyncColumns;
 import org.mozilla.reference.browser.compat.BrowserContract.Thumbnails;
 import org.mozilla.reference.browser.compat.BrowserContract.TopSites;
 
-import org.mozilla.gecko.util.IOUtils;
-import org.mozilla.gecko.util.StringUtils;
+// import org.mozilla.gecko.util.IOUtils;
+// import org.mozilla.gecko.util.StringUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -60,7 +60,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-import static org.mozilla.gecko.util.IOUtils.ConsumedInputStream;
+// import static org.mozilla.gecko.util.IOUtils.ConsumedInputStream;
 
 public class LocalBrowserDB extends BrowserDB {
     // The default size of the buffer to use for downloading Favicons in the event no size is given
@@ -376,7 +376,7 @@ public class LocalBrowserDB extends BrowserDB {
         return IOUtils.readFully(iStream, DEFAULT_FAVICON_BUFFER_SIZE_BYTES);
     } */
 
-    private static ConsumedInputStream getDefaultFaviconFromDrawable(Context context, String name) {
+    /* private static ConsumedInputStream getDefaultFaviconFromDrawable(Context context, String name) {
         int faviconId = getFaviconId(name);
         if (faviconId == FAVICON_ID_NOT_FOUND) {
             return null;
@@ -384,7 +384,7 @@ public class LocalBrowserDB extends BrowserDB {
 
         InputStream iStream = context.getResources().openRawResource(faviconId);
         return IOUtils.readFully(iStream, DEFAULT_FAVICON_BUFFER_SIZE_BYTES);
-    }
+    } */
 
     // Invalidate cached data
     @Override
@@ -1707,7 +1707,7 @@ public class LocalBrowserDB extends BrowserDB {
         return 0;
     } */
 
-    private static void appendUrlsFromCursor(List<String> urls, Cursor c) {
+    /* private static void appendUrlsFromCursor(List<String> urls, Cursor c) {
         if (!c.moveToFirst()) {
             return;
         }
@@ -1723,7 +1723,7 @@ public class LocalBrowserDB extends BrowserDB {
 
             urls.add(url);
         } while (c.moveToNext());
-    }
+    } */
 
 
     /**

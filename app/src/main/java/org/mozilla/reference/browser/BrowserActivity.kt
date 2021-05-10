@@ -37,26 +37,26 @@ import mozilla.components.support.base.feature.UserInteractionHandler
 import mozilla.components.support.base.feature.ViewBoundFeatureWrapper
 import mozilla.components.support.base.log.logger.Logger
 import mozilla.components.support.utils.SafeIntent
-import org.mozilla.gecko.GeckoProfile
+// import org.mozilla.gecko.GeckoProfile
 import org.mozilla.reference.browser.browser.BrowserFragment
-import org.mozilla.reference.browser.compat.BrowserContract
-import org.mozilla.reference.browser.compat.BrowserContract.Bookmarks
-import org.mozilla.reference.browser.compat.BrowserDB
-import org.mozilla.reference.browser.compat.LocalBrowserDB
-import org.mozilla.reference.browser.compat.SessionParser
+// import org.mozilla.reference.browser.compat.BrowserContract
+// import org.mozilla.reference.browser.compat.BrowserContract.Bookmarks
+// import org.mozilla.reference.browser.compat.BrowserDB
+// import org.mozilla.reference.browser.compat.LocalBrowserDB
+// import org.mozilla.reference.browser.compat.SessionParser
 import org.mozilla.reference.browser.ext.components
 import org.mozilla.reference.browser.layout.QwantBar
 import org.mozilla.reference.browser.layout.QwantBarFeature
 import org.mozilla.reference.browser.settings.SettingsContainerFragment
-import org.mozilla.reference.browser.storage.BookmarkItemV2
+// import org.mozilla.reference.browser.storage.BookmarkItemV2
 import org.mozilla.reference.browser.storage.bookmarks.BookmarksFragment
 import org.mozilla.reference.browser.storage.bookmarks.BookmarksStorage
 import org.mozilla.reference.browser.storage.history.HistoryFragment
 import org.mozilla.reference.browser.tabs.QwantTabsFragment
 import org.mozilla.reference.browser.tabs.tray.BrowserTabsTray
-import java.io.File
-import java.io.FileReader
-import java.io.IOException
+// import java.io.File
+// import java.io.FileReader
+// import java.io.IOException
 import java.util.*
 import kotlin.system.exitProcess
 
@@ -143,7 +143,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
             }
         }
 
-        this.loadV35Db()
+        // this.loadV35Db()
         this.checkFirstLaunch()
 
         qwantbar.updateTabCount()
@@ -227,7 +227,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         prefEditor.apply()
     }
 
-    private fun loadV35Db() {
+    /* private fun loadV35Db() {
         // load old db to new one on first launch
         val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
 
@@ -353,22 +353,6 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         return null
     }
 
-    override fun onPause() {
-        super.onPause()
-        try {
-            val view = this.window.currentFocus
-            if (view != null) {
-                val wt = view.windowToken
-                if (wt != null) {
-                    val imm: InputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                    imm.hideSoftInputFromWindow(wt, 0)
-                }
-            }
-        } catch (e: Exception) {
-            Log.e("QWANT_BROWSER", "fail closing keyboard: ${e.message}")
-        }
-    }
-
     private class LastSessionParser(private val context: Context) : SessionParser() {
         override fun onTabRead(sessionTab: SessionTab) {
             if (sessionTab.url != null && sessionTab.url != "null"/* && !sessionTab.url.startsWith("https://www.qwant.com/?client=qwantbrowser") */) {
@@ -385,6 +369,22 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
             parser.parse(sessionString)
         } else {
             Log.e("QWANT_BROWSER", "restore tabs session file is null")
+        }
+    } */
+
+    override fun onPause() {
+        super.onPause()
+        try {
+            val view = this.window.currentFocus
+            if (view != null) {
+                val wt = view.windowToken
+                if (wt != null) {
+                    val imm: InputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    imm.hideSoftInputFromWindow(wt, 0)
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("QWANT_BROWSER", "fail closing keyboard: ${e.message}")
         }
     }
 

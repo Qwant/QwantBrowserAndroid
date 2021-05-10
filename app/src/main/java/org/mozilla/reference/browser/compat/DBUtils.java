@@ -89,7 +89,7 @@ public class DBUtils {
 
                 // Things could get very bad if we don't find a way to unlock the DB.
                 Log.d(LOGTAG, "Database is locked, trying to kill any zombie processes: " + databasePath);
-                GeckoAppShell.killAnyZombies();
+                // GeckoAppShell.killAnyZombies();
                 try {
                     Thread.sleep(attempt * 100);
                 } catch (InterruptedException ie) {

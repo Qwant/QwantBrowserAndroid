@@ -22,7 +22,7 @@ import org.mozilla.reference.browser.compat.BrowserContract.DeletedLogins;
 import org.mozilla.reference.browser.compat.BrowserContract.Logins;
 import org.mozilla.reference.browser.compat.BrowserContract.LoginsDisabledHosts;
 // import org.mozilla.gecko.sync.Utils;
-import org.mozilla.gecko.util.StringUtils;
+// import org.mozilla.gecko.util.StringUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
@@ -115,7 +115,7 @@ public class LoginsProvider extends SharedBrowserDatabaseProvider {
             case LOGINS:
                 removeDeletedLoginsByGUIDInTransaction(values, db);
                 // Encrypt sensitive data.
-                encryptContentValueFields(values);
+                // encryptContentValueFields(values);
                 guid = values.getAsString(Logins.GUID);
                 debug("Inserting login in database with GUID: " + guid);
                 id = db.insertOrThrow(TABLE_LOGINS, Logins.GUID, values);
@@ -230,7 +230,7 @@ public class LoginsProvider extends SharedBrowserDatabaseProvider {
                 trace("Update on LOGINS: " + uri);
                 table = TABLE_LOGINS;
                 // Encrypt sensitive data.
-                encryptContentValueFields(values);
+                // encryptContentValueFields(values);
                 break;
 
             default:
@@ -319,7 +319,7 @@ public class LoginsProvider extends SharedBrowserDatabaseProvider {
         Cursor cursor = qb.query(db, projection, selection, selectionArgs, groupBy, null, sortOrder, limit);
         // If decryptManyCursorRows does not return the original cursor, it closes it, so there's
         // no need to close here.
-        cursor = decryptManyCursorRows(cursor);
+        // cursor = decryptManyCursorRows(cursor);
         cursor.setNotificationUri(getContext().getContentResolver(), BrowserContract.LOGINS_AUTHORITY_URI);
         return cursor;
     }
@@ -436,7 +436,7 @@ public class LoginsProvider extends SharedBrowserDatabaseProvider {
         }
     }
 
-    private void encryptContentValueFields(final ContentValues values) {
+    /* private void encryptContentValueFields(final ContentValues values) {
         if (values.containsKey(Logins.ENCRYPTED_PASSWORD)) {
             final String res = encrypt(values.getAsString(Logins.ENCRYPTED_PASSWORD));
             values.put(Logins.ENCRYPTED_PASSWORD, res);
@@ -446,7 +446,7 @@ public class LoginsProvider extends SharedBrowserDatabaseProvider {
             final String res = encrypt(values.getAsString(Logins.ENCRYPTED_USERNAME));
             values.put(Logins.ENCRYPTED_USERNAME, res);
         }
-    }
+    } */
 
     /**
      * Replace each password and username encrypted ciphertext with its equivalent decrypted
@@ -455,10 +455,9 @@ public class LoginsProvider extends SharedBrowserDatabaseProvider {
      * The encryption algorithm used to protect logins is unspecified; and further, a consumer of
      * consumers should never have access to encrypted ciphertext.
      *
-     * @param cursor containing at least one of password and username encrypted ciphertexts.
      * @return a new {@link Cursor} with password and username decrypted plaintexts.
      */
-    private Cursor decryptManyCursorRows(final Cursor cursor) {
+     /* private Cursor decryptManyCursorRows(final Cursor cursor) {
         final int passwordIndex = cursor.getColumnIndex(Logins.ENCRYPTED_PASSWORD);
         final int usernameIndex = cursor.getColumnIndex(Logins.ENCRYPTED_USERNAME);
 
@@ -515,7 +514,7 @@ public class LoginsProvider extends SharedBrowserDatabaseProvider {
             debug("Decryption failed : " + e);
             throw new IllegalStateException("Logins decryption failed", e);
         }
-    }
+    } */
 
     private Cipher getCipher(int mode) throws UnsupportedEncodingException, GeneralSecurityException {
         return new NullCipher();
