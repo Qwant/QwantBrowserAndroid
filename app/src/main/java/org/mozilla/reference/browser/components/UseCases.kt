@@ -45,7 +45,7 @@ class UseCases(
     /**
      * Use cases that provide search engine integration.
      */
-    val searchUseCases by lazy { SearchUseCases(store, searchEngineManager.toDefaultSearchEngineProvider(context), tabsUseCases) }
+    val searchUseCases by lazy { SearchUseCases(store, tabsUseCases) }
 
     /**
      * Use cases that provide settings management.
