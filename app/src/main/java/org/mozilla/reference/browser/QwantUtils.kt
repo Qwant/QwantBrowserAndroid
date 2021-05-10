@@ -26,8 +26,8 @@ class QwantUtils {
             val l = interface_language ?: prefs.getString(context.getString(R.string.pref_key_general_language_interface), "en_GB")
             val r = search_language ?: prefs.getString(context.getString(R.string.pref_key_general_language_search), "en")
             val sr = search_region ?: prefs.getString(context.getString(R.string.pref_key_general_region_search), "GB")
-            val s = adult_content ?: prefs.getString(context.getString(R.string.pref_key_general_adultcontent), "0")
-            val hc = news_on_home ?: prefs.getBoolean(context.getString(R.string.pref_key_general_newsonhome), true)
+            val s = adult_content ?: prefs.getString(context.getString(R.string.pref_key_general_adultcontent), "2")
+            val hc = news_on_home ?: prefs.getBoolean(context.getString(R.string.pref_key_general_newsonhome), false)
             val b = results_in_new_tab ?: prefs.getBoolean(context.getString(R.string.pref_key_general_resultsinnewtab), false)
 
             var theme = dark_theme ?: prefs.getString(context.getString(R.string.pref_key_general_dark_theme), "2")

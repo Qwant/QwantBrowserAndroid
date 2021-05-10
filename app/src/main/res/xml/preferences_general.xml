@@ -26,12 +26,12 @@
         android:title="@string/settings_general_adultcontent"
         android:entries="@array/adult_content_values"
         android:entryValues="@array/adult_content_keys"
-        android:defaultValue="@string/settings_adultcontent_moderate_code"
+        android:defaultValue="@string/settings_adultcontent_strict_code"
         app:iconSpaceReserved="false"/>
 
     <org.mozilla.reference.browser.settings.QwantPreferenceSwitch
         android:key="@string/pref_key_general_newsonhome"
-        android:defaultValue="true"
+        android:defaultValue="false"
         android:title="@string/settings_general_newsonhome"
         app:iconSpaceReserved="false" />
 
