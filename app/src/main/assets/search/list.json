@@ -1,0 +1,13 @@
+{
+  "default": {
+    "searchDefault": "Qwant",
+    "searchOrder": [
+      "Qwant"
+    ],
+    "visibleDefaultEngines": [
+      "qwant"
+    ]
+  },
+  "regionOverrides": {},
+  "locales": {}
+}

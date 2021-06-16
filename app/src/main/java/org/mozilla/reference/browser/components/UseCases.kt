@@ -5,8 +5,6 @@
 package org.mozilla.reference.browser.components
 
 import android.content.Context
-import mozilla.components.browser.search.SearchEngineManager
-import mozilla.components.browser.search.ext.toDefaultSearchEngineProvider
 import mozilla.components.browser.session.SessionManager
 import mozilla.components.browser.state.store.BrowserStore
 import mozilla.components.concept.engine.Engine
@@ -29,7 +27,6 @@ class UseCases(
         private val sessionManager: SessionManager,
         private val store: BrowserStore,
         private val engine: Engine,
-        private val searchEngineManager: SearchEngineManager,
         private val shortcutManager: WebAppShortcutManager
 ) {
     /**

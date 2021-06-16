@@ -190,7 +190,7 @@ dependencies {
 
     implementation Deps.mozilla_browser_awesomebar
     implementation Deps.mozilla_browser_domains
-    implementation Deps.mozilla_browser_search
+    // implementation Deps.mozilla_browser_search
     implementation Deps.mozilla_browser_tabstray
     implementation Deps.mozilla_browser_toolbar
     implementation Deps.mozilla_browser_menu
@@ -232,6 +232,8 @@ dependencies {
     // implementation Deps.mozilla_support_rustlog
     implementation Deps.mozilla_support_rusthttp
     implementation Deps.mozilla_support_webextensions
+
+    implementation Deps.mozilla_service_location
 
     implementation Deps.kotlin_stdlib
     implementation Deps.kotlin_coroutines

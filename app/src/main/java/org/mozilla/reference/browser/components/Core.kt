@@ -42,7 +42,10 @@ import org.mozilla.reference.browser.R.string.pref_key_tracking_protection_priva
 import java.util.concurrent.TimeUnit
 import mozilla.components.feature.pwa.ManifestStorage
 import mozilla.components.feature.pwa.WebAppShortcutManager
+import mozilla.components.feature.search.middleware.SearchMiddleware
+import mozilla.components.feature.search.region.RegionMiddleware
 import mozilla.components.feature.sitepermissions.SitePermissionsStorage
+import mozilla.components.service.location.LocationService
 import org.mozilla.reference.browser.addons.QwantAddonCollectionProvider
 
 
@@ -84,6 +87,11 @@ class Core(private val context: Context) {
                         DownloadMiddleware(context, DownloadService::class.java),
                         ThumbnailsMiddleware(thumbnailStorage),
                         ReaderViewMiddleware(),
+                        RegionMiddleware(
+                                context,
+                                LocationService.default()
+                        ),
+                        SearchMiddleware(context, listOf("qwant")),
                         RecordingDevicesMiddleware(context)
                 ) + EngineMiddleware.create(engine, ::findSessionById)
         )

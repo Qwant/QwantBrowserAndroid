@@ -10,6 +10,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
@@ -147,6 +148,11 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         this.checkFirstLaunch()
 
         qwantbar.updateTabCount()
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        this.showBrowserFragment()
     }
 
     private fun checkFirstLaunch() {

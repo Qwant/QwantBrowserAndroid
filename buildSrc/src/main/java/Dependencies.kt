@@ -19,7 +19,7 @@ private object Versions {
 
     const val android_gradle_plugin = "3.4.1"
 
-    const val mozilla_android_components = "+" // Always use the latest snapshot
+    const val mozilla_android_components = "90.0.20210509143123" // "+" // Always use the latest snapshot
 
     const val thirdparty_sentry = "1.7.10"
 
@@ -107,6 +107,8 @@ object Deps {
     const val mozilla_support_rusthttp = "org.mozilla.components:support-rusthttp:${Versions.mozilla_android_components}"
     const val mozilla_support_webextensions = "org.mozilla.components:support-webextensions:${Versions.mozilla_android_components}"
     const val mozilla_support_images= "org.mozilla.components:support-images:${Versions.mozilla_android_components}"
+
+    const val mozilla_service_location = "org.mozilla.components:service-location:${Versions.mozilla_android_components}"
 
     const val mozilla_lib_crash = "org.mozilla.components:lib-crash:${Versions.mozilla_android_components}"
     const val mozilla_lib_push_firebase = "org.mozilla.components:lib-push-firebase:${Versions.mozilla_android_components}"
