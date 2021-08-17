@@ -109,6 +109,7 @@ abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler, Activit
                 toolbar,
                 requireComponents.core.historyStorage,
                 requireComponents.core.sessionManager,
+                requireComponents.useCases.sessionUseCases,
                 sessionId),
             owner = this,
             view = view)

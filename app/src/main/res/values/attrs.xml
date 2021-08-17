@@ -24,14 +24,37 @@
     <attr name="qwant_color_tabpanel_tabcounter" format="reference|color" />
     <attr name="qwant_color_tabpanel_tabtext" format="reference|color" />
 
-    <attr name="toolbarSuggestionForeground" format="reference|color" />
+    <!-- <attr name="toolbarSuggestionForeground" format="reference|color" />
     <attr name="toolbarSuggestionBackground" format="reference|color" />
-    <attr name="toolbarBackgroundColor" format="reference|color" />
-    <attr name="toolbarUrlBoxColor" format="reference|color" />
+    <attr name="toolbarUrlTextColor" format="reference|color" />
+    <attr name="toolbarUrlIconColor" format="reference|color" />
+    <attr name="toolbarUrlSeparatorColor" format="reference|color" /> -->
 
     <attr name="tabsTrayItemElevation" format="reference|dimension" />
     <attr name="tabsTrayItemBackgroundColor" format="reference|color" />
     <attr name="tabsTrayItemTextColor" format="reference|color" />
     <attr name="tabsTraySelectedItemBackgroundColor" format="reference|color" />
     <attr name="tabsTraySelectedItemTextColor" format="reference|color" />
+
+
+    <attr name="qwant_true_black" format="reference|color" />
+
+
+    <!-- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA -->
+
+    <!-- Toolbar -->
+    <attr name="qwant_toolbar_BackgroundColor" format="reference|color" />
+    <attr name="qwant_toolbar_UrlBoxColor" format="reference|color" />
+
+    <attr name="qwant_toolbar_HintColor" format="reference|color" />
+    <attr name="qwant_toolbar_TextColor" format="reference|color" />
+    <attr name="qwant_toolbar_IconsColor" format="reference|color" />
+    <attr name="qwant_toolbar_InsecureColor" format="reference|color" />
+    <attr name="qwant_toolbar_SecureColor" format="reference|color" />
+    <attr name="qwant_toolbar_ClearColor" format="reference|color" />
+    <attr name="qwant_toolbar_TrackingProtectionAndSecurityIndicatorSeparatorColor" format="reference|color" />
+    <attr name="qwant_toolbar_SuggestionBackgroundColor" format="reference|color" />
+    <attr name="qwant_toolbar_SuggestionForegroundColor" format="reference|color" />
+
+    <attr name="qwant_toolbar_BottomSeparatorColor" format="reference|color" />
 </resources>

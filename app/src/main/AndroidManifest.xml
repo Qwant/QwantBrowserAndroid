@@ -52,7 +52,7 @@
             android:autoRemoveFromRecents="false"
             android:label="@string/app_name" /> -->
 
-        <activity
+        <!-- <activity
             android:theme="@style/ThemeQwant"
             android:name=".addons.AddonsActivity"
             android:label="@string/mozac_feature_addons_addons"
@@ -81,7 +81,7 @@
             android:name=".addons.AddonSettingsActivity"
             android:label="@string/mozac_feature_addons_addons"
             android:exported="false"
-            android:theme="@style/ThemeQwant" />
+            android:theme="@style/ThemeQwant" /> -->
 
         <activity android:name=".IntentReceiverActivity">
             <intent-filter>

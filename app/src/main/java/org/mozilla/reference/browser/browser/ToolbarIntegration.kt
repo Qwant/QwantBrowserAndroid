@@ -5,14 +5,19 @@
 package org.mozilla.reference.browser.browser
 
 import android.content.Context
+import android.content.res.ColorStateList
+import android.graphics.drawable.Drawable
+import android.util.Log
+import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import kotlinx.android.synthetic.main.browser_toolbar_displaytoolbar.view.*
 import mozilla.components.browser.domains.autocomplete.ShippedDomainsProvider
 import mozilla.components.browser.session.SessionManager
-// import mozilla.components.browser.toolbar.BrowserToolbar
-import org.mozilla.reference.browser.compat.toolbar.BrowserToolbar
-// import mozilla.components.browser.toolbar.display.DisplayToolbar
-import org.mozilla.reference.browser.compat.toolbar.DisplayToolbar
+import mozilla.components.browser.toolbar.BrowserToolbar
+// import org.mozilla.reference.browser.compat.toolbar.BrowserToolbar
+import mozilla.components.browser.toolbar.display.DisplayToolbar
+// import org.mozilla.reference.browser.compat.toolbar.DisplayToolbar
 import mozilla.components.concept.storage.HistoryStorage
 import mozilla.components.concept.toolbar.Toolbar
 import mozilla.components.feature.session.SessionUseCases
@@ -30,6 +35,7 @@ class ToolbarIntegration(
     toolbar: BrowserToolbar,
     historyStorage: HistoryStorage,
     sessionManager: SessionManager,
+    sessionUseCases: SessionUseCases,
     sessionId: String? = null
 ) : LifecycleAwareFeature, UserInteractionHandler {
     private val shippedDomainsProvider = ShippedDomainsProvider().also {
@@ -38,20 +44,35 @@ class ToolbarIntegration(
 
     class PrivateBrowsingBrowserAction(context: Context, val sessionManager: SessionManager)
         : Toolbar.ActionImage(
-            ContextCompat.getDrawable(context, R.drawable.ic_privacy_mask)!!,
-            padding = Padding(10, 10, 10, 10)
+            ContextCompat.getDrawable(context, R.drawable.icons_custom_privacy_fill)!!,
+            padding = Padding(-5, 5, 0, 5)
     ) {
         override val visible: () -> Boolean
             get() = { if (sessionManager.selectedSession != null) sessionManager.selectedSession!!.private else false }
     }
     private val privateBrowsingBrowserAction = PrivateBrowsingBrowserAction(context, sessionManager)
 
+    class ReloadPageAction(val sessionUseCases: SessionUseCases, drawable: Drawable)
+        : Toolbar.ActionButton(
+            drawable,
+            "Refresh",
+            padding = Padding(10, 10, 10, 10),
+            visible = { true },
+            listener = { sessionUseCases.reload() }
+    )
+    private val drawable = ContextCompat.getDrawable(context, R.drawable.icons_system_refresh_line)!!
+
     init {
+        drawable.setTint(context.getColorFromAttr(R.attr.qwant_toolbar_IconsColor))
+        toolbar.addPageAction(ReloadPageAction(sessionUseCases, drawable))
+
         toolbar.display.indicators = listOf(
             DisplayToolbar.Indicators.SECURITY,
             DisplayToolbar.Indicators.TRACKING_PROTECTION
         )
         toolbar.display.displayIndicatorSeparator = true
+        toolbar.display.setOnSiteSecurityClickedListener { Log.d("QWANT_BROWSER", "click site security"); }
+        toolbar.display.setOnTrackingProtectionClickedListener { Log.d("QWANT_BROWSER", "click tracking protection"); }
 
         toolbar.display.hint = context.getString(R.string.toolbar_hint)
         toolbar.edit.hint = context.getString(R.string.toolbar_hint)
@@ -63,26 +84,29 @@ class ToolbarIntegration(
 
         toolbar.addBrowserAction(privateBrowsingBrowserAction)
 
-        toolbar.edit.colors = toolbar.edit.colors.copy(
+        /* toolbar.edit.colors = toolbar.edit.colors.copy(
             clear = context.getColorFromAttr(R.attr.qwant_color_main),
             hint = context.getColorFromAttr(R.attr.qwant_color_light),
-            text = context.getColorFromAttr(R.attr.qwant_color_main),
+            text = context.getColorFromAttr(R.attr.toolbarUrlTextColor),
             suggestionBackground = context.getColorFromAttr(R.attr.qwant_color_selected),
             suggestionForeground = context.getColorFromAttr(R.attr.qwant_color_selected_text)
-        )
-        toolbar.display.setUrlBackground(ResourcesCompat.getDrawable(context.resources, R.drawable.url_background, context.theme))
+        ) */
 
         toolbar.display.colors = toolbar.display.colors.copy(
-            securityIconSecure = context.getColorFromAttr(R.attr.qwant_color_green),
-            securityIconInsecure = context.getColorFromAttr(R.attr.qwant_color_red),
-            emptyIcon = context.getColorFromAttr(R.attr.qwant_color_main),
-            menu = context.getColorFromAttr(R.attr.qwant_color_main),
-            hint = context.getColorFromAttr(R.attr.qwant_color_selected),
-            title = context.getColorFromAttr(R.attr.qwant_color_main),
-            text = context.getColorFromAttr(R.attr.qwant_color_main),
-            trackingProtection = context.getColorFromAttr(R.attr.qwant_color_main),
-            separator = context.getColorFromAttr(R.attr.qwant_color_main)
+            securityIconSecure = context.getColorFromAttr(R.attr.qwant_toolbar_SecureColor),
+            securityIconInsecure = context.getColorFromAttr(R.attr.qwant_toolbar_InsecureColor),
+            hint = context.getColorFromAttr(R.attr.qwant_toolbar_HintColor),
+            // title = context.getColorFromAttr(R.attr.qwant_color_main),
+            text = context.getColorFromAttr(R.attr.qwant_toolbar_TextColor),
+            trackingProtection = context.getColorFromAttr(R.attr.qwant_toolbar_IconsColor),
+            separator = context.getColorFromAttr(R.attr.qwant_toolbar_TrackingProtectionAndSecurityIndicatorSeparatorColor)
         )
+        toolbar.display.icons = toolbar.display.icons.copy(
+            trackingProtectionException = ResourcesCompat.getDrawable(context.resources, R.drawable.icons_system_shield_warning_line, context.theme)!!,
+            trackingProtectionNothingBlocked = ResourcesCompat.getDrawable(context.resources, R.drawable.icons_system_shield_off_line, context.theme)!!,
+            trackingProtectionTrackersBlocked = ResourcesCompat.getDrawable(context.resources, R.drawable.icons_system_shield_line_2, context.theme)!!
+        )
+
         toolbar.display.setUrlBackground(ResourcesCompat.getDrawable(context.resources, R.drawable.url_background, context.theme))
     }
 

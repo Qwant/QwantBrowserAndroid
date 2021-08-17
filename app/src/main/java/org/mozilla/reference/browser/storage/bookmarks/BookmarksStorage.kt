@@ -104,18 +104,23 @@ class BookmarksStorage(private var context: Context) {
 
     private fun doRestoreOldOld() {
         try {
-            val fileInputStream: FileInputStream = context.openFileInput(QWANT_BOOKMARKS_FILENAME)
-            val objectInputStream = ObjectInputStream(fileInputStream)
-            val oldBookmarks: ArrayList<BookmarkItem> = objectInputStream.readObject() as ArrayList<BookmarkItem>
-            objectInputStream.close()
-            fileInputStream.close()
+            val f = File(QWANT_BOOKMARKS_FILENAME)
+            if (f.exists() && f.canRead()) {
+                val fileInputStream = FileInputStream(f) // : FileInputStream = context.openFileInput(QWANT_BOOKMARKS_FILENAME)
+                val objectInputStream = ObjectInputStream(fileInputStream)
+                val oldBookmarks: ArrayList<BookmarkItem> = objectInputStream.readObject() as ArrayList<BookmarkItem>
+                objectInputStream.close()
+                fileInputStream.close()
 
-            oldBookmarks.forEach {
-                this.bookmarksList.add(BookmarkItemV2(BookmarkItemV2.BookmarkType.BOOKMARK, it.title, it.url))
+                oldBookmarks.forEach {
+                    this.bookmarksList.add(BookmarkItemV2(BookmarkItemV2.BookmarkType.BOOKMARK, it.title, it.url))
+                }
+
+                this.persist()
+                this.emitOnChange()
+            } else {
+                Log.w("QWANT_BROWSER", "no bookmarks to restore")
             }
-
-            this.persist()
-            this.emitOnChange()
         } catch (e: IOException) {
             Log.e("QWANT_BROWSER", "Failed reading bookmarks file: IO exception: " + e.message)
             e.printStackTrace()
@@ -130,18 +135,23 @@ class BookmarksStorage(private var context: Context) {
 
     private fun doRestoreOld() {
         try {
-            val fileInputStream: FileInputStream = context.openFileInput(QWANT_BOOKMARKS_FILENAME)
-            val objectInputStream = ObjectInputStream(fileInputStream)
-            val oldBookmarks: ArrayList<BookmarkItemV1> = objectInputStream.readObject() as ArrayList<BookmarkItemV1>
-            objectInputStream.close()
-            fileInputStream.close()
+            val f = File(QWANT_BOOKMARKS_FILENAME)
+            if (f.exists() && f.canRead()) {
+                val fileInputStream = FileInputStream(f) // : FileInputStream = context.openFileInput(QWANT_BOOKMARKS_FILENAME)
+                val objectInputStream = ObjectInputStream(fileInputStream)
+                val oldBookmarks: ArrayList<BookmarkItemV1> = objectInputStream.readObject() as ArrayList<BookmarkItemV1>
+                objectInputStream.close()
+                fileInputStream.close()
 
-            oldBookmarks.forEach {
-                this.bookmarksList.add(BookmarkItemV2(BookmarkItemV2.BookmarkType.BOOKMARK, it.title, it.url))
+                oldBookmarks.forEach {
+                    this.bookmarksList.add(BookmarkItemV2(BookmarkItemV2.BookmarkType.BOOKMARK, it.title, it.url))
+                }
+
+                this.persist()
+                this.emitOnChange()
+            } else {
+                Log.w("QWANT_BROWSER", "no bookmarks to restore")
             }
-
-            this.persist()
-            this.emitOnChange()
         } catch (e: IOException) {
             Log.e("QWANT_BROWSER", "Failed reading bookmarks file: IO exception: " + e.message)
             e.printStackTrace()
@@ -156,18 +166,23 @@ class BookmarksStorage(private var context: Context) {
 
     private fun doRestore() {
         try {
-            val fileInputStream: FileInputStream = context.openFileInput(QWANT_BOOKMARKS_FILENAME)
-            val objectInputStream = ObjectInputStream(fileInputStream)
-            this.bookmarksList = objectInputStream.readObject() as ArrayList<BookmarkItemV2>
+            val f = File(QWANT_BOOKMARKS_FILENAME)
+            if (f.exists() && f.canRead()) {
+                val fileInputStream = FileInputStream(f) // : FileInputStream = context.openFileInput(QWANT_BOOKMARKS_FILENAME)
+                val objectInputStream = ObjectInputStream(fileInputStream)
+                this.bookmarksList = objectInputStream.readObject() as ArrayList<BookmarkItemV2>
 
-            // reload parents, ignored in serialization else we would infinite recursion
-            this.bookmarksList.filter { it.type == BookmarkItemV2.BookmarkType.FOLDER }.forEach {
-                restoreBookmarksParents(it)
+                // reload parents, ignored in serialization else we would infinite recursion
+                this.bookmarksList.filter { it.type == BookmarkItemV2.BookmarkType.FOLDER }.forEach {
+                    restoreBookmarksParents(it)
+                }
+
+                objectInputStream.close()
+                fileInputStream.close()
+                this.emitOnChange()
+            } else {
+                Log.w("QWANT_BROWSER", "no bookmarks to restore")
             }
-
-            objectInputStream.close()
-            fileInputStream.close()
-            this.emitOnChange()
         } catch (e: IOException) {
             Log.e("QWANT_BROWSER", "Failed reading bookmarks file: IO exception: " + e.message)
             e.printStackTrace()

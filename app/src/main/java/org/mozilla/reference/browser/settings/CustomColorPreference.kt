@@ -34,9 +34,9 @@ class CustomColorPreference : Preference {
     private fun init(context: Context, attrs: AttributeSet) {
         context.obtainStyledAttributes(attrs, R.styleable.CustomColorPreference).apply {
             titleColor = getColor(R.styleable.CustomColorPreference_titleColor,
-                ContextCompat.getColor(context, R.color.placeholder_grey))
+                ContextCompat.getColor(context, R.color.qwant_main))
             summaryColor = getColor(R.styleable.CustomColorPreference_summaryColor,
-                ContextCompat.getColor(context, R.color.placeholder_grey))
+                ContextCompat.getColor(context, R.color.qwant_main))
             recycle()
         }
     }

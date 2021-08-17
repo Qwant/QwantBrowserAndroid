@@ -59,15 +59,12 @@
         mozac:findInPageButtonsTint="#ff88ff"
         android:visibility="gone" />
 
-    <org.mozilla.reference.browser.compat.toolbar.BrowserToolbar
+    <mozilla.components.browser.toolbar.BrowserToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:layout_gravity="top"
-        android:paddingEnd="8dp"
-        android:background="?attr/toolbarBackgroundColor"
-        mozac:browserToolbarSuggestionForegroundColor="?attr/toolbarSuggestionForeground"
-        mozac:browserToolbarSuggestionBackgroundColor="?attr/toolbarSuggestionBackground" />
+        android:background="?attr/qwant_toolbar_BackgroundColor" />
 
     <ImageView
         android:layout_width="match_parent"

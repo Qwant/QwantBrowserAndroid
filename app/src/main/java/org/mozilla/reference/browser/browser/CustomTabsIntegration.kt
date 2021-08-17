@@ -11,9 +11,11 @@ import mozilla.components.browser.menu.BrowserMenuBuilder
 import mozilla.components.browser.menu.item.BrowserMenuItemToolbar
 import mozilla.components.browser.menu.item.SimpleBrowserMenuItem
 import mozilla.components.browser.session.SessionManager
-import org.mozilla.reference.browser.compat.toolbar.BrowserToolbar
+import mozilla.components.browser.toolbar.BrowserToolbar
+// import org.mozilla.reference.browser.compat.toolbar.BrowserToolbar
 import mozilla.components.concept.engine.EngineView
-import org.mozilla.reference.browser.compat.toolbar.CustomTabsToolbarFeature
+import mozilla.components.feature.customtabs.CustomTabsToolbarFeature
+// import org.mozilla.reference.browser.compat.toolbar.CustomTabsToolbarFeature
 import mozilla.components.feature.session.SessionUseCases
 import mozilla.components.support.base.feature.LifecycleAwareFeature
 import mozilla.components.support.base.feature.UserInteractionHandler
@@ -25,13 +27,13 @@ import org.mozilla.reference.browser.ext.components
 import org.mozilla.reference.browser.ext.share
 
 class CustomTabsIntegration(
-    context: Context,
-    sessionManager: SessionManager,
-    toolbar: BrowserToolbar,
-    engineView: EngineView,
-    sessionUseCases: SessionUseCases,
-    sessionId: String,
-    activity: Activity?
+        context: Context,
+        sessionManager: SessionManager,
+        toolbar: BrowserToolbar,
+        engineView: EngineView,
+        sessionUseCases: SessionUseCases,
+        sessionId: String,
+        activity: Activity?
 ) : LifecycleAwareFeature, UserInteractionHandler {
 
     private val session = sessionManager.findSessionById(sessionId)

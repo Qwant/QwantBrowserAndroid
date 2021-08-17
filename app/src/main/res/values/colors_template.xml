@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="qwant_background">@color/true_white</color>
+
+    <color name="qwant_toolbar_urlBox">@color/qwant_grey_lighter</color>
+    <color name="qwant_toolbar_text">@color/qwant_black</color>
+    <color name="qwant_toolbar_icon">@color/qwant_black</color>
+    <color name="qwant_toolbar_separator">@color/qwant_grey_semi_light</color>
+    <color name="qwant_toolbar_bottomSeparator">@color/qwant_white</color>
+</resources>

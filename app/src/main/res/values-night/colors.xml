@@ -1,20 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Original colors -->
-    <color name="placeholder_grey">#777777</color>
-    <color name="dark">#ff212121</color>
-    <color name="evenDarker">#ff1a1a1a</color>
-    <color name="accent">#ff00BCD4</color>
-
     <!-- QWANT COLORS -->
-    <color name="qwant_background">#1b2028</color>
+    <!-- <color name="qwant_background">#1b2028</color> -->
     <color name="qwant_background_dark">#2c3036</color>
     <color name="qwant_main">#c8cbd3</color>
     <color name="qwant_light">#AAAAAA</color>
     <color name="qwant_selected">#4ba2ea</color>
     <color name="qwant_selected_text">@color/photonWhite</color>
     <color name="qwant_url_green">#83c458</color>
-    <color name="qwant_black">#f5f5f7</color>
+    <!-- <color name="qwant_black">#f5f5f7</color> -->
     <color name="qwant_tab_selected">#1050c5</color>
 
     <color name="qwant_main_privacy">#c8cbd3</color>
@@ -32,4 +26,7 @@
     <!-- <color name="qwantbar_background_privacy">@color/qwant_background_privacy</color> -->
 
     <color name="mozac_ui_tabcounter_default_tint" tools:ignore="UnusedResources">@color/menu_items</color> <!-- Overriding color of tab counter icon in toolbar -->
+
+    <!-- <color name="qwant_toolbar_background">#46464c</color>
+    <color name="qwant_toolbar_text">#f2dbf8</color> -->
 </resources>

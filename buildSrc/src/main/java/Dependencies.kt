@@ -19,7 +19,7 @@ private object Versions {
 
     const val android_gradle_plugin = "3.4.1"
 
-    const val mozilla_android_components = "90.0.20210509143123" // "+" // Always use the latest snapshot
+    const val mozilla_android_components = "90.0.20210509143123"
 
     const val thirdparty_sentry = "1.7.10"
 
@@ -52,8 +52,6 @@ object Deps {
 
     const val mozilla_browser_awesomebar = "org.mozilla.components:browser-awesomebar:${Versions.mozilla_android_components}"
     const val mozilla_browser_engine_gecko = "org.mozilla.components:browser-engine-gecko:${Versions.mozilla_android_components}"
-    const val mozilla_browser_engine_gecko_beta = "org.mozilla.components:browser-engine-gecko-beta:${Versions.mozilla_android_components}"
-    const val mozilla_browser_engine_gecko_nightly = "org.mozilla.components:browser-engine-gecko-nightly:${Versions.mozilla_android_components}"
     const val mozilla_browser_domains = "org.mozilla.components:browser-domains:${Versions.mozilla_android_components}"
     const val mozilla_browser_search = "org.mozilla.components:browser-search:${Versions.mozilla_android_components}"
     const val mozilla_browser_session = "org.mozilla.components:browser-session:${Versions.mozilla_android_components}"
