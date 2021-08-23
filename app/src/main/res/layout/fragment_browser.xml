@@ -11,16 +11,6 @@
     android:layout_height="match_parent"
     tools:context=".BrowserActivity">
 
-    <!-- <ImageView
-        android:id="@+id/splashScreen"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="bottom"
-        android:background="@color/photonWhite"
-        android:scaleType="center"
-        android:visibility="gone"
-        android:src="@drawable/flat_icon"/> -->
-
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefresh"
         android:layout_width="match_parent"
@@ -39,13 +29,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="56dp"
-        android:padding="4dp"
         android:visibility="gone"
-        android:background="@color/photonWhite"
-        mozac:awesomeBarTitleTextColor="?attr/qwant_color_main"
-        mozac:awesomeBarDescriptionTextColor="?attr/qwant_color_light"
-        mozac:awesomeBarChipTextColor="?attr/qwant_color_selected_text"
-        mozac:awesomeBarChipBackgroundColor="?attr/qwant_color_selected" />
+
+        android:background="?attr/qwant_toolbar_BackgroundColor"
+        mozac:awesomeBarTitleTextColor="?attr/qwant_toolbar_TextColor"
+        mozac:awesomeBarDescriptionTextColor="?attr/qwant_toolbar_TextColor"
+
+    />
 
     <mozilla.components.feature.findinpage.view.FindInPageBar
         android:id="@+id/findInPageBar"

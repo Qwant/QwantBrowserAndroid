@@ -43,9 +43,6 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
         // toolbarSessionObserver = ToolbarSessionObserver(requireContext().components.core.sessionManager, toolbar, swipeRefresh)
         // requireContext().components.core.sessionManager.register(this.toolbarSessionObserver!!)
 
-        // toolbar.onFocusChangeListener()
-        // awesomeBar.onFocusChangeListener()
-
         AwesomeBarFeature(awesomeBar, toolbar, engineView)
             .addSearchProvider(
                     requireContext(),
@@ -56,10 +53,6 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
                     engine = requireComponents.core.engine,
                     filterExactMatch = true
             )
-            /* .addSearchProvider(
-                requireComponents.search.searchEngineManager.defaultSearchEngine!!,
-                requireComponents.useCases.searchUseCases.defaultSearch,
-                requireComponents.core.client) */
             .addSessionProvider(
                 resources,
                 requireComponents.core.store,

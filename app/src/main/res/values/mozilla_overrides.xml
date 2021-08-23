@@ -2,4 +2,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <dimen name="mozac_browser_toolbar_icon_padding">0dp</dimen>
     <item name="mozac_browser_toolbar_displaytoolbar" type="layout" tools:override="true">@layout/browser_toolbar_displaytoolbar</item>
+    <item name="mozac_browser_awesomebar_item_generic" type="layout" tools:override="true">@layout/browser_toolbar_autocomplete_item</item>
 </resources>

@@ -31,23 +31,21 @@
         <item name="qwant_color_red">@color/photonRed70</item> -->
 
 
-        <item name="autocompleteBackgroundColor">@color/qwant_selected</item>
+        <!-- <item name="autocompleteBackgroundColor">@color/qwant_selected</item> -->
 
         <item name="tabsTrayItemBackgroundColor">@color/qwant_background</item>
         <item name="tabsTrayItemTextColor">@color/qwant_main</item>
         <item name="tabsTraySelectedItemBackgroundColor">@color/qwant_selected</item>
         <item name="tabsTraySelectedItemTextColor">@color/qwant_selected_text</item>
 
-
-
         <!-- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA -->
 
         <!-- Android -->
         <!-- <item name="colorPrimary">@color/qwant_background_dark</item>
         <item name="android:colorSecondary" tools:targetApi="n_mr1">@color/qwant_main</item>
-        <item name="android:windowBackground">@color/qwant_background</item>
         <item name="colorPrimaryDark">@color/qwant_background</item> -->
         <item name="colorAccent">@color/qwant_blue</item>
+        <item name="android:windowBackground">@color/qwant_background</item>
         <item name="android:navigationBarColor" tools:targetApi="lollipop">@color/qwant_background</item>
         <item name="android:statusBarColor" tools:targetApi="lollipop">@color/qwant_background</item>
         <item name="android:windowLightStatusBar" tools:targetApi="m">?attr/isLightTheme</item>
@@ -72,6 +70,7 @@
     <style name="ThemeQwantNoActionBarPrivacy" parent="ThemeQwantNoActionBar">
         <!-- Android -->
         <item name="colorAccent">@color/qwant_purple_base</item>
+        <item name="android:windowBackground">@color/qwant_purple_dark</item>
         <!-- TODO NOT WORKING status and navigation bars in privacy mode ! -->
         <item name="android:navigationBarColor" tools:targetApi="lollipop">@color/qwant_purple_dark</item>
         <item name="android:statusBarColor" tools:targetApi="lollipop">@color/qwant_purple_dark</item>

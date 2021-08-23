@@ -5,13 +5,10 @@
 package org.mozilla.reference.browser.browser
 
 import android.content.Context
-import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.util.Log
-import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
-import kotlinx.android.synthetic.main.browser_toolbar_displaytoolbar.view.*
 import mozilla.components.browser.domains.autocomplete.ShippedDomainsProvider
 import mozilla.components.browser.session.SessionManager
 import mozilla.components.browser.toolbar.BrowserToolbar
@@ -65,38 +62,26 @@ class ToolbarIntegration(
     init {
         drawable.setTint(context.getColorFromAttr(R.attr.qwant_toolbar_IconsColor))
         toolbar.addPageAction(ReloadPageAction(sessionUseCases, drawable))
-
-        toolbar.display.indicators = listOf(
-            DisplayToolbar.Indicators.SECURITY,
-            DisplayToolbar.Indicators.TRACKING_PROTECTION
-        )
-        toolbar.display.displayIndicatorSeparator = true
-        toolbar.display.setOnSiteSecurityClickedListener { Log.d("QWANT_BROWSER", "click site security"); }
-        toolbar.display.setOnTrackingProtectionClickedListener { Log.d("QWANT_BROWSER", "click tracking protection"); }
-
-        toolbar.display.hint = context.getString(R.string.toolbar_hint)
-        toolbar.edit.hint = context.getString(R.string.toolbar_hint)
+        toolbar.addBrowserAction(privateBrowsingBrowserAction)
 
         ToolbarAutocompleteFeature(toolbar).apply {
             addHistoryStorageProvider(historyStorage)
             addDomainProvider(shippedDomainsProvider)
         }
 
-        toolbar.addBrowserAction(privateBrowsingBrowserAction)
+        toolbar.display.indicators = listOf(
+            DisplayToolbar.Indicators.SECURITY,
+            DisplayToolbar.Indicators.TRACKING_PROTECTION
+        )
+        toolbar.display.displayIndicatorSeparator = true
 
-        /* toolbar.edit.colors = toolbar.edit.colors.copy(
-            clear = context.getColorFromAttr(R.attr.qwant_color_main),
-            hint = context.getColorFromAttr(R.attr.qwant_color_light),
-            text = context.getColorFromAttr(R.attr.toolbarUrlTextColor),
-            suggestionBackground = context.getColorFromAttr(R.attr.qwant_color_selected),
-            suggestionForeground = context.getColorFromAttr(R.attr.qwant_color_selected_text)
-        ) */
+        toolbar.display.setOnSiteSecurityClickedListener { Log.d("QWANT_BROWSER", "click site security"); }
+        toolbar.display.setOnTrackingProtectionClickedListener { Log.d("QWANT_BROWSER", "click tracking protection"); }
 
         toolbar.display.colors = toolbar.display.colors.copy(
             securityIconSecure = context.getColorFromAttr(R.attr.qwant_toolbar_SecureColor),
             securityIconInsecure = context.getColorFromAttr(R.attr.qwant_toolbar_InsecureColor),
             hint = context.getColorFromAttr(R.attr.qwant_toolbar_HintColor),
-            // title = context.getColorFromAttr(R.attr.qwant_color_main),
             text = context.getColorFromAttr(R.attr.qwant_toolbar_TextColor),
             trackingProtection = context.getColorFromAttr(R.attr.qwant_toolbar_IconsColor),
             separator = context.getColorFromAttr(R.attr.qwant_toolbar_TrackingProtectionAndSecurityIndicatorSeparatorColor)
@@ -106,8 +91,15 @@ class ToolbarIntegration(
             trackingProtectionNothingBlocked = ResourcesCompat.getDrawable(context.resources, R.drawable.icons_system_shield_off_line, context.theme)!!,
             trackingProtectionTrackersBlocked = ResourcesCompat.getDrawable(context.resources, R.drawable.icons_system_shield_line_2, context.theme)!!
         )
-
         toolbar.display.setUrlBackground(ResourcesCompat.getDrawable(context.resources, R.drawable.url_background, context.theme))
+
+        toolbar.edit.hint = context.getString(R.string.toolbar_hint)
+        /* toolbar.edit.colors = toolbar.edit.colors.copy( // TODO colors
+            hint = context.getColorFromAttr(R.attr.qwant_color_light),
+            text = context.getColorFromAttr(R.attr.qwant_toolbar_TextColor),
+            suggestionBackground = context.getColorFromAttr(R.attr.qwant_color_selected),
+            suggestionForeground = context.getColorFromAttr(R.attr.qwant_color_selected_text)
+        ) */
     }
 
     private val toolbarFeature: ToolbarFeature = ToolbarFeature(
