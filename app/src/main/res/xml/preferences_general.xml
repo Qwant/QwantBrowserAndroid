@@ -21,7 +21,7 @@
         android:defaultValue="@string/settings_dark_theme_system_code"
         app:iconSpaceReserved="false"/>
 
-    <org.mozilla.reference.browser.settings.QwantPreferenceDropdown
+    <!-- <org.mozilla.reference.browser.settings.QwantPreferenceDropdown
         android:key="@string/pref_key_general_adultcontent"
         android:title="@string/settings_general_adultcontent"
         android:entries="@array/adult_content_values"
@@ -33,7 +33,7 @@
         android:key="@string/pref_key_general_newsonhome"
         android:defaultValue="false"
         android:title="@string/settings_general_newsonhome"
-        app:iconSpaceReserved="false" />
+        app:iconSpaceReserved="false" /> -->
 
     <org.mozilla.reference.browser.settings.QwantPreferenceSwitch
         android:key="@string/pref_key_general_resultsinnewtab"

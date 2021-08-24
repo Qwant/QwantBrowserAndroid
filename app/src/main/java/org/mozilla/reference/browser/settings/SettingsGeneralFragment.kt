@@ -36,7 +36,7 @@ class SettingsGeneralFragment: BaseSettingsFragment() {
         // findPreference(context?.getPreferenceKey(R.string.pref_key_general_cleardata)).onPreferenceClickListener = getPreferenceLinkListener(SettingsGeneralClearDataFragment(this.settingsContainer), "SETTINGS_GENERAL_CLEARDATA_FRAGMENT")
         findPreference(context?.getPreferenceKey(R.string.pref_key_general_makedefaultbrowser)).onPreferenceClickListener = getClickListenerForMakeDefaultBrowser()
 
-        val prefNewsOnHome = findPreference(context?.getPreferenceKey(R.string.pref_key_general_newsonhome))
+        /* val prefNewsOnHome = findPreference(context?.getPreferenceKey(R.string.pref_key_general_newsonhome))
         prefNewsOnHome.onPreferenceClickListener = Preference.OnPreferenceClickListener {
             requireComponents.core.sessionManager.sessions.forEach {
                 if (it.url.startsWith(requireContext().getString(R.string.homepage_startwith_filter))) {
@@ -49,7 +49,7 @@ class SettingsGeneralFragment: BaseSettingsFragment() {
                 }
             }
             true
-        }
+        } */
 
         val prefResultInNewTabs = findPreference(context?.getPreferenceKey(R.string.pref_key_general_resultsinnewtab))
         prefResultInNewTabs.onPreferenceChangeListener = Preference.OnPreferenceChangeListener {_, value ->
@@ -66,7 +66,7 @@ class SettingsGeneralFragment: BaseSettingsFragment() {
             true
         }
 
-        val prefAdultContent = findPreference(context?.getPreferenceKey(R.string.pref_key_general_adultcontent)) as QwantPreferenceDropdown
+        /* val prefAdultContent = findPreference(context?.getPreferenceKey(R.string.pref_key_general_adultcontent)) as QwantPreferenceDropdown
         prefAdultContent.summary = adultContentValues[adultContentKeys.indexOf(prefAdultContent.value)]
         prefAdultContent.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, value ->
             requireComponents.core.sessionManager.sessions.forEach {
@@ -82,7 +82,7 @@ class SettingsGeneralFragment: BaseSettingsFragment() {
 
             prefAdultContent.summary = adultContentValues[adultContentKeys.indexOf(value)]
             true
-        }
+        } */
 
         val prefTheme = findPreference(context?.getPreferenceKey(R.string.pref_key_general_dark_theme)) as QwantPreferenceDropdown
         prefTheme.summary = darkThemeValues[darkThemeKeys.indexOf(prefTheme.value)]
