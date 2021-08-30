@@ -5,6 +5,7 @@
 package org.mozilla.reference.browser
 
 import android.content.Context
+import android.util.Log
 import mozilla.components.browser.errorpages.ErrorPages
 import mozilla.components.browser.errorpages.ErrorType
 import mozilla.components.concept.engine.EngineSession
@@ -22,6 +23,19 @@ class AppRequestInterceptor(private val context: Context) : RequestInterceptor {
             isDirectNavigation: Boolean,
             isSubframeRequest: Boolean
     ): RequestInterceptor.InterceptionResponse? {
+        if (uri.startsWith(context.getString(R.string.homepage_startwith_filter))) {
+            if (uri.indexOf("&qbc=1") == -1) {
+                var searchStart = uri.indexOf("&q=")
+                if (searchStart == -1) searchStart = uri.indexOf("?q=")
+                if (searchStart != -1) {
+                    var searchEnd = uri.indexOf('&', searchStart + 3)
+                    if (searchEnd == -1) searchEnd = uri.length
+                    val searchTerms = uri.substring(searchStart + 3, searchEnd)
+
+                    return RequestInterceptor.InterceptionResponse.Url(QwantUtils.getHomepage(context, query = searchTerms))
+                }
+            }
+        }
         return context.components.services.appLinksInterceptor.onLoadRequest(
                 engineSession, uri, lastUri, hasUserGesture, isSameDomain, isRedirect, isDirectNavigation,
                 isSubframeRequest

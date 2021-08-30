@@ -12,12 +12,11 @@ import mozilla.components.feature.contextmenu.ContextMenuUseCases
 import mozilla.components.feature.downloads.DownloadsUseCases
 import mozilla.components.feature.pwa.WebAppShortcutManager
 import mozilla.components.feature.pwa.WebAppUseCases
-// import mozilla.components.feature.search.SearchUseCases
+import mozilla.components.feature.search.SearchUseCases
 import mozilla.components.feature.session.SessionUseCases
 import mozilla.components.feature.session.SettingsUseCases
 import mozilla.components.feature.tabs.CustomTabsUseCases
 import mozilla.components.feature.tabs.TabsUseCases
-import org.mozilla.reference.browser.compat.QwantSearchUseCases
 
 /**
  * Component group for all use cases. Use cases are provided by feature
@@ -43,7 +42,7 @@ class UseCases(
     /**
      * Use cases that provide search engine integration.
      */
-    val searchUseCases by lazy { QwantSearchUseCases(context, store, tabsUseCases) }
+    val searchUseCases by lazy { SearchUseCases(store, tabsUseCases) }
 
     /**
      * Use cases that provide settings management.

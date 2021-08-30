@@ -18,7 +18,7 @@ android {
     compileSdkVersion Config.compileSdkVersion
 
     defaultConfig {
-        applicationId "com.qwant.sqool"
+        applicationId "com.qwant.liberty"
         minSdkVersion Config.minSdkVersion
         targetSdkVersion Config.targetSdkVersion
         versionCode 1

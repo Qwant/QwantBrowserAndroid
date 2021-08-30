@@ -5,7 +5,6 @@
 package org.mozilla.reference.browser
 
 import android.content.Context
-import android.util.Log
 import org.mozilla.reference.browser.components.*
 
 /**

@@ -53,6 +53,8 @@ class QwantUtils {
             if (widget) builder.append("&widget=1")
             if (query != null) builder.append("&q=").append(query)
 
+            builder.append("&qbc=1")
+
             return builder.toString()
         }
     }
