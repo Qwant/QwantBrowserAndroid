@@ -73,18 +73,18 @@ class BookmarksAdapter(
                 selectedCallback.invoke(bookmarkItem, false)
             }
 
-            itemButtonMenu.setColorFilter(ContextCompat.getColor(context, context.theme.resolveAttribute(R.attr.qwant_color_main)))
+            itemButtonMenu.setColorFilter(ContextCompat.getColor(context, R.color.qwant_text))
             itemButtonMenu.menuBuilder = BrowserMenuBuilder(listOf(
                 BrowserMenuImageText(
                         context.getString(R.string.mozac_feature_contextmenu_open_link_in_new_tab),
-                        textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
+                        textColorResource = R.color.qwant_text,
                         imageResource = R.drawable.ic_ctmenu_newtab
                 ) {
                     selectedCallback.invoke(bookmarkItem, false)
                 },
                 BrowserMenuImageText(
                         context.getString(R.string.mozac_feature_contextmenu_open_link_in_private_tab),
-                        textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
+                        textColorResource = R.color.qwant_text,
                         imageResource = R.drawable.ic_ctmenu_newtab_private
                 ) {
                     // context.components.useCases.tabsUseCases.addPrivateTab.invoke(bookmarkItem.url!!, selectTab = true)
@@ -92,7 +92,7 @@ class BookmarksAdapter(
                 },
                 BrowserMenuImageText(
                         context.getString(R.string.mozac_feature_contextmenu_copy_link),
-                        textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
+                        textColorResource = R.color.qwant_text,
                         imageResource = R.drawable.ic_ctmenu_clipboard
                 ) {
                     val clipboard: ClipboardManager? = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
@@ -102,7 +102,7 @@ class BookmarksAdapter(
 
                 BrowserMenuImageText(
                         context.getString(R.string.bookmarks_modify),
-                        textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
+                        textColorResource = R.color.qwant_text,
                         imageResource = R.drawable.ic_ctmenu_edit
                 ) {
                     bookmarkEditCallback.invoke(bookmarkItem)
@@ -110,7 +110,7 @@ class BookmarksAdapter(
 
                 BrowserMenuImageText(
                         context.getString(R.string.bookmarks_delete),
-                        textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
+                        textColorResource = R.color.qwant_text,
                         imageResource = R.drawable.ic_ctmenu_delete
                 ) {
                     bookmarkStorage.deleteBookmark(bookmarkItem)
@@ -131,18 +131,18 @@ class BookmarksAdapter(
                 selectedCallback.invoke(bookmarkItem, false)
             }
 
-            itemButtonMenu.setColorFilter(ContextCompat.getColor(context, context.theme.resolveAttribute(R.attr.qwant_color_main)))
+            itemButtonMenu.setColorFilter(ContextCompat.getColor(context, R.color.qwant_text))
             itemButtonMenu.menuBuilder = BrowserMenuBuilder(listOf(
                     BrowserMenuImageText(
                             context.getString(R.string.bookmarks_modify_folder),
-                            textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
+                            textColorResource = R.color.qwant_text,
                             imageResource = R.drawable.ic_ctmenu_edit
                     ) {
                         bookmarkEditCallback.invoke(bookmarkItem)
                     },
                     BrowserMenuImageText(
                             context.getString(R.string.bookmarks_delete),
-                            textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
+                            textColorResource = R.color.qwant_text,
                             imageResource = R.drawable.ic_ctmenu_delete
                     ) {
                         bookmarkStorage.deleteBookmark(bookmarkItem)

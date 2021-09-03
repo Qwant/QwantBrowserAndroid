@@ -32,10 +32,10 @@
 
         <!-- <item name="autocompleteBackgroundColor">@color/qwant_selected</item> -->
 
-        <item name="tabsTrayItemBackgroundColor">@color/qwant_background</item>
+        <!-- <item name="tabsTrayItemBackgroundColor">@color/qwant_background</item>
         <item name="tabsTrayItemTextColor">@color/qwant_main</item>
         <item name="tabsTraySelectedItemBackgroundColor">@color/qwant_selected</item>
-        <item name="tabsTraySelectedItemTextColor">@color/qwant_selected_text</item>
+        <item name="tabsTraySelectedItemTextColor">@color/qwant_selected_text</item> -->
 
         <!-- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA -->
 
@@ -59,7 +59,7 @@
         <item name="qwant_toolbar_InsecureColor">@color/photonRed70</item>
         <item name="qwant_toolbar_TrackingProtectionAndSecurityIndicatorSeparatorColor">@color/qwant_toolbar_separator</item>
         <item name="qwant_toolbar_BottomSeparatorColor">@color/qwant_toolbar_bottomSeparator</item>
-        <!-- check those below ... -->
+        <!-- TODO check those below, and add to privacy theme ... -->
         <item name="qwant_toolbar_HintColor">@color/qwant_light</item>
         <item name="qwant_toolbar_ClearColor">@color/photonPurple50</item>
         <item name="qwant_toolbar_SuggestionBackgroundColor">@color/qwant_selected</item>

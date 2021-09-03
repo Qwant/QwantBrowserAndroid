@@ -13,11 +13,9 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:background="@color/qwant_background_dark"
-        android:backgroundTint="?attr/qwant_color_background_dark"
-        app:titleTextColor="?attr/qwant_color_main"
-        android:theme="@style/ThemeQwantNoActionBar"
-        app:navigationIcon="@drawable/ic_back" />
+        android:background="@color/qwant_background"
+        app:titleTextColor="@color/qwant_text"
+        app:title="@string/settings"/>
 
     <FrameLayout
         android:id="@+id/settings_fragment_container"

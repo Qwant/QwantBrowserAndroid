@@ -8,14 +8,7 @@
     android:paddingEnd="20dp"
     android:paddingTop="8dp"
     android:paddingBottom="8dp"
-    android:background="?attr/qwant_color_background">
-
-    <!-- <ImageView
-        android:id="@+id/history_item_icon"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_gravity="center"
-        android:src="@drawable/ic_bookmark_default_fav" /> -->
+    android:background="@color/qwant_background">
 
     <LinearLayout
         android:id="@+id/history_item_layout_text"
@@ -31,7 +24,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
-            android:textColor="@color/menu_items"
+            android:textColor="@color/qwant_text"
             android:textSize="15sp" />
 
         <TextView
@@ -39,7 +32,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
-            android:textColor="@color/qwant_url_green"
+            android:textColor="@color/qwant_tabs_url"
             android:textSize="12sp" />
 
     </LinearLayout>
@@ -49,7 +42,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:gravity="center_vertical"
-        android:textColor="@color/menu_items"
+        android:textColor="@color/qwant_text"
         android:paddingEnd="4dp"
         android:textSize="12sp" />
 
@@ -57,17 +50,17 @@
         android:id="@+id/history_item_menu_button"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:src="@drawable/ic_nav_menu"
-        />
+        android:src="@drawable/icons_system_more_2_fill"
+        android:foregroundTint="@color/qwant_text"
+    />
 
     <TextView
         android:id="@+id/history_item_date_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
-        android:textColor="@color/menu_items"
+        android:textColor="@color/qwant_text"
         android:textSize="18sp"
-        android:fontFamily="@font/asap_bold"
         android:visibility="gone" />
 
 

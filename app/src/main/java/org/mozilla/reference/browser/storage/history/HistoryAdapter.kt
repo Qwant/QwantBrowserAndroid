@@ -91,11 +91,11 @@ class HistoryAdapter(
                     historyItemSelectedCallback.invoke(historyItem.visit)
                 }
 
-                itemButtonMenu.setColorFilter(ContextCompat.getColor(context, context.theme.resolveAttribute(R.attr.qwant_color_main)))
+                itemButtonMenu.setColorFilter(ContextCompat.getColor(context, R.color.qwant_text))
                 itemButtonMenu.menuBuilder = BrowserMenuBuilder(listOf(
                     BrowserMenuImageText(
                             context.getString(R.string.mozac_feature_contextmenu_open_link_in_new_tab),
-                            textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
+                            textColorResource = R.color.qwant_text,
                             imageResource = R.drawable.ic_ctmenu_newtab
                     ) {
                         context.components.useCases.tabsUseCases.addTab.invoke(historyItem.visit.url, selectTab = true)
@@ -103,7 +103,7 @@ class HistoryAdapter(
                     },
                     BrowserMenuImageText(
                             context.getString(R.string.mozac_feature_contextmenu_open_link_in_private_tab),
-                            textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
+                            textColorResource = R.color.qwant_text,
                             imageResource = R.drawable.ic_ctmenu_newtab_private
                     ) {
                         context.components.useCases.tabsUseCases.addPrivateTab.invoke(historyItem.visit.url, selectTab = true)
@@ -111,7 +111,7 @@ class HistoryAdapter(
                     },
                     BrowserMenuImageText(
                             context.getString(R.string.mozac_feature_contextmenu_copy_link),
-                            textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
+                            textColorResource = R.color.qwant_text,
                             imageResource = R.drawable.ic_ctmenu_clipboard
                     ) {
                         val clipboard: ClipboardManager? = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
@@ -120,7 +120,7 @@ class HistoryAdapter(
                     },
                     BrowserMenuImageText(
                             context.getString(R.string.bookmarks_delete),
-                            textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
+                            textColorResource = R.color.qwant_text,
                             imageResource = R.drawable.ic_trash
                     ) {
                         MainScope().launch {

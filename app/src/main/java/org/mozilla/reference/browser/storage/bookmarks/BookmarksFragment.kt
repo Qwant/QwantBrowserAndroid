@@ -63,9 +63,6 @@ class BookmarksFragment: Fragment(), UserInteractionHandler {
         }
 
         toolbar = view.findViewById(R.id.bookmarks_toolbar)
-        toolbar?.setNavigationOnClickListener {
-            this.onBackPressed()
-        }
 
         listview = view.findViewById(R.id.bookmarks_listview)
         layoutNoResult = view.findViewById(R.id.bookmarks_noresult_layout)

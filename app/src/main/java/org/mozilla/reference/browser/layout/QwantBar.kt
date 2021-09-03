@@ -76,7 +76,7 @@ class QwantBar @JvmOverloads constructor(
     private var currentMode: QwantBarMode = QwantBarMode.HOME
     private var currentPrivacyEnabled = false
 
-    private val menuItemColor = context.theme.resolveAttribute(R.attr.qwant_color_main)
+    private val menuItemColor = R.color.qwant_text
     private val menuItems: List<BrowserMenuItem> by lazy {
         listOf(
             BrowserMenuItemToolbar(listOf(

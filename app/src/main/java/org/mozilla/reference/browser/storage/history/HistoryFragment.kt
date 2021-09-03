@@ -12,7 +12,6 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.TextView
-import androidx.appcompat.widget.Toolbar
 import mozilla.components.concept.storage.VisitInfo
 import mozilla.components.support.base.feature.UserInteractionHandler
 import org.mozilla.reference.browser.BrowserActivity
@@ -44,12 +43,6 @@ class HistoryFragment: Fragment(), UserInteractionHandler {
         currentLoadedIndex = HISTORY_PAGE_SIZE
 
         val view: View = inflater.inflate(R.layout.fragment_history, container, false)
-
-        val toolbar: Toolbar = view.findViewById(R.id.history_toolbar)
-        toolbar.title = context?.getString(R.string.history)
-        toolbar.setNavigationOnClickListener {
-            this.onBackPressed()
-        }
 
         listview = view.findViewById(R.id.history_listview)
         clearAll = view.findViewById(R.id.history_clear_all)

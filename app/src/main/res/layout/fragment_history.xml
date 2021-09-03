@@ -15,10 +15,9 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:background="@color/qwant_background_dark"
-        android:backgroundTint="?attr/qwant_color_background_dark"
-        app:titleTextColor="?attr/qwant_color_main"
-        app:navigationIcon="@drawable/ic_back" />
+        android:background="@color/qwant_background"
+        app:titleTextColor="@color/qwant_text"
+        app:title="@string/history" />
 
     <LinearLayout
         android:id="@+id/history_noresult_layout"
@@ -27,7 +26,7 @@
         android:layout_weight="1"
         android:orientation="vertical"
         android:visibility="gone"
-        android:background="?attr/qwant_color_background">
+        android:background="@color/qwant_background">
 
         <ImageView
             android:layout_width="match_parent"
@@ -60,7 +59,7 @@
         android:id="@+id/history_clear_all"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/menu_items"
+        android:textColor="@color/qwant_text"
         android:layout_gravity="end"
         android:paddingStart="20dp"
         android:paddingEnd="20dp"
