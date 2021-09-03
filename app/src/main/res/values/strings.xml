@@ -6,7 +6,8 @@
     <string name="app_name">Qwant</string>
 
     <!-- Menu option on the toolbar to open a new tab-->
-    <string name="menu_action_add_tab">Add New</string>
+    <string name="menu_action_add_tab">New tab</string>
+    <string name="menu_action_add_tab_private">New private tab</string>
 
     <!-- Menu option on the toolbar to close all tabs-->
     <string name="menu_action_close_tabs">Close All Tabs</string>

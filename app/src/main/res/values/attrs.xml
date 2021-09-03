@@ -63,4 +63,7 @@
     <attr name="qwantbar_normalColor" format="reference|color" />
     <attr name="qwantbar_selectedColor" format="reference|color" />
     <attr name="qwantbar_disabledColor" format="reference|color" />
+
+    <attr name="qwant_tabs_foregroundColor" format="reference|color" />
+    <attr name="qwant_tabs_selectedColor" format="reference|color" />
 </resources>

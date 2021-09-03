@@ -97,7 +97,7 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:background="@drawable/blue_gradient"
+            android:background="@drawable/button_background"
             android:textColor="?attr/qwant_color_selected_text"
             android:layout_marginStart="24dp"
             android:text="@string/bookmark_edit_save"

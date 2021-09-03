@@ -2,5 +2,6 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
     <corners android:radius="20dp" />
-    <solid android:color="#1a6aff" />
+    <!-- <solid android:color="@color/qwant_blue" /> -->
+    <solid android:color="?attr/qwant_tabs_foregroundColor" />
 </shape>

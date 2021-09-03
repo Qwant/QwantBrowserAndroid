@@ -14,6 +14,7 @@ import mozilla.components.browser.tabstray.thumbnail.TabThumbnailView
 import mozilla.components.browser.thumbnails.loader.ThumbnailLoader
 import mozilla.components.concept.base.images.ImageLoadRequest
 import mozilla.components.concept.tabstray.Tab
+import mozilla.components.support.ktx.android.content.getColorFromAttr
 import mozilla.components.support.ktx.android.util.dpToPx
 import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.ext.components
@@ -30,6 +31,7 @@ class TabsAdapter(
     internal class TabListItemViewHolder(
             item_layout: View,
             private val context: Context,
+            private val isPrivate: Boolean,
             private val selectedCallback: (tab: Tab?) -> Unit,
             private val deletedCallback: (tabSession: TabSessionState?) -> Unit
     ) : RecyclerView.ViewHolder(item_layout) {
@@ -62,7 +64,7 @@ class TabsAdapter(
 
         private fun setSelected(isSelected: Boolean) {
             if (isSelected) {
-                this.itemMainLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.qwant_tab_selected))
+                this.itemMainLayout.setBackgroundColor(context.getColorFromAttr(R.attr.qwant_tabs_selectedColor))
             } else {
                 this.itemMainLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.qwant_background))
             }
@@ -72,8 +74,8 @@ class TabsAdapter(
             if (tab.thumbnail == null) {
                 val thumbnailSize = 100.dpToPx(this.itemPreview.context.resources.displayMetrics)
                 thumbnailLoader.loadIntoView(
-                        this.itemPreview,
-                        ImageLoadRequest(id = tab.id, size = thumbnailSize)
+                    this.itemPreview,
+                    ImageLoadRequest(id = tab.id, size = thumbnailSize)
                 )
             } else if (tab.thumbnail != null) {
                 this.itemPreview.setImageBitmap(tab.thumbnail)
@@ -119,7 +121,7 @@ class TabsAdapter(
 
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val newView = inflater.inflate(R.layout.tablist_item, parent, false)
-        val viewHolder = TabListItemViewHolder(newView, context, selectedCallback, deletedCallback)
+        val viewHolder = TabListItemViewHolder(newView, context, isPrivate, selectedCallback, deletedCallback)
         viewHolder.setup(tabSession, selectedState)
         newView.tag = viewHolder
 

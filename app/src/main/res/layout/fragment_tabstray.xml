@@ -22,7 +22,7 @@
         android:layout_width="140dp"
         android:layout_height="40dp"
         android:layout_marginBottom="48dp"
-        android:background="@drawable/blue_gradient"
+        android:background="@drawable/button_background"
         android:drawableStart="@drawable/mozac_ic_tab_new"
         android:gravity="center|center_horizontal"
         android:paddingStart="16dp"

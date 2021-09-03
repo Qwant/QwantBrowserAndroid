@@ -53,7 +53,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:src="@drawable/ic_nav_menu" />
+            android:src="@drawable/icons_system_more_2_fill" />
 
     </LinearLayout>
 

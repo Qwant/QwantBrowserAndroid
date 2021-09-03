@@ -20,15 +20,6 @@
         card_view:cardCornerRadius="12dp"
         card_view:cardElevation="3dp">
 
-        <!-- <ImageView
-            android:id="@+id/tablist_item_icon"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_gravity="center"
-            android:scaleType="fitCenter"
-            android:src="@drawable/default_favicon"
-            android:visibility="gone" /> -->
-
         <mozilla.components.browser.tabstray.thumbnail.TabThumbnailView
             android:id="@+id/tablist_item_preview"
             android:layout_width="match_parent"
@@ -52,7 +43,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
-            android:textColor="@color/qwant_black"
+            android:textColor="@color/qwant_text"
             android:layout_marginBottom="4dp"
             android:maxLines="2"
             android:textSize="18sp" />
@@ -62,7 +53,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
-            android:textColor="@color/qwant_url_green"
+            android:textColor="@color/qwant_tabs_url"
             android:maxLines="1"
             android:textSize="12sp" />
 
@@ -77,6 +68,6 @@
         android:paddingHorizontal="7dp"
         android:background="@android:color/transparent"
         android:src="@drawable/close_cross"
-        android:tint="@color/qwant_black" />
+        android:tint="@color/qwant_text" />
 
 </LinearLayout>
