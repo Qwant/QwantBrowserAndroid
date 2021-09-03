@@ -103,24 +103,24 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         bookmarksStorage?.restore()
 
         qwantBarFeature.set(
-                feature = QwantBarFeature(components.core.store, qwantbar),
-                owner = this,
-                view = qwantbar
+            feature = QwantBarFeature(components.core.store, qwantbar),
+            owner = this,
+            view = qwantbar
         )
 
-        qwantbar.setBookmarkStorage(bookmarksStorage!!)
-        qwantbar.onTabsClicked(::showTabs)
-        qwantbar.onBookmarksClicked(::showBookmarks)
-        qwantbar.onHomeClicked(::showHome)
-        qwantbar.onMenuClicked(::showSettings)
-        qwantbar.onBackClicked(::onBackPressed)
-        qwantbar.onHistoryClicked(::showHistory)
-        qwantbar.onQuitAppClicked(::quitApp)
+        qwantbar.bookmarksStorage = bookmarksStorage
+        qwantbar.onTabsClicked = ::showTabs
+        qwantbar.onBookmarksClicked = ::showBookmarks
+        qwantbar.onHomeClicked = ::showHome
+        qwantbar.onSettingsClicked = ::showSettings
+        qwantbar.onBackClicked = ::onBackPressed
+        qwantbar.onHistoryClicked = ::showHistory
+        qwantbar.onQuitAppClicked = ::quitApp
 
         if (savedInstanceState == null) {
             when (intent.action) {
                 "CHANGED_LANGUAGE" -> {
-                    qwantbar.setHighlight(QwantBar.QwantBarSelection.MORE)
+                    qwantbar.setHighlight(QwantBar.QwantBarSelection.SETTINGS)
                     supportFragmentManager.beginTransaction().apply {
                         replace(R.id.container, SettingsContainerFragment.create(language_changed_reload = true, theme_changed_reload = false), "SETTINGS_FRAGMENT")
                         commit()
@@ -128,7 +128,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
                     intent.action = null
                 }
                 "CHANGED_THEME" -> {
-                    qwantbar.setHighlight(QwantBar.QwantBarSelection.MORE)
+                    qwantbar.setHighlight(QwantBar.QwantBarSelection.SETTINGS)
                     supportFragmentManager.beginTransaction().apply {
                         replace(R.id.container, SettingsContainerFragment.create(language_changed_reload = false, theme_changed_reload = true), "SETTINGS_FRAGMENT")
                         commit()
@@ -553,6 +553,8 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         var settingsFragment = this.supportFragmentManager.findFragmentByTag("SETTINGS_FRAGMENT")
         if (settingsFragment == null) {
             settingsFragment = SettingsContainerFragment.create()
+        } else {
+            settingsFragment.arguments?.clear()
         }
         this.supportFragmentManager.beginTransaction().apply {
             this.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
@@ -561,7 +563,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         }
         this.supportFragmentManager.executePendingTransactions()
         qwantbar.setupHomeBar()
-        qwantbar.setHighlight(QwantBar.QwantBarSelection.MORE)
+        qwantbar.setHighlight(QwantBar.QwantBarSelection.SETTINGS)
     }
 
     private fun showHome() {
@@ -595,7 +597,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
             qwantbar.setHighlight(QwantBar.QwantBarSelection.NONE)
             qwantbar.setupNavigationBar()
         }
-        qwantbar.updateHomeIcon(qwantbar.getCurrentMode())
+        // qwantbar.updateHomeIcon(qwantbar.getCurrentMode())
     }
 
     override fun settingsClosed() {

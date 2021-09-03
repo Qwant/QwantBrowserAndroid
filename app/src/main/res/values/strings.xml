@@ -83,7 +83,8 @@
     <string name="menu_search">Search</string>
     <string name="menu_bookmarks">Bookmarks</string>
     <string name="menu_tabs">Tabs</string>
-    <string name="menu_more">@string/settings</string>
+    <!-- <string name="menu_more">@string/settings</string> -->
+    <string name="menu_settings" translatable="false">@string/settings</string>
     <string name="menu_back">Back</string>
 
     <string name="bookmarks_empty_1">The bookmarks list is empty.</string>

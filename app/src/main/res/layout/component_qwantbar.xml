@@ -1,158 +1,149 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/qwantbar_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/qwant_color_background"
-    android:baselineAligned="false">
+    android:baselineAligned="false"
+    android:orientation="horizontal">
 
     <LinearLayout
-        android:id="@+id/qwantbar_layout_nav_back"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:visibility="gone">
+        android:id="@+id/qwantbar_layout_navbar"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:orientation="horizontal"
+        android:baselineAligned="false"
+        android:visibility="gone" >
 
         <ImageView
             android:id="@+id/qwantbar_button_nav_back"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="?attr/qwant_color_main"
-            android:contentDescription="@string/menu_search"
-            android:src="@drawable/ic_nav_back" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/qwantbar_layout_nav_forward"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:visibility="gone">
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:scaleType="center"
+            android:src="@drawable/icons_system_arrow_left_s_line"
+            app:tint="?attr/qwantbar_normalColor"/>
 
         <ImageView
             android:id="@+id/qwantbar_button_nav_forward"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="?attr/qwant_color_main"
-            android:contentDescription="@string/menu_search"
-            android:src="@drawable/ic_nav_forward" />
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:scaleType="center"
+            android:src="@drawable/icons_system_arrow_right_s_line"
+            app:tint="?attr/qwantbar_normalColor"/>
+
+        <ImageView
+            android:id="@+id/qwantbar_button_nav_home"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:scaleType="center"
+            android:src="@drawable/brands_logos_qwant_letter_colored" />
+
+        <mozilla.components.ui.tabcounter.TabCounter
+            android:id="@+id/qwantbar_button_nav_tabs"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_gravity="center" />
+
+        <mozilla.components.browser.menu.view.MenuButton
+            android:id="@+id/qwantbar_button_nav_menu"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:src="@drawable/ic_nav_menu" />
+
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/qwantbar_layout_home"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:orientation="vertical">
-
-        <ImageView
-            android:id="@+id/qwantbar_button_home"
-            android:layout_width="match_parent"
-            android:layout_height="22dp"
-            android:background="@android:color/transparent"
-            android:contentDescription="@string/menu_search"
-            android:src="@drawable/ic_search" />
+        android:id="@+id/qwantbar_layout_menubar"
+        android:layout_width="match_parent"
+        android:layout_height="58dp"
+        android:orientation="horizontal">
 
         <TextView
             android:id="@+id/qwantbar_text_home"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:gravity="center"
+            android:layout_gravity="center_vertical"
             android:text="@string/menu_search"
-            android:textColor="@color/menu_items" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/qwantbar_layout_bookmarks"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:orientation="vertical">
-
-        <ImageView
-            android:id="@+id/qwantbar_button_bookmarks"
-            android:layout_width="match_parent"
-            android:layout_height="22dp"
-            android:background="@android:color/transparent"
-            android:contentDescription="@string/menu_bookmarks"
-            android:src="@drawable/ic_bookmark" />
+            android:textColor="?attr/qwantbar_normalColor"
+            app:drawableTopCompat="@drawable/icons_system_search_line"
+            app:drawableTint="?attr/qwantbar_normalColor" />
 
         <TextView
             android:id="@+id/qwantbar_text_bookmarks"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:gravity="center"
+            android:layout_gravity="center_vertical"
             android:text="@string/menu_bookmarks"
-            android:textColor="@color/menu_items" />
-    </LinearLayout>
+            android:textColor="?attr/qwantbar_normalColor"
+            app:drawableTopCompat="@drawable/icons_business_bookmark_line"
+            app:drawableTint="?attr/qwantbar_normalColor" />
 
-    <LinearLayout
-        android:id="@+id/qwantbar_layout_tabs"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:orientation="vertical">
+        <LinearLayout
+            android:id="@+id/qwantbar_layout_tabs"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
 
-        <mozilla.components.ui.tabcounter.TabCounter
-            android:id="@+id/qwantbar_button_tabs"
-            android:layout_width="match_parent"
-            android:layout_height="22dp" />
+            <mozilla.components.ui.tabcounter.TabCounter
+                android:id="@+id/qwantbar_button_tabs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/qwantbar_text_tabs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/menu_tabs"
+                android:textColor="@color/menu_items" />
+        </LinearLayout>
+
+        <!-- <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <mozilla.components.ui.tabcounter.TabCounter
+                android:id="@+id/qwantbar_button_tabs2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                app:layout_constraintTop_toTopOf="parent"/>
+
+            <TextView
+                android:id="@+id/qwantbar_text_tabs2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/menu_settings"
+                android:textColor="?attr/qwantbar_normalColor"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/qwantbar_button_tabs2" />
+        </androidx.constraintlayout.widget.ConstraintLayout> -->
 
         <TextView
-            android:id="@+id/qwantbar_text_tabs"
-            android:layout_width="match_parent"
+            android:id="@+id/qwantbar_text_settings"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:gravity="center"
-            android:text="@string/menu_tabs"
-            android:textColor="@color/menu_items" />
+            android:layout_gravity="center_vertical"
+            android:text="@string/menu_settings"
+            android:textColor="?attr/qwantbar_normalColor"
+            app:drawableTopCompat="@drawable/icons_system_settings_line"
+            app:drawableTint="?attr/qwantbar_normalColor" />
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/qwantbar_layout_menu_qwant"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:orientation="vertical">
-
-        <ImageView
-            android:id="@+id/qwantbar_button_menu_qwant"
-            android:layout_width="match_parent"
-            android:layout_height="22dp"
-            android:background="@android:color/transparent"
-            android:contentDescription="@string/menu_bookmarks"
-            android:scaleType="center"
-            android:src="@drawable/ic_menu_selected" />
-
-        <TextView
-            android:id="@+id/qwantbar_text_menu_qwant"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="@string/menu_more"
-            android:textColor="@color/menu_items" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/qwantbar_layout_menu_nav"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:visibility="gone">
-
-        <mozilla.components.browser.menu.view.MenuButton
-            android:id="@+id/qwantbar_button_menu_nav"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_nav_menu" />
-    </LinearLayout>
 </LinearLayout>

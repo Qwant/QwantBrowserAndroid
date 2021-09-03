@@ -20,7 +20,7 @@ class QwantBarFeature(
     private var tabCountChangedScope: CoroutineScope? = null
     private var privacyChangedScope: CoroutineScope? = null
     private var canForwardChangedScope: CoroutineScope? = null
-    // private var canBackwardChangedScope: CoroutineScope? = null
+    private var canBackwardChangedScope: CoroutineScope? = null
     // private var fullscreenChangedScope: CoroutineScope? = null
 
     override fun start() {
@@ -39,12 +39,12 @@ class QwantBarFeature(
             }
         }
         privacyChangedScope = store.flowScoped { flow -> flow
-                .mapNotNull { state -> state.selectedTab?.content?.private }
-                .ifChanged()
-                .collect {
-                    Log.d("QWANT_BROWSER", "flow scope observer: privacy changed")
-                    qwantBar.setPrivacyMode(it)
-                }
+            .mapNotNull { state -> state.selectedTab?.content?.private }
+            .ifChanged()
+            .collect {
+                Log.d("QWANT_BROWSER", "flow scope observer: privacy changed")
+                qwantBar.setPrivacyMode(it)
+            }
         }
         canForwardChangedScope = store.flowScoped { flow -> flow
             .mapNotNull { state -> state.selectedTab?.content?.canGoForward }
@@ -54,14 +54,14 @@ class QwantBarFeature(
                 qwantBar.changeForwardButton(it)
             }
         }
-        /* canBackwardChangedScope = store.flowScoped { flow -> flow
+        canBackwardChangedScope = store.flowScoped { flow -> flow
             .mapNotNull { state -> state.selectedTab?.content?.canGoBack }
             .ifChanged()
             .collect {
                 Log.d("QWANT_BROWSER", "flow scope observer: can backward changed")
                 qwantBar.changeBackwardButton(it)
             }
-        } */
+        }
     }
 
     override fun stop() {

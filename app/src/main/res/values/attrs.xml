@@ -57,4 +57,10 @@
     <attr name="qwant_toolbar_SuggestionForegroundColor" format="reference|color" />
 
     <attr name="qwant_toolbar_BottomSeparatorColor" format="reference|color" />
+
+    <!-- Qwantbar -->
+    <attr name="qwantbar_backgroundColor" format="reference|color" />
+    <attr name="qwantbar_normalColor" format="reference|color" />
+    <attr name="qwantbar_selectedColor" format="reference|color" />
+    <attr name="qwantbar_disabledColor" format="reference|color" />
 </resources>

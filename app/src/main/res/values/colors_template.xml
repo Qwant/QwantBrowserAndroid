@@ -7,4 +7,9 @@
     <color name="qwant_toolbar_icon">@color/qwant_black</color>
     <color name="qwant_toolbar_separator">@color/qwant_grey_semi_light</color>
     <color name="qwant_toolbar_bottomSeparator">@color/qwant_white</color>
+
+    <color name="qwantbar_background">@color/true_white</color>
+    <color name="qwantbar_normal">@color/qwant_grey_medium</color>
+    <color name="qwantbar_selected">@color/qwant_blue</color>
+    <color name="qwantbar_disabled">@color/qwant_grey_semi_light</color>
 </resources>

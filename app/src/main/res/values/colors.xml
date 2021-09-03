@@ -47,12 +47,15 @@
     <color name="qwant_dark">#19191b</color>
     <color name="qwant_white">#f5f5f7</color>
     <color name="qwant_grey_base">#898991</color>
+    <color name="qwant_grey_medium">#59595f</color>
     <color name="qwant_grey_dark">#46464c</color>
     <color name="qwant_grey_darker">#29292f</color>
+    <color name="qwant_grey_light">#d9d9e0</color>
     <color name="qwant_grey_lighter">#e8e8ed</color>
     <color name="qwant_grey_semi_light">#c4c4cc</color>
 
     <color name="qwant_blue">#1a6aff</color>
+    <color name="qwant_blue_light">#80acff</color>
 
     <!-- Privacy colors -->
     <color name="qwant_purple_base">#ba41da</color>
