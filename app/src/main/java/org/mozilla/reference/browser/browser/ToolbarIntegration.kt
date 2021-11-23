@@ -9,29 +9,36 @@ import android.graphics.drawable.Drawable
 import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.mapNotNull
 import mozilla.components.browser.domains.autocomplete.ShippedDomainsProvider
-import mozilla.components.browser.session.SessionManager
+// import mozilla.components.browser.session.SessionManager
+import mozilla.components.browser.state.selector.selectedTab
+import mozilla.components.browser.state.store.BrowserStore
 import mozilla.components.browser.toolbar.BrowserToolbar
-// import org.mozilla.reference.browser.compat.toolbar.BrowserToolbar
 import mozilla.components.browser.toolbar.display.DisplayToolbar
-// import org.mozilla.reference.browser.compat.toolbar.DisplayToolbar
 import mozilla.components.concept.storage.HistoryStorage
 import mozilla.components.concept.toolbar.Toolbar
 import mozilla.components.feature.session.SessionUseCases
 import mozilla.components.feature.toolbar.ToolbarAutocompleteFeature
-import mozilla.components.feature.toolbar.ToolbarFeature
+// import mozilla.components.feature.toolbar.ToolbarFeature
+import org.mozilla.reference.browser.compat.ToolbarFeature
+import mozilla.components.lib.state.ext.flowScoped
 import mozilla.components.support.base.android.Padding
 import mozilla.components.support.base.feature.LifecycleAwareFeature
 import mozilla.components.support.base.feature.UserInteractionHandler
 import mozilla.components.support.ktx.android.content.getColorFromAttr
+import mozilla.components.support.ktx.kotlinx.coroutines.flow.ifChanged
 import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.ext.components
+import java.net.URLDecoder
 
 class ToolbarIntegration(
-    context: Context,
-    toolbar: BrowserToolbar,
+    val context: Context,
+    val toolbar: BrowserToolbar,
     historyStorage: HistoryStorage,
-    sessionManager: SessionManager,
     sessionUseCases: SessionUseCases,
     sessionId: String? = null
 ) : LifecycleAwareFeature, UserInteractionHandler {
@@ -39,29 +46,41 @@ class ToolbarIntegration(
         it.initialize(context)
     }
 
-    class PrivateBrowsingBrowserAction(context: Context, val sessionManager: SessionManager)
+    class PrivateBrowsingBrowserAction(context: Context, val store: BrowserStore)
         : Toolbar.ActionImage(
             ContextCompat.getDrawable(context, R.drawable.icons_custom_privacy_fill)!!,
             padding = Padding(-5, 5, 0, 5)
     ) {
         override val visible: () -> Boolean
-            get() = { if (sessionManager.selectedSession != null) sessionManager.selectedSession!!.private else false }
+            get() = { store.state.selectedTab?.content?.private ?: false }
     }
-    private val privateBrowsingBrowserAction = PrivateBrowsingBrowserAction(context, sessionManager)
+    private val privateBrowsingBrowserAction = PrivateBrowsingBrowserAction(context, context.components.core.store)
 
     class ReloadPageAction(val sessionUseCases: SessionUseCases, drawable: Drawable)
         : Toolbar.ActionButton(
             drawable,
             "Refresh",
             padding = Padding(10, 10, 10, 10),
-            visible = { true },
             listener = { sessionUseCases.reload() }
     )
-    private val drawable = ContextCompat.getDrawable(context, R.drawable.icons_system_refresh_line)!!
+    class CancelLoadPageAction(val sessionUseCases: SessionUseCases, drawable: Drawable)
+        : Toolbar.ActionButton(
+            drawable,
+            "Cancel",
+            padding = Padding(10, 10, 10, 10),
+            listener = { sessionUseCases.stopLoading() }
+    )
+
+    private val drawableReload = ContextCompat.getDrawable(context, R.drawable.icons_system_refresh_line)!!
+    private val reloadAction = ReloadPageAction(sessionUseCases, drawableReload)
+    private val drawableCancelLoad = ContextCompat.getDrawable(context, R.drawable.close_cross)!!
+    private val cancelLoadAction = CancelLoadPageAction(sessionUseCases, drawableCancelLoad)
+    private var loadingStateChangedScope: CoroutineScope? = null
 
     init {
-        drawable.setTint(context.getColorFromAttr(R.attr.qwant_toolbar_IconsColor))
-        toolbar.addPageAction(ReloadPageAction(sessionUseCases, drawable))
+        drawableReload.setTint(context.getColorFromAttr(R.attr.qwant_toolbar_IconsColor))
+        drawableCancelLoad.setTint(context.getColorFromAttr(R.attr.qwant_toolbar_IconsColor))
+
         toolbar.addBrowserAction(privateBrowsingBrowserAction)
 
         ToolbarAutocompleteFeature(toolbar).apply {
@@ -93,13 +112,27 @@ class ToolbarIntegration(
         )
         toolbar.display.setUrlBackground(ResourcesCompat.getDrawable(context.resources, R.drawable.url_background, context.theme))
 
+
+        toolbar.edit.setOnEditFocusChangeListener { hasFocus ->
+            val url = context.components.core.store.state.selectedTab?.content?.url
+            if (hasFocus && url?.startsWith(context.getString(R.string.homepage_startwith_filter)) == true) {
+                if (url.contains("?q=") || url.contains("&q=")) {
+                    val query = url.split("?q=", "&q=")[1].split("&")[0]
+                    toolbar.edit.updateUrl(URLDecoder.decode(query, "UTF-8"))
+                } else {
+                    toolbar.edit.updateUrl("")
+                }
+            }
+        }
+
         toolbar.edit.hint = context.getString(R.string.toolbar_hint)
-        /* toolbar.edit.colors = toolbar.edit.colors.copy( // TODO colors
+        toolbar.edit.colors = toolbar.edit.colors.copy(
+            /* TODO clear = context.getColorFromAttr(R.attr.qwant_toolbar_TextColor),
             hint = context.getColorFromAttr(R.attr.qwant_color_light),
             text = context.getColorFromAttr(R.attr.qwant_toolbar_TextColor),
             suggestionBackground = context.getColorFromAttr(R.attr.qwant_color_selected),
-            suggestionForeground = context.getColorFromAttr(R.attr.qwant_color_selected_text)
-        ) */
+            suggestionForeground = context.getColorFromAttr(R.attr.qwant_color_selected_text) */
+        )
     }
 
     private val toolbarFeature: ToolbarFeature = ToolbarFeature(
@@ -115,12 +148,49 @@ class ToolbarIntegration(
         sessionId
     )
 
+    private var pageActionReloadState = false
+    private var pageActionCancelState = false
     override fun start() {
         toolbarFeature.start()
+        loadingStateChangedScope = context.components.core.store.flowScoped { flow -> flow
+            .mapNotNull { state -> state.selectedTab?.content?.loading }
+            .ifChanged()
+            .collect {
+                if (it) {
+                    toolbar.display.indicators = listOf(
+                            DisplayToolbar.Indicators.TRACKING_PROTECTION
+                    )
+                    toolbar.display.displayIndicatorSeparator = false
+                    if (pageActionReloadState) {
+                        toolbar.removePageAction(reloadAction)
+                        pageActionReloadState = false
+                    }
+                    if (!pageActionCancelState) {
+                        toolbar.addPageAction(cancelLoadAction)
+                        pageActionCancelState = true
+                    }
+                } else {
+                    toolbar.display.indicators = listOf(
+                            DisplayToolbar.Indicators.SECURITY,
+                            DisplayToolbar.Indicators.TRACKING_PROTECTION
+                    )
+                    toolbar.display.displayIndicatorSeparator = true
+                    if (!pageActionReloadState) {
+                        toolbar.addPageAction(reloadAction)
+                        pageActionReloadState = true
+                    }
+                    if (pageActionCancelState) {
+                        toolbar.removePageAction(cancelLoadAction)
+                        pageActionCancelState = false
+                    }
+                }
+            }
+        }
     }
 
     override fun stop() {
         toolbarFeature.stop()
+        loadingStateChangedScope?.cancel()
     }
 
     override fun onBackPressed(): Boolean {

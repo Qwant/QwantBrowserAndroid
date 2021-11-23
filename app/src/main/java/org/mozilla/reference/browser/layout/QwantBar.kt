@@ -5,33 +5,30 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
 import android.util.AttributeSet
+import android.util.Log
 import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.core.content.ContextCompat
+import androidx.preference.PreferenceManager
 import kotlinx.android.synthetic.main.component_qwantbar.view.*
 import kotlinx.coroutines.*
 import mozilla.components.browser.menu.BrowserMenuBuilder
 import mozilla.components.browser.menu.BrowserMenuItem
-import mozilla.components.browser.menu.item.BrowserMenuItemToolbar
-import mozilla.components.browser.menu.item.BrowserMenuDivider
-import mozilla.components.browser.menu.item.BrowserMenuImageText
-import mozilla.components.browser.session.Session
-import mozilla.components.browser.session.SessionManager
+import mozilla.components.browser.menu.item.*
 import mozilla.components.browser.state.selector.getNormalOrPrivateTabs
+import mozilla.components.browser.state.selector.selectedTab
+import mozilla.components.browser.state.state.TabSessionState
 import mozilla.components.feature.pwa.WebAppUseCases
 import mozilla.components.feature.session.SessionUseCases
 import mozilla.components.support.ktx.android.content.getColorFromAttr
-import mozilla.components.support.ktx.android.content.res.resolveAttribute
 import mozilla.components.support.ktx.android.util.dpToPx
 import mozilla.components.support.utils.DrawableUtils
 import mozilla.components.ui.tabcounter.TabCounter
 import org.mozilla.gecko.util.ThreadUtils
 import org.mozilla.reference.browser.R
-import org.mozilla.reference.browser.addons.AddonsActivity
 import org.mozilla.reference.browser.browser.FindInPageIntegration
 import org.mozilla.reference.browser.ext.application
 import org.mozilla.reference.browser.ext.components
@@ -52,7 +49,6 @@ class QwantBar @JvmOverloads constructor(
         SEARCH, BOOKMARKS, SETTINGS
     }
 
-    private val sessionManager: SessionManager = context.applicationContext.application.components.core.sessionManager
     private val sessionUseCases: SessionUseCases = context.applicationContext.application.components.useCases.sessionUseCases
     private val webAppUseCases: WebAppUseCases = context.applicationContext.application.components.useCases.webAppUseCases
 
@@ -78,62 +74,48 @@ class QwantBar @JvmOverloads constructor(
 
     private val menuItemColor = R.color.qwant_text
     private val menuItems: List<BrowserMenuItem> by lazy {
+        val store = context.components.core.store
+        val prefs = PreferenceManager.getDefaultSharedPreferences(context)
         listOf(
-            BrowserMenuItemToolbar(listOf(
-                BrowserMenuItemToolbar.Button(
-                    mozilla.components.ui.icons.R.drawable.mozac_ic_refresh,
-                    iconTintColorResource = menuItemColor,
-                    contentDescription = context.getString(R.string.context_menu_refresh)
-                ) { sessionUseCases.reload.invoke() },
-                BrowserMenuItemToolbar.Button(
-                    mozilla.components.ui.icons.R.drawable.mozac_ic_stop,
-                    iconTintColorResource = menuItemColor,
-                    contentDescription = context.getString(R.string.context_menu_stop)
-                ) { sessionUseCases.stopLoading.invoke() }
-            )),
-            BrowserMenuDivider(),
-            BrowserMenuImageText(
-                context.getString(R.string.context_menu_downloads),
-                textColorResource = menuItemColor,
-                iconTintColorResource = menuItemColor,
-                imageResource = R.drawable.ic_downloads
-            ) { context.startActivity(Intent(DownloadManager.ACTION_VIEW_DOWNLOADS)) },
             BrowserMenuImageText(
                 context.getString(R.string.context_menu_add_bookmark),
                 textColorResource = menuItemColor,
                 iconTintColorResource = menuItemColor,
                 imageResource = R.drawable.ic_add_bookmark
-            ) { bookmarksStorage?.addBookmark(sessionManager.selectedSession) }
+            ) { bookmarksStorage?.addBookmark(store.state.selectedTab) }
             .apply {
                 visible = {
-                    if (bookmarksStorage != null && sessionManager.selectedSession != null)
-                        !bookmarksStorage!!.contains(sessionManager.selectedSession!!.url)
+                    if (bookmarksStorage != null && store.state.selectedTab != null)
+                        !bookmarksStorage!!.contains(store.state.selectedTab!!.content.url)
                     else false
                 }
             },
+
             BrowserMenuImageText(
                 context.getString(R.string.context_menu_del_bookmark),
                 textColorResource = menuItemColor,
                 iconTintColorResource = menuItemColor,
                 imageResource = R.drawable.ic_del_bookmark
-            ) { bookmarksStorage?.deleteBookmark(sessionManager.selectedSession) }
+            ) { bookmarksStorage?.deleteBookmark(store.state.selectedTab) }
             .apply {
                 visible = {
-                    if (bookmarksStorage != null && sessionManager.selectedSession != null)
-                        bookmarksStorage!!.contains(sessionManager.selectedSession!!.url)
+                    if (bookmarksStorage != null && store.state.selectedTab != null)
+                        bookmarksStorage!!.contains(store.state.selectedTab!!.content.url)
                     else false
                 }
             },
+
             BrowserMenuImageText(
                 context.getString(R.string.context_menu_share),
                 textColorResource = menuItemColor,
                 iconTintColorResource = menuItemColor,
                 imageResource = R.drawable.ic_share
             ) {
-                val url = sessionManager.selectedSession?.url ?: ""
+                val url = store.state.selectedTab?.content?.url ?: ""
                 context.share(url)
             }
-            .apply { visible = { sessionManager.selectedSession != null }},
+            .apply { visible = { store.state.selectedTab != null }},
+
             BrowserMenuImageText(
                 context.getString(R.string.context_menu_add_homescreen),
                 textColorResource = menuItemColor,
@@ -141,58 +123,59 @@ class QwantBar @JvmOverloads constructor(
                 imageResource = R.drawable.ic_add_homescreen
             ) { MainScope().launch { webAppUseCases.addToHomescreen() }}
             .apply { visible = { webAppUseCases.isPinningSupported() }},
+
+            BrowserMenuImageSwitch(
+                label = context.getString(R.string.context_menu_request_desktop),
+                imageResource = R.drawable.icons_device_computer_line,
+                initialState = { store.state.selectedTab?.content?.desktopMode == true }
+            ) { checked -> sessionUseCases.requestDesktopSite.invoke(checked) }
+            .apply { visible = { store.state.selectedTab != null }},
+
             BrowserMenuImageText(
                 context.getString(R.string.context_menu_find),
                 textColorResource = menuItemColor,
                 iconTintColorResource = menuItemColor,
                 imageResource = R.drawable.ic_search
             ) { FindInPageIntegration.launch?.invoke() }
-            .apply { visible = { sessionManager.selectedSession != null }},
+            .apply { visible = { store.state.selectedTab != null }},
+
             BrowserMenuDivider(),
+
             BrowserMenuImageText(
-                context.getString(R.string.context_menu_addons),
+                context.getString(R.string.context_menu_downloads),
                 textColorResource = menuItemColor,
                 iconTintColorResource = menuItemColor,
-                imageResource = R.drawable.ic_addons
-            ) {
-                val intent = Intent(context, AddonsActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                context.startActivity(intent)
-            },
+                imageResource = R.drawable.ic_downloads
+            ) { context.startActivity(Intent(DownloadManager.ACTION_VIEW_DOWNLOADS)) },
+
             BrowserMenuImageText(
                 context.getString(R.string.bookmarks),
                 textColorResource = menuItemColor,
                 iconTintColorResource = menuItemColor,
                 imageResource = R.drawable.ic_bookmark
             ) { onBookmarksClicked?.invoke() },
+
             BrowserMenuImageText(
                 context.getString(R.string.history),
                 textColorResource = menuItemColor,
                 iconTintColorResource = menuItemColor,
                 imageResource = R.drawable.ic_history
             ) { onHistoryClicked?.invoke() },
+
             BrowserMenuImageText(
                 context.getString(R.string.settings),
                 textColorResource = menuItemColor,
                 iconTintColorResource = menuItemColor,
-                imageResource = R.drawable.ic_menu
+                imageResource = R.drawable.icons_system_settings_line
             ) { onSettingsClicked?.invoke() },
-            BrowserMenuImageText(
-                context.getString(R.string.context_menu_close_tab),
-                textColorResource = menuItemColor,
-                iconTintColorResource = menuItemColor,
-                imageResource = R.drawable.ic_close_tab
-            ) {
-                if (sessionManager.selectedSession != null) {
-                    context.components.useCases.tabsUseCases.removeTab.invoke(sessionManager.selectedSession!!.id)
-                }
-            },
+
             BrowserMenuImageText(
                 context.getString(R.string.context_menu_quit_app),
                 textColorResource = menuItemColor,
                 iconTintColorResource = menuItemColor,
                 imageResource = R.drawable.ic_quit_app
             ) { onQuitAppClicked?.invoke() }
+            .apply { visible = { prefs.getBoolean(context.getString(R.string.pref_key_privacy_cleardata_on_close), false) }}
         )
     }
 
@@ -203,22 +186,24 @@ class QwantBar @JvmOverloads constructor(
 
         val colorDefault = context.getColorFromAttr(R.attr.qwantbar_normalColor)
 
+        val isPrivateTab = context.components.core.store.state.selectedTab?.content?.private ?: false
+        val tabsCount = context.components.core.store.state.getNormalOrPrivateTabs(isPrivateTab).size
+
         // Tabs buttons
         // TODO change tabs buttons
         reference = WeakReference(qwantbar_button_tabs)
         tabButtonBox = qwantbar_button_tabs.findViewById(R.id.counter_box)
         tabButtonText = qwantbar_button_tabs.findViewById(R.id.counter_text)
-        tabButtonBox?.setImageDrawable(DrawableUtils.loadAndTintDrawable(context, R.drawable.mozac_ui_tabcounter_box, colorDefault))
+        tabButtonBox?.setImageDrawable(DrawableUtils.loadAndTintDrawable(context, R.drawable.qwant_tabcounter_box, colorDefault))
         tabButtonText?.setTextColor(colorDefault)
-        qwantbar_button_tabs.setCount(sessionManager.sessions.size)
+        qwantbar_button_tabs.setCount(tabsCount)
 
         referenceNav = WeakReference(qwantbar_button_nav_tabs)
         navTabButtonBox = qwantbar_button_nav_tabs.findViewById(R.id.counter_box)
         navTabButtonText = qwantbar_button_nav_tabs.findViewById(R.id.counter_text)
-        navTabButtonBox?.setImageDrawable(DrawableUtils.loadAndTintDrawable(context, R.drawable.mozac_ui_tabcounter_box, colorDefault))
+        navTabButtonBox?.setImageDrawable(DrawableUtils.loadAndTintDrawable(context, R.drawable.qwant_tabcounter_box, colorDefault))
         navTabButtonText?.setTextColor(colorDefault)
-        qwantbar_button_tabs.setCount(sessionManager.sessions.size)
-
+        qwantbar_button_tabs.setCount(tabsCount)
 
         // Menu bar
         qwantbar_text_home.setOnClickListener { onHomeClicked?.invoke() }
@@ -233,18 +218,14 @@ class QwantBar @JvmOverloads constructor(
         qwantbar_button_nav_back.setOnClickListener { onBackClicked?.invoke() } // sessionUseCases.goBack.invoke() }
         qwantbar_button_nav_forward.setOnClickListener { sessionUseCases.goForward.invoke() }
         qwantbar_button_nav_home.setOnClickListener { onHomeClicked?.invoke() }
-        qwantbar_button_nav_tabs.setOnClickListener {
+        qwantbar_layout_nav_tabs.setOnClickListener {
             it.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
             onTabsClicked?.invoke()
         }
         qwantbar_button_nav_menu.menuBuilder = menuBuilder
         qwantbar_button_nav_menu.setColorFilter(colorDefault)
 
-        // TODO duplicates ?
-        val session = sessionManager.selectedSession
-        if (session == null || session.url.startsWith(context.getString(R.string.homepage_startwith_filter))) {
-            this.setHighlight(QwantBarSelection.SEARCH)
-        }
+        this.setHighlight(QwantBarSelection.SEARCH)
         this.checkSession()
     }
 
@@ -276,18 +257,21 @@ class QwantBar @JvmOverloads constructor(
 
         // TODO Change tabs buttons
         val tabColor = if (selection == QwantBarSelection.TABS) colorSelected else colorDefault
-        tabButtonBox?.setImageDrawable(DrawableUtils.loadAndTintDrawable(context, R.drawable.mozac_ui_tabcounter_box, tabColor))
+        tabButtonBox?.setImageDrawable(DrawableUtils.loadAndTintDrawable(context, R.drawable.qwant_tabcounter_box, tabColor))
         tabButtonText?.setTextColor(tabColor)
         qwantbar_text_tabs.setTextColor(if (selection == QwantBarSelection.TABS) colorSelected else colorDefault)
-        navTabButtonBox?.setImageDrawable(DrawableUtils.loadAndTintDrawable(context, R.drawable.mozac_ui_tabcounter_box, tabColor))
+        navTabButtonBox?.setImageDrawable(DrawableUtils.loadAndTintDrawable(context, R.drawable.qwant_tabcounter_box, tabColor))
         navTabButtonText?.setTextColor(tabColor)
 
         qwantbar_button_nav_menu.setColorFilter(colorDefault)
     }
 
     fun setPrivacyMode(enabled: Boolean) {
+        Log.d("QWANT_BROWSER", "Set QwantBar privacy: $enabled")
         if (enabled != currentPrivacyEnabled) {
             currentPrivacyEnabled = enabled
+            qwantbar_button_tabs_privacy.visibility = if (enabled) VISIBLE else GONE
+            qwantbar_button_nav_tabs_privacy.visibility = if (enabled) VISIBLE else GONE
             this.setHighlight(currentSelection)
         }
     }
@@ -306,6 +290,12 @@ class QwantBar @JvmOverloads constructor(
                 if (currentSelection == QwantBarSelection.SETTINGS) R.drawable.icons_system_settings_fill
                 else R.drawable.icons_system_settings_line
             }
+        }
+    }
+
+    fun hideIfInNavigation() {
+        if (currentMode == QwantBarMode.NAVIGATION) {
+            this.visibility = View.GONE
         }
     }
 
@@ -333,8 +323,8 @@ class QwantBar @JvmOverloads constructor(
         qwantbar_layout_navbar.visibility = View.GONE
         this.setBarHeight(58)
 
-        val selected = (sessionManager.selectedSession == null || sessionManager.selectedSession!!.url.startsWith("https://www.qwant.com"))
-        if (selected) this.setHighlight(QwantBarSelection.SEARCH)
+        if (context.components.core.store.state.selectedTab?.content?.url?.startsWith("https://www.qwant.com") == true)
+            this.setHighlight(QwantBarSelection.SEARCH)
     }
 
     fun setupNavigationBar() {
@@ -370,14 +360,15 @@ class QwantBar @JvmOverloads constructor(
         }
     }
 
-    private fun checkSession(session: Session) {
-        checkSession(session.url)
-        this.setPrivacyMode(session.private)
-
-        context.setTheme(if (session.private) R.style.ThemeQwantNoActionBarPrivacy else R.style.ThemeQwantNoActionBar)
+    private fun checkSession(session: TabSessionState?) {
+        checkSession(session?.content?.url)
+        val private = session?.content?.private ?: false
+        Log.d("QWANT_BROWSER", "Set privacy from checkSession")
+        this.setPrivacyMode(private)
+        context.setTheme(if (private) R.style.ThemeQwantNoActionBarPrivacy else R.style.ThemeQwantNoActionBar)
     }
 
     private fun checkSession() {
-        if (sessionManager.selectedSession != null) this.checkSession(sessionManager.selectedSession!!)
+        this.checkSession(context.components.core.store.state.selectedTab)
     }
 }

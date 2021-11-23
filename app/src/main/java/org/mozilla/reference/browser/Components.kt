@@ -15,14 +15,13 @@ class Components(private val context: Context) {
     val useCases by lazy {
         UseCases(
             context,
-            core.sessionManager,
             core.store,
             core.engine,
             core.shortcutManager
         )
     }
     val utils by lazy {
-        Utilities(context, core.sessionManager, useCases.sessionUseCases, useCases.searchUseCases, useCases.tabsUseCases, useCases.customTabsUseCases)
+        Utilities(context, useCases.sessionUseCases, useCases.searchUseCases, useCases.tabsUseCases, useCases.customTabsUseCases)
     }
     val services by lazy { Services(context) }
 }

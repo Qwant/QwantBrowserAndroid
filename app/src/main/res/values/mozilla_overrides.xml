@@ -1,7 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <dimen name="mozac_browser_toolbar_icon_padding">0dp</dimen>
+    <!-- layouts -->
     <item name="mozac_browser_toolbar_displaytoolbar" type="layout" tools:override="true">@layout/browser_toolbar_displaytoolbar</item>
     <item name="mozac_browser_awesomebar_item_generic" type="layout" tools:override="true">@layout/browser_toolbar_autocomplete_item</item>
+    <item name="mozac_ui_tabcounter_box" type="drawable" tools:override="true">@drawable/qwant_tabcounter_box</item>
+
+
+    <dimen name="mozac_tab_counter_box_width_height">20dp</dimen>
+
+    <!-- toolbar -->
+    <dimen name="mozac_browser_toolbar_icon_padding">0dp</dimen>
+
+    <!-- menus -->
     <dimen name="mozac_browser_menu_corner_radius">12dp</dimen>
+    <dimen name="mozac_browser_menu_item_container_layout_height">40dp</dimen>
+    <dimen name="mozac_browser_menu_material_min_tap_area">40dp</dimen>
+    <dimen name="mozac_browser_menu_item_image_text_icon_height">20dp</dimen>
+    <dimen name="mozac_browser_menu_item_image_text_icon_width">20dp</dimen>
+    <dimen name="mozac_browser_menu_item_image_text_icon_padding">16dp</dimen>
+    <dimen name="mozac_browser_menu_item_image_text_label_padding_start">16dp</dimen>
+    <color name="mozac_browser_menu_background">@color/qwant_background</color>
 </resources>

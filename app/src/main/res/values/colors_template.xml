@@ -18,6 +18,8 @@
     <color name="qwant_tabs_selected">@color/qwant_blue_lighter</color>
     <color name="qwant_tabs_url">@color/qwant_green_dark</color>
 
+    <color name="qwant_menu_background">@color/true_white</color>
+
     <!-- Privacy colors -->
     <color name="qwant_tabs_selected_private">@color/qwant_purple_lighter</color>
 </resources>

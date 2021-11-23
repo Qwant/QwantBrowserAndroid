@@ -10,6 +10,7 @@ import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.ListView
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
 import mozilla.components.support.base.feature.UserInteractionHandler
@@ -85,6 +86,9 @@ class BookmarksFragment: Fragment(), UserInteractionHandler {
             editAfterCreation = newFolder
         }
 
+        toolbar?.navigationIcon?.setTint(ContextCompat.getColor(requireContext(), R.color.qwant_text))
+        toolbar?.setNavigationOnClickListener { this.onBackPressed() }
+
         return view
     }
 
@@ -118,7 +122,6 @@ class BookmarksFragment: Fragment(), UserInteractionHandler {
     private fun bookmarkEdit(bookmark: BookmarkItemV2) {
         if (this.bookmarksStorage != null) {
             parentFragmentManager.beginTransaction().apply {
-                this.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
                 replace(R.id.container, BookmarksEditFragment(bookmark, bookmarksStorage!!.root()), tag)
                 addToBackStack(tag)
                 commit()
@@ -128,11 +131,7 @@ class BookmarksFragment: Fragment(), UserInteractionHandler {
 
     private fun bookmarkSelected(item: BookmarkItemV2, private: Boolean = false) {
         if (item.type == BookmarkItemV2.BookmarkType.BOOKMARK) {
-            if (private) {
-                requireContext().components.useCases.tabsUseCases.addPrivateTab.invoke(item.url!!, selectTab = true)
-            } else {
-                requireContext().components.useCases.tabsUseCases.addTab.invoke(item.url!!, selectTab = true)
-            }
+            requireContext().components.useCases.tabsUseCases.addTab.invoke(item.url!!, selectTab = true, private = private)
             this.closeBookmarks()
         } else {
             folder = item

@@ -10,22 +10,24 @@ import android.view.ViewGroup
 import android.widget.ListView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import kotlinx.android.synthetic.main.fragment_tabstray.*
-import mozilla.components.browser.menu.BrowserMenuBuilder
-import mozilla.components.browser.menu.item.BrowserMenuImageText
-import mozilla.components.browser.session.SessionManager
-import mozilla.components.browser.state.state.TabSessionState
+import kotlinx.android.synthetic.main.fragment_qwant_tabs.*
+import mozilla.components.browser.state.selector.getNormalOrPrivateTabs
 import mozilla.components.concept.tabstray.Tab
+import mozilla.components.concept.tabstray.Tabs
 import mozilla.components.support.base.feature.UserInteractionHandler
-import mozilla.components.support.ktx.android.content.res.resolveAttribute
 import mozilla.components.support.ktx.android.util.dpToPx
 import mozilla.components.ui.tabcounter.TabCounter
 import org.mozilla.reference.browser.BrowserActivity
 import org.mozilla.reference.browser.QwantUtils
 import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.ext.components
+import org.mozilla.reference.browser.ext.requireComponents
 import org.mozilla.reference.browser.layout.QwantBar
 import java.lang.ref.WeakReference
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import mozilla.components.browser.state.selector.selectedTab
+
 
 class QwantTabsFragment : Fragment(), UserInteractionHandler {
     private var tabsClosedCallback: (() -> Unit)? = null
@@ -35,7 +37,8 @@ class QwantTabsFragment : Fragment(), UserInteractionHandler {
     private var qwantbar: QwantBar? = null
     fun setQwantBar(bar: QwantBar) { this.qwantbar = bar }
 
-    private var sessionManager: SessionManager? = null
+    private var qwantTabsFeature: QwantTabsFeature? = null
+
     private var applicationContext: Context? = null
     private var reference: WeakReference<TabCounter> = WeakReference<TabCounter>(null)
 
@@ -45,7 +48,6 @@ class QwantTabsFragment : Fragment(), UserInteractionHandler {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         if (activity != null) {
             applicationContext = requireActivity().applicationContext
-            sessionManager = requireActivity().application.components.core.sessionManager
         }
         super.onActivityCreated(savedInstanceState)
     }
@@ -64,7 +66,6 @@ class QwantTabsFragment : Fragment(), UserInteractionHandler {
             val attachTransaction = fragmentManager.beginTransaction()
 
             currentFragment?.let {
-                Log.d("QWANT_BROWSER", "fragment ok")
                 detachTransaction.detach(it)
                 attachTransaction.attach(it)
                 detachTransaction.commit()
@@ -87,33 +88,46 @@ class QwantTabsFragment : Fragment(), UserInteractionHandler {
             this.refreshFragment()
         }))
 
+        back_tabs_button.setOnClickListener { this.onBackPressed() }
+
         button_new_tab.setOnClickListener((View.OnClickListener {
-            if (applicationContext != null) {
-                if (isPrivate) {
-                    context.components.useCases.tabsUseCases.addPrivateTab.invoke(QwantUtils.getHomepage(applicationContext!!))
-                } else {
-                    context.components.useCases.tabsUseCases.addTab.invoke(QwantUtils.getHomepage(applicationContext!!))
-                }
-                this.closeTabsTray()
-            }
+            context.components.useCases.tabsUseCases.addTab.invoke(QwantUtils.getHomepage(applicationContext!!), selectTab = true, private = this.isPrivate)
+            this.closeTabsTray()
         }))
 
-        tab_menu_more.setColorFilter(ContextCompat.getColor(context, R.color.qwant_text))
-        tab_menu_more.menuBuilder = BrowserMenuBuilder(listOf(
-            BrowserMenuImageText(
-                    context.getString(R.string.menu_action_close_tabs),
-                    textColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
-                    imageResource = R.drawable.icon_cross
-            ) {
-                context.components.useCases.tabsUseCases.removeAllTabs.invoke()
-                tabsAdapter?.tabChanged()
-            }
-        ))
+        button_delete_all_tabs.setOnClickListener {
+            val title = if (isPrivate) context.getString(R.string.menu_action_close_tabs_private) else context.getString(R.string.menu_action_close_tabs)
+            val privateText = if (isPrivate) context.getString(R.string.private_only) + " " else ""
+            val builder = AlertDialog.Builder(context)
+            builder.setTitle(title)
+                .setMessage("Do you really want to close all ${privateText}tabs ?")
+                .setPositiveButton(android.R.string.yes) { _, _ ->
+                    if (isPrivate) context.components.useCases.tabsUseCases.removePrivateTabs.invoke()
+                    else context.components.useCases.tabsUseCases.removeNormalTabs.invoke()
+                    Toast.makeText(context, "All ${privateText}tabs have been closed", Toast.LENGTH_SHORT).show()
+                }
+                .setNegativeButton(android.R.string.no, null).show()
+        }
+
         this.setupPrivacyUi()
+
+        qwantTabsFeature = QwantTabsFeature(requireComponents.core.store, ::tabsChanged) {
+            tabSessionState -> tabSessionState.content.private == isPrivate
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        qwantTabsFeature?.start()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        qwantTabsFeature?.stop()
     }
 
     private fun setupPrivacyUi() {
-        tabsAdapter = TabsAdapter(requireContext(), isPrivate, ::tabSelected, ::tabDeleted)
+        tabsAdapter = TabsAdapter(requireContext(), ::tabSelected)
         tabsList?.adapter = tabsAdapter
 
         val context = requireContext()
@@ -128,8 +142,8 @@ class QwantTabsFragment : Fragment(), UserInteractionHandler {
             button_new_tab.text = getString(R.string.menu_action_add_tab_private)
         } else {
             // button_new_tab.background = ContextCompat.getDrawable(context, R.drawable.button_background)
-            // TODO change icon
-            button_new_tab.setCompoundDrawablesWithIntrinsicBounds(R.drawable.mozac_ic_tab_new, 0, 0, 0)
+            // TODO change icon ?
+            button_new_tab.setCompoundDrawablesWithIntrinsicBounds(R.drawable.icons_system_add_circle_line, 0, 0, 0)
             // tab_switch_normal_counter.background = ???
             tab_switch_normal_counter.elevation = 6.dpToPx(Resources.getSystem().displayMetrics).toFloat()
             tab_switch_private_browsing_icon.background = null
@@ -142,38 +156,35 @@ class QwantTabsFragment : Fragment(), UserInteractionHandler {
 
     private fun tabSelected(tab: Tab?) {
         if (tab != null) {
-            requireContext().components.useCases.tabsUseCases.selectTab(tab.id)
+            requireComponents.useCases.tabsUseCases.selectTab.invoke(tab.id)
             this.closeTabsTray()
         }
     }
 
-    private fun tabDeleted(tabSession: TabSessionState?) {
-        if (tabSession != null) {
-            val session = requireContext().components.core.sessionManager.findSessionById(tabSession.id)
-            if (session != null) {
-                requireContext().components.core.sessionManager.remove(session)
-                tabsAdapter?.tabChanged()
-            }
-        }
+    private fun tabsChanged(tabs: Tabs) {
+        tabsAdapter?.tabChanged(tabs)
+        this.updateTabCount()
     }
 
     override fun onBackPressed(): Boolean {
+        isPrivate = requireComponents.core.store.state.selectedTab?.content?.private ?: false
         closeTabsTray()
         return true
     }
 
     private fun closeTabsTray() {
-        isPrivate = (sessionManager != null && sessionManager!!.selectedSession != null && sessionManager!!.selectedSession!!.private)
         context?.setTheme(if (isPrivate) R.style.ThemeQwantNoActionBarPrivacy else R.style.ThemeQwantNoActionBar)
+        Log.d("QWANT_BROWSER", "Set privacy from TabsFragment:closeTabsTray")
+        // qwantbar?.visibility = View.VISIBLE
         qwantbar?.setPrivacyMode(isPrivate)
         qwantbar?.updateTabCount()
         (activity as BrowserActivity).showBrowserFragment()
         tabsClosedCallback?.invoke()
+
     }
 
     private fun updateTabCount() {
-        if (sessionManager != null)
-            reference.get()?.setCountWithAnimation(sessionManager!!.sessions.filter { it.private == isPrivate }.size)
+        reference.get()?.setCountWithAnimation(requireComponents.core.store.state.getNormalOrPrivateTabs(false).size)
         qwantbar?.updateTabCount(isPrivate)
     }
 }

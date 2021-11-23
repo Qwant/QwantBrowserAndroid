@@ -4,60 +4,44 @@
 
 package org.mozilla.reference.browser
 
-import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.preference.PreferenceManager
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
-import mozilla.components.browser.session.Session
+import mozilla.components.browser.state.selector.findCustomTabOrSelectedTab
 import mozilla.components.browser.state.selector.selectedTab
+import mozilla.components.browser.state.state.SessionState
+import mozilla.components.browser.state.state.TabSessionState
 import mozilla.components.concept.engine.EngineSession
 import mozilla.components.concept.engine.EngineView
-import mozilla.components.concept.storage.PageObservation
-import mozilla.components.concept.storage.PageVisit
-import mozilla.components.concept.storage.RedirectSource
-import mozilla.components.concept.storage.VisitType
-import mozilla.components.concept.tabstray.TabsTray
 import mozilla.components.feature.intent.ext.EXTRA_SESSION_ID
 import mozilla.components.support.base.feature.ActivityResultHandler
 import mozilla.components.support.base.feature.UserInteractionHandler
 import mozilla.components.support.base.feature.ViewBoundFeatureWrapper
 import mozilla.components.support.base.log.logger.Logger
 import mozilla.components.support.utils.SafeIntent
-// import org.mozilla.gecko.GeckoProfile
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
 import org.mozilla.reference.browser.browser.BrowserFragment
-// import org.mozilla.reference.browser.compat.BrowserContract
-// import org.mozilla.reference.browser.compat.BrowserContract.Bookmarks
-// import org.mozilla.reference.browser.compat.BrowserDB
-// import org.mozilla.reference.browser.compat.LocalBrowserDB
-// import org.mozilla.reference.browser.compat.SessionParser
 import org.mozilla.reference.browser.ext.components
 import org.mozilla.reference.browser.layout.QwantBar
 import org.mozilla.reference.browser.layout.QwantBarFeature
 import org.mozilla.reference.browser.settings.SettingsContainerFragment
-// import org.mozilla.reference.browser.storage.BookmarkItemV2
 import org.mozilla.reference.browser.storage.bookmarks.BookmarksFragment
 import org.mozilla.reference.browser.storage.bookmarks.BookmarksStorage
 import org.mozilla.reference.browser.storage.history.HistoryFragment
 import org.mozilla.reference.browser.tabs.QwantTabsFragment
-import org.mozilla.reference.browser.tabs.tray.BrowserTabsTray
-// import java.io.File
-// import java.io.FileReader
-// import java.io.IOException
 import java.util.*
 import kotlin.system.exitProcess
 
@@ -68,6 +52,9 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
     private var bookmarksStorage: BookmarksStorage? = null
     private val sessionId: String?
         get() = SafeIntent(intent).getStringExtra(EXTRA_SESSION_ID)
+
+    private val tab: SessionState?
+        get() = components.core.store.state.findCustomTabOrSelectedTab(sessionId)
 
     /* private val webExtensionPopupFeature by lazy {
         WebExtensionPopupFeature(components.core.store, ::openPopup)
@@ -89,11 +76,17 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
 
         this.loadLocale()
 
+        Log.d("QWANT_BROWSER_T", "load browser activity")
+
         darkmode = if (intent.hasExtra("newTheme")) {
+            Log.d("QWANT_BROWSER_T", "with theme " + intent.getIntExtra("newTheme", AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM))
             intent.getIntExtra("newTheme", AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
         } else {
+            Log.d("QWANT_BROWSER_T", "with theme default " + (applicationContext.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK))
             applicationContext.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
         }
+
+        Log.d("QWANT_BROWSER_T", "darkmode: $darkmode")
 
         setContentView(R.layout.activity_main)
 
@@ -144,7 +137,10 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
             }
         }
 
-        // this.loadV35Db()
+        KeyboardVisibilityEvent.setEventListener(this) { visible ->
+            qwantbar.visibility = if (visible) View.GONE else View.VISIBLE
+        }
+
         this.checkFirstLaunch()
 
         qwantbar.updateTabCount()
@@ -170,7 +166,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-
+        Log.d("QWANT_BROWSER_T", "config changed")
         if (darkmode != (newConfig.uiMode and Configuration.UI_MODE_NIGHT_MASK)) {
             val intent = Intent(applicationContext, BrowserActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -233,151 +229,6 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         prefEditor.apply()
     }
 
-    /* private fun loadV35Db() {
-        // load old db to new one on first launch
-        val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-
-        val firstLaunch40 = prefs.getBoolean(resources.getString(R.string.pref_key_first_launch_40), true)
-        val firstLaunch402 = prefs.getBoolean(resources.getString(R.string.pref_key_first_launch_402), true)
-        val firstLaunch403 = prefs.getBoolean(resources.getString(R.string.pref_key_first_launch_403), true)
-
-        val db: BrowserDB? = LocalBrowserDB.from(GeckoProfile.get(applicationContext, null))
-        val cr = applicationContext.contentResolver
-
-        if (firstLaunch40) {
-            val editor: SharedPreferences.Editor = prefs.edit()
-            editor.putBoolean(resources.getString(R.string.pref_key_first_launch_40), false)
-            editor.putBoolean(resources.getString(R.string.pref_key_first_launch_403), false)
-            editor.apply()
-
-            this.loadOldBookmarksForFolder(db, cr, Bookmarks.FIXED_ROOT_ID.toLong())
-
-            val historyCursor = db?.getAllVisitedHistory(cr)
-            try {
-                if (historyCursor != null) {
-                    while (historyCursor.moveToNext()) {
-                        val title: String = historyCursor.getString(historyCursor.getColumnIndexOrThrow(BrowserContract.History.TITLE))
-                        val url: String = historyCursor.getString(historyCursor.getColumnIndexOrThrow(BrowserContract.History.URL))
-                        val time: Long = historyCursor.getLong(historyCursor.getColumnIndexOrThrow(BrowserContract.History.DATE_LAST_VISITED))
-                        MainScope().launch {
-                            applicationContext.components.core.historyStorage.recordVisit(url, PageVisit(VisitType.LINK, RedirectSource.NOT_A_SOURCE), time)
-                            applicationContext.components.core.historyStorage.recordObservation(url, PageObservation(title = title))
-                        }
-                    }
-                }
-            } catch (e: Exception) {
-                Log.e("QWANT_BROWSER", "exception: ${e.message}\n${e.stackTrace}")
-            }
-        } else if (firstLaunch403 && oldBookmarksHasFolder(db, cr)) {
-            this.loadOldBookmarksForFolder(db, cr, Bookmarks.FIXED_ROOT_ID.toLong())
-            val editor: SharedPreferences.Editor = prefs.edit()
-            editor.putBoolean(resources.getString(R.string.pref_key_first_launch_403), false)
-            editor.apply()
-        }
-
-        if (firstLaunch402) {
-            val editor: SharedPreferences.Editor = prefs.edit()
-            editor.putBoolean(resources.getString(R.string.pref_key_first_launch_402), false)
-            editor.apply()
-
-            restoreSessionTabs()
-        }
-    }
-
-    private fun oldBookmarksHasFolder(db: BrowserDB?, cr: ContentResolver): Boolean {
-        val bookmarkCursor = db?.getBookmarksInFolder(cr, Bookmarks.FIXED_ROOT_ID.toLong())
-        try {
-            if (bookmarkCursor != null) {
-                while (bookmarkCursor.moveToNext()) {
-                    if (bookmarkCursor.getInt(bookmarkCursor.getColumnIndexOrThrow(Bookmarks.TYPE)) == Bookmarks.TYPE_FOLDER) {
-                        return true
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            Log.e("QWANT_BROWSER", "first launch 4.0 exception: ${e.message}\n${e.stackTrace}")
-        }
-        return false
-    }
-
-    private fun loadOldBookmarksForFolder(db: BrowserDB?, cr: ContentResolver, parentId: Long = Bookmarks.FIXED_ROOT_ID.toLong(), parentItem: BookmarkItemV2? = null) {
-        val bookmarkCursor = db?.getBookmarksInFolder(cr, parentId)
-        try {
-            if (bookmarkCursor != null) {
-                while (bookmarkCursor.moveToNext()) {
-                    var newItem: BookmarkItemV2
-
-                    val type: Int = bookmarkCursor.getInt(bookmarkCursor.getColumnIndexOrThrow(Bookmarks.TYPE))
-                    val title: String = bookmarkCursor.getString(bookmarkCursor.getColumnIndexOrThrow(Bookmarks.TITLE))
-
-                    if (type == Bookmarks.TYPE_FOLDER) {
-                        val subfolderGuid: String = bookmarkCursor.getString(bookmarkCursor.getColumnIndexOrThrow(Bookmarks.GUID))
-                        val subfolderId: Long = db.getFolderIdFromGuid(cr, subfolderGuid)
-
-                        newItem = BookmarkItemV2(BookmarkItemV2.BookmarkType.FOLDER, title, parent = parentItem)
-                        this.loadOldBookmarksForFolder(db, cr, subfolderId, newItem)
-                    } else {
-                        // TODO Bookmarks.FAVICON
-                        val url: String = bookmarkCursor.getString(bookmarkCursor.getColumnIndexOrThrow(Bookmarks.URL))
-                        newItem = BookmarkItemV2(BookmarkItemV2.BookmarkType.BOOKMARK, title, url, parent = parentItem)
-                    }
-
-                    if (parentItem == null) {
-                        bookmarksStorage?.addBookmark(newItem)
-                    } else {
-                        parentItem.addChild(newItem)
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            Log.e("QWANT_BROWSER", "first launch 4.0 exception: ${e.message}\n${e.stackTrace}")
-        }
-    }
-
-    private val SESSION_FILE = "sessionstore.js"
-
-    private fun readSessionFile(): String? {
-        val sessionFile = File(GeckoProfile.get(applicationContext, null).dir, SESSION_FILE)
-        try {
-            if (sessionFile.exists()) {
-                val fr = FileReader(sessionFile)
-
-                return fr.use { reader ->
-                    val sb = StringBuilder()
-                    val buf = CharArray(8192)
-                    var read = reader.read(buf)
-                    while (read >= 0) {
-                        sb.append(buf, 0, read)
-                        read = reader.read(buf)
-                    }
-                    sb.toString()
-                }
-            }
-        } catch (ioe: IOException) {
-            Log.e("QWANT_BROWSER", "Unable to read session file", ioe)
-        }
-        return null
-    }
-
-    private class LastSessionParser(private val context: Context) : SessionParser() {
-        override fun onTabRead(sessionTab: SessionTab) {
-            if (sessionTab.url != null && sessionTab.url != "null"/* && !sessionTab.url.startsWith("https://www.qwant.com/?client=qwantbrowser") */) {
-                val tabId = context.components.useCases.tabsUseCases.addTab(sessionTab.url, selectTab = sessionTab.isSelected, startLoading = false)
-                context.components.core.sessionManager.findSessionById(tabId)?.title = sessionTab.title
-            }
-        }
-    }
-
-    private fun restoreSessionTabs() {
-        val sessionString = readSessionFile()
-        if (sessionString != null) {
-            val parser = LastSessionParser(applicationContext)
-            parser.parse(sessionString)
-        } else {
-            Log.e("QWANT_BROWSER", "restore tabs session file is null")
-        }
-    } */
-
     override fun onPause() {
         super.onPause()
         try {
@@ -395,20 +246,20 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
     }
 
     override fun onBackPressed() {
-        val sessionManager = components.core.sessionManager
-        if (sessionManager.selectedSession != null) {
-            val url = components.core.sessionManager.selectedSession!!.url
+        val selectedTab = components.core.store.state.selectedTab
+        if (selectedTab != null) {
+            val url = selectedTab.content.url
             val canGoBack = components.core.store.state.selectedTab?.content?.canGoBack ?: false
-            if (!canGoBack && sessionManager.selectedSession!!.source.name == "ACTION_VIEW") {
+            if (!canGoBack && selectedTab.source.equals("ACTION_VIEW")) { // TODO test that (has changed)
                 // Tab has been opened from external app, so we close the app to get back to it, after closing the tab
-                sessionManager.remove(sessionManager.selectedSession!!)
+                components.useCases.tabsUseCases.removeTab(selectedTab.id)
                 this.finish()
                 return
             } else if (url.startsWith(getString(R.string.homepage_startwith_filter)) && url.contains("&o=")) {
                 // Fix for closing qwant opened medias with back button
                 components.useCases.sessionUseCases.loadUrl(url.substringBefore("&o="), flags = EngineSession.LoadUrlFlags.select(64)) // FLAG_REPLACE_HISTORY from GeckoSession native
                 return
-            } else if (components.core.sessionManager.selectedSession!!.url.startsWith(getString(R.string.settings_page_startwith_filter))) {
+            } else if (url.startsWith(getString(R.string.settings_page_startwith_filter))) {
                 // Highlight search icon when on the settings page. Do not return.
                 qwantbar.setHighlight(QwantBar.QwantBarSelection.SEARCH)
             }
@@ -430,10 +281,6 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
                 fragment.setOnSettingsClosed(this)
             }
             is QwantTabsFragment -> {
-                var isPrivate = false
-                if (components.core.sessionManager.selectedSession != null)
-                    isPrivate = components.core.sessionManager.selectedSession!!.private
-                fragment.setPrivacy(isPrivate)
                 fragment.setQwantBar(qwantbar)
                 fragment.setTabsClosedCallback(::fragmentClosed)
             }
@@ -455,16 +302,22 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
      *
      * Eventually we may want to move this functionality into one of our feature components.
      */
-    private fun removeSessionIfNeeded() {
-        val sessionManager = components.core.sessionManager
-        val sessionId = sessionId
+    private fun removeSessionIfNeeded(): Boolean {
+        val session = tab ?: return false
 
-        val session = (if (sessionId != null) {
-            sessionManager.findSessionById(sessionId)
+        return if (session.source is SessionState.Source.External && !session.restored) {
+            finish()
+            components.useCases.tabsUseCases.removeTab(session.id)
+            true
         } else {
-            sessionManager.selectedSession
-        }) ?: return
-        sessionManager.remove(session)
+            val hasParentSession = session is TabSessionState && session.parentId != null
+            if (hasParentSession) {
+                components.useCases.tabsUseCases.removeTab(session.id, selectParentIfExists = true)
+            }
+            // We want to return to home if this session didn't have a parent session to select.
+            val goToOverview = !hasParentSession
+            !goToOverview
+        }
     }
 
     override fun onUserLeaveHint() {
@@ -480,7 +333,6 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
     override fun onCreateView(parent: View?, name: String, context: Context, attrs: AttributeSet): View? =
         when (name) {
             EngineView::class.java.name -> components.core.engine.createView(context, attrs).asView()
-            TabsTray::class.java.name -> { BrowserTabsTray(context, attrs) }
             else -> super.onCreateView(parent, name, context, attrs)
         }
 
@@ -494,14 +346,16 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         if (tabsFragment == null) {
             tabsFragment = QwantTabsFragment() // TabsTrayFragment()
         }
+
+        (tabsFragment as QwantTabsFragment).setPrivacy(components.core.store.state.selectedTab?.content?.private ?: false)
+
         this.supportFragmentManager.beginTransaction().apply {
-            this.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
             replace(R.id.container, tabsFragment, tag)
             commit()
         }
         this.supportFragmentManager.executePendingTransactions()
-        qwantbar.setupHomeBar()
         qwantbar.setHighlight(QwantBar.QwantBarSelection.TABS)
+        qwantbar.hideIfInNavigation()
     }
 
     private fun showBookmarks() {
@@ -510,16 +364,19 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
             bookmarksFragment = BookmarksFragment()
         }
         this.supportFragmentManager.beginTransaction().apply {
-            this.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
             replace(R.id.container, bookmarksFragment, "BOOKMARKS_FRAGMENT")
             commit()
         }
         this.supportFragmentManager.executePendingTransactions()
-        qwantbar.setupHomeBar()
         qwantbar.setHighlight(QwantBar.QwantBarSelection.BOOKMARKS)
+        qwantbar.hideIfInNavigation()
     }
 
     fun showBrowserFragment() {
+        if (applicationContext.components.core.store.state.tabs.isEmpty()) {
+            applicationContext.components.useCases.tabsUseCases.addTab(QwantUtils.getHomepage(applicationContext))
+        }
+
         var browserFragment = this.supportFragmentManager.findFragmentByTag("BROWSER_FRAGMENT")
         if (browserFragment == null) {
             browserFragment = BrowserFragment.create()
@@ -528,12 +385,12 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         (browserFragment as BrowserFragment).closeAwesomeBarIfOpen()
 
         this.supportFragmentManager.beginTransaction().apply {
-            this.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
             replace(R.id.container, browserFragment, "BROWSER_FRAGMENT")
             addToBackStack("BROWSER_FRAGMENT")
             commit()
         }
         this.supportFragmentManager.executePendingTransactions()
+        qwantbar.visibility = View.VISIBLE
     }
 
     fun showHistory() {
@@ -542,11 +399,11 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
             historyFragment = HistoryFragment()
         }
         this.supportFragmentManager.beginTransaction().apply {
-            this.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
             replace(R.id.container, historyFragment, "HISTORY_FRAGMENT")
             commit()
         }
         this.supportFragmentManager.executePendingTransactions()
+        qwantbar.hideIfInNavigation()
     }
 
     private fun showSettings() {
@@ -557,47 +414,31 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
             settingsFragment.arguments?.clear()
         }
         this.supportFragmentManager.beginTransaction().apply {
-            this.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
             replace(R.id.container, settingsFragment, "SETTINGS_FRAGMENT")
             commit()
         }
         this.supportFragmentManager.executePendingTransactions()
-        qwantbar.setupHomeBar()
         qwantbar.setHighlight(QwantBar.QwantBarSelection.SETTINGS)
+        qwantbar.hideIfInNavigation()
     }
 
     private fun showHome() {
-        val session: Session? = components.core.sessionManager.selectedSession
-        if (session == null || !session.url.startsWith(getString(R.string.homepage_startwith_filter))) {
-            var alreadyThere = false
-            val currentSessionPrivate = (session != null && session.private)
-            components.core.sessionManager.sessions.forEach {
-                if (it.private == currentSessionPrivate && it.url.startsWith(getString(R.string.homepage_startwith_filter))) {
-                    components.core.sessionManager.select(it)
-                    alreadyThere = true
-                }
-            }
-            if (!alreadyThere)
-                components.useCases.sessionUseCases.loadUrl(QwantUtils.getHomepage(applicationContext))
-        } else {
-            components.useCases.sessionUseCases.loadUrl(QwantUtils.getHomepage(applicationContext))
-        }
-
+        components.useCases.tabsUseCases.selectOrAddTab(QwantUtils.getHomepage(applicationContext), components.core.store.state.selectedTab?.content?.private ?: false)
         this.showBrowserFragment()
-
+        qwantbar.setupHomeBar()
         qwantbar.setHighlight(QwantBar.QwantBarSelection.SEARCH)
     }
 
     private fun fragmentClosed() {
-        val session: Session? = components.core.sessionManager.selectedSession
-        if (session == null || session.url.startsWith(baseContext.getString(R.string.homepage_base))) {
+        val url = components.core.store.state.selectedTab?.content?.url
+        if (url == null || url.startsWith(baseContext.getString(R.string.homepage_base))) {
             qwantbar.setHighlight(QwantBar.QwantBarSelection.SEARCH)
             qwantbar.setupHomeBar()
         } else {
             qwantbar.setHighlight(QwantBar.QwantBarSelection.NONE)
             qwantbar.setupNavigationBar()
         }
-        // qwantbar.updateHomeIcon(qwantbar.getCurrentMode())
+        qwantbar.visibility = View.VISIBLE
     }
 
     override fun settingsClosed() {
@@ -643,8 +484,16 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
     }
 
     private fun quitApp() {
-        finishAffinity()
-        exitProcess(0)
+        QwantUtils.clearDataOnQuit(this,
+            success = {
+                Toast.makeText(this, R.string.cleardata_done, Toast.LENGTH_LONG).show()
+                finishAffinity()
+                exitProcess(0)
+            },
+            error = {
+                Toast.makeText(this, R.string.cleardata_failed, Toast.LENGTH_LONG).show()
+            }
+        )
     }
 
     companion object {

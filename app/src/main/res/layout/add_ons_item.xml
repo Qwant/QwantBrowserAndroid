@@ -30,56 +30,63 @@
                 android:layout_gravity="center"
                 android:src="@drawable/mozac_ic_extensions"
                 android:importantForAccessibility="no"
-                android:scaleType="fitCenter" />
+                android:scaleType="fitCenter"
+                app:tint="@color/qwant_text" />
 
     </androidx.cardview.widget.CardView>
 
     <LinearLayout
-            android:id="@+id/details_container"
+        android:id="@+id/details_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:layout_toStartOf="@+id/add_button"
+        android:layout_toEndOf="@+id/icon_container"
+        android:orientation="vertical"
+        android:padding="8dp">
+
+        <TextView
+            android:id="@+id/add_on_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"
+            android:textStyle="bold"
+            tools:text="uBlock Origin"
+            android:textColor="@color/qwant_text"/>
+
+        <TextView
+            android:id="@+id/add_on_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:padding="8dp"
-            android:layout_toStartOf="@+id/add_button"
-            android:layout_toEndOf="@+id/icon_container"
-            android:orientation="vertical">
-
-        <TextView
-                android:id="@+id/add_on_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textStyle="bold"
-                android:layout_marginBottom="6dp"
-                tools:text="uBlock Origin" />
-
-        <TextView
-                android:id="@+id/add_on_description"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="12sp"
-                tools:text="An efficient blocker: easy on memory and CPU footprint, and yet can load and enforce thousands more filters than other popular blockers out there." />
+            android:textSize="12sp"
+            tools:text="An efficient blocker: easy on memory and CPU footprint, and yet can load and enforce thousands more filters than other popular blockers out there."
+            android:textColor="@color/qwant_text"/>
 
         <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:orientation="horizontal">
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:orientation="horizontal">
 
             <RatingBar
-                    android:id="@+id/rating"
-                    style="@style/Widget.AppCompat.RatingBar.Small"
-                    android:layout_width="wrap_content"
-                    android:layout_height="20dp"
-                    android:isIndicator="true"
-                    android:numStars="5" />
+                android:id="@+id/rating"
+                style="@style/Widget.AppCompat.RatingBar.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="20dp"
+                android:isIndicator="true"
+                android:numStars="5" />
 
             <TextView
-                    android:id="@+id/users_count"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="6dp"
-                    android:textSize="12sp"
-                    tools:text="Users: 591,642" />
+                android:id="@+id/users_count"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:textSize="12sp"
+                tools:text="Users: 591,642"
+                android:textColor="@color/qwant_text" />
 
         </LinearLayout>
 

@@ -12,6 +12,7 @@
     <!-- Menu option on the toolbar to close all tabs-->
     <string name="menu_action_close_tabs">Close All Tabs</string>
     <string name="menu_action_close_tabs_private">Close Private Tabs</string>
+    <string name="private_only">private</string>
 
     <!-- Preference enabling remote debugging -->
     <string name="preferences_remote_debugging">Remote debugging via USB</string>
@@ -88,11 +89,13 @@
     <string name="menu_settings" translatable="false">@string/settings</string>
     <string name="menu_back">Back</string>
 
-    <string name="bookmarks_empty_1">The bookmarks list is empty.</string>
+    <string name="bookmarks_empty_1">The bookmarks list is empty</string>
     <string name="bookmarks_empty_2">Add bookmarks using the menu access on the web page.</string>
 
     <string name="bookmarks_delete">Delete</string>
+    <string name="bookmarks_deleted">Bookmark deleted</string>
     <string name="bookmarks_add">Add bookmark</string>
+    <string name="bookmarks_added">Bookmark added</string>
     <string name="bookmarks_modify">Edit bookmark</string>
     <string name="bookmarks_modify_folder">Edit folder</string>
     <string name="bookmark_edit_title">Title</string>
@@ -124,13 +127,19 @@
     <string name="history_load_more">Load more</string>
     <string name="history_hour_placeholder" translatable="false">%1$d:%2$s</string>
 
-    <string name="settings_main">Qwant Settings</string>
+    <string name="settings_main">Settings</string>
+
+
+    <string name="enabled">Enabled</string>
+    <string name="disabled">Disabled</string>
 
     <string name="settings_general">General</string>
     <string name="settings_interface">Interface</string>
 
     <string name="settings_privacy_clear_data">Clear Data</string>
-    <!-- <string name="settings_privacy_clear_data_on_close">Clear Data on quit</string> -->
+    <string name="settings_privacy_clear_data_on_close">Clear Data On Quit</string>
+    <string name="settings_privacy_clear_data_on_close_summary">Please use the Quit app button to be sure it is applied</string>
+
     <string name="settings_privacy_personal_data">Personal data</string>
     <string name="cleardata_allsites">All sites data</string>
     <string name="cleardata_cache">Cache</string>
@@ -138,6 +147,9 @@
     <string name="cleardata_sessions">Sessions</string>
     <string name="cleardata_permissions">Permissions</string>
     <string name="cleardata_done">Data has been cleared</string>
+    <string name="cleardata_failed">Error clearing data</string>
+    <string name="cleardata_tabs">Opened normal tabs</string>
+    <string name="cleardata_tabs_private">Opened private tabs</string>
 
     <string name="settings_general_language">Language</string>
     <string name="settings_general_adultcontent">Adult content filter</string>
@@ -147,6 +159,7 @@
     <string name="settings_general_cleardata">Clear browsing data</string>
     <string name="settings_general_launchexternalapp">Open links in native app</string>
     <string name="settings_general_makedefaultbrowser">Set as default browser</string>
+    <string name="settings_general_makedefaultbrowser_summary">Open all your links in the Qwant app</string>
 
     <string name="settings_general_language_interface">Interface language</string>
     <string name="settings_general_language_search">Search results language</string>
@@ -168,11 +181,11 @@
     <string name="settings_privacy_policy">Privacy policy</string>
     <string name="settings_license">License (MPL 2.0)</string>
 
-    <string name="browser_client" translatable="false">brz-sqool</string>
+    <string name="browser_client" translatable="false">qwantbrowser</string>
     <string name="homepage_base" translatable="false">https://www.qwant.com/</string>
     <string name="homepage_startwith_filter" translatable="false">https://www.qwant.com/</string>
     <string name="settings_page_base" translatable="false">https://www.qwant.com/settings</string>
-    <string name="settings_page_startwith_filter" translatable="false">https://www.qwant.com/settings?client=brz-sqool</string>
+    <string name="settings_page_startwith_filter" translatable="false">https://www.qwant.com/settings?client=qwantbrowser</string>
     <string name="privacy_policy_url">https://about.qwant.com/legal/privacy/</string>
 
     <string name="settings_language_english">English</string>

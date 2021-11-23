@@ -10,7 +10,7 @@ import android.content.Intent
 import mozilla.components.browser.menu.BrowserMenuBuilder
 import mozilla.components.browser.menu.item.BrowserMenuItemToolbar
 import mozilla.components.browser.menu.item.SimpleBrowserMenuItem
-import mozilla.components.browser.session.SessionManager
+// import mozilla.components.browser.session.SessionManager
 import mozilla.components.browser.toolbar.BrowserToolbar
 // import org.mozilla.reference.browser.compat.toolbar.BrowserToolbar
 import mozilla.components.concept.engine.EngineView
@@ -28,7 +28,7 @@ import org.mozilla.reference.browser.ext.share
 
 class CustomTabsIntegration(
         context: Context,
-        sessionManager: SessionManager,
+        // sessionManager: SessionManager,
         toolbar: BrowserToolbar,
         engineView: EngineView,
         sessionUseCases: SessionUseCases,
@@ -36,18 +36,18 @@ class CustomTabsIntegration(
         activity: Activity?
 ) : LifecycleAwareFeature, UserInteractionHandler {
 
-    private val session = sessionManager.findSessionById(sessionId)
+    // private val session = sessionManager.findSessionById(sessionId)
     private val logger = Logger("CustomTabsIntegration")
 
     init {
-        if (session == null) {
+        /* if (session == null) {
             logger.warn("The session for this ID, no longer exists. Finishing activity.")
             activity?.finish()
-        }
+        } */
         toolbar.display.setUrlBackground(null)
     }
 
-    private val menuToolbar by lazy {
+    /* private val menuToolbar by lazy {
         val forward = BrowserMenuItemToolbar.Button(
             mozilla.components.ui.icons.R.drawable.mozac_ic_forward,
             iconTintColorResource = context.theme.resolveAttribute(R.attr.qwant_color_main),
@@ -70,13 +70,13 @@ class CustomTabsIntegration(
         }
 
         BrowserMenuItemToolbar(listOf(forward, refresh, stop))
-    }
+    } */
 
     private val menuItems by lazy {
         listOf(
-            menuToolbar,
+            // menuToolbar,
             SimpleBrowserMenuItem("Share") {
-                session?.url?.let { context.share(it) }
+                // session?.url?.let { context.share(it) }
             },
 
             /* BrowserMenuSwitch("Request desktop site", {
@@ -94,10 +94,10 @@ class CustomTabsIntegration(
                 engineView.release()
 
                 // Stip the CustomTabConfig to turn this Session into a regular tab and then select it
-                sessionManager.findSessionById(sessionId)?.let { session ->
+                /* sessionManager.findSessionById(sessionId)?.let { session ->
                     session.customTabConfig = null
                     sessionManager.select(session)
-                }
+                } */
 
                 // Close this activity since it is no longer displaying any session
                 activity?.finish()

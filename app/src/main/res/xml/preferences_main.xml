@@ -24,6 +24,12 @@
         android:widgetLayout="@layout/preference_arrowed_widget" />
 
     <org.mozilla.reference.browser.settings.QwantPreference
+        android:key="@string/pref_key_addons_menu"
+        android:title="@string/context_menu_addons"
+        android:icon="@drawable/ic_addons"
+        android:widgetLayout="@layout/preference_arrowed_widget" />
+
+    <org.mozilla.reference.browser.settings.QwantPreference
         android:key="@string/pref_key_about_menu"
         android:title="@string/settings_about_menu"
         android:icon="@drawable/ic_settings_about"

@@ -118,6 +118,7 @@ class BrowserIcons(
         val desiredSize = DesiredSize(
                 targetSize = context.resources.getDimensionPixelSize(initialRequest.size.dimen),
                 maxSize = maximumSize,
+                minSize = 0,
                 maxScaleFactor = MAXIMUM_SCALE_FACTOR
         )
 

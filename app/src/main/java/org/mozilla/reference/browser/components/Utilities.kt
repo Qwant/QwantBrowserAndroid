@@ -5,20 +5,18 @@
 package org.mozilla.reference.browser.components
 
 import android.content.Context
-import mozilla.components.browser.session.SessionManager
 import mozilla.components.feature.customtabs.CustomTabIntentProcessor
-import mozilla.components.feature.session.SessionUseCases
 import mozilla.components.feature.tabs.CustomTabsUseCases
 import mozilla.components.feature.tabs.TabsUseCases
 import mozilla.components.feature.intent.processing.TabIntentProcessor
 import mozilla.components.feature.search.SearchUseCases
+import mozilla.components.feature.session.SessionUseCases
 
 /**
  * Component group for miscellaneous components.
  */
 class Utilities(
         private val context: Context,
-        private val sessionManager: SessionManager,
         private val sessionUseCases: SessionUseCases,
         private val searchUseCases: SearchUseCases,
         private val tabsUseCases: TabsUseCases,

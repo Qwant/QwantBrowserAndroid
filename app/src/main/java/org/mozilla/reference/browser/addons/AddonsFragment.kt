@@ -10,6 +10,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.annotation.ColorRes
+import androidx.annotation.DimenRes
+import androidx.annotation.DrawableRes
+import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -66,15 +71,21 @@ class AddonsFragment : Fragment(), AddonsManagerAdapterDelegate {
             recyclerView.layoutManager = LinearLayoutManager(requireContext())
             scope.launch {
                 try {
-                        val addons = requireContext().components.core.addonManager.getAddons()
-                        scope.launch(Dispatchers.Main) {
-                            val adapter = AddonsManagerAdapter(
-                                    requireContext().components.core.addonCollectionProvider,
-                                    this@AddonsFragment,
-                                    addons
+                    val addons = requireContext().components.core.addonManager.getAddons()
+                    scope.launch(Dispatchers.Main) {
+                        val adapter = AddonsManagerAdapter(
+                            requireContext().components.core.addonCollectionProvider,
+                            this@AddonsFragment,
+                            addons,
+                            style = AddonsManagerAdapter.Style(
+                                sectionsTextColor = R.color.qwant_text,
+                                addonNameTextColor = R.color.qwant_text,
+                                addonSummaryTextColor = R.color.qwant_text,
+                                visibleDividers = false
                             )
-                            recyclerView.adapter = adapter
-                        }
+                        )
+                        recyclerView.adapter = adapter
+                    }
                 } catch (e: AddonManagerException) {
                     scope.launch(Dispatchers.Main) {
                         Toast.makeText(

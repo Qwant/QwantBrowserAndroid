@@ -1,94 +1,66 @@
-package org.mozilla.reference.browser.tabs.tray
+package org.mozilla.reference.browser.tabs
 
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListUpdateCallback
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
-import mozilla.components.browser.state.state.BrowserState
 import mozilla.components.browser.state.state.TabSessionState
 import mozilla.components.browser.state.store.BrowserStore
-// import mozilla.components.browser.thumbnails.ThumbnailsUseCases
 import mozilla.components.concept.tabstray.Tabs
-import mozilla.components.concept.tabstray.TabsTray
+import mozilla.components.feature.tabs.ext.toTabs
 import mozilla.components.lib.state.ext.flowScoped
+import mozilla.components.support.base.feature.LifecycleAwareFeature
 import mozilla.components.support.ktx.kotlinx.coroutines.flow.ifChanged
 
-/**
- * Presenter implementation for a tabs tray implementation in order to update the tabs tray whenever
- * the state of the session manager changes.
- */
-class TabsTrayPresenter(
-        private val tabsTray: TabsTray,
+class QwantTabsFeature(
         private val store: BrowserStore,
-        // private val thumbnailsUseCases: ThumbnailsUseCases? = null,
+        private val tabsChanged: (Tabs) -> Unit,
         internal var tabsFilter: (TabSessionState) -> Boolean,
-        private val closeTabsTray: () -> Unit
-) {
+) : LifecycleAwareFeature {
     private var tabs: Tabs? = null
     private var scope: CoroutineScope? = null
 
-    fun start() {
-        scope = store.flowScoped { flow -> collect(flow) }
+    override fun start() {
+        scope = store.flowScoped { flow ->
+            flow.map { it.toTabs(tabsFilter) }
+            .ifChanged()
+            .collect { tabs ->
+                // Do not invoke the callback on start if this is the initial state.
+                updateTabs(tabs)
+            }
+        }
     }
 
-    fun stop() {
+    override fun stop() {
         scope?.cancel()
     }
 
-    private suspend fun collect(flow: Flow<BrowserState>) {
-        flow.map { state -> state.toTabs(tabsFilter) }
-                /* .map { tabs ->
-                    if (thumbnailsUseCases != null) {
-                        // Load the tab thumbnail from the memory or disk caches.
-                        tabs.copy(list = tabs.list.map { tab ->
-                            tab.copy(thumbnail = thumbnailsUseCases.loadThumbnail(tab.id))
-                        })
-                    } else {
-                        tabs
-                    }
-                } */
-                .ifChanged()
-                .collect { tabs ->
-                    // Do not invoke the callback on start if this is the initial state.
-                    /* if (tabs.list.isEmpty() && this.tabs != null) {
-                        closeTabsTray.invoke()
-                    } */
-
-                    updateTabs(tabs)
-                }
-    }
-
     internal fun updateTabs(tabs: Tabs) {
-        val currentTabs = this.tabs
+        this.tabs = tabs
+        tabsChanged.invoke(tabs)
+        /* val currentTabs = this.tabs
 
         if (currentTabs == null) {
             this.tabs = tabs
             if (tabs.list.isNotEmpty()) {
-                tabsTray.updateTabs(tabs)
-                tabsTray.onTabsInserted(0, tabs.list.size)
+                // tabsTray.updateTabs(tabs)
+                // tabsTray.onTabsInserted(0, tabs.list.size)
             }
             return
         } else {
             calculateDiffAndUpdateTabsTray(currentTabs, tabs)
-        }
+        } */
     }
 
-    /**
-     * Calculates a diff between the last know state and the new state. After that it updates the
-     * tab tray with the new data and notifies it about what changes happened so that it can animate
-     * those changes.
-     */
     private fun calculateDiffAndUpdateTabsTray(currentTabs: Tabs, updatedTabs: Tabs) {
         val result = DiffUtil.calculateDiff(DiffCallback(currentTabs, updatedTabs), false)
 
         this.tabs = updatedTabs
 
-        tabsTray.updateTabs(updatedTabs)
+        // tabsTray.updateTabs(updatedTabs)
 
-        result.dispatchUpdatesTo(object : ListUpdateCallback {
+        /* result.dispatchUpdatesTo(object : ListUpdateCallback {
             override fun onChanged(position: Int, count: Int, payload: Any?) {
                 tabsTray.onTabsChanged(position, count)
             }
@@ -104,7 +76,7 @@ class TabsTrayPresenter(
             override fun onRemoved(position: Int, count: Int) {
                 tabsTray.onTabsRemoved(position, count)
             }
-        })
+        }) */
     }
 }
 

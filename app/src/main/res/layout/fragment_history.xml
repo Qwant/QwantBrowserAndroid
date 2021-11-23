@@ -17,7 +17,20 @@
         app:layout_constraintTop_toTopOf="parent"
         android:background="@color/qwant_background"
         app:titleTextColor="@color/qwant_text"
-        app:title="@string/history" />
+        app:title="@string/history"
+        app:navigationIcon="@drawable/ic_back">
+
+        <ImageButton
+            android:id="@+id/history_clear_all"
+            android:layout_width="64dp"
+            android:layout_height="48dp"
+            android:layout_gravity="end"
+            android:background="@android:color/transparent"
+            android:src="@drawable/ic_trash"
+            app:tint="@color/qwant_text"
+            />
+
+    </androidx.appcompat.widget.Toolbar>
 
     <LinearLayout
         android:id="@+id/history_noresult_layout"
@@ -54,20 +67,6 @@
             android:textColor="@color/menu_items"
             android:textSize="18sp" />
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/history_clear_all"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@color/qwant_text"
-        android:layout_gravity="end"
-        android:paddingStart="20dp"
-        android:paddingEnd="20dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        android:textSize="18sp"
-        android:fontFamily="@font/asap_bold"
-        android:text="@string/history_clear_all"/>
 
     <ListView
         android:id="@+id/history_listview"

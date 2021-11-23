@@ -8,32 +8,29 @@ import android.widget.*
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import mozilla.components.browser.state.selector.getNormalOrPrivateTabs
-import mozilla.components.browser.state.state.TabSessionState
 import mozilla.components.browser.tabstray.thumbnail.TabThumbnailView
 import mozilla.components.browser.thumbnails.loader.ThumbnailLoader
 import mozilla.components.concept.base.images.ImageLoadRequest
 import mozilla.components.concept.tabstray.Tab
+import mozilla.components.concept.tabstray.Tabs
 import mozilla.components.support.ktx.android.content.getColorFromAttr
 import mozilla.components.support.ktx.android.util.dpToPx
 import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.ext.components
-import org.mozilla.reference.browser.tabs.tray.toTab
+import java.net.URI
+import java.net.URISyntaxException
 
 class TabsAdapter(
         private val context: Context,
-        private var isPrivate: Boolean,
-        private val selectedCallback: (tab: Tab?) -> Unit,
-        private val deletedCallback: (tabSession: TabSessionState?) -> Unit
+        private val selectedCallback: (tab: Tab?) -> Unit
 )  : BaseAdapter() {
-    var tabs = context.components.core.store.state.getNormalOrPrivateTabs(isPrivate)
+    var tabs: Tabs? = null
 
     internal class TabListItemViewHolder(
             item_layout: View,
             private val context: Context,
-            private val isPrivate: Boolean,
             private val selectedCallback: (tab: Tab?) -> Unit,
-            private val deletedCallback: (tabSession: TabSessionState?) -> Unit
+            private val deletedCallback: (tab: Tab?) -> Unit
     ) : RecyclerView.ViewHolder(item_layout) {
         private var itemMainLayout: LinearLayout = item_layout.findViewById(R.id.tablist_item_layout)
         private var itemPreview: TabThumbnailView = item_layout.findViewById(R.id.tablist_item_preview)
@@ -43,20 +40,19 @@ class TabsAdapter(
 
         private val thumbnailLoader = ThumbnailLoader(context.components.core.thumbnailStorage)
 
-        fun setup(tabSession: TabSessionState, isSelected: Boolean) {
-            val tab = tabSession.toTab()
-
+        fun setup(tab: Tab, isSelected: Boolean) {
             val title = if (tab.title.length > MAX_TITLE_LENGTH) tab.title.substring(0, MAX_TITLE_LENGTH - 3) + "..." else tab.title
 
-            var url: String = tab.url
-            if (url.startsWith("http://www.")) url = url.substring(11)
-            else if (url.startsWith("https://www.")) url = url.substring(12)
-            url = if (url.length > MAX_URL_LENGTH) url.substring(0, MAX_URL_LENGTH - 3) + "..." else url
+            val host: String = try {
+                URI(tab.url).host
+            } catch (e: URISyntaxException) {
+                tab.url
+            }
 
             this.itemTitle.text = title
-            this.itemUrl.text = url
+            this.itemUrl.text = if (host.startsWith("www.")) host.substring(4) else host
             this.itemMainLayout.setOnClickListener { selectedCallback.invoke(tab) }
-            this.itemDelete.setOnClickListener { deletedCallback.invoke(tabSession) }
+            this.itemDelete.setOnClickListener { deletedCallback.invoke(tab) }
 
             this.setThumbnail(tab)
             this.setSelected(isSelected)
@@ -116,20 +112,25 @@ class TabsAdapter(
         // viewHolder.setThumbnail(tabSession.toTab())
         // viewHolder.setSelected(selectedState)
 
-        val tabSession = this.getItem(position) as TabSessionState
-        val selectedState = (context.components.core.store.state.selectedTabId == tabSession.id)
+        val tab = this.getItem(position) as Tab
+        val selectedState = (context.components.core.store.state.selectedTabId == tab.id)
 
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val newView = inflater.inflate(R.layout.tablist_item, parent, false)
-        val viewHolder = TabListItemViewHolder(newView, context, isPrivate, selectedCallback, deletedCallback)
-        viewHolder.setup(tabSession, selectedState)
+        val viewHolder = TabListItemViewHolder(newView, context, selectedCallback, {
+            if (it != null) {
+                context.components.useCases.tabsUseCases.removeTab.invoke(it.id)
+                // this.tabChanged()
+            }
+        })
+        viewHolder.setup(tab, selectedState)
         newView.tag = viewHolder
 
         return newView
     }
 
     override fun getItem(position: Int): Any {
-        return tabs[tabs.count() - 1 - position]
+        return tabs!!.list[tabs!!.list.count() - 1 - position]
     }
 
     override fun getItemId(position: Int): Long {
@@ -137,11 +138,11 @@ class TabsAdapter(
     }
 
     override fun getCount(): Int {
-        return tabs.count()
+        return tabs?.list?.count() ?: 0
     }
 
-    fun tabChanged() {
-        tabs = context.components.core.store.state.getNormalOrPrivateTabs(isPrivate)
+    fun tabChanged(tabs: Tabs) {
+        this.tabs = tabs
         this.notifyDataSetChanged()
     }
 }

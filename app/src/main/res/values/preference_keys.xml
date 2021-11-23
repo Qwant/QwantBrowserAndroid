@@ -9,12 +9,14 @@
     <string name="pref_key_remote_debugging" translatable="false">pref_key_remote_debugging</string>
     <string name="pref_key_privacy_cleardata" translatable="false">pref_key_general_cleardata</string>
     <string name="pref_key_privacy_cleardata_on_close" translatable="false">pref_key_general_cleardata_on_close</string>
+    <string name="pref_key_privacy_cleardata_on_close_content" translatable="false">pref_key_general_cleardata_on_close_content</string>
 
     <string name="pref_key_privacy" translatable="false">pref_key_privacy</string>
     <string name="pref_key_general" translatable="false">pref_key_general</string>
     <string name="pref_key_interface" translatable="false">pref_key_interface</string>
     <string name="pref_key_history" translatable="false">pref_key_history</string>
     <string name="pref_key_about_menu" translatable="false">pref_key_about_menu</string>
+    <string name="pref_key_addons_menu" translatable="false">pref_key_addons_menu</string>
 
     <string name="pref_key_general_language" translatable="false">pref_key_general_language</string>
     <string name="pref_key_general_adultcontent" translatable="false">pref_key_general_adultcontent</string>
@@ -22,6 +24,7 @@
     <string name="pref_key_general_resultsinnewtab" translatable="false">pref_key_general_resultsinnewtab</string>
     <string name="pref_key_general_dark_theme" translatable="false">pref_key_general_dark_theme</string>
     <string name="pref_key_general_launchexternalapp" translatable="false">pref_key_general_launchexternalapp</string>
+    <!-- <string name="pref_key_general_cleardata" translatable="false">pref_key_general_cleardata</string> -->
     <string name="pref_key_general_makedefaultbrowser" translatable="false">pref_key_general_makedefaultbrowser</string>
 
     <string name="pref_key_general_language_interface" translatable="false">pref_key_general_language_interface</string>
@@ -39,4 +42,9 @@
     <string name="pref_key_first_launch_40" translatable="false">pref_key_first_launch_40</string>
     <string name="pref_key_first_launch_402" translatable="false">pref_key_first_launch_402</string>
     <string name="pref_key_first_launch_403" translatable="false">pref_key_first_launch_403</string>
+
+    <string name="pref_key_cleardata_content_history" translatable="false">pref_key_cleardata_content_history</string>
+    <string name="pref_key_cleardata_content_tabs" translatable="false">pref_key_cleardata_content_tabs</string>
+    <string name="pref_key_cleardata_content_tabs_private" translatable="false">pref_key_cleardata_content_tabs_private</string>
+    <string name="pref_key_cleardata_content_browsingdata" translatable="false">pref_key_cleardata_content_browsingdata</string>
 </resources>

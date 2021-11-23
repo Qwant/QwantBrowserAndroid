@@ -7,6 +7,7 @@ package org.mozilla.reference.browser.browser
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -16,6 +17,8 @@ import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
 import kotlinx.android.synthetic.main.fragment_browser.*
 import kotlinx.android.synthetic.main.fragment_browser.view.*
+import kotlinx.coroutines.flow.collect
+import mozilla.components.browser.state.state.LoadRequestState
 import mozilla.components.feature.downloads.DownloadsFeature
 import mozilla.components.feature.app.links.AppLinksFeature
 import mozilla.components.feature.downloads.manager.FetchDownloadManager
@@ -25,16 +28,21 @@ import mozilla.components.feature.session.FullScreenFeature
 import mozilla.components.feature.session.SwipeRefreshFeature
 import mozilla.components.feature.tabs.WindowFeature
 import mozilla.components.feature.sitepermissions.SitePermissionsFeature
+import mozilla.components.lib.state.Observer
+import mozilla.components.lib.state.ext.flowScoped
+import mozilla.components.lib.state.ext.observe
 import mozilla.components.support.base.feature.ActivityResultHandler
 import mozilla.components.support.base.feature.PermissionsFeature
 import mozilla.components.support.base.feature.UserInteractionHandler
 import mozilla.components.support.base.feature.ViewBoundFeatureWrapper
 import mozilla.components.support.base.log.logger.Logger
+import mozilla.components.support.ktx.kotlinx.coroutines.flow.ifChanged
 import org.mozilla.reference.browser.AppPermissionCodes.REQUEST_CODE_APP_PERMISSIONS
 import org.mozilla.reference.browser.AppPermissionCodes.REQUEST_CODE_DOWNLOAD_PERMISSIONS
 import org.mozilla.reference.browser.AppPermissionCodes.REQUEST_CODE_PROMPT_PERMISSIONS
 import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.downloads.DownloadService
+import org.mozilla.reference.browser.ext.components
 import org.mozilla.reference.browser.ext.getPreferenceKey
 import org.mozilla.reference.browser.ext.requireComponents
 import org.mozilla.reference.browser.pip.PictureInPictureIntegration
@@ -93,7 +101,6 @@ abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler, Activit
             feature = QwantSessionFeature(
                 requireContext(),
                 requireComponents.core.store,
-                requireComponents.core.sessionManager,
                 requireComponents.useCases,
                 // requireComponents.useCases.sessionUseCases.goBack,
                 // requireComponents.useCases.tabsUseCases,
@@ -108,7 +115,6 @@ abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler, Activit
                 requireContext(),
                 toolbar,
                 requireComponents.core.historyStorage,
-                requireComponents.core.sessionManager,
                 requireComponents.useCases.sessionUseCases,
                 sessionId),
             owner = this,
@@ -207,7 +213,7 @@ abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler, Activit
                     context = requireContext(),
                     fragmentManager = parentFragmentManager,
                     sessionId = sessionId,
-                    storage = requireComponents.core.sitePermissionsStorage,
+                    // storage = requireComponents.core.sitePermissionsStorage,
                     onNeedToRequestPermissions = { permissions ->
                         requestPermissions(permissions, REQUEST_CODE_APP_PERMISSIONS)
                     },

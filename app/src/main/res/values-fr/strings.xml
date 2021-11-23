@@ -84,10 +84,10 @@
     <string name="menu_search">Recherche</string>
     <string name="menu_bookmarks">Favoris</string>
     <string name="menu_tabs">Onglets</string>
-    <string name="menu_more">@string/settings</string>
+    <string name="menu_settings">@string/settings</string>
     <string name="menu_back">Retour</string>
 
-    <string name="bookmarks_empty_1">La liste des favoris est vide.</string>
+    <string name="bookmarks_empty_1">La liste des favoris est vide</string>
     <string name="bookmarks_empty_2">Ajouter un favori en utilisant le menu sur une page web.</string>
 
     <string name="bookmarks_delete">Supprimer</string>
@@ -113,7 +113,7 @@
     <string name="context_menu_downloads">Téléchargements</string>
     <string name="context_menu_close_tab">Fermer cet onglet</string>
 
-    <string name="settings_main">Paramètres Qwant</string>
+    <string name="settings_main">Paramètres</string>
 
     <string name="settings_general">General</string>
     <string name="settings_interface">Interface</string>

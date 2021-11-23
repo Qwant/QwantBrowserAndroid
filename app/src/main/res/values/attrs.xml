@@ -55,6 +55,7 @@
     <attr name="qwant_toolbar_TrackingProtectionAndSecurityIndicatorSeparatorColor" format="reference|color" />
     <attr name="qwant_toolbar_SuggestionBackgroundColor" format="reference|color" />
     <attr name="qwant_toolbar_SuggestionForegroundColor" format="reference|color" />
+    <attr name="qwant_toolbar_SuggestTextColor" format="reference|color" />
 
     <attr name="qwant_toolbar_BottomSeparatorColor" format="reference|color" />
 

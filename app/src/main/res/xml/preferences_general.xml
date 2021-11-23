@@ -8,8 +8,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <org.mozilla.reference.browser.settings.QwantPreference
+        android:key="@string/pref_key_general_makedefaultbrowser"
+        android:title="@string/settings_general_makedefaultbrowser"
+        android:widgetLayout="@layout/preference_arrowed_widget"
+        android:summary="@string/settings_general_makedefaultbrowser_summary"
+        app:iconSpaceReserved="false" />
+
+    <org.mozilla.reference.browser.settings.QwantPreference
         android:key="@string/pref_key_general_language"
         android:title="@string/settings_general_language"
+        app:allowDividerAbove="true"
         android:widgetLayout="@layout/preference_arrowed_widget"
         app:iconSpaceReserved="false" />
 
@@ -21,19 +29,19 @@
         android:defaultValue="@string/settings_dark_theme_system_code"
         app:iconSpaceReserved="false"/>
 
-    <!-- <org.mozilla.reference.browser.settings.QwantPreferenceDropdown
+    <org.mozilla.reference.browser.settings.QwantPreferenceDropdown
         android:key="@string/pref_key_general_adultcontent"
         android:title="@string/settings_general_adultcontent"
         android:entries="@array/adult_content_values"
         android:entryValues="@array/adult_content_keys"
-        android:defaultValue="@string/settings_adultcontent_strict_code"
+        android:defaultValue="@string/settings_adultcontent_moderate_code"
         app:iconSpaceReserved="false"/>
 
     <org.mozilla.reference.browser.settings.QwantPreferenceSwitch
         android:key="@string/pref_key_general_newsonhome"
-        android:defaultValue="false"
+        android:defaultValue="true"
         android:title="@string/settings_general_newsonhome"
-        app:iconSpaceReserved="false" /> -->
+        app:iconSpaceReserved="false" />
 
     <org.mozilla.reference.browser.settings.QwantPreferenceSwitch
         android:key="@string/pref_key_general_resultsinnewtab"
@@ -41,24 +49,11 @@
         android:title="@string/settings_general_resultsinnewtab"
         app:iconSpaceReserved="false" />
 
-    <!-- <org.mozilla.reference.browser.settings.QwantPreference
-        android:key="@string/pref_key_general_cleardata"
-        android:title="@string/settings_general_cleardata"
-        android:widgetLayout="@layout/preference_arrowed_widget"
-        app:allowDividerBelow="true"
-        app:iconSpaceReserved="false" /> -->
-
-    <!-- <org.mozilla.reference.browser.settings.QwantPreferenceSwitch
+    <org.mozilla.reference.browser.settings.QwantPreferenceSwitch
         android:key="@string/pref_key_general_launchexternalapp"
         android:defaultValue="true"
         android:title="@string/settings_general_launchexternalapp"
-        app:allowDividerAbove="true"
-        app:iconSpaceReserved="false" /> -->
-
-    <org.mozilla.reference.browser.settings.QwantPreference
-        android:key="@string/pref_key_general_makedefaultbrowser"
-        android:title="@string/settings_general_makedefaultbrowser"
-        android:widgetLayout="@layout/preference_arrowed_widget"
         app:iconSpaceReserved="false" />
+
 
 </androidx.preference.PreferenceScreen>

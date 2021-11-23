@@ -40,6 +40,14 @@
         android:paddingBottom="8dp">
 
         <ImageButton
+            android:id="@+id/back_tabs_button"
+            android:layout_width="64dp"
+            android:layout_height="48dp"
+            android:background="@android:color/transparent"
+            app:srcCompat="@drawable/ic_back"
+            app:tint="@color/qwant_text" />
+
+        <ImageButton
             android:id="@+id/tab_switch_button_background"
             android:layout_width="140dp"
             android:layout_height="40dp"
@@ -71,12 +79,21 @@
             app:srcCompat="@drawable/icons_custom_privacy_fill"
             app:tint="@color/true_white"/>
 
-        <mozilla.components.browser.menu.view.MenuButton
+        <!-- <mozilla.components.browser.menu.view.MenuButton
             android:id="@+id/tab_menu_more"
             android:layout_width="64dp"
             android:layout_height="48dp"
             android:layout_alignParentEnd="true"
-            android:src="@drawable/icons_system_more_2_fill" />
+            android:src="@drawable/icons_system_more_2_fill" /> -->
+
+        <ImageButton
+            android:id="@+id/button_delete_all_tabs"
+            android:layout_width="64dp"
+            android:layout_height="48dp"
+            android:layout_alignParentEnd="true"
+            android:background="@android:color/transparent"
+            app:srcCompat="@drawable/ic_trash"
+            app:tint="@color/qwant_text" />
     </RelativeLayout>
 
     <ListView

@@ -42,7 +42,7 @@ class QwantBarFeature(
             .mapNotNull { state -> state.selectedTab?.content?.private }
             .ifChanged()
             .collect {
-                Log.d("QWANT_BROWSER", "flow scope observer: privacy changed")
+                Log.d("QWANT_BROWSER", "qwant bar feature, flow scope observer: privacy changed")
                 qwantBar.setPrivacyMode(it)
             }
         }

@@ -6,9 +6,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <PreferenceCategory
-        android:title="@string/tracker_category"
-        android:paddingLeft="0dp" >
+    <androidx.preference.PreferenceCategory
+        android:title="@string/tracker_category" >
 
         <org.mozilla.reference.browser.settings.QwantPreferenceSwitch
             android:defaultValue="true"
@@ -22,11 +21,10 @@
             android:key="@string/pref_key_tracking_protection_private"
             app:iconSpaceReserved="false"/>
 
-    </PreferenceCategory>
+    </androidx.preference.PreferenceCategory>
 
-    <PreferenceCategory
-        android:title="@string/settings_privacy_personal_data"
-        android:paddingLeft="0dp" >
+    <androidx.preference.PreferenceCategory
+        android:title="@string/settings_privacy_personal_data">
 
         <org.mozilla.reference.browser.settings.QwantPreference
             android:key="@string/pref_key_privacy_cleardata"
@@ -37,9 +35,16 @@
         <!-- <org.mozilla.reference.browser.settings.QwantPreferenceSwitch
             android:key="@string/pref_key_privacy_cleardata_on_close"
             android:title="@string/settings_privacy_clear_data_on_close"
+            android:summary="@string/settings_privacy_clear_data_on_close_summary"
             android:defaultValue="false"
             app:iconSpaceReserved="false"/> -->
 
-    </PreferenceCategory>
+        <org.mozilla.reference.browser.settings.QwantPreference
+            android:key="@string/pref_key_privacy_cleardata_on_close_content"
+            android:title="@string/settings_privacy_clear_data_on_close"
+            android:widgetLayout="@layout/preference_arrowed_widget"
+            app:iconSpaceReserved="false" />
+
+    </androidx.preference.PreferenceCategory>
 
 </androidx.preference.PreferenceScreen>

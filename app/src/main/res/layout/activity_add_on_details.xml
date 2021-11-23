@@ -18,139 +18,149 @@
             android:paddingEnd="?android:attr/listPreferredItemPaddingEnd">
 
         <TextView
-                android:id="@+id/details"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                tools:text="@tools:sample/lorem/random" />
+            android:id="@+id/details"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:textColor="@color/qwant_text"
+            tools:text="@tools:sample/lorem/random" />
 
         <TextView
-                android:id="@+id/author_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/details"
-                android:text="@string/mozac_feature_addons_authors" />
+            android:id="@+id/author_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/details"
+            android:textColor="@color/qwant_text"
+            android:text="@string/mozac_feature_addons_authors" />
 
         <TextView
-                android:id="@+id/author_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/details"
-                android:layout_alignParentEnd="true"
-                tools:text="@tools:sample/full_names" />
+            android:id="@+id/author_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/details"
+            android:layout_alignParentEnd="true"
+            tools:text="@tools:sample/full_names"
+            android:textColor="@color/qwant_text"/>
 
         <View
-                android:id="@+id/author_divider"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_below="@+id/author_label"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"
-                android:background="@color/photonGrey40"
-                android:importantForAccessibility="no" />
+            android:id="@+id/author_divider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@+id/author_label"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:background="@color/qwant_text"
+            android:importantForAccessibility="no" />
 
         <TextView
-                android:id="@+id/version_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/author_divider"
-                android:text="@string/mozac_feature_addons_version" />
+            android:id="@+id/version_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/author_divider"
+            android:text="@string/mozac_feature_addons_version"
+            android:textColor="@color/qwant_text" />
 
         <TextView
-                android:id="@+id/version_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/author_divider"
-                android:layout_alignParentEnd="true"
-                tools:text="1.2.3" />
+            android:id="@+id/version_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/author_divider"
+            android:layout_alignParentEnd="true"
+            tools:text="1.2.3"
+            android:textColor="@color/qwant_text" />
 
         <View
-                android:id="@+id/version_divider"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_below="@+id/version_label"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"
-                android:background="@color/photonGrey40"
-                android:importantForAccessibility="no" />
+            android:id="@+id/version_divider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@+id/version_label"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:background="@color/qwant_text"
+            android:importantForAccessibility="no" />
 
         <TextView
-                android:id="@+id/last_updated_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/version_divider"
-                android:text="@string/mozac_feature_addons_last_updated" />
+            android:id="@+id/last_updated_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/version_divider"
+            android:text="@string/mozac_feature_addons_last_updated"
+            android:textColor="@color/qwant_text" />
 
         <TextView
-                android:id="@+id/last_updated_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/version_divider"
-                android:layout_alignParentEnd="true"
-                tools:text="Oct 16, 2019" />
+            android:id="@+id/last_updated_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/version_divider"
+            android:layout_alignParentEnd="true"
+            tools:text="Oct 16, 2019"
+            android:textColor="@color/qwant_text" />
 
         <View
-                android:id="@+id/last_updated_divider"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_below="@+id/last_updated_label"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"
-                android:background="@color/photonGrey40"
-                android:importantForAccessibility="no" />
+            android:id="@+id/last_updated_divider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@+id/last_updated_label"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:background="@color/qwant_text"
+            android:importantForAccessibility="no" />
 
         <TextView
-                android:id="@+id/home_page_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/last_updated_divider"
-                android:text="@string/mozac_feature_addons_home_page" />
+            android:id="@+id/home_page_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/last_updated_divider"
+            android:text="@string/mozac_feature_addons_home_page"
+            android:textColor="@color/qwant_text" />
 
         <ImageView
-                android:id="@+id/home_page_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/last_updated_divider"
-                android:layout_alignParentEnd="true"
-                android:contentDescription="@string/mozac_feature_addons_home_page"
-                android:src="@drawable/mozac_ic_link"
-                app:tint="@android:color/black" />
+            android:id="@+id/home_page_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/last_updated_divider"
+            android:layout_alignParentEnd="true"
+            android:contentDescription="@string/mozac_feature_addons_home_page"
+            android:src="@drawable/mozac_ic_link"
+            app:tint="@color/qwant_text" />
 
         <View
-                android:id="@+id/home_page_divider"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_below="@+id/home_page_label"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"
-                android:background="@color/photonGrey40"
-                android:importantForAccessibility="no" />
+            android:id="@+id/home_page_divider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@+id/home_page_label"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:background="@color/qwant_text"
+            android:importantForAccessibility="no" />
 
         <TextView
-                android:id="@+id/rating_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/home_page_divider"
-                android:text="@string/mozac_feature_addons_rating" />
+            android:id="@+id/rating_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/home_page_divider"
+            android:text="@string/mozac_feature_addons_rating"
+            android:textColor="@color/qwant_text"  />
 
         <RatingBar
-                android:id="@+id/rating_view"
-                style="@style/Widget.AppCompat.RatingBar.Small"
-                android:layout_width="wrap_content"
-                android:layout_height="20dp"
-                android:layout_below="@+id/home_page_divider"
-                android:layout_toStartOf="@+id/users_count"
-                android:isIndicator="true"
-                android:numStars="5" />
+            android:id="@+id/rating_view"
+            style="@style/Widget.AppCompat.RatingBar.Small"
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            android:layout_below="@+id/home_page_divider"
+            android:layout_toStartOf="@+id/users_count"
+            android:isIndicator="true"
+            android:numStars="5" />
 
         <TextView
-                android:id="@+id/users_count"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/home_page_divider"
-                android:layout_alignParentEnd="true"
-                android:layout_marginStart="6dp"
-                tools:text="591,642" />
+            android:id="@+id/users_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/home_page_divider"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="6dp"
+            tools:text="591,642"
+            android:textColor="@color/qwant_text"  />
 
     </RelativeLayout>
 </ScrollView>

@@ -7,11 +7,12 @@ package org.mozilla.reference.browser.components
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
-import mozilla.components.browser.session.Session
+// import mozilla.components.browser.session.Session
 import org.mozilla.reference.browser.browser.icons.BrowserIcons
-import mozilla.components.browser.session.SessionManager
-import mozilla.components.browser.session.engine.EngineMiddleware
+// import mozilla.components.browser.session.SessionManager
+// import mozilla.components.browser.session.engine.EngineMiddleware
 import mozilla.components.browser.session.storage.SessionStorage
+import mozilla.components.browser.state.engine.EngineMiddleware
 import mozilla.components.browser.state.state.BrowserState
 import mozilla.components.browser.state.store.BrowserStore
 import mozilla.components.browser.thumbnails.ThumbnailsMiddleware
@@ -45,7 +46,7 @@ import mozilla.components.feature.pwa.ManifestStorage
 import mozilla.components.feature.pwa.WebAppShortcutManager
 import mozilla.components.feature.search.middleware.SearchMiddleware
 import mozilla.components.feature.search.region.RegionMiddleware
-import mozilla.components.feature.sitepermissions.SitePermissionsStorage
+// import mozilla.components.feature.sitepermissions.SitePermissionsStorage
 import mozilla.components.service.location.LocationService
 import org.mozilla.reference.browser.addons.QwantAddonCollectionProvider
 
@@ -94,12 +95,8 @@ class Core(private val context: Context) {
                         ),
                         SearchMiddleware(context, listOf("qwant")),
                         RecordingDevicesMiddleware(context)
-                ) + EngineMiddleware.create(engine, ::findSessionById)
+                ) + EngineMiddleware.create(engine)
         )
-    }
-
-    private fun findSessionById(tabId: String): Session? {
-        return sessionManager.findSessionById(tabId)
     }
 
     val sessionStorage: SessionStorage by lazy {
@@ -112,7 +109,7 @@ class Core(private val context: Context) {
      * sessions from the [SessionStorage], and with a default session (about:blank) in
      * case all sessions/tabs are closed.
      */
-    val sessionManager by lazy {
+    /* val sessionManager by lazy {
         SessionManager(engine, store).apply {
             // Install the "icons" WebExtension to automatically load icons for every visited website.
             icons.install(engine, store = store)
@@ -124,7 +121,7 @@ class Core(private val context: Context) {
 
             MediaSessionFeature(context, MediaSessionService::class.java, store).start()
         }
-    }
+    } */
 
     val customTabsStore by lazy { CustomTabsServiceStore() }
 
@@ -145,7 +142,7 @@ class Core(private val context: Context) {
     /**
      * A storage component for site permissions.
      */
-    val sitePermissionsStorage by lazy { SitePermissionsStorage(context) }
+    // val sitePermissionsStorage by lazy { SitePermissionsStorage(context) }
 
     /**
      * Icons component for loading, caching and processing website icons.

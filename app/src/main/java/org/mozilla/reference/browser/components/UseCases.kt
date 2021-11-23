@@ -5,7 +5,7 @@
 package org.mozilla.reference.browser.components
 
 import android.content.Context
-import mozilla.components.browser.session.SessionManager
+// import mozilla.components.browser.session.SessionManager
 import mozilla.components.browser.state.store.BrowserStore
 import mozilla.components.concept.engine.Engine
 import mozilla.components.feature.contextmenu.ContextMenuUseCases
@@ -24,7 +24,6 @@ import mozilla.components.feature.tabs.TabsUseCases
  */
 class UseCases(
         private val context: Context,
-        private val sessionManager: SessionManager,
         private val store: BrowserStore,
         private val engine: Engine,
         private val shortcutManager: WebAppShortcutManager
@@ -32,12 +31,12 @@ class UseCases(
     /**
      * Use cases that provide engine interactions for a given browser session.
      */
-    val sessionUseCases by lazy { SessionUseCases(store, sessionManager) }
+    val sessionUseCases by lazy { SessionUseCases(store) }
 
     /**
      * Use cases that provide tab management.
      */
-    val tabsUseCases: TabsUseCases by lazy { TabsUseCases(store, sessionManager) }
+    val tabsUseCases: TabsUseCases by lazy { TabsUseCases(store) }
 
     /**
      * Use cases that provide search engine integration.
@@ -61,5 +60,5 @@ class UseCases(
 
     val downloadsUseCases: DownloadsUseCases by lazy { DownloadsUseCases(store) }
 
-    val customTabsUseCases: CustomTabsUseCases by lazy { CustomTabsUseCases(sessionManager, sessionUseCases.loadUrl) }
+    val customTabsUseCases: CustomTabsUseCases by lazy { CustomTabsUseCases(store, sessionUseCases.loadUrl) }
 }

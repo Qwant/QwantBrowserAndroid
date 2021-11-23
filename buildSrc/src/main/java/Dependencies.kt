@@ -4,12 +4,12 @@
 
 // Synchronized version numbers for dependencies used by (some) modules
 private object Versions {
-    const val kotlin = "1.3.50"
-    const val coroutines = "1.0.1"
+    const val kotlin = "1.5.10"
+    const val coroutines = "1.5.0"
 
-    const val androidx_appcompat = "1.0.2"
-    const val androidx_annotation = "1.1.0"
-    const val androidx_loader = "1.1.0"
+    const val androidx_appcompat = "1.3.0-rc01"
+    /* const val androidx_annotation = "1.1.0"
+    const val androidx_loader = "1.1.0" */
     const val androidx_localbroadcastmanager = "1.0.0"
     const val androidx_constraintlayout = "1.1.3"
     const val androidx_preference = "1.0.0"
@@ -17,9 +17,12 @@ private object Versions {
     const val workmanager = "2.0.0"
     const val google_material = "1.0.0"
 
-    const val android_gradle_plugin = "3.4.1"
+    const val android_gradle_plugin = "7.0.0"
+    // const val android_gradle_plugin = "3.4.1"
 
-    const val mozilla_android_components = "90.0.20210509143123"
+    const val mozilla_android_components = "94.0.20210918190139"
+    // const val mozilla_android_components = "90.0.20210509143123"
+    const val mozilla_android_components_old = "90.0.20210509143123"
 
     const val thirdparty_sentry = "1.7.10"
 
@@ -34,6 +37,7 @@ private object Versions {
     object AndroidX {
         const val core = "1.2.0"
         const val fragment_ktx = "1.3.0"
+        const val swiperefreshlayout = "1.1.0"
     }
 }
 
@@ -54,7 +58,7 @@ object Deps {
     const val mozilla_browser_engine_gecko = "org.mozilla.components:browser-engine-gecko:${Versions.mozilla_android_components}"
     const val mozilla_browser_domains = "org.mozilla.components:browser-domains:${Versions.mozilla_android_components}"
     const val mozilla_browser_search = "org.mozilla.components:browser-search:${Versions.mozilla_android_components}"
-    const val mozilla_browser_session = "org.mozilla.components:browser-session:${Versions.mozilla_android_components}"
+    const val mozilla_browser_session = "org.mozilla.components:browser-session:${Versions.mozilla_android_components_old}"
     const val mozilla_browser_session_storage = "org.mozilla.components:browser-session-storage:${Versions.mozilla_android_components}"
     const val mozilla_browser_state = "org.mozilla.components:browser-state:${Versions.mozilla_android_components}"
     const val mozilla_browser_tabstray = "org.mozilla.components:browser-tabstray:${Versions.mozilla_android_components}"
@@ -108,6 +112,7 @@ object Deps {
 
     const val mozilla_service_location = "org.mozilla.components:service-location:${Versions.mozilla_android_components}"
 
+    const val mozilla_lib_publicsuffixlist = "org.mozilla.components:lib-publicsuffixlist:${Versions.mozilla_android_components}"
     const val mozilla_lib_crash = "org.mozilla.components:lib-crash:${Versions.mozilla_android_components}"
     const val mozilla_lib_push_firebase = "org.mozilla.components:lib-push-firebase:${Versions.mozilla_android_components}"
 
@@ -120,10 +125,14 @@ object Deps {
     const val androidx_work_runtime_ktx = "androidx.work:work-runtime-ktx:${Versions.workmanager}"
     const val androidx_fragment = "androidx.fragment:fragment:${Versions.AndroidX.core}"
     const val androidx_fragment_ktx = "androidx.fragment:fragment-ktx:${Versions.AndroidX.fragment_ktx}"
+    const val androidx_swiperefreshlayout = "androidx.swiperefreshlayout:swiperefreshlayout:${Versions.AndroidX.swiperefreshlayout}"
     const val google_material = "com.google.android.material:material:${Versions.google_material}"
-    const val androidx_annotation = "androidx.annotation:annotation:${Versions.androidx_annotation}"
-    const val androidx_loader = "androidx.loader:loader:${Versions.androidx_loader}"
+    // const val androidx_annotation = "androidx.annotation:annotation:${Versions.androidx_annotation}"
+    // const val androidx_loader = "androidx.loader:loader:${Versions.androidx_loader}"
     const val androidx_localbroadcastmanager = "androidx.localbroadcastmanager:localbroadcastmanager:${Versions.androidx_localbroadcastmanager}"
+
+
+    const val keyboardvisibilityevent = "net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:2.3.0"
 
     const val tools_androidgradle = "com.android.tools.build:gradle:${Versions.android_gradle_plugin}"
     const val tools_kotlingradle = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlin}"

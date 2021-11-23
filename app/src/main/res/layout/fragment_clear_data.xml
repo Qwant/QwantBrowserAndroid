@@ -1,10 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:padding="30dp">
+
+    <LinearLayout
+        android:id="@+id/clear_data_enable_toggle_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="10dp">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="1">
+            <TextView
+                android:id="@+id/clear_data_enable_toggle_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:text="@string/enabled"
+                android:textColor="@color/qwant_main" />
+            <TextView
+                android:id="@+id/clear_data_enable_toggle_summary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:text="@string/settings_privacy_clear_data_on_close_summary"
+                android:textColor="@color/qwant_main"/>
+        </LinearLayout>
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/clear_data_enable_toggle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"/>
+    </LinearLayout>
+
     <androidx.appcompat.widget.AppCompatCheckBox
         android:id="@+id/cleardata_check_allsites"
         android:layout_width="match_parent"
@@ -60,14 +96,34 @@
         android:fontFamily="@font/asap"
         android:textColor="@color/qwant_main" />
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/cleardata_button"
-        android:layout_width="wrap_content"
+    <androidx.appcompat.widget.AppCompatCheckBox
+        android:id="@+id/cleardata_check_tabs"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
+        android:text="@string/cleardata_tabs"
+        android:textSize="16sp"
+        android:fontFamily="@font/asap"
+        android:textColor="@color/qwant_main" />
+
+    <androidx.appcompat.widget.AppCompatCheckBox
+        android:id="@+id/cleardata_check_tabs_private"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/cleardata_tabs_private"
+        android:textSize="16sp"
+        android:fontFamily="@font/asap"
+        android:textColor="@color/qwant_main" />
+
+    <Button
+        android:id="@+id/cleardata_button"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginTop="28dp"
+        android:background="@drawable/button_background"
+        android:textColor="?attr/qwant_color_selected_text"
         android:text="@string/settings_privacy_clear_data"
-        android:textColor="@color/photonWhite"
-        android:paddingStart="20dp"
-        android:paddingEnd="20dp"
-        android:layout_marginTop="20dp"/>
+        android:textSize="14sp"
+        android:textAllCaps="false"
+        tools:ignore="ButtonStyle" />
+
 </LinearLayout>

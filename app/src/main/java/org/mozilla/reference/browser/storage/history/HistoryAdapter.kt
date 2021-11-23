@@ -73,7 +73,7 @@ class HistoryAdapter(
                 itemButtonMenu.visibility = View.VISIBLE
                 itemDateTitle.visibility = View.GONE
 
-                var title = "NO TITLE"
+                var title = ""
                 if (historyItem.visit.title != null) {
                     title = if (historyItem.visit.title!!.length > MAX_TITLE_LENGTH) historyItem.visit.title!!.substring(0, MAX_TITLE_LENGTH - 3) + "..." else historyItem.visit.title!!
                 }
@@ -96,7 +96,8 @@ class HistoryAdapter(
                     BrowserMenuImageText(
                             context.getString(R.string.mozac_feature_contextmenu_open_link_in_new_tab),
                             textColorResource = R.color.qwant_text,
-                            imageResource = R.drawable.ic_ctmenu_newtab
+                            imageResource = R.drawable.ic_ctmenu_newtab,
+                            iconTintColorResource = R.color.qwant_text
                     ) {
                         context.components.useCases.tabsUseCases.addTab.invoke(historyItem.visit.url, selectTab = true)
                         historyItemSelectedCallback.invoke(historyItem.visit)
@@ -104,7 +105,8 @@ class HistoryAdapter(
                     BrowserMenuImageText(
                             context.getString(R.string.mozac_feature_contextmenu_open_link_in_private_tab),
                             textColorResource = R.color.qwant_text,
-                            imageResource = R.drawable.ic_ctmenu_newtab_private
+                            imageResource = R.drawable.ic_ctmenu_newtab_private,
+                            iconTintColorResource = R.color.qwant_text
                     ) {
                         context.components.useCases.tabsUseCases.addPrivateTab.invoke(historyItem.visit.url, selectTab = true)
                         historyItemSelectedCallback.invoke(historyItem.visit)
@@ -112,7 +114,8 @@ class HistoryAdapter(
                     BrowserMenuImageText(
                             context.getString(R.string.mozac_feature_contextmenu_copy_link),
                             textColorResource = R.color.qwant_text,
-                            imageResource = R.drawable.ic_ctmenu_clipboard
+                            imageResource = R.drawable.ic_ctmenu_clipboard,
+                            iconTintColorResource = R.color.qwant_text
                     ) {
                         val clipboard: ClipboardManager? = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
                         val clip = ClipData.newPlainText("Copied URL", historyItem.visit.url)
@@ -121,7 +124,8 @@ class HistoryAdapter(
                     BrowserMenuImageText(
                             context.getString(R.string.bookmarks_delete),
                             textColorResource = R.color.qwant_text,
-                            imageResource = R.drawable.ic_trash
+                            imageResource = R.drawable.ic_trash,
+                            iconTintColorResource = R.color.qwant_text
                     ) {
                         MainScope().launch {
                             context.components.core.historyStorage.deleteVisitsFor(historyItem.visit.url)

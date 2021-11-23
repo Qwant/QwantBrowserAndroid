@@ -9,9 +9,10 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
-import android.widget.ListView
-import android.widget.TextView
+import android.widget.*
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
 import mozilla.components.concept.storage.VisitInfo
 import mozilla.components.support.base.feature.UserInteractionHandler
 import org.mozilla.reference.browser.BrowserActivity
@@ -35,8 +36,9 @@ class HistoryFragment: Fragment(), UserInteractionHandler {
     private var currentLoadedIndex: Long = 0
 
     private var listview: ListView? = null
-    private var clearAll: TextView? = null
+    private var clearAll: ImageButton? = null
     private var layoutNoResult: LinearLayout? = null
+    private var topbar: Toolbar? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         loadVisits(0, HISTORY_PAGE_SIZE, false)
@@ -47,17 +49,27 @@ class HistoryFragment: Fragment(), UserInteractionHandler {
         listview = view.findViewById(R.id.history_listview)
         clearAll = view.findViewById(R.id.history_clear_all)
         layoutNoResult = view.findViewById(R.id.history_noresult_layout)
+        topbar = view.findViewById(R.id.history_toolbar)
 
         adapter = HistoryAdapter(requireContext(), ::historyItemSelected, ::reload, ::loadMore)
         listview!!.adapter = adapter
 
-        val clearAll: TextView = view.findViewById(R.id.history_clear_all)
-        clearAll.setOnClickListener {
-            MainScope().launch {
-                context?.components?.core?.historyStorage?.deleteEverything()
-                reload()
-            }
+        clearAll?.setOnClickListener {
+            val builder = AlertDialog.Builder(requireContext())
+            builder.setTitle("Delete history")
+                .setMessage("Do you really want to delete all history ?")
+                .setPositiveButton(android.R.string.yes) { _, _ ->
+                    MainScope().launch {
+                        context?.components?.core?.historyStorage?.deleteEverything()
+                        reload()
+                        Toast.makeText(context, "History have been cleaned up", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                .setNegativeButton(android.R.string.no, null).show()
         }
+
+        topbar?.navigationIcon?.setTint(ContextCompat.getColor(requireContext(), R.color.qwant_text))
+        topbar?.setNavigationOnClickListener { this.onBackPressed() }
 
         return view
     }
@@ -136,7 +148,8 @@ class HistoryFragment: Fragment(), UserInteractionHandler {
     }
 
     private fun closeHistory() {
-        (activity as BrowserActivity).showBrowserFragment()
+        val ba = (activity as BrowserActivity)
+        ba.showBrowserFragment()
         historyClosedCallback?.invoke()
     }
 

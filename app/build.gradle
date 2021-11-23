@@ -193,7 +193,7 @@ dependencies {
     implementation Deps.mozilla_browser_tabstray
     implementation Deps.mozilla_browser_toolbar
     implementation Deps.mozilla_browser_menu
-    implementation Deps.mozilla_browser_session
+    // implementation Deps.mozilla_browser_session
     implementation Deps.mozilla_browser_session_storage
     implementation Deps.mozilla_browser_state
     implementation Deps.mozilla_browser_icons
@@ -220,6 +220,8 @@ dependencies {
     implementation Deps.mozilla_feature_webnotifications
     implementation Deps.mozilla_feature_readerview
 
+    implementation Deps.mozilla_lib_publicsuffixlist
+
     implementation Deps.mozilla_ui_autocomplete
     implementation Deps.mozilla_ui_colors
     implementation Deps.mozilla_ui_icons
@@ -243,10 +245,13 @@ dependencies {
     implementation Deps.androidx_preference_ktx
     implementation Deps.androidx_work_runtime_ktx
     implementation Deps.androidx_fragment_ktx
+    implementation Deps.androidx_swiperefreshlayout
     implementation Deps.google_material
-    implementation Deps.androidx_annotation
-    implementation Deps.androidx_loader
+//     implementation Deps.androidx_annotation
+//    implementation Deps.androidx_loader
     implementation Deps.androidx_localbroadcastmanager
+
+    implementation Deps.keyboardvisibilityevent
 
     androidTestImplementation Deps.uiautomator
 

@@ -80,11 +80,11 @@
     <string name="menu_search">Suche</string>
     <string name="menu_bookmarks">Lesezeichen</string>
     <string name="menu_tabs">Tabs</string>
-    <string name="menu_more">@string/settings</string>
+    <string name="menu_settings">@string/settings</string>
     <string name="menu_back">Rückseite</string>
 
 
-    <string name="bookmarks_empty_1">Die Liste der Lesezeichen ist leer.</string>
+    <string name="bookmarks_empty_1">Die Liste der Lesezeichen ist leer</string>
     <string name="bookmarks_empty_2">Fügen Sie Lesezeichen über das Menü der Webseite hinzu.</string>
 
     <string name="bookmarks_delete">Löschen</string>
@@ -104,7 +104,7 @@
 
     <string name="context_menu_close_tab">Diesen Tab schließen</string>
 
-    <string name="settings_main">Qwant Einstellungen</string>
+    <string name="settings_main">Einstellungen</string>
 
     <string name="settings_general">Allgemein</string>
     <string name="settings_interface">Oberfläche</string>

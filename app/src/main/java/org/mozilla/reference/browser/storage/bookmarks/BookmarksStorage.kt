@@ -3,8 +3,10 @@ package org.mozilla.reference.browser.storage.bookmarks
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
+import android.widget.Toast
 import androidx.preference.PreferenceManager
-import mozilla.components.browser.session.Session
+import mozilla.components.browser.state.state.TabSessionState
+// import mozilla.components.browser.session.Session
 import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.storage.BookmarkItem
 import org.mozilla.reference.browser.storage.BookmarkItemV1
@@ -31,15 +33,18 @@ class BookmarksStorage(private var context: Context) {
         this.persist()
     }
 
-    fun addBookmark(session: Session?) {
+    fun addBookmark(session: TabSessionState?) {
         if (session != null) {
-            if (session.icon != null) this.addBookmark(BookmarkItemV2(BookmarkItemV2.BookmarkType.BOOKMARK, session.title, session.url, SerializableBitmap(session.icon!!)))
-            else this.addBookmark(BookmarkItemV2(BookmarkItemV2.BookmarkType.BOOKMARK, session.title, session.url))
+            val content = session.content
+            if (content.icon != null) this.addBookmark(BookmarkItemV2(BookmarkItemV2.BookmarkType.BOOKMARK, content.title, content.url, SerializableBitmap(content.icon!!)))
+            else this.addBookmark(BookmarkItemV2(BookmarkItemV2.BookmarkType.BOOKMARK, content.title, content.url))
+            Toast.makeText(context, context.getString(R.string.bookmarks_added), Toast.LENGTH_LONG).show()
         }
     }
 
     private fun deleteBookmarkChildren(item: BookmarkItemV2) {
-        item.children?.forEach { this.deleteBookmarkChildren(it) }
+        item.children.forEach { this.deleteBookmarkChildren(it) }
+        // TODO fix this. Not trully deleted
     }
 
     fun deleteBookmark(item: BookmarkItemV2) {
@@ -49,13 +54,14 @@ class BookmarksStorage(private var context: Context) {
         } else {
             this.bookmarksList.remove(item)
         }
+        Toast.makeText(context, context.getString(R.string.bookmarks_deleted), Toast.LENGTH_LONG).show()
         this.emitOnChange()
         this.persist()
     }
 
-    fun deleteBookmark(session: Session?) {
+    fun deleteBookmark(session: TabSessionState?) {
         if (session != null) {
-            val b = this.getBookmark(session.url)
+            val b = this.getBookmark(session.content.url)
             if (b != null) this.deleteBookmark(b)
         }
     }
@@ -64,7 +70,7 @@ class BookmarksStorage(private var context: Context) {
         (list ?: this.bookmarksList).forEach {
             if (it.type == BookmarkItemV2.BookmarkType.BOOKMARK) {
                 if (it.url == url) return it
-            } else if (it.children != null){
+            } else {
                 val b = getBookmark(url, it.children)
                 if (b != null) return b
             }
@@ -77,7 +83,7 @@ class BookmarksStorage(private var context: Context) {
             if (it.type == BookmarkItemV2.BookmarkType.BOOKMARK) {
                 if (it.url == url) return true
             } else {
-                if (it.children?.isNotEmpty() == true) {
+                if (it.children.isNotEmpty()) {
                     if (hasBookmark(url, it.children)) return true
                 }
             }
@@ -85,12 +91,13 @@ class BookmarksStorage(private var context: Context) {
         return false
     }
 
-    fun getBookmarks(): ArrayList<BookmarkItemV2> { return this.bookmarksList }
+    // fun getBookmarks(): ArrayList<BookmarkItemV2> { return this.bookmarksList }
     fun count(): Int { return this.bookmarksList.size }
     fun get(i: Int): BookmarkItemV2 { return this.bookmarksList[i] }
 
     fun persist() {
         try {
+            Log.d("QWANT_BROWSER", "persist bookmarks")
             val fileOutputStream: FileOutputStream = context.openFileOutput(QWANT_BOOKMARKS_FILENAME, Context.MODE_PRIVATE)
             val objectOutputStream = ObjectOutputStream(fileOutputStream)
             objectOutputStream.writeObject(this.bookmarksList)
@@ -98,6 +105,7 @@ class BookmarksStorage(private var context: Context) {
             objectOutputStream.close()
             fileOutputStream.close()
         } catch (e: Exception) {
+            Log.d("QWANT_BROWSER", "persist bookmarks error: " + e.message)
             e.printStackTrace()
         }
     }
@@ -166,9 +174,9 @@ class BookmarksStorage(private var context: Context) {
 
     private fun doRestore() {
         try {
-            val f = File(QWANT_BOOKMARKS_FILENAME)
-            if (f.exists() && f.canRead()) {
-                val fileInputStream = FileInputStream(f) // : FileInputStream = context.openFileInput(QWANT_BOOKMARKS_FILENAME)
+            val file: File = context.getFileStreamPath(QWANT_BOOKMARKS_FILENAME)
+            if (file.exists()) {
+                val fileInputStream = context.openFileInput(QWANT_BOOKMARKS_FILENAME) // FileInputStream(f)
                 val objectInputStream = ObjectInputStream(fileInputStream)
                 this.bookmarksList = objectInputStream.readObject() as ArrayList<BookmarkItemV2>
 
@@ -181,7 +189,7 @@ class BookmarksStorage(private var context: Context) {
                 fileInputStream.close()
                 this.emitOnChange()
             } else {
-                Log.w("QWANT_BROWSER", "no bookmarks to restore")
+                Log.w("QWANT_BROWSER" ,"No bookmarks yet")
             }
         } catch (e: IOException) {
             Log.e("QWANT_BROWSER", "Failed reading bookmarks file: IO exception: " + e.message)
@@ -196,7 +204,7 @@ class BookmarksStorage(private var context: Context) {
     }
 
     private fun restoreBookmarksParents(folder :BookmarkItemV2) {
-        folder.children?.forEach {
+        folder.children.forEach {
             if (it.type == BookmarkItemV2.BookmarkType.FOLDER) {
                 it.parent = folder
                 restoreBookmarksParents(it)

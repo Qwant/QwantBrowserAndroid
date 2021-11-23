@@ -53,19 +53,19 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
                     engine = requireComponents.core.engine,
                     filterExactMatch = true
             )
-            .addSessionProvider(
+            /* .addSessionProvider(
                 resources,
                 requireComponents.core.store,
                 requireComponents.useCases.tabsUseCases.selectTab)
             .addHistoryProvider(
                 requireComponents.core.historyStorage,
-                requireComponents.useCases.sessionUseCases.loadUrl)
+                requireComponents.useCases.sessionUseCases.loadUrl) */
             .addClipboardProvider(requireContext(), requireComponents.useCases.sessionUseCases.loadUrl)
 
         thumbnailsFeature.set(
                 feature = BrowserThumbnails(requireContext(),
-                        engineView,
-                        requireComponents.core.store),
+                    engineView,
+                    requireComponents.core.store),
                 owner = this,
                 view = view
         )

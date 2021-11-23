@@ -84,7 +84,7 @@ internal class QwantMenuButton @JvmOverloads constructor(
                 .mapNotNull { it as? HighlightableMenuItem }
                 .filter { it.isHighlighted() }
                 .map { it.highlight }
-                .maxBy {
+                .maxByOrNull {
                     // Select the highlight with the highest priority
                     when (it) {
                         is BrowserMenuHighlight.HighPriority -> 2

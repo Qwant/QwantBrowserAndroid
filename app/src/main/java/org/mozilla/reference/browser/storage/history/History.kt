@@ -149,7 +149,7 @@ class History(val context: Context) : HistoryStorage {
         }
         // Calculate maxScore so that we can invert our scoring.
         // Lower Levenshtein distance should produce a higher score.
-        val maxScore = urlMatches.maxBy { it.score }?.score ?: return@synchronized listOf()
+        val maxScore = urlMatches.maxByOrNull { it.score }?.score ?: return@synchronized listOf()
 
         // TODO exclude non-matching results entirely? Score that implies complete mismatch.
         matchedUrls.asSequence().sortedBy { it.value }.map {

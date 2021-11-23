@@ -84,11 +84,13 @@
             android:id="@+id/bookmark_edit_button_cancel"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:background="@drawable/button_background_light"
             android:textColor="@color/qwant_new_selected_color"
             android:layout_marginEnd="24dp"
             android:text="@string/bookmark_edit_cancel"
+            android:textSize="14sp"
+            android:textAllCaps="false"
             tools:ignore="ButtonStyle">
         </Button>
 
@@ -96,11 +98,13 @@
             android:id="@+id/bookmark_edit_button_save"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:background="@drawable/button_background"
             android:textColor="?attr/qwant_color_selected_text"
             android:layout_marginStart="24dp"
             android:text="@string/bookmark_edit_save"
+            android:textSize="14sp"
+            android:textAllCaps="false"
             tools:ignore="ButtonStyle">
         </Button>
     </LinearLayout>

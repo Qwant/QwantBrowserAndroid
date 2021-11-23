@@ -16,14 +16,13 @@ import mozilla.components.concept.base.images.ImageLoadRequest
 import mozilla.components.concept.tabstray.Tab
 import mozilla.components.support.ktx.android.util.dpToPx
 import org.mozilla.reference.browser.R
-import org.mozilla.reference.browser.tabs.tray.toTab
 
 class TabListItemRecycleViewHolder(
         item_layout: View,
         private val context: Context,
         private val thumbnailLoader: ThumbnailLoader,
         private val selectedCallback: (tab: Tab?) -> Unit,
-        private val deletedCallback: (tabSession: TabSessionState?) -> Unit
+        private val deletedCallback: (tab: Tab?) -> Unit
 ) : RecyclerView.ViewHolder(item_layout) {
     private var itemMainLayout: LinearLayout = item_layout.findViewById(R.id.tablist_item_layout)
     private var itemPreview: TabThumbnailView = item_layout.findViewById(R.id.tablist_item_preview)
@@ -31,8 +30,8 @@ class TabListItemRecycleViewHolder(
     private var itemUrl: TextView = item_layout.findViewById(R.id.tablist_item_url)
     private var itemDelete: AppCompatImageButton = item_layout.findViewById(R.id.tablist_item_delete)
 
-    fun bind(tabSession: TabSessionState, isSelected: Boolean) {
-        val tab = tabSession.toTab()
+    fun bind(tab: Tab, isSelected: Boolean) {
+        // val tab = tabSession.toTab()
 
         val title = if (tab.title.length > MAX_TITLE_LENGTH) tab.title.substring(0, MAX_TITLE_LENGTH - 3) + "..." else tab.title
         val url = if (tab.url.length > MAX_URL_LENGTH) tab.url.substring(0, MAX_URL_LENGTH - 3) + "..." else tab.url
@@ -40,7 +39,7 @@ class TabListItemRecycleViewHolder(
         this.itemTitle.text = title
         this.itemUrl.text = url
         this.itemMainLayout.setOnClickListener { selectedCallback.invoke(tab) }
-        this.itemDelete.setOnClickListener { deletedCallback.invoke(tabSession) }
+        this.itemDelete.setOnClickListener { deletedCallback.invoke(tab) }
 
         this.setThumbnail(tab)
         this.setSelected(isSelected)
@@ -48,7 +47,7 @@ class TabListItemRecycleViewHolder(
 
     private fun setSelected(isSelected: Boolean) {
         if (isSelected) {
-            this.itemMainLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.qwant_tab_selected))
+            this.itemMainLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.qwant_tabs_selected))
         } else {
             this.itemMainLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.qwant_background))
         }

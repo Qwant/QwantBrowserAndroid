@@ -13,7 +13,6 @@ import androidx.preference.PreferenceManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import mozilla.components.browser.session.Session
 import mozilla.components.browser.state.action.SystemAction
 import mozilla.components.feature.addons.update.GlobalAddonDependencyProvider
 import mozilla.components.support.base.log.Log
@@ -69,17 +68,33 @@ open class BrowserApplication : Application(), Application.ActivityLifecycleCall
             runtime = components.core.engine,
             store = components.core.store,
             onNewTabOverride = { _, engineSession, url ->
-                val session = Session(url)
-                components.core.sessionManager.add(session, true, engineSession)
-                session.id
+                val tabId = components.useCases.tabsUseCases.addTab(
+                        url = url,
+                        selectTab = true,
+                        engineSession = engineSession
+                )
+                tabId
             },
             onCloseTabOverride = { _, sessionId ->
                 components.useCases.tabsUseCases.removeTab(sessionId)
             },
             onSelectTabOverride = { _, sessionId ->
-                val selected = components.core.sessionManager.findSessionById(sessionId)
-                selected?.let { components.useCases.tabsUseCases.selectTab(it.id) }
-            }
+                components.useCases.tabsUseCases.selectTab(sessionId)
+            },
+            onExtensionsLoaded = { _ ->
+                /* components.core.addonUpdater.registerForFutureUpdates(extensions)
+
+                val checker = components.core.supportedAddonsChecker
+                val hasUnsupportedAddons = extensions.any { it.isUnsupported() }
+                if (hasUnsupportedAddons) {
+                    checker.registerForChecks()
+                } else {
+                    // As checks are a persistent subscriptions, we have to make sure
+                    // we remove any previous subscriptions.
+                    checker.unregisterForChecks()
+                } */
+            },
+            onUpdatePermissionRequest = components.core.addonUpdater::onUpdatePermissionRequest
         )
     }
 
@@ -109,13 +124,13 @@ open class BrowserApplication : Application(), Application.ActivityLifecycleCall
         }
     }
 
-    override fun onActivityResumed(activity: Activity?) { this.currentActivity = activity }
-    override fun onActivityStarted(activity: Activity?) { this.currentActivity = activity }
-    override fun onActivityCreated(activity: Activity?, savedInstanceState: Bundle?) { this.currentActivity = activity }
-    override fun onActivityPaused(activity: Activity?) { }
-    override fun onActivityDestroyed(activity: Activity?) { }
-    override fun onActivitySaveInstanceState(activity: Activity?, outState: Bundle?) { }
-    override fun onActivityStopped(activity: Activity?) { }
+    override fun onActivityResumed(activity: Activity) { this.currentActivity = activity }
+    override fun onActivityStarted(activity: Activity) { this.currentActivity = activity }
+    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) { this.currentActivity = activity }
+    override fun onActivityPaused(activity: Activity) { }
+    override fun onActivityDestroyed(activity: Activity) { }
+    override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) { }
+    override fun onActivityStopped(activity: Activity) { }
 }
 
 private fun setupLogging() {

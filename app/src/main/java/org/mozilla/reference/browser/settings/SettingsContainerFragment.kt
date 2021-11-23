@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.fragment_settings.*
 import mozilla.components.support.base.feature.UserInteractionHandler
@@ -49,6 +50,7 @@ class SettingsContainerFragment: Fragment(), UserInteractionHandler {
         val tmp2 = arguments?.getBoolean(BUNDLE_THEME_CHANGE)
         if (tmp2 != null) themeChangedReload = tmp2
 
+        settings_toolbar.navigationIcon?.setTint(ContextCompat.getColor(requireContext(), R.color.qwant_text))
         settings_toolbar.setNavigationOnClickListener {
             this.onBackPressed()
         }

@@ -35,7 +35,7 @@ class SettingsGeneralLanguageFragment: BaseSettingsFragment() {
         toggleRegionForLanguage(languageIndex, prefRegionSearch.value)
 
         prefLanguageInterface.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, value ->
-            this.refreshQwantPage(interfaceLanguage = value as String)
+            QwantUtils.refreshQwantPages(requireContext(), interface_language = value as String)
 
             val localeStringSplit = value.split('_')
             val locale = Locale(localeStringSplit[0], localeStringSplit[1])
@@ -55,14 +55,14 @@ class SettingsGeneralLanguageFragment: BaseSettingsFragment() {
             prefLanguageSearch.summary = searchValues[index]
             toggleRegionForLanguage(index)
 
-            this.refreshQwantPage(searchLanguage = value as String)
+            QwantUtils.refreshQwantPages(requireContext(), search_language = value as String)
 
             true
         }
         prefRegionSearch.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, value ->
             prefRegionSearch.summary = prefRegionSearch.entries[prefRegionSearch.findIndexOfValue(value as String)]
 
-            this.refreshQwantPage(searchRegion = value)
+            QwantUtils.refreshQwantPages(requireContext(), search_region = value)
 
             true
         }
@@ -76,8 +76,8 @@ class SettingsGeneralLanguageFragment: BaseSettingsFragment() {
         return true
     }
 
-    private fun refreshQwantPage(interfaceLanguage: String? = null, searchLanguage: String? = null, searchRegion: String? = null) {
-        requireComponents.core.sessionManager.sessions.forEach {
+    /* private fun refreshQwantPage(interfaceLanguage: String? = null, searchLanguage: String? = null, searchRegion: String? = null) {
+        /* requireComponents.core.sessionManager.sessions.forEach {
             if (it.url.startsWith(requireContext().getString(R.string.homepage_startwith_filter))) {
                 var query: String? = null
                 if (it.url.contains("?q=") || it.url.contains("&q=")) {
@@ -86,8 +86,14 @@ class SettingsGeneralLanguageFragment: BaseSettingsFragment() {
                 val reloadPage = QwantUtils.getHomepage(requireContext(), query = query, interface_language = interfaceLanguage, search_language = searchLanguage, search_region = searchRegion)
                 requireComponents.useCases.sessionUseCases.loadUrl(reloadPage, it.id)
             }
+        } */
+
+        requireComponents.core.store.state.tabs.forEach {
+            if (it.content.url.startsWith(requireContext().getString(R.string.homepage_startwith_filter))) {
+                requireComponents.useCases.sessionUseCases.reload.invoke(it.id)
+            }
         }
-    }
+    } */
 
     private fun toggleRegionForLanguage(languageIndex: Int, value: String? = null) {
         val listArrayKeys = resources.obtainTypedArray(R.array.region_list_arrays_keys)

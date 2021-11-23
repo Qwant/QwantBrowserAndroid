@@ -4,10 +4,12 @@
 
 package org.mozilla.reference.browser.settings
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.preference.Preference
 import org.mozilla.reference.browser.BrowserActivity
 import org.mozilla.reference.browser.R
+import org.mozilla.reference.browser.addons.AddonsActivity
 import org.mozilla.reference.browser.ext.getPreferenceKey
 
 class SettingsMainFragment: BaseSettingsFragment() {
@@ -19,11 +21,15 @@ class SettingsMainFragment: BaseSettingsFragment() {
     override fun setupPreferences() {
         findPreference(context?.getPreferenceKey(R.string.pref_key_privacy)).onPreferenceClickListener = getPreferenceLinkListener(PrivacySettingsFragment(), "SETTINGS_PRIVACY_FRAGMENT")
         findPreference(context?.getPreferenceKey(R.string.pref_key_general)).onPreferenceClickListener = getPreferenceLinkListener(SettingsGeneralFragment(), "SETTINGS_GENERAL_FRAGMENT")
-        // findPreference(context?.getPreferenceKey(pref_key_interface)).onPreferenceClickListener = getPreferenceLinkListener(SettingsInterfaceFragment(), "SETTINGS_INTERFACE_FRAGMENT")
         findPreference(context?.getPreferenceKey(R.string.pref_key_about_menu)).onPreferenceClickListener = getPreferenceLinkListener(AboutMenuFragment(), "SETTINGS_ABOUTMENU_FRAGMENT")
-
         findPreference(context?.getPreferenceKey(R.string.pref_key_history)).onPreferenceClickListener = Preference.OnPreferenceClickListener {
             (activity as BrowserActivity).showHistory()
+            true
+        }
+        findPreference(context?.getPreferenceKey(R.string.pref_key_addons_menu)).onPreferenceClickListener = Preference.OnPreferenceClickListener {
+            val intent = Intent(context, AddonsActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            context?.startActivity(intent)
             true
         }
     }
