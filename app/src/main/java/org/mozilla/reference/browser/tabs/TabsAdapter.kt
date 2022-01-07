@@ -44,7 +44,7 @@ class TabsAdapter(
             val title = if (tab.title.length > MAX_TITLE_LENGTH) tab.title.substring(0, MAX_TITLE_LENGTH - 3) + "..." else tab.title
 
             val host: String = try {
-                URI(tab.url).host
+                URI(tab.url).host ?: tab.url
             } catch (e: URISyntaxException) {
                 tab.url
             }
