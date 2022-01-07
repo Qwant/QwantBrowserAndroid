@@ -283,8 +283,8 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
             }
         }
 
-        super.onBackPressed()
         removeSessionIfNeeded()
+        this.finish()
     }
 
     override fun onAttachFragment(fragment: Fragment) {

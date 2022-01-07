@@ -1,10 +1,6 @@
 package org.mozilla.reference.browser.browser
 
 import android.content.Context
-// import mozilla.components.browser.session.SessionManager
-// import mozilla.components.browser.session.ext.toTabSessionState
-import mozilla.components.browser.state.selector.findTabOrCustomTabOrSelectedTab
-import mozilla.components.browser.state.selector.getNormalOrPrivateTabs
 import mozilla.components.browser.state.selector.selectedTab
 import mozilla.components.browser.state.store.BrowserStore
 import mozilla.components.concept.engine.EngineView
@@ -39,7 +35,7 @@ class QwantSessionFeature(
      * @return true if the event was handled, otherwise false.
      */
     override fun onBackPressed(): Boolean {
-        val tab = store.state.selectedTab // findTabOrCustomTabOrSelectedTab(tabId)
+        val tab = store.state.selectedTab
 
         if (engineView.canClearSelection()) {
             engineView.clearSelection()
@@ -48,52 +44,17 @@ class QwantSessionFeature(
             useCases.sessionUseCases.goBack(tab.id)
             return true
         } else {
-            /* val session = tabId?.let {
-                sessionManager.findSessionById(it)
-            } ?: sessionManager.selectedSession */
-
             if (store.state.tabs.size > 1 && tab != null) {
                 if (tab.parentId != null) {
                     useCases.tabsUseCases.selectTab(tab.parentId!!)
                     useCases.tabsUseCases.removeTab(tab.id)
                     return true
-
-                    /* val parentId = session.toTabSessionState().parentId
-                    sessionManager.sessions.forEach {
-                        if (it.id == parentId) {
-                            sessionManager.select(it)
-
-                            // val engineSession = it.toCustomTabSessionState().engineState.engineSession
-                            // if (engineSession != null) engineView.render(engineSession)
-
-                            useCases.tabsUseCases.removeTab(session.id)
-                            return true
-                        }
-                    } */
-                } else {
-                    useCases.tabsUseCases.selectOrAddTab(QwantUtils.getHomepage(context.applicationContext), tab.content.private)
-                    return true
-
-                    /* val currentSessionPrivate = tab.content.private
-                    store.state.getNormalOrPrivateTabs(currentSessionPrivate).forEach {
-                        if (it.content.url.startsWith(context.getString(R.string.homepage_startwith_filter))) {
-                            sessionManager.select(it)
-                            useCases.tabsUseCases.selectTab(it.id)
-                            useCases.tabsUseCases.removeTab(session.id)
-                            return true
-                        }
-                    }
-                    sessionManager.sessions.forEach {
-                        if (it.private == currentSessionPrivate && it.url.startsWith(context.getString(R.string.homepage_startwith_filter))) {
-                            sessionManager.select(it)
-                            useCases.tabsUseCases.removeTab(session.id)
-                            return true
-                        }
-                    }
-
-                    useCases.sessionUseCases.loadUrl(QwantUtils.getHomepage(context.applicationContext))
-                    return true */
                 }
+            }
+            if (tab?.content?.url?.startsWith(context.getString(R.string.homepage_startwith_filter), false) == false) {
+                useCases.tabsUseCases.selectOrAddTab(QwantUtils.getHomepage(context.applicationContext), tab.content.private)
+                useCases.tabsUseCases.removeTab(tab.id)
+                return true
             }
         }
 
