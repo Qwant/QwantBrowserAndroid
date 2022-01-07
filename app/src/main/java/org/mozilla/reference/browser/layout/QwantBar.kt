@@ -170,14 +170,6 @@ class QwantBar @JvmOverloads constructor(
                 iconTintColorResource = menuItemColor,
                 imageResource = R.drawable.icons_system_settings_line
             ) { onSettingsClicked?.invoke() },
-
-            BrowserMenuImageText(
-                context.getString(R.string.context_menu_quit_app),
-                textColorResource = menuItemColor,
-                iconTintColorResource = menuItemColor,
-                imageResource = R.drawable.ic_quit_app
-            ) { onQuitAppClicked?.invoke() }
-            .apply { visible = { prefs.getBoolean(context.getString(R.string.pref_key_privacy_cleardata_on_close), false) }}
         )
     }
 
@@ -270,7 +262,6 @@ class QwantBar @JvmOverloads constructor(
     }
 
     fun setPrivacyMode(enabled: Boolean) {
-        Log.d("QWANT_BROWSER", "Set QwantBar privacy: $enabled")
         if (enabled != currentPrivacyEnabled) {
             currentPrivacyEnabled = enabled
             qwantbar_button_tabs_privacy.visibility = if (enabled) VISIBLE else GONE

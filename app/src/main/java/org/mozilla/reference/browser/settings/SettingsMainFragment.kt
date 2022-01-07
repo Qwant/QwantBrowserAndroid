@@ -7,6 +7,7 @@ package org.mozilla.reference.browser.settings
 import android.content.Intent
 import android.os.Bundle
 import androidx.preference.Preference
+import androidx.preference.PreferenceManager
 import org.mozilla.reference.browser.BrowserActivity
 import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.addons.AddonsActivity
@@ -31,6 +32,15 @@ class SettingsMainFragment: BaseSettingsFragment() {
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             context?.startActivity(intent)
             true
+        }
+        val quitAppPref = findPreference(context?.getPreferenceKey(R.string.pref_key_quit_app))
+        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean(getString(R.string.pref_key_privacy_cleardata_on_close) , false)) {
+            quitAppPref.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+                (activity as BrowserActivity).quitApp()
+                true
+            }
+        } else {
+            quitAppPref.isVisible = false
         }
     }
 

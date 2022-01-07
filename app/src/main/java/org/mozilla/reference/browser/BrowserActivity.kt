@@ -512,7 +512,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         super.onActivityResult(requestCode, resultCode, data)
     }
 
-    private fun quitApp() {
+    fun quitApp() {
         QwantUtils.clearDataOnQuit(this,
             success = {
                 Toast.makeText(this, R.string.cleardata_done, Toast.LENGTH_LONG).show()

@@ -35,4 +35,9 @@
         android:icon="@drawable/ic_settings_about"
         android:widgetLayout="@layout/preference_arrowed_widget" />
 
+    <org.mozilla.reference.browser.settings.QwantPreference
+        android:key="@string/pref_key_quit_app"
+        android:title="@string/context_menu_quit_app"
+        android:icon="@drawable/ic_quit_app" />
+
 </androidx.preference.PreferenceScreen>
