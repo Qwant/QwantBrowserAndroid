@@ -23,9 +23,9 @@ class BookmarksAdapter(
         private val bookmarkStorage: BookmarksStorage,
         private val bookmarkSelectedCallback: (bookmarkItem: BookmarkItemV2, private: Boolean) -> Unit,
         private val bookmarkEditCallback: (bookmarkItem: BookmarkItemV2) -> Unit,
-        parent: BookmarkItemV2? = null
+        private val parent: BookmarkItemV2? = null
 ) : BaseAdapter() {
-    private var list: ArrayList<BookmarkItemV2>? = if (parent == null) bookmarkStorage.root() else parent.children
+    private var list: List<BookmarkItemV2>? = (parent?.children ?: bookmarkStorage.root()).sortedWith(compareByDescending<BookmarkItemV2> { it.type }.thenBy { it.title })
 
     internal class BookmarkItemViewHolder(
             item_layout: View,
@@ -192,5 +192,10 @@ class BookmarksAdapter(
         if (this.list != null)
             return this.list!!.count()
         return 0
+    }
+
+    override fun notifyDataSetChanged() {
+        list = (parent?.children ?: bookmarkStorage.root()).sortedWith(compareByDescending<BookmarkItemV2> { it.type }.thenBy { it.title })
+        super.notifyDataSetChanged()
     }
 }
