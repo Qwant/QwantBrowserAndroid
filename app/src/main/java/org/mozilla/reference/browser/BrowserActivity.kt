@@ -451,7 +451,9 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
     }
 
     private fun showHome() {
-        components.useCases.tabsUseCases.selectOrAddTab(QwantUtils.getHomepage(applicationContext), components.core.store.state.selectedTab?.content?.private ?: false)
+        val tabId = components.useCases.tabsUseCases.selectOrAddTab(QwantUtils.getHomepage(applicationContext), components.core.store.state.selectedTab?.content?.private ?: false)
+        components.useCases.sessionUseCases.reload(tabId)
+
         this.showBrowserFragment()
         qwantbar.setupHomeBar()
         qwantbar.setPrivacyModeFromBrowser()
