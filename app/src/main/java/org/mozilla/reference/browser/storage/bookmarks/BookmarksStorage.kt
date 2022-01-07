@@ -6,7 +6,6 @@ import android.util.Log
 import android.widget.Toast
 import androidx.preference.PreferenceManager
 import mozilla.components.browser.state.state.TabSessionState
-// import mozilla.components.browser.session.Session
 import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.storage.BookmarkItem
 import org.mozilla.reference.browser.storage.BookmarkItemV1
@@ -42,21 +41,16 @@ class BookmarksStorage(private var context: Context) {
         }
     }
 
-    private fun deleteBookmarkChildren(item: BookmarkItemV2) {
-        item.children.forEach { this.deleteBookmarkChildren(it) }
-        // TODO fix this. Not trully deleted
-    }
-
     fun deleteBookmark(item: BookmarkItemV2) {
-        this.deleteBookmarkChildren(item)
         if (item.parent != null) {
             item.parent?.removeChild(item)
         } else {
             this.bookmarksList.remove(item)
         }
-        Toast.makeText(context, context.getString(R.string.bookmarks_deleted), Toast.LENGTH_LONG).show()
-        this.emitOnChange()
+
         this.persist()
+        this.emitOnChange()
+        Toast.makeText(context, context.getString(R.string.bookmarks_deleted), Toast.LENGTH_LONG).show()
     }
 
     fun deleteBookmark(session: TabSessionState?) {
@@ -83,7 +77,7 @@ class BookmarksStorage(private var context: Context) {
             if (it.type == BookmarkItemV2.BookmarkType.BOOKMARK) {
                 if (it.url == url) return true
             } else {
-                if (it.children.isNotEmpty()) {
+                if (it.children?.isNotEmpty()) {
                     if (hasBookmark(url, it.children)) return true
                 }
             }
@@ -180,7 +174,7 @@ class BookmarksStorage(private var context: Context) {
                 val objectInputStream = ObjectInputStream(fileInputStream)
                 this.bookmarksList = objectInputStream.readObject() as ArrayList<BookmarkItemV2>
 
-                // reload parents, ignored in serialization else we would infinite recursion
+                // reload parents, ignored in serialization else we would go infinite recursion
                 this.bookmarksList.filter { it.type == BookmarkItemV2.BookmarkType.FOLDER }.forEach {
                     restoreBookmarksParents(it)
                 }
@@ -204,7 +198,7 @@ class BookmarksStorage(private var context: Context) {
     }
 
     private fun restoreBookmarksParents(folder :BookmarkItemV2) {
-        folder.children.forEach {
+        folder.children?.forEach {
             if (it.type == BookmarkItemV2.BookmarkType.FOLDER) {
                 it.parent = folder
                 restoreBookmarksParents(it)
