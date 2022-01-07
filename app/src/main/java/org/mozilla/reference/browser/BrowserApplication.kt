@@ -102,7 +102,11 @@ open class BrowserApplication : Application(), Application.ActivityLifecycleCall
         val store = components.core.store
         val sessionStorage = components.core.sessionStorage
 
-        components.useCases.tabsUseCases.restore(sessionStorage)
+        components.useCases.tabsUseCases.restore(sessionStorage).invokeOnCompletion {
+            if (components.core.store.state.tabs.isEmpty()) {
+                components.useCases.tabsUseCases.addTab(QwantUtils.getHomepage(applicationContext), selectTab = true)
+            }
+        }
 
         // if (currentActivity != null && currentActivity is BrowserActivity)
         //    (currentActivity as BrowserActivity).updateTabCount()
