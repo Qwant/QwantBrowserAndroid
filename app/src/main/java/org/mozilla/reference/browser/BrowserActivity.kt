@@ -44,6 +44,8 @@ import org.mozilla.reference.browser.storage.history.HistoryFragment
 import org.mozilla.reference.browser.tabs.QwantTabsFragment
 import java.util.*
 import kotlin.system.exitProcess
+import androidx.core.view.WindowInsetsControllerCompat
+import mozilla.components.support.ktx.android.content.getColorFromAttr
 
 /**
  * Activity that holds the [BrowserFragment].
@@ -91,6 +93,16 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         setContentView(R.layout.activity_main)
 
         super.onCreate(savedInstanceState)
+
+        val statusbarBackground = getColorFromAttr(R.attr.qwant_systembar_background)
+        window?.statusBarColor = statusbarBackground
+        window?.navigationBarColor = statusbarBackground
+        val view = window?.decorView
+        if (window != null && view != null) {
+            val controller = WindowInsetsControllerCompat(window, view)
+            controller.isAppearanceLightNavigationBars = (darkmode == 16)
+            controller.isAppearanceLightStatusBars = (darkmode == 16)
+        }
 
         bookmarksStorage = BookmarksStorage(applicationContext)
         bookmarksStorage?.restore()
