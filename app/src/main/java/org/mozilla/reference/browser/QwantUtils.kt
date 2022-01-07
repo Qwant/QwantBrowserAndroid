@@ -24,7 +24,9 @@ class QwantUtils {
                 adult_content: String? = null,
                 news_on_home: Boolean? = null,
                 results_in_new_tab: Boolean? = null,
-                dark_theme: String? = null
+                dark_theme: String? = null,
+                maps: Boolean = false,
+                music: Boolean = false
         ) : String {
             val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
@@ -47,7 +49,9 @@ class QwantUtils {
 
             val builder = StringBuilder()
             builder.append(context.getString(R.string.homepage_base))
-                .append("?client=").append(client)
+            if (maps) builder.append("maps/")
+            if (music) builder.append("music/search")
+            builder.append("?client=").append(client)
                 .append("&l=").append(l?.toLowerCase(Locale.getDefault()))
                 .append("&sr=").append(sr)
                 .append("&r=").append(r)

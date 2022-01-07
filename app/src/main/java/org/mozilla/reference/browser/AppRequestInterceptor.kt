@@ -24,7 +24,7 @@ class AppRequestInterceptor(private val context: Context) : RequestInterceptor {
             isSubframeRequest: Boolean
     ): RequestInterceptor.InterceptionResponse? {
         if (uri.startsWith(context.getString(R.string.homepage_startwith_filter))) {
-            if (uri.indexOf("&qbc=1") == -1) {
+            if (uri.indexOf("&qbc=1") == -1 && !uri.startsWith(context.getString(R.string.qwantmaps_result_startwith_filter))) {
                 var searchStart = uri.indexOf("&q=")
                 if (searchStart == -1) searchStart = uri.indexOf("?q=")
                 if (searchStart != -1) {
@@ -32,7 +32,13 @@ class AppRequestInterceptor(private val context: Context) : RequestInterceptor {
                     if (searchEnd == -1) searchEnd = uri.length
                     val searchTerms = uri.substring(searchStart + 3, searchEnd)
 
-                    return RequestInterceptor.InterceptionResponse.Url(QwantUtils.getHomepage(context, query = searchTerms))
+                    val isMaps = uri.startsWith(context.getString(R.string.qwantmaps_startwith_filter))
+                    val isMusic = uri.startsWith(context.getString(R.string.qwantmusic_startwith_filter))
+                    val redirectUri = QwantUtils.getHomepage(context, query = searchTerms, maps = isMaps, music = isMusic)
+
+                    Log.d("QWANT_BROWSER_REDIRECT", "redirect $uri to $redirectUri")
+
+                    return RequestInterceptor.InterceptionResponse.Url(redirectUri)
                 }
             }
         }
