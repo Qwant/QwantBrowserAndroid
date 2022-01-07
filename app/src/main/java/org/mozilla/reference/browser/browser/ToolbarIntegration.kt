@@ -127,11 +127,10 @@ class ToolbarIntegration(
 
         toolbar.edit.hint = context.getString(R.string.toolbar_hint)
         toolbar.edit.colors = toolbar.edit.colors.copy(
-            /* TODO clear = context.getColorFromAttr(R.attr.qwant_toolbar_TextColor),
-            hint = context.getColorFromAttr(R.attr.qwant_color_light),
-            text = context.getColorFromAttr(R.attr.qwant_toolbar_TextColor),
-            suggestionBackground = context.getColorFromAttr(R.attr.qwant_color_selected),
-            suggestionForeground = context.getColorFromAttr(R.attr.qwant_color_selected_text) */
+            text = context.getColorFromAttr(R.attr.qwant_toolbar_EditTextColor),
+            hint = context.getColorFromAttr(R.attr.qwant_toolbar_HintColor),
+            suggestionBackground = context.getColorFromAttr(R.attr.qwant_toolbar_SuggestionBackgroundColor),
+            suggestionForeground = context.getColorFromAttr(R.attr.qwant_toolbar_SuggestionForegroundColor)
         )
     }
 

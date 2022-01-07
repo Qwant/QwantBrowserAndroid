@@ -42,12 +42,15 @@
 
     <!-- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA -->
 
+    <attr name="qwant_systembar_background" format="reference|color" />
+
     <!-- Toolbar -->
     <attr name="qwant_toolbar_BackgroundColor" format="reference|color" />
     <attr name="qwant_toolbar_UrlBoxColor" format="reference|color" />
 
     <attr name="qwant_toolbar_HintColor" format="reference|color" />
     <attr name="qwant_toolbar_TextColor" format="reference|color" />
+    <attr name="qwant_toolbar_EditTextColor" format="reference|color" />
     <attr name="qwant_toolbar_IconsColor" format="reference|color" />
     <attr name="qwant_toolbar_InsecureColor" format="reference|color" />
     <attr name="qwant_toolbar_SecureColor" format="reference|color" />

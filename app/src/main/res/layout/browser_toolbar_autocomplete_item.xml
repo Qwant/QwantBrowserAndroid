@@ -44,13 +44,14 @@
         android:ellipsize="end"
         android:lines="1"
         android:textSize="15sp"
-        app:layout_constraintBottom_toTopOf="@+id/mozac_browser_awesomebar_description"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/mozac_browser_awesomebar_edit_suggestion"
         app:layout_constraintStart_toEndOf="@+id/mozac_browser_awesomebar_icon"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="packed"
         tools:text="Android Components" />
 
+    <!-- This is hidden, to not display "qwant" every line. Visibility is modified by mozilla component so we trick to move it out of view -->
     <TextView
         android:id="@+id/mozac_browser_awesomebar_description"
         android:layout_width="0dp"
@@ -60,10 +61,9 @@
         android:ellipsize="end"
         android:lines="1"
         android:textSize="12sp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/mozac_browser_awesomebar_edit_suggestion"
         app:layout_constraintStart_toEndOf="@+id/mozac_browser_awesomebar_icon"
-        app:layout_constraintTop_toBottomOf="@id/mozac_browser_awesomebar_title"
         tools:text="https://github.com/mozilla-mobile/android-components" />
 
     <ImageButton

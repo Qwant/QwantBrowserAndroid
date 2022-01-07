@@ -12,6 +12,8 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
 import kotlinx.android.synthetic.main.component_qwantbar.view.*
 import kotlinx.coroutines.*
@@ -255,13 +257,14 @@ class QwantBar @JvmOverloads constructor(
         qwantbar_text_settings.setTextColor(colorSettings)
         qwantbar_text_settings.setCompoundDrawablesWithIntrinsicBounds(null, drawableSettings, null, null)
 
-        // TODO Change tabs buttons
-        val tabColor = if (selection == QwantBarSelection.TABS) colorSelected else colorDefault
-        tabButtonBox?.setImageDrawable(DrawableUtils.loadAndTintDrawable(context, R.drawable.qwant_tabcounter_box, tabColor))
-        tabButtonText?.setTextColor(tabColor)
+        val boxTextColor = if (selection == QwantBarSelection.TABS) ContextCompat.getColor(context, R.color.qwant_white) else colorDefault
+        val boxDrawableId = if (selection == QwantBarSelection.TABS) R.drawable.qwant_tabcounter_box_selected else R.drawable.qwant_tabcounter_box
+        val boxDrawable = AppCompatResources.getDrawable(context, boxDrawableId)
+        tabButtonBox?.setImageDrawable(boxDrawable)
+        tabButtonText?.setTextColor(boxTextColor)
         qwantbar_text_tabs.setTextColor(if (selection == QwantBarSelection.TABS) colorSelected else colorDefault)
-        navTabButtonBox?.setImageDrawable(DrawableUtils.loadAndTintDrawable(context, R.drawable.qwant_tabcounter_box, tabColor))
-        navTabButtonText?.setTextColor(tabColor)
+        navTabButtonBox?.setImageDrawable(boxDrawable)
+        navTabButtonText?.setTextColor(boxTextColor)
 
         qwantbar_button_nav_menu.setColorFilter(colorDefault)
     }
@@ -273,7 +276,12 @@ class QwantBar @JvmOverloads constructor(
             qwantbar_button_tabs_privacy.visibility = if (enabled) VISIBLE else GONE
             qwantbar_button_nav_tabs_privacy.visibility = if (enabled) VISIBLE else GONE
             this.setHighlight(currentSelection)
+            this.updateTabCount()
         }
+    }
+
+    fun setPrivacyModeFromBrowser() {
+        this.setPrivacyMode(context.components.core.store.state.selectedTab?.content?.private ?: false)
     }
 
     private fun getIcon(icon: QwantBarIcon) : Int {
@@ -340,6 +348,7 @@ class QwantBar @JvmOverloads constructor(
     }
 
     fun changeBackwardButton(canBackward: Boolean) {
+        qwantbar_button_nav_back.isEnabled = canBackward
         val backwardColor = if (canBackward) context.getColorFromAttr(R.attr.qwantbar_normalColor) else context.getColorFromAttr(R.attr.qwantbar_disabledColor)
         qwantbar_button_nav_back.setColorFilter(backwardColor)
     }

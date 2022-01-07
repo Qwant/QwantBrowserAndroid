@@ -17,15 +17,13 @@ import mozilla.components.feature.awesomebar.provider.SearchSuggestionProvider
 import mozilla.components.feature.toolbar.WebExtensionToolbarFeature
 import mozilla.components.support.base.feature.UserInteractionHandler
 import mozilla.components.support.base.feature.ViewBoundFeatureWrapper
-import mozilla.components.support.ktx.android.content.getColorFromAttr
 import mozilla.components.support.ktx.android.util.dpToPx
 import mozilla.components.support.ktx.android.view.enterToImmersiveMode
 import mozilla.components.support.ktx.android.view.exitImmersiveModeIfNeeded
 import org.mozilla.reference.browser.BrowserActivity
-import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.ext.components
 import org.mozilla.reference.browser.ext.requireComponents
-import org.mozilla.reference.browser.qwant.ToolbarControlFeature
+
 
 
 /**
@@ -98,17 +96,6 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
             toolbar.visibility = View.VISIBLE
             swipeRefresh.setPadding(0, 56.dpToPx(Resources.getSystem().displayMetrics), 0, 0)
             activity?.exitImmersiveModeIfNeeded()
-
-            // Restore system UI colors
-            activity?.window?.statusBarColor = requireContext().getColorFromAttr(R.attr.qwant_color_background_dark)
-            activity?.window?.navigationBarColor = requireContext().getColorFromAttr(R.attr.qwant_color_background_dark)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                var flags = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    flags = flags or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-                }
-                activity?.window?.decorView?.systemUiVisibility = flags
-            }
         }
     }
 

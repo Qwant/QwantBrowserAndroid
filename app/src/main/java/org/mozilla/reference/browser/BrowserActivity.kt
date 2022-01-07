@@ -359,6 +359,9 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
     }
 
     private fun showBookmarks() {
+        val isPrivate = components.core.store.state.selectedTab?.content?.private ?: false
+        setTheme(if (isPrivate) R.style.ThemeQwantNoActionBarPrivacy else R.style.ThemeQwantNoActionBar)
+
         var bookmarksFragment = this.supportFragmentManager.findFragmentByTag("BOOKMARKS_FRAGMENT")
         if (bookmarksFragment == null) {
             bookmarksFragment = BookmarksFragment()
@@ -369,6 +372,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         }
         this.supportFragmentManager.executePendingTransactions()
         qwantbar.setHighlight(QwantBar.QwantBarSelection.BOOKMARKS)
+        qwantbar.setPrivacyModeFromBrowser()
         qwantbar.hideIfInNavigation()
     }
 
@@ -376,6 +380,9 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         if (applicationContext.components.core.store.state.tabs.isEmpty()) {
             applicationContext.components.useCases.tabsUseCases.addTab(QwantUtils.getHomepage(applicationContext))
         }
+
+        val isPrivate = components.core.store.state.selectedTab?.content?.private ?: false
+        setTheme(if (isPrivate) R.style.ThemeQwantNoActionBarPrivacy else R.style.ThemeQwantNoActionBar)
 
         var browserFragment = this.supportFragmentManager.findFragmentByTag("BROWSER_FRAGMENT")
         if (browserFragment == null) {
@@ -390,10 +397,14 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
             commit()
         }
         this.supportFragmentManager.executePendingTransactions()
+        qwantbar.setPrivacyModeFromBrowser()
         qwantbar.visibility = View.VISIBLE
     }
 
     fun showHistory() {
+        val isPrivate = components.core.store.state.selectedTab?.content?.private ?: false
+        setTheme(if (isPrivate) R.style.ThemeQwantNoActionBarPrivacy else R.style.ThemeQwantNoActionBar)
+
         var historyFragment = this.supportFragmentManager.findFragmentByTag("HISTORY_FRAGMENT")
         if (historyFragment == null) {
             historyFragment = HistoryFragment()
@@ -403,10 +414,14 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
             commit()
         }
         this.supportFragmentManager.executePendingTransactions()
+        qwantbar.setPrivacyModeFromBrowser()
         qwantbar.hideIfInNavigation()
     }
 
     private fun showSettings() {
+        val isPrivate = components.core.store.state.selectedTab?.content?.private ?: false
+        setTheme(if (isPrivate) R.style.ThemeQwantNoActionBarPrivacy else R.style.ThemeQwantNoActionBar)
+
         var settingsFragment = this.supportFragmentManager.findFragmentByTag("SETTINGS_FRAGMENT")
         if (settingsFragment == null) {
             settingsFragment = SettingsContainerFragment.create()
@@ -419,6 +434,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         }
         this.supportFragmentManager.executePendingTransactions()
         qwantbar.setHighlight(QwantBar.QwantBarSelection.SETTINGS)
+        qwantbar.setPrivacyModeFromBrowser()
         qwantbar.hideIfInNavigation()
     }
 
@@ -426,6 +442,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         components.useCases.tabsUseCases.selectOrAddTab(QwantUtils.getHomepage(applicationContext), components.core.store.state.selectedTab?.content?.private ?: false)
         this.showBrowserFragment()
         qwantbar.setupHomeBar()
+        qwantbar.setPrivacyModeFromBrowser()
         qwantbar.setHighlight(QwantBar.QwantBarSelection.SEARCH)
     }
 

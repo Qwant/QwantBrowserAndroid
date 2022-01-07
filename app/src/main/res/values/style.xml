@@ -45,27 +45,31 @@
         <item name="colorPrimaryDark">@color/qwant_background</item> -->
         <item name="colorAccent">@color/qwant_blue</item>
         <item name="android:windowBackground">@color/qwant_background</item>
-        <item name="android:navigationBarColor" tools:targetApi="lollipop">@color/qwant_background</item>
+
+        <!-- Status bar -->
+        <item name="qwant_systembar_background">@color/qwant_background</item>
+        <!-- <item name="android:navigationBarColor" tools:targetApi="lollipop">@color/qwant_background</item>
         <item name="android:statusBarColor" tools:targetApi="lollipop">@color/qwant_background</item>
         <item name="android:windowLightStatusBar" tools:targetApi="m">?attr/isLightTheme</item>
-        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">?attr/isLightTheme</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">?attr/isLightTheme</item> -->
 
         <!-- Toolbar -->
         <item name="qwant_toolbar_BackgroundColor">@color/qwant_background</item>
         <item name="qwant_toolbar_UrlBoxColor">@color/qwant_toolbar_urlBox</item>
         <item name="qwant_toolbar_TextColor">@color/qwant_toolbar_text</item>
+        <item name="qwant_toolbar_EditTextColor">@color/qwant_toolbar_text</item>
         <item name="qwant_toolbar_IconsColor">@color/qwant_toolbar_icon</item>
         <item name="qwant_toolbar_SecureColor">?attr/qwant_toolbar_IconsColor</item>
         <item name="qwant_toolbar_InsecureColor">@color/photonRed70</item>
         <item name="qwant_toolbar_TrackingProtectionAndSecurityIndicatorSeparatorColor">@color/qwant_toolbar_separator</item>
         <item name="qwant_toolbar_BottomSeparatorColor">@color/qwant_toolbar_bottomSeparator</item>
         <item name="qwant_toolbar_SuggestTextColor">@color/qwant_text</item>
+        <item name="qwant_toolbar_HintColor">@color/qwant_light</item>
+        <item name="qwant_toolbar_SuggestionBackgroundColor">?attr/qwantbar_selectedColor</item>
+        <item name="qwant_toolbar_SuggestionForegroundColor">?attr/qwant_toolbar_EditTextColor</item>
 
         <!-- TODO check those below, and add to privacy theme ... -->
-        <item name="qwant_toolbar_HintColor">@color/qwant_light</item>
-        <!-- <item name="qwant_toolbar_ClearColor">@color/photonPurple50</item>
-        <item name="qwant_toolbar_SuggestionBackgroundColor">@color/photonRed50</item>
-        <item name="qwant_toolbar_SuggestionForegroundColor">@color/photonWhite</item> -->
+        <!-- <item name="qwant_toolbar_ClearColor">@color/photonPurple50</item> -->
 
         <!-- Qwantbar -->
         <item name="qwantbar_backgroundColor">@color/qwantbar_background</item>
@@ -82,20 +86,26 @@
         <!-- Android -->
         <item name="colorAccent">@color/qwant_purple_base</item>
         <item name="android:windowBackground">@color/qwant_purple_dark</item>
+
+        <!-- <item name="qwant_systembar_background">@color/qwant_purple_dark</item> -->
+
         <!-- TODO NOT WORKING status and navigation bars in privacy mode ! -->
-        <item name="android:navigationBarColor" tools:targetApi="lollipop">@color/qwant_purple_dark</item>
+        <!-- <item name="android:navigationBarColor" tools:targetApi="lollipop">@color/qwant_purple_dark</item>
         <item name="android:statusBarColor" tools:targetApi="lollipop">@color/qwant_purple_dark</item>
         <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
-        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">false</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">false</item> -->
 
         <!-- Toolbar -->
         <item name="qwant_toolbar_BackgroundColor">@color/qwant_purple_dark</item>
         <item name="qwant_toolbar_UrlBoxColor">@color/qwant_purple_lighter</item>
         <item name="qwant_toolbar_TextColor">@color/qwant_purple</item>
+        <item name="qwant_toolbar_EditTextColor">@color/qwant_white</item>
         <item name="qwant_toolbar_IconsColor">@color/qwant_black</item>
         <item name="qwant_toolbar_TrackingProtectionAndSecurityIndicatorSeparatorColor">@color/qwant_grey_semi_light</item>
         <item name="qwant_toolbar_BottomSeparatorColor">@color/qwant_grey_darker</item>
         <item name="qwant_toolbar_SuggestTextColor">@color/qwant_white</item>
+        <item name="qwant_toolbar_SuggestionBackgroundColor">?attr/qwantbar_selectedColor</item>
+        <item name="qwant_toolbar_SuggestionForegroundColor">?attr/qwant_toolbar_EditTextColor</item>
 
         <!-- Qwantbar -->
         <item name="qwantbar_backgroundColor">@color/qwant_purple_dark</item>
