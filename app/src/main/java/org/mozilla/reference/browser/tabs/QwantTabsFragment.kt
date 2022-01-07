@@ -97,14 +97,15 @@ class QwantTabsFragment : Fragment(), UserInteractionHandler {
 
         button_delete_all_tabs.setOnClickListener {
             val title = if (isPrivate) context.getString(R.string.menu_action_close_tabs_private) else context.getString(R.string.menu_action_close_tabs)
-            val privateText = if (isPrivate) context.getString(R.string.private_only) + " " else ""
+            val message = if (isPrivate) context.getString(R.string.close_tabs_confirm_private) else context.getString(R.string.close_tabs_confirm)
+            val successToast = if (isPrivate) context.getString(R.string.close_tabs_done_private) else context.getString(R.string.close_tabs_done)
             val builder = AlertDialog.Builder(context)
             builder.setTitle(title)
-                .setMessage("Do you really want to close all ${privateText}tabs ?")
+                .setMessage(message)
                 .setPositiveButton(android.R.string.yes) { _, _ ->
                     if (isPrivate) context.components.useCases.tabsUseCases.removePrivateTabs.invoke()
                     else context.components.useCases.tabsUseCases.removeNormalTabs.invoke()
-                    Toast.makeText(context, "All ${privateText}tabs have been closed", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, successToast, Toast.LENGTH_SHORT).show()
                 }
                 .setNegativeButton(android.R.string.no, null).show()
         }

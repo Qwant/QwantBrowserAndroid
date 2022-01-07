@@ -12,7 +12,6 @@
     <!-- Menu option on the toolbar to close all tabs-->
     <string name="menu_action_close_tabs">Close All Tabs</string>
     <string name="menu_action_close_tabs_private">Close Private Tabs</string>
-    <string name="private_only">private</string>
 
     <!-- Preference enabling remote debugging -->
     <string name="preferences_remote_debugging">Remote debugging via USB</string>
@@ -115,7 +114,7 @@
     <string name="context_menu_add_bookmark">Add to bookmarks</string>
     <string name="context_menu_del_bookmark">Delete bookmark</string>
     <string name="context_menu_close_tab">Close this tab</string>
-    <string name="context_menu_quit_app">Close the Qwant app</string>
+    <string name="context_menu_quit_app">Close the app</string>
     <string name="context_menu_downloads">Downloads</string>
 
     <string name="history">History</string>
@@ -126,6 +125,9 @@
     <string name="history_yesterday">Yesterday</string>
     <string name="history_load_more">Load more</string>
     <string name="history_hour_placeholder" translatable="false">%1$d:%2$s</string>
+    <string name="history_clear_all_confirm_title">Delete history</string>
+    <string name="history_clear_all_confirm_message">Do you really want to delete all history ?</string>
+    <string name="history_clear_all_confirm_ok">Clear all</string>
 
     <string name="settings_main">Settings</string>
 
@@ -595,7 +597,7 @@
         <p>For job applications, you are entitled to refuse that your data be transmitted or retained.</p>
         <p>Information about this right to oppose (such as&nbsp;your contact info) are kept for one year&nbsp;after Qwant has answered,&nbsp;and entirely removed&nbsp;when the legal delay is over (3 years).</p>
         <br/><h4>Right to restriction of processing</h4><br/>
-        <p>This right allows you to obtain the temporary withdrawal of published data when its accuracy is challenged, for a period that allows Qwant to procede with necessary checks.</p>
+        <p>This right allows you to obtain the temporary withdrawal of published data when its accuracy is challenged, for a period that allows Qwant to proceed with necessary checks.</p>
         <p>Information related to the exercize of this right (for instance your data) are stored for a period of one year following the day Qwant answers, then deleted when this delay is over.</p>
         <br/><h4>Right to data portability</h4><br/>
         <p>This right allows to receive the data you have communicated, or to ask Qwant to transmit them to another data controller (another website for instance). In practice, following article 20 of the GDPR, the right to portability applies to your Boards.</p>
@@ -619,4 +621,19 @@
         <br/><h3>How does Qwant index the web?</h3><br/>
         <p>We continue our efforts to index all the Web diversity. Our crawlers relentlessly visit the global Web to refine our results. Nevertheless, this requires both a lot of resources and time: some parts of the Web are not yet perfectly indexed. In the meantime, our agreement with Microsoft Bing allows us to complement our own results with those of Microsoft Bing to offer the best possible results from all around the Web.</p>
     ]]></string>
+
+    <string name="addon_install_failed">Fail to install addon</string>
+    <string name="cleardata_failed_engine">Error cleaning engine data</string>
+    <string name="all_fields_required">All fields are required</string>
+    <string name="history_cleaned_ok">History have been cleaned up</string>
+    <string name="close_tabs_confirm">Do you really want to close all tabs ?</string>
+    <string name="close_tabs_confirm_private">Do you really want to close all private tabs ?</string>
+    <string name="close_tabs_done">All tabs have been closed</string>
+    <string name="close_tabs_done_private">All private tabs have been closed</string>
+    <string name="addon_enabled_ok">Successfully enabled</string>
+    <string name="addon_enabled_failed">Failed to enable</string>
+    <string name="addon_disabled_ok">Successfully disabled</string>
+    <string name="addon_disabled_failed">Failed to disable</string>
+    <string name="addon_uninstall_ok">Successfully uninstalled</string>
+    <string name="addon_uninstall_failed">Failed to uninstall</string>
 </resources>

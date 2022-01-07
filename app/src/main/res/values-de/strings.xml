@@ -7,6 +7,7 @@
 
     <!-- Menu option on the toolbar to open a new tab-->
     <string name="menu_action_add_tab">Neuer Tab</string>
+    <string name="menu_action_add_tab_private">Neuer privater Tab</string>
 
     <!-- Menu option on the toolbar to close all tabs-->
     <string name="menu_action_close_tabs">Alle Tabs schließen</string>
@@ -95,11 +96,12 @@
     <string name="bookmark_edit_folder">Ordner</string>
     <string name="bookmark_edit_cancel">Abbrechen</string>
     <string name="bookmark_edit_save">Speichern</string>
-
+    <string name="bookmarks_deleted">Lesezeichen gelöscht</string>
+    <string name="bookmarks_added">Lesezeichen hinzugefügt</string>
 
     <string name="context_menu_add_bookmark">Lesezeichen hinzufügen</string>
     <string name="context_menu_del_bookmark">Lesezeichen löschen</string>
-    <string name="context_menu_quit_app">Die Qwant-App schließen</string>
+    <string name="context_menu_quit_app">Die App schließen</string>
     <string name="context_menu_downloads">Downloads</string>
 
     <string name="context_menu_close_tab">Diesen Tab schließen</string>
@@ -315,6 +317,31 @@
         <br/><h3>Wie indiziert Qwant das Internet?</h3><br/>
         <p>Wir setzen unsere Bemühungen fort, die gesamte Web-Diversität zu indexieren. Unsere Crawler suchen unermüdlich durch das globale Web, um unsere Ergebnisse zu verfeinern. Dieses erfordert sowohl umfassende Ressourcen als auch viel Zeit: Einige Teile des Webs sind noch nicht perfekt indiziert. In der Zwischenzeit ermöglicht es uns unsere Vereinbarung mit Microsoft Bing, eigene Ergebnisse mit denen von Microsoft Bing zu ergänzen, um die bestmöglichen Suchergebnisse aus dem gesamten Web anzubieten.</p>
     ]]></string>
+    <string name="cleardata_tabs">Normale Tabs geöffnet</string>
+    <string name="cleardata_tabs_private">Private Tabs geöffnet</string>
+    <string name="enabled">Aktiviert</string>
+    <string name="disabled">Deaktiviert</string>
+    <string name="settings_privacy_clear_data_on_close">Beim Verlassen Daten löschen</string>
+    <string name="settings_privacy_clear_data_on_close_summary">Bitte nutzen Sie die Schaltfläche Verlassen der App, um sicherzustellen, dass sie ausgeführt wird</string>
+    <string name="cleardata_failed">Fehler beim Löschen der Daten</string>
+    <string name="settings_general_makedefaultbrowser_summary">Alle Ihre Links in der Qwant-App öffnen</string>
+    <string name="cleardata_failed_engine">Fehler beim Löschen der Maschinendaten</string>
+    <string name="close_tabs_done">Alle Tabs wurden geschlossen</string>
+    <string name="close_tabs_done_private">Alle private Tabs wurden geschlossen</string>
+    <string name="history_cleaned_ok">Der Verlauf wurde gelöscht</string>
+    <string name="all_fields_required">Alle Felder sind erforderlich</string>
+    <string name="addon_install_failed">Die Installation des Addons ist fehlgeschlagen</string>
+    <string name="addon_uninstall_failed">Deinstallation fehlgeschlagen</string>
+    <string name="addon_uninstall_ok">Erfolgreich deinstalliert</string>
+    <string name="addon_disabled_failed">Deaktivierung fehlgeschlagen</string>
+    <string name="addon_disabled_ok">Erfolgreich deaktiviert</string>
+    <string name="addon_enabled_failed">Aktivierung fehlgeschlagen</string>
+    <string name="addon_enabled_ok">Erfolgreich aktiviert</string>
+    <string name="close_tabs_confirm">Wollen Sie wirklich alle Tabs schließen?</string>
+    <string name="close_tabs_confirm_private">Wollen Sie wirklich alle privaten Tabs schließen?</string>
+    <string name="history_clear_all_confirm_title">Verlauf löschen</string>
+    <string name="history_clear_all_confirm_message">Wollen Sie den gesamten Verlauf wirklich löschen?</string>
+    <string name="history_clear_all_confirm_ok">Alle löschen</string>
 </resources>
 
 

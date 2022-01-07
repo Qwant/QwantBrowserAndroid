@@ -92,7 +92,7 @@
 
     <string name="bookmarks_delete">Supprimer</string>
     <string name="bookmarks_add">Ajouter aux favoris</string>
-    <string name="bookmarks_modify">Modifier le favoris</string>
+    <string name="bookmarks_modify">Modifier le favori</string>
     <string name="bookmarks_modify_folder">Modifier le dossier</string>
     <string name="bookmark_edit_title">Titre</string>
     <string name="bookmark_edit_folder">Dossier</string>
@@ -109,13 +109,13 @@
     <string name="context_menu_addons">Add-ons</string>
     <string name="context_menu_add_bookmark">Ajouter aux favoris</string>
     <string name="context_menu_del_bookmark">Retirer des favoris</string>
-    <string name="context_menu_quit_app">Quitter l\'application Qwant</string>
+    <string name="context_menu_quit_app">Quitter l\'application</string>
     <string name="context_menu_downloads">Téléchargements</string>
     <string name="context_menu_close_tab">Fermer cet onglet</string>
 
     <string name="settings_main">Paramètres</string>
 
-    <string name="settings_general">General</string>
+    <string name="settings_general">Général</string>
     <string name="settings_interface">Interface</string>
 
     <string name="settings_general_language">Langage</string>
@@ -204,7 +204,7 @@
     <string name="history">Historique</string>
     <string name="history_empty_1">L\'historique est vide</string>
     <string name="history_empty_2">Les pages visitées apparaîtront ici</string>
-    <string name="history_clear_all">Tout supprimer</string>
+    <string name="history_clear_all">Effacer tout</string>
     <string name="history_today">Aujourd\'hui</string>
     <string name="history_yesterday">Hier</string>
     <string name="history_load_more">Plus de résultats</string>
@@ -323,4 +323,31 @@
         <br/><p><strong>Comment Qwant indexe le web ?</strong></p><br/>
         <p>Nous poursuivons nos efforts pour indexer toute la diversité du web. Nos crawlers visitent sans relâche le web du monde entier pour affiner la qualité de nos résultats. Cependant, cela demande à la fois des ressources et du temps ; certaines parties du Web ne sont pas encore parfaitement indexées. Dans l’attente, notre partenariat avec Microsoft Bing nous permet de compléter nos résultats avec ceux de Microsoft Bing pour offrir les meilleurs résultats provenant du Web tout entier.</p>
     ]]></string>
+    <string name="bookmarks_deleted">Favori supprimé</string>
+    <string name="bookmarks_added">Favori ajouté</string>
+    <string name="enabled">Activé</string>
+    <string name="disabled">Désactivé</string>
+    <string name="all_fields_required">Tous les champs sont requis</string>
+    <string name="cleardata_failed">Erreur en supprimant les données</string>
+    <string name="cleardata_failed_engine">Erreur en supprimant les données du moteur</string>
+    <string name="cleardata_tabs">Onglets normaux ouverts</string>
+    <string name="cleardata_tabs_private">Onglets privés ouverts</string>
+    <string name="close_tabs_confirm">Voulez-vous vraiment fermer tous les onglets</string>
+    <string name="close_tabs_confirm_private">Voulez-vous vraiment fermer tous les onglets privés</string>
+    <string name="close_tabs_done">Tous les onglets ont été fermés</string>
+    <string name="close_tabs_done_private">Tous les onglets privés ont été fermés</string>
+    <string name="history_cleaned_ok">Historique effacée</string>
+    <string name="settings_general_makedefaultbrowser_summary">Ouvrez tous vos liens dans l\'appli Qwant</string>
+    <string name="settings_privacy_clear_data_on_close">Supprimer les données à la fermeture</string>
+    <string name="settings_privacy_clear_data_on_close_summary">Merci d\'utiliser le bouton \"Quitter l\'application\" pour être certain de l\'effacement de vos données</string>
+    <string name="addon_install_failed">Installation de l\'addon échouée</string>
+    <string name="addon_enabled_ok">Activation réussie</string>
+    <string name="addon_enabled_failed">Activation echouée</string>
+    <string name="addon_disabled_ok">Désactivation réussie</string>
+    <string name="addon_disabled_failed">Désactivation échouée</string>
+    <string name="addon_uninstall_ok">Désinstallation réussie</string>
+    <string name="addon_uninstall_failed">Désinstallation échouée</string>
+    <string name="history_clear_all_confirm_title">Effacer mon historique</string>
+    <string name="history_clear_all_confirm_message">Voulez-vous vraiment supprimer tout votre historique ?</string>
+    <string name="history_clear_all_confirm_ok">Effacer tout</string>
 </resources>

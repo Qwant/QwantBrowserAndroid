@@ -196,7 +196,7 @@
     <string name="context_menu_addons">Add-ons</string>
     <string name="context_menu_add_bookmark">Añadir marcador</string>
     <string name="context_menu_del_bookmark">Eliminar marcador</string>
-    <string name="context_menu_quit_app">Cierra la aplicación Qwant</string>
+    <string name="context_menu_quit_app">Cierra la aplicación</string>
     <string name="context_menu_downloads">Descargas</string>
     <string name="context_menu_close_tab">Cerrar esta pestaña</string>
 
@@ -314,4 +314,32 @@
         <br/><h3>How does Qwant index the web?</h3><br/>
         <p>We continue our efforts to index all the Web diversity. Our crawlers relentlessly visit the global Web to refine our results. Nevertheless, this requires both a lot of resources and time: some parts of the Web are not yet perfectly indexed. In the meantime, our agreement with Microsoft Bing allows us to complement our own results with those of Microsoft Bing to offer the best possible results from all around the Web.</p>
     ]]></string>
+    <string name="menu_action_add_tab_private">Nueva pestaña privada</string>
+    <string name="cleardata_tabs">Pestañas normales abiertas</string>
+    <string name="cleardata_tabs_private">Pestañas privadas abiertas</string>
+    <string name="bookmarks_deleted">Marcador eliminado</string>
+    <string name="bookmarks_added">Marcador agregado</string>
+    <string name="enabled">Activado</string>
+    <string name="disabled">Desactivado</string>
+    <string name="settings_privacy_clear_data_on_close">Borrar datos al salir</string>
+    <string name="settings_privacy_clear_data_on_close_summary">Utilice el botón Salir de la aplicación para asegurarse de que se aplique</string>
+    <string name="all_fields_required">Todos los campos son obligatorios</string>
+    <string name="cleardata_failed">Error al borrar los datos</string>
+    <string name="cleardata_failed_engine">Error al limpiar los datos del motor</string>
+    <string name="settings_general_makedefaultbrowser_summary">Abra todos sus enlaces en la aplicación Qwant</string>
+    <string name="addon_install_failed">Error al instalar el complemento</string>
+    <string name="history_cleaned_ok">La historia se ha limpiado</string>
+    <string name="close_tabs_done">Se han cerrado todas las pestañas</string>
+    <string name="close_tabs_done_private">Se han cerrado todas las pestañas privadas</string>
+    <string name="addon_uninstall_failed">No se pudo desinstalar</string>
+    <string name="addon_uninstall_ok">Desinstalado exitosamente</string>
+    <string name="addon_disabled_failed">No se pudo inhabilitar</string>
+    <string name="addon_disabled_ok">Desactivado con éxito</string>
+    <string name="addon_enabled_failed">No se pudo habilitar</string>
+    <string name="addon_enabled_ok">Habilitado con éxito</string>
+    <string name="close_tabs_confirm">¿Realmente deseas cerrar todas las pestañas?</string>
+    <string name="close_tabs_confirm_private">¿Realmente deseas cerrar todas las pestañas privadas?</string>
+    <string name="history_clear_all_confirm_title">Borrar el historial</string>
+    <string name="history_clear_all_confirm_message">¿Realmente quieres borrar todo el historial?</string>
+    <string name="history_clear_all_confirm_ok">Borrar todo</string>
 </resources>

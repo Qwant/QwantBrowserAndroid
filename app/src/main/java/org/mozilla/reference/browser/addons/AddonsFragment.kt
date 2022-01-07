@@ -185,7 +185,7 @@ class AddonsFragment : Fragment(), AddonsManagerAdapterDelegate {
                         runIfFragmentIsAttached {
                             Toast.makeText(
                                     requireContext(),
-                                    "Fail to install addon",
+                                    R.string.addon_install_failed,
                                     Toast.LENGTH_SHORT
                             ).show()
 

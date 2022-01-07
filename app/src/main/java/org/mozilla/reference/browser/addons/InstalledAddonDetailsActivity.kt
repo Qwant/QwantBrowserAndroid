@@ -56,14 +56,14 @@ class InstalledAddonDetailsActivity : AppCompatActivity() {
                         switch.setState(true)
                         Toast.makeText(
                             this,
-                            "Successfully enabled ${addon.translatableName.translate()}",
+                            getString(R.string.addon_enabled_ok) + " ${addon.translatableName.translate()}",
                             Toast.LENGTH_SHORT
                         ).show()
                     },
                     onError = {
                         Toast.makeText(
                             this,
-                            "Failed to enable ${addon.translatableName.translate()}",
+                            getString(R.string.addon_enabled_failed) + " ${addon.translatableName.translate()}",
                             Toast.LENGTH_SHORT
                         ).show()
                     }
@@ -75,14 +75,14 @@ class InstalledAddonDetailsActivity : AppCompatActivity() {
                         switch.setState(false)
                         Toast.makeText(
                             this,
-                            "Successfully disabled ${addon.translatableName.translate()}",
+                            getString(R.string.addon_disabled_ok) + " ${addon.translatableName.translate()}",
                             Toast.LENGTH_SHORT
                         ).show()
                     },
                     onError = {
                         Toast.makeText(
                             this,
-                            "Failed to disable ${addon.translatableName.translate()}",
+                            getString(R.string.addon_disabled_failed) + " ${addon.translatableName.translate()}",
                             Toast.LENGTH_SHORT
                         ).show()
                     }
@@ -124,7 +124,7 @@ class InstalledAddonDetailsActivity : AppCompatActivity() {
                 onSuccess = {
                     Toast.makeText(
                         this,
-                        "Successfully uninstalled ${addon.translatableName.translate()}",
+                        getString(R.string.addon_disabled_ok) + " ${addon.translatableName.translate()}",
                         Toast.LENGTH_SHORT
                     ).show()
                     finish()
@@ -132,7 +132,7 @@ class InstalledAddonDetailsActivity : AppCompatActivity() {
                 onError = { _, _ ->
                     Toast.makeText(
                         this,
-                        "Failed to uninstall ${addon.translatableName.translate()}",
+                        getString(R.string.addon_disabled_ok) + "Failed to uninstall ${addon.translatableName.translate()}",
                         Toast.LENGTH_SHORT
                     ).show()
                 }

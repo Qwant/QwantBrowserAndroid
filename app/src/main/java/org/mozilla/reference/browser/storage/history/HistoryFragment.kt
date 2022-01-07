@@ -56,13 +56,13 @@ class HistoryFragment: Fragment(), UserInteractionHandler {
 
         clearAll?.setOnClickListener {
             val builder = AlertDialog.Builder(requireContext())
-            builder.setTitle("Delete history")
-                .setMessage("Do you really want to delete all history ?")
-                .setPositiveButton(android.R.string.yes) { _, _ ->
+            builder.setTitle(getString(R.string.history_clear_all_confirm_title))
+                .setMessage(getString(R.string.history_clear_all_confirm_message))
+                .setPositiveButton(getString(R.string.history_clear_all_confirm_ok)) { _, _ ->
                     MainScope().launch {
                         context?.components?.core?.historyStorage?.deleteEverything()
                         reload()
-                        Toast.makeText(context, "History have been cleaned up", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, R.string.history_cleaned_ok, Toast.LENGTH_SHORT).show()
                     }
                 }
                 .setNegativeButton(android.R.string.no, null).show()

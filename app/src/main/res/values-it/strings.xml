@@ -206,7 +206,7 @@
     <string name="context_menu_add_homescreen">Aggiungi alla schermata Home</string>
     <string name="context_menu_find">Trova nella Pagina</string>
     <string name="context_menu_addons">Add-ons</string>
-    <string name="context_menu_quit_app">Chiudi l\'app Qwant</string>
+    <string name="context_menu_quit_app">Chiudi l\'app</string>
     <string name="context_menu_downloads">Download</string>
 
     <!-- Text shown in the toolbar if it is empty -->
@@ -289,4 +289,32 @@
         <br/><h3>In che modo Qwant indicizza il web?</h3><br/>
         <p>Facciamo il possibile per continuare ad indicizzare la diversità del web. I nostri crawler visitano incessantemente il web di tutto il mondo al fine di perfezionare la qualità dei risultati. Tuttavia, questo richiede tempo e risorse; alcune parti del web sono sono ancora perfettamente indicizzate. Nel frattempo, l’accordo preso con Microsoft Bing ci consente di integrare i nostri risultati con quelli di Microsoft Bing per offrire i migliori risultati provenienti dalla totalità del web.</p>
     ]]></string>
+    <string name="menu_action_add_tab_private">Nuova scheda privata</string>
+    <string name="cleardata_tabs">Schede normali aperte</string>
+    <string name="cleardata_tabs_private">Schede private aperte</string>
+    <string name="bookmarks_deleted">Elemento preferito cancellato</string>
+    <string name="bookmarks_added">Elemento preferito aggiunto</string>
+    <string name="enabled">Abilitato</string>
+    <string name="disabled">Disabilitato</string>
+    <string name="settings_privacy_clear_data_on_close">Cancella dati all\'uscita</string>
+    <string name="settings_privacy_clear_data_on_close_summary">Si prega di utilizzare il pulsante Esci dall\'app per essere sicuri che sia applicato</string>
+    <string name="all_fields_required">Tutti i campi sono obbligatori</string>
+    <string name="cleardata_failed">Errore durante la cancellazione dei dati</string>
+    <string name="cleardata_failed_engine">Errore durante la pulizia dei dati del sistema</string>
+    <string name="settings_general_makedefaultbrowser_summary">Apri tutti i tuoi collegamenti nell\'app Qwant</string>
+    <string name="addon_install_failed">Impossibile installare il componente aggiuntivo</string>
+    <string name="history_cleaned_ok">La cronologia è stata ripulita</string>
+    <string name="close_tabs_done">Tutte le schede sono state chiuse</string>
+    <string name="close_tabs_done_private">Tutte le schede private sono state chiuse</string>
+    <string name="addon_uninstall_failed">Disinstallazione non riuscita</string>
+    <string name="addon_uninstall_ok">Disinstallato con successo</string>
+    <string name="addon_disabled_failed">Impossibile disabilitare</string>
+    <string name="addon_disabled_ok">Disabilitato con successo</string>
+    <string name="addon_enabled_failed">Impossibile abilitare</string>
+    <string name="addon_enabled_ok">Abilitato con successo</string>
+    <string name="close_tabs_confirm">Vuoi davvero chiudere tutte le schede ?</string>
+    <string name="close_tabs_confirm_private">Vuoi davvero chiudere tutte le schede private?</string>
+    <string name="history_clear_all_confirm_title">Elimina cronologia</string>
+    <string name="history_clear_all_confirm_message">Vuoi davvero eliminare tutta la cronologia?</string>
+    <string name="history_clear_all_confirm_ok">Cancella tutto</string>
 </resources>

@@ -91,7 +91,7 @@ class BookmarksEditFragment(
                 editingFolder = false
             } else {
                 if (editTitle?.text?.isEmpty() == true || (bookmark.type == BookmarkItemV2.BookmarkType.BOOKMARK && editUrl.text.isEmpty())) {
-                    Toast.makeText(context, "All fields are required", Toast.LENGTH_LONG).show() // TODO translations
+                    Toast.makeText(context, R.string.all_fields_required, Toast.LENGTH_LONG).show() // TODO translations
                 } else {
                     bookmark.title = editTitle?.text.toString()
                     bookmark.url = editUrl.text.toString()

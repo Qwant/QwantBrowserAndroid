@@ -81,7 +81,7 @@ class ClearDataFragment(
                         this.onBackPressed()
                     },
                     error = {
-                        Toast.makeText(context, "Error cleaning engine data", Toast.LENGTH_LONG).show()
+                        Toast.makeText(context, R.string.cleardata_failed_engine, Toast.LENGTH_LONG).show()
                     }
                 )
             }
