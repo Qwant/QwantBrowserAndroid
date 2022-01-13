@@ -162,7 +162,7 @@ class QwantTabsFragment : Fragment(), UserInteractionHandler {
         }
     }
 
-    private fun tabsChanged(tabs: Tabs) {
+    private fun tabsChanged(tabs: QTabs) {
         tabsAdapter?.tabChanged(tabs)
         this.updateTabCount()
     }

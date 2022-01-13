@@ -24,7 +24,7 @@ class TabsAdapter(
         private val context: Context,
         private val selectedCallback: (tab: Tab?) -> Unit
 )  : BaseAdapter() {
-    var tabs: Tabs? = null
+    var tabs: QTabs? = null
 
     internal class TabListItemViewHolder(
             item_layout: View,
@@ -141,7 +141,7 @@ class TabsAdapter(
         return tabs?.list?.count() ?: 0
     }
 
-    fun tabChanged(tabs: Tabs) {
+    fun tabChanged(tabs: QTabs) {
         this.tabs = tabs
         this.notifyDataSetChanged()
     }
