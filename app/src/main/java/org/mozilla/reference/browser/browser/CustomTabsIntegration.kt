@@ -8,23 +8,19 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import mozilla.components.browser.menu.BrowserMenuBuilder
-import mozilla.components.browser.menu.item.BrowserMenuItemToolbar
 import mozilla.components.browser.menu.item.SimpleBrowserMenuItem
 // import mozilla.components.browser.session.SessionManager
-import mozilla.components.browser.toolbar.BrowserToolbar
-// import org.mozilla.reference.browser.compat.toolbar.BrowserToolbar
+// import mozilla.components.browser.toolbar.BrowserToolbar
+import org.mozilla.reference.browser.compat.toolbar.BrowserToolbar
 import mozilla.components.concept.engine.EngineView
-import mozilla.components.feature.customtabs.CustomTabsToolbarFeature
+import org.mozilla.reference.browser.compat.toolbar.CustomTabsToolbarFeature
 // import org.mozilla.reference.browser.compat.toolbar.CustomTabsToolbarFeature
 import mozilla.components.feature.session.SessionUseCases
 import mozilla.components.support.base.feature.LifecycleAwareFeature
 import mozilla.components.support.base.feature.UserInteractionHandler
 import mozilla.components.support.base.log.logger.Logger
-import mozilla.components.support.ktx.android.content.res.resolveAttribute
 import org.mozilla.reference.browser.BrowserActivity
-import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.ext.components
-import org.mozilla.reference.browser.ext.share
 
 class CustomTabsIntegration(
         context: Context,

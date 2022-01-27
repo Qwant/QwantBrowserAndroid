@@ -7,6 +7,7 @@ package org.mozilla.reference.browser.browser
 import android.content.res.Resources
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import kotlinx.android.synthetic.main.fragment_browser.*
 import kotlinx.android.synthetic.main.fragment_browser.view.*
@@ -74,6 +75,11 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
             owner = this,
             view = view
         )
+
+        awesomeBar.setOnEditSuggestionListener { search ->
+            toolbar.edit.updateUrl(search, shouldAutoComplete = true, shouldHighlight = false)
+            toolbar.edit.views.url.setSelection(search.length)
+        }
 
         /* toolbarControlFeature.set(
             feature = ToolbarControlFeature(

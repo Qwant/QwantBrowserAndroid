@@ -17,8 +17,12 @@ import mozilla.components.browser.domains.autocomplete.ShippedDomainsProvider
 // import mozilla.components.browser.session.SessionManager
 import mozilla.components.browser.state.selector.selectedTab
 import mozilla.components.browser.state.store.BrowserStore
-import mozilla.components.browser.toolbar.BrowserToolbar
-import mozilla.components.browser.toolbar.display.DisplayToolbar
+// import mozilla.components.browser.toolbar.BrowserToolbar
+// import mozilla.components.browser.toolbar.display.DisplayToolbar
+// import mozilla.components.browser.toolbar.BrowserToolbar
+import org.mozilla.reference.browser.compat.toolbar.BrowserToolbar
+// import mozilla.components.browser.toolbar.display.DisplayToolbar
+import org.mozilla.reference.browser.compat.toolbar.DisplayToolbar
 import mozilla.components.concept.storage.HistoryStorage
 import mozilla.components.concept.toolbar.Toolbar
 import mozilla.components.feature.session.SessionUseCases

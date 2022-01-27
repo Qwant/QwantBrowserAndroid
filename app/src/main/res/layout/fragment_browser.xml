@@ -47,7 +47,7 @@
         mozac:findInPageButtonsTint="#ff88ff"
         android:visibility="gone" />
 
-    <mozilla.components.browser.toolbar.BrowserToolbar
+    <org.mozilla.reference.browser.compat.toolbar.BrowserToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="56dp"

@@ -45,6 +45,8 @@
         <item name="colorPrimaryDark">@color/qwant_background</item> -->
         <item name="colorAccent">@color/qwant_blue</item>
         <item name="android:windowBackground">@color/qwant_background</item>
+        <item name="android:textColorHighlight">@color/qwant_highlight</item>
+        <item name="android:textColorPrimary">@color/qwant_text</item>
 
         <!-- Status bar -->
         <item name="qwant_systembar_background">@color/qwant_background</item>
@@ -65,8 +67,12 @@
         <item name="qwant_toolbar_BottomSeparatorColor">@color/qwant_toolbar_bottomSeparator</item>
         <item name="qwant_toolbar_SuggestTextColor">@color/qwant_text</item>
         <item name="qwant_toolbar_HintColor">@color/qwant_light</item>
-        <item name="qwant_toolbar_SuggestionBackgroundColor">?attr/qwantbar_selectedColor</item>
-        <item name="qwant_toolbar_SuggestionForegroundColor">?attr/qwant_toolbar_EditTextColor</item>
+
+        <item name="qwant_toolbar_SuggestionBackgroundColor">@color/qwant_highlight</item>
+        <item name="qwant_toolbar_SuggestionForegroundColor">@color/qwant_text</item>
+
+        <!-- <item name="qwant_toolbar_SuggestionBackgroundColor">?attr/qwantbar_selectedColor</item>
+        <item name="qwant_toolbar_SuggestionForegroundColor">?attr/qwant_toolbar_EditTextColor</item> -->
 
         <!-- TODO check those below, and add to privacy theme ... -->
         <!-- <item name="qwant_toolbar_ClearColor">@color/photonPurple50</item> -->
@@ -86,6 +92,8 @@
         <!-- Android -->
         <item name="colorAccent">@color/qwant_purple_base</item>
         <item name="android:windowBackground">@color/qwant_purple_dark</item>
+        <item name="android:textColorHighlight">?attr/qwantbar_selectedColor</item>
+        <item name="android:textColorPrimary">@color/qwant_white</item>
 
         <!-- <item name="qwant_systembar_background">@color/qwant_purple_dark</item> -->
 

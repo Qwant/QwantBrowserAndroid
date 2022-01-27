@@ -19,6 +19,7 @@
     <color name="qwant_background_dark_privacy">#ff1a1a1a</color>
     <color name="qwant_selected_text_privacy">@color/photonWhite</color> -->
 
+    <color name="qwant_highlight">#A1C2FC</color>
 
     <!-- QWANTBAR COLORS -->
     <color name="menu_items">@color/qwant_main</color>
