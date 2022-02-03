@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="qwant_ripple">@color/qwant_blue_darker</color>
+
     <color name="qwant_background">@color/qwant_dark</color>
     <color name="qwant_text">@color/qwant_white</color>
 
@@ -21,5 +23,6 @@
     <color name="qwant_menu_background">@color/qwant_grey_darker</color>
 
     <!-- Privacy colors -->
+    <color name="qwant_ripple_private">@color/qwant_purple</color>
     <color name="qwant_tabs_selected_private">@color/qwant_purple</color>
 </resources>

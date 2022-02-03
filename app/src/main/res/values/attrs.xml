@@ -42,6 +42,7 @@
 
     <!-- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA -->
 
+    <attr name="qwant_rippleColor" format="reference|color" />
     <attr name="qwant_systembar_background" format="reference|color" />
 
     <!-- Toolbar -->
@@ -70,4 +71,5 @@
 
     <attr name="qwant_tabs_foregroundColor" format="reference|color" />
     <attr name="qwant_tabs_selectedColor" format="reference|color" />
+
 </resources>

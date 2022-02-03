@@ -57,6 +57,7 @@
     <color name="qwant_blue_light">#80acff</color>
     <color name="qwant_blue_lighter">#e5eeff</color>
     <color name="qwant_blue_dark">#1050c5</color>
+    <color name="qwant_blue_darker">#0a3076</color>
 
     <color name="qwant_green">#83c458</color>
     <color name="qwant_green_dark">#5d9836</color>

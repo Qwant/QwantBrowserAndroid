@@ -11,6 +11,7 @@
         <item name="colorButtonNormal">@color/qwant_main</item>
         <item name="colorControlNormal">@color/qwant_main</item>
 
+
         <!-- <item name="android:textColor">@color/qwant_main</item>
         <item name="actionMenuTextColor">@color/qwant_main</item>
        <item name="android:textColorSecondary">@color/qwant_main</item>
@@ -47,6 +48,8 @@
         <item name="android:windowBackground">@color/qwant_background</item>
         <item name="android:textColorHighlight">@color/qwant_highlight</item>
         <item name="android:textColorPrimary">@color/qwant_text</item>
+        <item name="colorControlHighlight">?attr/qwant_rippleColor</item>
+        <item name="android:selectableItemBackground">@drawable/qwant_ripple</item>
 
         <!-- Status bar -->
         <item name="qwant_systembar_background">@color/qwant_background</item>
@@ -54,6 +57,8 @@
         <item name="android:statusBarColor" tools:targetApi="lollipop">@color/qwant_background</item>
         <item name="android:windowLightStatusBar" tools:targetApi="m">?attr/isLightTheme</item>
         <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">?attr/isLightTheme</item> -->
+
+        <item name="qwant_rippleColor">@color/qwant_ripple</item>
 
         <!-- Toolbar -->
         <item name="qwant_toolbar_BackgroundColor">@color/qwant_background</item>
@@ -102,6 +107,8 @@
         <item name="android:statusBarColor" tools:targetApi="lollipop">@color/qwant_purple_dark</item>
         <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
         <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">false</item> -->
+
+        <item name="qwant_rippleColor">@color/qwant_ripple_private</item>
 
         <!-- Toolbar -->
         <item name="qwant_toolbar_BackgroundColor">@color/qwant_purple_dark</item>

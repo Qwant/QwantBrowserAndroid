@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.preference.Preference
 import androidx.preference.PreferenceViewHolder
 import mozilla.components.support.ktx.android.content.getColorFromAttr
@@ -21,7 +22,8 @@ class QwantPreference : Preference {
         val summaryView = holder?.findViewById(android.R.id.summary) as TextView?
         val iconView = holder?.findViewById(android.R.id.icon) as ImageView?
 
-        holder?.itemView?.setBackgroundColor(context.getColorFromAttr(R.attr.qwant_color_background))
+        // holder?.itemView?.setBackgroundColor(context.getColorFromAttr(R.attr.qwant_color_background))
+        holder?.itemView?.background = ContextCompat.getDrawable(context, R.drawable.qwant_ripple)
 
         val mainColor = context.getColorFromAttr(R.attr.qwant_color_main)
         titleView?.setTextColor(mainColor)

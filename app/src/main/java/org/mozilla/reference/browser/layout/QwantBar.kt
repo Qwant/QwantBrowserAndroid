@@ -77,7 +77,6 @@ class QwantBar @JvmOverloads constructor(
     private val menuItemColor = R.color.qwant_text
     private val menuItems: List<BrowserMenuItem> by lazy {
         val store = context.components.core.store
-        val prefs = PreferenceManager.getDefaultSharedPreferences(context)
         listOf(
             BrowserMenuImageText(
                 context.getString(R.string.context_menu_add_bookmark),
@@ -233,21 +232,25 @@ class QwantBar @JvmOverloads constructor(
 
         val colorDefault = context.getColorFromAttr(R.attr.qwantbar_normalColor)
         val colorSelected = context.getColorFromAttr(R.attr.qwantbar_selectedColor)
+        // val background = ContextCompat.getDrawable(context, R.drawable.ripple_qwantbar)
 
         val colorHome = if (selection == QwantBarSelection.SEARCH) colorSelected else colorDefault
         val drawableHome = DrawableUtils.loadAndTintDrawable(context, this.getIcon(QwantBarIcon.SEARCH), colorHome)
         qwantbar_text_home.setTextColor(colorHome)
         qwantbar_text_home.setCompoundDrawablesWithIntrinsicBounds(null, drawableHome, null, null)
+        qwantbar_text_home.background = ContextCompat.getDrawable(context, R.drawable.ripple_qwantbar)
 
         val colorBookmark = if (selection == QwantBarSelection.BOOKMARKS) colorSelected else colorDefault
         val drawableBookmark = DrawableUtils.loadAndTintDrawable(context, this.getIcon(QwantBarIcon.BOOKMARKS), colorBookmark)
         qwantbar_text_bookmarks.setTextColor(colorBookmark)
         qwantbar_text_bookmarks.setCompoundDrawablesWithIntrinsicBounds(null, drawableBookmark, null, null)
+        qwantbar_text_bookmarks.background = ContextCompat.getDrawable(context, R.drawable.ripple_qwantbar)
 
         val colorSettings = if (selection == QwantBarSelection.SETTINGS) colorSelected else colorDefault
         val drawableSettings = DrawableUtils.loadAndTintDrawable(context, this.getIcon(QwantBarIcon.SETTINGS), colorSettings)
         qwantbar_text_settings.setTextColor(colorSettings)
         qwantbar_text_settings.setCompoundDrawablesWithIntrinsicBounds(null, drawableSettings, null, null)
+        qwantbar_text_settings.background = ContextCompat.getDrawable(context, R.drawable.ripple_qwantbar)
 
         val boxTextColor = if (selection == QwantBarSelection.TABS) ContextCompat.getColor(context, R.color.qwant_white) else colorDefault
         val boxDrawableId = if (selection == QwantBarSelection.TABS) R.drawable.qwant_tabcounter_box_selected else R.drawable.qwant_tabcounter_box
@@ -257,8 +260,15 @@ class QwantBar @JvmOverloads constructor(
         qwantbar_text_tabs.setTextColor(if (selection == QwantBarSelection.TABS) colorSelected else colorDefault)
         navTabButtonBox?.setImageDrawable(boxDrawable)
         navTabButtonText?.setTextColor(boxTextColor)
+        qwantbar_layout_tabs.background = ContextCompat.getDrawable(context, R.drawable.ripple_qwantbar)
 
         qwantbar_button_nav_menu.setColorFilter(colorDefault)
+
+        qwantbar_button_nav_back.background = ContextCompat.getDrawable(context, R.drawable.ripple_qwantbar)
+        qwantbar_button_nav_forward.background = ContextCompat.getDrawable(context, R.drawable.ripple_qwantbar)
+        qwantbar_button_nav_home.background = ContextCompat.getDrawable(context, R.drawable.ripple_qwantbar)
+        qwantbar_layout_nav_tabs.background = ContextCompat.getDrawable(context, R.drawable.ripple_qwantbar)
+        qwantbar_button_nav_menu.background = ContextCompat.getDrawable(context, R.drawable.ripple_qwantbar)
     }
 
     fun setPrivacyMode(enabled: Boolean) {
