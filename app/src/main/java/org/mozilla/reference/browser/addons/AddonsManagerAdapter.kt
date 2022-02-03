@@ -252,8 +252,8 @@ class AddonsManagerAdapter(
                 // We calculate how much time takes to fetch an icon,
                 // if takes less than a second, we assume it comes
                 // from a cache and we don't show any transition animation.
-                /*  val startTime = System.currentTimeMillis()
-                val iconBitmap = null //addonCollectionProvider.getAddonIconBitmap(addon)
+                val startTime = System.currentTimeMillis()
+                val iconBitmap = addonCollectionProvider.getAddonIconBitmap(addon)
                 val timeToFetch: Double = (System.currentTimeMillis() - startTime) / 1000.0
                 val isFromCache = timeToFetch < 1
                 if (iconBitmap != null) {
@@ -264,7 +264,7 @@ class AddonsManagerAdapter(
                             setWithCrossFadeAnimation(iconView, iconBitmap)
                         }
                     }
-                } else */ if (addon.installedState?.icon != null) {
+                } else if (addon.installedState?.icon != null) {
                     scope.launch(Main) {
                         val ais = addon.installedState
                         if (ais != null) iconView.setImageDrawable(BitmapDrawable(iconView.resources, ais.icon))
