@@ -178,6 +178,7 @@
     <string name="settings_dark_theme_dark_code" translatable="false">1</string>
     <string name="settings_dark_theme_system_code" translatable="false">2</string>
 
+    <string name="settings_rate_app">Rate this app</string>
     <string name="settings_about_menu">About</string>
     <string name="settings_about">About Qwant Browser</string>
     <string name="settings_privacy_policy">Privacy policy</string>

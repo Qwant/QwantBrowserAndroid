@@ -17,6 +17,7 @@
     <string name="pref_key_history" translatable="false">pref_key_history</string>
     <string name="pref_key_about_menu" translatable="false">pref_key_about_menu</string>
     <string name="pref_key_addons_menu" translatable="false">pref_key_addons_menu</string>
+    <string name="pref_key_rate_app" translatable="false">pref_key_rate_app</string>
     <string name="pref_key_quit_app" translatable="false">pref_key_quit_app</string>
 
     <string name="pref_key_general_language" translatable="false">pref_key_general_language</string>

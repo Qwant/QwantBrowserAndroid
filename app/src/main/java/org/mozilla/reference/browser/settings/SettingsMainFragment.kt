@@ -5,6 +5,7 @@
 package org.mozilla.reference.browser.settings
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.preference.Preference
 import androidx.preference.PreferenceManager
@@ -33,6 +34,12 @@ class SettingsMainFragment: BaseSettingsFragment() {
             context?.startActivity(intent)
             true
         }
+        findPreference(context?.getPreferenceKey(R.string.pref_key_rate_app)).onPreferenceClickListener = Preference.OnPreferenceClickListener {
+            val intent = Intent("android.intent.action.VIEW", Uri.parse("https://play.google.com/store/apps/details?id=com.qwant.liberty"))
+            context?.startActivity(intent)
+            true
+        }
+
         val quitAppPref = findPreference(context?.getPreferenceKey(R.string.pref_key_quit_app))
         if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean(getString(R.string.pref_key_privacy_cleardata_on_close) , false)) {
             quitAppPref.onPreferenceClickListener = Preference.OnPreferenceClickListener {
