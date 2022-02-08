@@ -26,11 +26,11 @@ class QwantUtils {
                 results_in_new_tab: Boolean? = null,
                 dark_theme: String? = null,
                 maps: Boolean = false,
-                music: Boolean = false
+                music: Boolean = false,
+                client: String = context.getString(R.string.browser_client)
         ) : String {
             val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
-            val client = context.getString(R.string.browser_client)
             val l = interface_language ?: prefs.getString(context.getString(R.string.pref_key_general_language_interface), "en_GB")
             val r = search_language ?: prefs.getString(context.getString(R.string.pref_key_general_language_search), "en")
             val sr = search_region ?: prefs.getString(context.getString(R.string.pref_key_general_region_search), "GB")
