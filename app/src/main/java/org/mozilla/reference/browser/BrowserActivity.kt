@@ -80,6 +80,8 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
 
         Log.d("QWANT_BROWSER_T", "load browser activity")
 
+        Log.e("QWANT_BROWSER_BT", "client string from buildType: " + getString(R.string.app_client_string))
+
         darkmode = if (intent.hasExtra("newTheme")) {
             Log.d("QWANT_BROWSER_T", "with theme " + intent.getIntExtra("newTheme", AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM))
             intent.getIntExtra("newTheme", AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
