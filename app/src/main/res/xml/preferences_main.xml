@@ -38,7 +38,7 @@
     <org.mozilla.reference.browser.settings.QwantPreference
         android:key="@string/pref_key_rate_app"
         android:title="@string/settings_rate_app"
-        android:icon="@drawable/ic_settings_about" />
+        android:icon="@drawable/icons_system_star_line" />
 
     <org.mozilla.reference.browser.settings.QwantPreference
         android:key="@string/pref_key_quit_app"

@@ -41,10 +41,10 @@ android {
             resValue 'string', 'app_client_string', 'debugandroidclient'
         }
         release releaseTemplate >> {
-            resValue 'string', 'app_client_string', 'monsuperclient'
+            resValue 'string', 'app_client_string', 'qwantbrowser'
         }
         release_huawei releaseTemplate >> {
-            resValue 'string', 'app_client_string', 'huaweiclient'
+            resValue 'string', 'app_client_string', 'brz-huawei'
         }
     }
 
