@@ -1,4 +1,4 @@
-include ':app'
+include ':qwantbrowser'
 
 Properties localProperties = null;
 String settingAppServicesPath = "substitutions.application-services.dir";
