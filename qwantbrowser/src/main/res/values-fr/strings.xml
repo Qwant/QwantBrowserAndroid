@@ -187,6 +187,8 @@
     <string name="settings_adultcontent_moderate">Moderé</string>
     <string name="settings_adultcontent_strict">Strict</string>
 
+    <string name="settings_rate_app">Noter cette application</string>
+
     <string name="settings_about_menu">A propos</string>
     <string name="settings_about">A propos de Qwant Browser</string>
     <string name="settings_privacy_policy">Politique de confidentialité</string>
