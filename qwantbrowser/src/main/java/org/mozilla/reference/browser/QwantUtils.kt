@@ -27,7 +27,7 @@ class QwantUtils {
                 dark_theme: String? = null,
                 maps: Boolean = false,
                 music: Boolean = false,
-                client: String = context.getString(R.string.browser_client)
+                client: String = context.getString(R.string.app_client_string)
         ) : String {
             val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 

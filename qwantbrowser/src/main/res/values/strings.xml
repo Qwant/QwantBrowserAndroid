@@ -184,7 +184,7 @@
     <string name="settings_privacy_policy">Privacy policy</string>
     <string name="settings_license">License (MPL 2.0)</string>
 
-    <string name="browser_client" translatable="false">qwantbrowser</string>
+    <!-- <string name="browser_client" translatable="false">brz-huawei</string> -->
     <string name="homepage_base" translatable="false">https://www.qwant.com/</string>
     <string name="homepage_startwith_filter" translatable="false">https://www.qwant.com/</string>
     <string name="qwantmaps_startwith_filter" translatable="false">https://www.qwant.com/maps/</string>

@@ -322,7 +322,7 @@ public class Assist extends Activity {
             webview.loadUrl(QwantUtils.Companion.getHomepage(getApplicationContext(),
                     query, true, null, null, null,
                     null, null, null, null,
-                    false, false, "qwantwidget"
+                    false, false, getString(R.string.widget_client_string)
             ));
             // Force hide keyboard
             InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
