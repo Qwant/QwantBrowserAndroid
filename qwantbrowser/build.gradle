@@ -39,12 +39,18 @@ android {
         debug {
             applicationIdSuffix ".debug"
             resValue 'string', 'app_client_string', 'debugandroidclient'
+            resValue 'string', 'widget_client_string', 'debugandroidclient-widget'
+            buildConfigField "boolean", "HIDE_TOOLBAR_ON_QWANT", "false"
         }
         release releaseTemplate >> {
             resValue 'string', 'app_client_string', 'qwantbrowser'
+            resValue 'string', 'widget_client_string', 'qwantbrowser-widget'
+            buildConfigField "boolean", "HIDE_TOOLBAR_ON_QWANT", "false"
         }
         release_huawei releaseTemplate >> {
             resValue 'string', 'app_client_string', 'brz-huawei'
+            resValue 'string', 'widget_client_string', 'brz-huawei-widget'
+            buildConfigField "boolean", "HIDE_TOOLBAR_ON_QWANT", "true"
         }
     }
 
