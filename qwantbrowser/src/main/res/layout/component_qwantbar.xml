@@ -22,8 +22,8 @@
             android:layout_weight="1"
             android:scaleType="center"
             android:src="@drawable/icons_system_arrow_left_s_line"
-            android:background="@drawable/ripple_qwantbar"
-            app:tint="?attr/qwantbar_normalColor"/>
+            app:tint="?attr/qwantbar_normalColor"
+            android:stateListAnimator="@animator/qwantbar_zoom_animator" />
 
         <ImageView
             android:id="@+id/qwantbar_button_nav_forward"
@@ -32,8 +32,8 @@
             android:layout_weight="1"
             android:scaleType="center"
             android:src="@drawable/icons_system_arrow_right_s_line"
-            android:background="@drawable/ripple_qwantbar"
-            app:tint="?attr/qwantbar_normalColor"/>
+            app:tint="?attr/qwantbar_normalColor"
+            android:stateListAnimator="@animator/qwantbar_zoom_animator" />
 
         <ImageView
             android:id="@+id/qwantbar_button_nav_home"
@@ -41,8 +41,8 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:scaleType="center"
-            android:background="@drawable/ripple_qwantbar"
-            android:src="@drawable/brands_logos_qwant_letter_colored" />
+            android:src="@drawable/brands_logos_qwant_letter_colored"
+            android:stateListAnimator="@animator/qwantbar_zoom_animator" />
 
         <!-- <mozilla.components.ui.tabcounter.TabCounter
             android:id="@+id/qwantbar_button_nav_tabs"
@@ -53,6 +53,7 @@
 
         <!--  TODO Make a component for tabs button -->
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:stateListAnimator="@animator/qwantbar_zoom_animator"
             android:id="@+id/qwantbar_layout_nav_tabs"
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -95,6 +96,7 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <mozilla.components.browser.menu.view.MenuButton
+            android:stateListAnimator="@animator/qwantbar_zoom_animator"
             android:id="@+id/qwantbar_button_nav_menu"
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -118,11 +120,12 @@
             android:layout_gravity="center_vertical"
             android:text="@string/menu_search"
             android:textColor="?attr/qwantbar_normalColor"
-            android:background="@drawable/ripple_qwantbar"
+            android:background="?attr/qwantbar_backgroundColor"
             android:drawablePadding="-8dp"
             android:paddingTop="8dp"
             app:drawableTopCompat="@drawable/icons_system_search_line"
-            app:drawableTint="?attr/qwantbar_normalColor" />
+            app:drawableTint="?attr/qwantbar_normalColor"
+            android:stateListAnimator="@animator/qwantbar_zoom_animator" />
 
         <TextView
             android:id="@+id/qwantbar_text_bookmarks"
@@ -135,16 +138,18 @@
             android:layout_gravity="center_vertical"
             android:text="@string/menu_bookmarks"
             android:textColor="?attr/qwantbar_normalColor"
-            android:background="@drawable/ripple_qwantbar"
+            android:background="?attr/qwantbar_backgroundColor"
             app:drawableTopCompat="@drawable/icons_business_bookmark_line"
-            app:drawableTint="?attr/qwantbar_normalColor" />
+            app:drawableTint="?attr/qwantbar_normalColor"
+            android:stateListAnimator="@animator/qwantbar_zoom_animator" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/qwantbar_layout_tabs"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:background="@drawable/ripple_qwantbar"
-            android:layout_weight="1">
+            android:background="?attr/qwantbar_backgroundColor"
+            android:layout_weight="1"
+            android:stateListAnimator="@animator/qwantbar_zoom_animator" >
 
             <mozilla.components.ui.tabcounter.TabCounter
                 android:id="@+id/qwantbar_button_tabs"
@@ -219,9 +224,10 @@
             android:layout_gravity="center_vertical"
             android:text="@string/menu_settings"
             android:textColor="?attr/qwantbar_normalColor"
-            android:background="@drawable/ripple_qwantbar"
+            android:background="?attr/qwantbar_backgroundColor"
             app:drawableTopCompat="@drawable/icons_system_settings_line"
-            app:drawableTint="?attr/qwantbar_normalColor" />
+            app:drawableTint="?attr/qwantbar_normalColor"
+            android:stateListAnimator="@animator/qwantbar_zoom_animator" />
     </LinearLayout>
 
 </LinearLayout>
