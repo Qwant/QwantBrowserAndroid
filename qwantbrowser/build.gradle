@@ -281,6 +281,7 @@ dependencies {
     implementation Deps.androidx_compose_material
 
     implementation Deps.keyboardvisibilityevent
+    implementation 'com.google.android.play:core-ktx:1.8.1'
     // implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
     androidTestImplementation Deps.uiautomator

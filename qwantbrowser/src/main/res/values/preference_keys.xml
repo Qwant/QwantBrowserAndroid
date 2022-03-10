@@ -36,7 +36,6 @@
     <string name="pref_key_privacy_policy" translatable="false">pref_key_privacy_policy</string>
     <string name="pref_key_license" translatable="false">pref_key_license</string>
 
-
     <string name="pref_key_saved_version" translatable="false">pref_key_saved_version</string>
     <string name="pref_key_bookmarks_version" translatable="false">pref_key_bookmarks_version</string>
     <string name="pref_key_first_launch" translatable="false">pref_key_first_launch</string>
@@ -49,4 +48,10 @@
     <string name="pref_key_cleardata_content_tabs" translatable="false">pref_key_cleardata_content_tabs</string>
     <string name="pref_key_cleardata_content_tabs_private" translatable="false">pref_key_cleardata_content_tabs_private</string>
     <string name="pref_key_cleardata_content_browsingdata" translatable="false">pref_key_cleardata_content_browsingdata</string>
+
+    <string name="pref_key_ratepush_last_opened" translatable="false">pref_key_ratepush_last_opened</string>
+    <string name="pref_key_ratepush_consecutive_days" translatable="false">pref_key_ratepush_consecutive_days</string>
+    <string name="pref_key_ratepush_app_opened_count" translatable="false">pref_key_ratepush_app_opened_count</string>
+    <string name="pref_key_ratepush_searches" translatable="false">pref_key_ratepush_search_count</string>
+    <string name="pref_key_ratepush_date" translatable="false">pref_key_ratepush_date</string>
 </resources>

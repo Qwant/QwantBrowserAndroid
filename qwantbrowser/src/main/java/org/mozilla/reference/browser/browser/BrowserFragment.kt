@@ -11,6 +11,7 @@ import android.util.Log
 import android.view.View
 import kotlinx.android.synthetic.main.fragment_browser.*
 import kotlinx.android.synthetic.main.fragment_browser.view.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import mozilla.components.browser.state.selector.selectedTab
 import mozilla.components.browser.thumbnails.BrowserThumbnails
 import mozilla.components.feature.awesomebar.AwesomeBarFeature
@@ -30,10 +31,12 @@ import org.mozilla.reference.browser.ext.requireComponents
 /**
  * Fragment used for browsing the web within the main app.
  */
+@ExperimentalCoroutinesApi
 class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
     private val thumbnailsFeature = ViewBoundFeatureWrapper<BrowserThumbnails>()
     private val webExtToolbarFeature = ViewBoundFeatureWrapper<WebExtensionToolbarFeature>()
     // private var toolbarControlFeature = ViewBoundFeatureWrapper<ToolbarControlFeature>()
+    private val qwantRatingFeature = ViewBoundFeatureWrapper<QwantRatingFeature>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -81,6 +84,12 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
             toolbar.edit.updateUrl(search, shouldAutoComplete = true, shouldHighlight = false)
             toolbar.edit.views.url.setSelection(search.length)
         }
+
+        qwantRatingFeature.set(
+            feature = QwantRatingFeature(requireContext(), requireComponents.core.store),
+            owner = this,
+            view = view
+        )
 
         /* toolbarControlFeature.set(
             feature = ToolbarControlFeature(

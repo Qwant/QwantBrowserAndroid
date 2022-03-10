@@ -16,7 +16,6 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.preference.PreferenceManager
@@ -49,6 +48,8 @@ import org.mozilla.reference.browser.tabs.QwantTabsFragment
 import java.util.*
 import kotlin.system.exitProcess
 
+import androidx.core.view.WindowInsetsControllerCompat
+import com.google.android.play.core.review.ReviewManagerFactory
 
 /**
  * Activity that holds the [BrowserFragment].
@@ -100,6 +101,8 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
 
 
 
+        this.ratePushCheck()
+
         val statusbarBackground = getColorFromAttr(R.attr.qwant_systembar_background)
         window?.statusBarColor = statusbarBackground
         window?.navigationBarColor = statusbarBackground
@@ -120,7 +123,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         )
 
         qwantbar.bookmarksStorage = bookmarksStorage
-        qwantbar.onTabsClicked = ::showTabs
+        qwantbar.onTabsClicked = ::checkRatePushBeforeTabs
         qwantbar.onBookmarksClicked = ::showBookmarks
         qwantbar.onHomeClicked = ::showHome
         qwantbar.onSettingsClicked = ::showSettings
@@ -164,6 +167,63 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         this.removeABP()
         this.checkFirstLaunch()
         this.launchOnboardingIfNecessary()
+    }
+
+    private fun ratePushCheck() {
+        val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+
+        if (prefs.getLong(getString(R.string.pref_key_ratepush_date), 0) == 0L) {
+            val ratepushOpenedCountKey = getString(R.string.pref_key_ratepush_app_opened_count)
+            val ratepushOpenedCount = prefs.getInt(ratepushOpenedCountKey, 0)
+            val ratepushConsecutiveDaysKey = getString(R.string.pref_key_ratepush_consecutive_days)
+            val ratepushConsecutiveDays = prefs.getInt(ratepushConsecutiveDaysKey, 0)
+            val ratepushLastOpenedKey = getString(R.string.pref_key_ratepush_last_opened)
+            val editor = prefs.edit()
+
+            if (ratepushOpenedCount < RATEPUSH_MIN_CONNECTION) {
+                Log.d("QWANT_BROWSER_RATING", "New app opened recorded | total: ${ratepushOpenedCount + 1}")
+                editor.putInt(ratepushOpenedCountKey, ratepushOpenedCount + 1)
+                editor.apply()
+            }
+
+            if (ratepushConsecutiveDays < RATEPUSH_CONSECUTIVE_DAYS_LIMIT) {
+                val now = Calendar.getInstance()
+
+                // now.day
+                val last = Calendar.getInstance()
+                last.time = Date(prefs.getLong(ratepushLastOpenedKey, 0))
+
+                val nowYear = now.get(Calendar.YEAR)
+                val nowDay = now.get(Calendar.DAY_OF_YEAR)
+                val lastYear = last.get(Calendar.YEAR)
+                val lastDay = last.get(Calendar.DAY_OF_YEAR)
+                var increment = false
+                var reset = false
+                if (nowYear == lastYear) {
+                    if (nowDay == lastDay + 1) {
+                        increment = true
+                    } else if (nowDay != lastDay) {
+                        reset = true
+                    }
+                } else if (now.get(Calendar.YEAR) == last.get(Calendar.YEAR) + 1 && now.get(Calendar.DAY_OF_YEAR) == 1 && last.get(Calendar.DAY_OF_YEAR) == 364) {
+                    increment = true
+                } else {
+                    reset = true
+                }
+
+                if (increment) {
+                    Log.d("QWANT_BROWSER_RATING", "New consecutive day recorded | total: ${ratepushConsecutiveDays + 1}")
+                    editor.putInt(ratepushConsecutiveDaysKey, ratepushConsecutiveDays + 1)
+                } else if (reset) {
+                    Log.d("QWANT_BROWSER_RATING", "Consecutive days reset to 1")
+                    editor.putInt(ratepushConsecutiveDaysKey, 1)
+                }
+
+                editor.putLong(ratepushLastOpenedKey, now.time.time)
+
+                editor.apply()
+            }
+        }
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -391,6 +451,54 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         qwantbar.visibility = if (enabled) View.GONE else View.VISIBLE
     }
 
+    private fun checkRatePushBeforeTabs() {
+        Log.d("QWANT_BROWSER_RATING", "Check rate push before tabs")
+
+        val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+
+        val ratePushDate = prefs.getLong(getString(R.string.pref_key_ratepush_date), 0)
+        if (ratePushDate == 0L) {
+            Log.d("QWANT_BROWSER_RATING", "rating not done yet")
+            val ratepushOpenedCount = prefs.getInt(getString(R.string.pref_key_ratepush_app_opened_count), 0)
+            val ratepushConsecutiveDays = prefs.getInt(getString(R.string.pref_key_ratepush_consecutive_days), 0)
+            val searchesCount = prefs.getStringSet(getString(R.string.pref_key_ratepush_searches), mutableSetOf())?.size ?: 0
+            if (ratepushOpenedCount >= RATEPUSH_MIN_CONNECTION
+                && ratepushConsecutiveDays >= RATEPUSH_CONSECUTIVE_DAYS_LIMIT
+                && searchesCount >= RATEPUSH_SEARCH_LIMIT
+            ) {
+                Log.d("QWANT_BROWSER_RATING", "Rating conditions OK. Launching rating API.")
+
+                val manager = ReviewManagerFactory.create(this)
+                val request = manager.requestReviewFlow()
+                request.addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        val reviewInfo = task.result
+                        val flow = manager.launchReviewFlow(this, reviewInfo)
+                        flow.addOnCompleteListener {
+                            Log.d("QWANT_BROWSER_RATING", "Rate push DONE")
+
+                            val editor = prefs.edit()
+                            editor.putLong(getString(R.string.pref_key_ratepush_date), Date().time)
+                            editor.apply()
+
+                            showTabs()
+                        }
+                    } else {
+                        Log.d("QWANT_BROWSER_RATING", "Error requesting review API: ${task.exception}")
+                        Log.e("QWANT_BROWSER", "Error requesting review API")
+                        showTabs()
+                    }
+                }
+            } else {
+                Log.d("QWANT_BROWSER_RATING", "rating conditions not met")
+                showTabs()
+            }
+        } else {
+            Log.d("QWANT_BROWSER_RATING", "rating already done")
+            showTabs()
+        }
+    }
+
     private fun showTabs() {
         val tag = "TABS_FRAGMENT"
         var tabsFragment = this.supportFragmentManager.findFragmentByTag(tag)
@@ -576,5 +684,9 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
 
     companion object {
         lateinit var PACKAGE_NAME: String
+
+        const val RATEPUSH_SEARCH_LIMIT = 3
+        const val RATEPUSH_CONSECUTIVE_DAYS_LIMIT = 3
+        const val RATEPUSH_MIN_CONNECTION = 10
     }
 }
