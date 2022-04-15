@@ -20,9 +20,8 @@ private object Versions {
     const val android_gradle_plugin = "7.0.0"
     // const val android_gradle_plugin = "3.4.1"
 
-    const val mozilla_android_components = "94.0.20210918190139"
-    // const val mozilla_android_components = "90.0.20210509143123"
-    const val mozilla_android_components_old = "90.0.20210509143123"
+    const val mozilla_android_components = "97.0.20220108190339" // "94.0.20210918190139"
+    // const val mozilla_android_components_old = "90.0.20210509143123"
 
     const val thirdparty_sentry = "1.7.10"
 
@@ -34,9 +33,13 @@ private object Versions {
     const val tools_test_runner = "1.1.0"
     const val uiautomator = "2.2.0"
 
+    const val compose_version = "1.0.0-rc02"
+
     object AndroidX {
         const val core = "1.2.0"
         const val fragment_ktx = "1.3.0"
+        const val compose = compose_version
+        const val activity_compose = "1.3.0-rc02"
         const val swiperefreshlayout = "1.1.0"
     }
 }
@@ -49,16 +52,19 @@ object Deps {
     const val mozilla_concept_engine = "org.mozilla.components:concept-engine:${Versions.mozilla_android_components}"
     const val mozilla_concept_tabstray = "org.mozilla.components:concept-tabstray:${Versions.mozilla_android_components}"
     const val mozilla_concept_toolbar = "org.mozilla.components:concept-toolbar:${Versions.mozilla_android_components}"
+    const val mozilla_concept_awesomebar = "org.mozilla.components:concept-awesomebar:${Versions.mozilla_android_components}"
     const val mozilla_concept_storage = "org.mozilla.components:concept-storage:${Versions.mozilla_android_components}"
     const val mozilla_concept_menu = "org.mozilla.components:concept-menu:${Versions.mozilla_android_components}"
     const val mozilla_concept_sync = "org.mozilla.components:concept-sync:${Versions.mozilla_android_components}"
     const val mozilla_concept_push = "org.mozilla.components:concept-push:${Versions.mozilla_android_components}"
 
-    const val mozilla_browser_awesomebar = "org.mozilla.components:browser-awesomebar:${Versions.mozilla_android_components}"
+    const val mozilla_compose_awesomebar = "org.mozilla.components:compose-awesomebar:${Versions.mozilla_android_components}"
+
+    // const val mozilla_browser_awesomebar = "org.mozilla.components:browser-awesomebar:${Versions.mozilla_android_components}"
     const val mozilla_browser_engine_gecko = "org.mozilla.components:browser-engine-gecko:${Versions.mozilla_android_components}"
     const val mozilla_browser_domains = "org.mozilla.components:browser-domains:${Versions.mozilla_android_components}"
     const val mozilla_browser_search = "org.mozilla.components:browser-search:${Versions.mozilla_android_components}"
-    const val mozilla_browser_session = "org.mozilla.components:browser-session:${Versions.mozilla_android_components_old}"
+    // const val mozilla_browser_session = "org.mozilla.components:browser-session:${Versions.mozilla_android_components_old}"
     const val mozilla_browser_session_storage = "org.mozilla.components:browser-session-storage:${Versions.mozilla_android_components}"
     const val mozilla_browser_state = "org.mozilla.components:browser-state:${Versions.mozilla_android_components}"
     const val mozilla_browser_tabstray = "org.mozilla.components:browser-tabstray:${Versions.mozilla_android_components}"
@@ -125,6 +131,11 @@ object Deps {
     const val androidx_work_runtime_ktx = "androidx.work:work-runtime-ktx:${Versions.workmanager}"
     const val androidx_fragment = "androidx.fragment:fragment:${Versions.AndroidX.core}"
     const val androidx_fragment_ktx = "androidx.fragment:fragment-ktx:${Versions.AndroidX.fragment_ktx}"
+    const val androidx_compose_ui = "androidx.compose.ui:ui:${Versions.AndroidX.compose}"
+    const val androidx_compose_ui_tooling = "androidx.compose.ui:ui-tooling:${Versions.AndroidX.compose}"
+    const val androidx_compose_foundation = "androidx.compose.foundation:foundation:${Versions.AndroidX.compose}"
+    const val androidx_compose_material = "androidx.compose.material:material:${Versions.AndroidX.compose}"
+    const val androidx_activity_compose = "androidx.activity:activity-compose:${Versions.AndroidX.activity_compose}"
     const val androidx_swiperefreshlayout = "androidx.swiperefreshlayout:swiperefreshlayout:${Versions.AndroidX.swiperefreshlayout}"
     const val google_material = "com.google.android.material:material:${Versions.google_material}"
     // const val androidx_annotation = "androidx.annotation:annotation:${Versions.androidx_annotation}"
