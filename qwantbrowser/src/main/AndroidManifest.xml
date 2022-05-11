@@ -62,6 +62,8 @@
             android:exported="false"
             android:parentActivityName=".BrowserActivity" />
 
+        <activity android:name="com.qwant.android.webext.ABPRemovalActivity" />
+
         <activity
             android:name=".addons.AddonDetailsActivity"
             android:exported="false"

@@ -68,4 +68,6 @@
     <color name="qwant_purple_medium">#a125be</color>
     <color name="qwant_purple_dark">#110626</color>
     <color name="qwant_purple_lighter">#f2dbf8</color>
+
+    <color name="qwant_black_v2">#050506</color>
 </resources>

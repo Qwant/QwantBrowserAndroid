@@ -20,6 +20,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.preference.PreferenceManager
+import com.qwant.android.webext.ABPRemovalActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import mozilla.components.browser.state.selector.findCustomTabOrSelectedTab
 import mozilla.components.browser.state.selector.selectedTab
@@ -154,6 +155,28 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         this.checkFirstLaunch()
 
         qwantbar.updateTabCount()
+        this.removeABP()
+    }
+
+    fun removeABP() {
+        components.core.engine.listInstalledWebExtensions({ list ->
+            list.forEach { ext ->
+                if (ext.id == "{d10d0bf8-f5b5-c8b4-a8b2-2b9879e08c5d}") { // adblockplus ID
+                    Log.d("QWANT_BROWSER_EXTENSION", "ABP Extension found: ${ext.getMetadata()}")
+                    components.core.engine.uninstallWebExtension(ext,
+                        onSuccess = {
+                            Log.d("QWANT_BROWSER_EXTENSION", "ABP uninstalled")
+                            Log.d("QWANT_BROWSER_EXTENSION", "Should show sorry activity")
+                            val intent = Intent(this, ABPRemovalActivity::class.java)
+                            startActivity(intent)
+                        },
+                        onError = { _, throwable ->
+                            Log.e("QWANT_BROWSER_EXTENSION", "Error uninstalling ABP", throwable)
+                        }
+                    )
+                }
+            }
+        })
     }
 
     override fun onNewIntent(intent: Intent?) {
