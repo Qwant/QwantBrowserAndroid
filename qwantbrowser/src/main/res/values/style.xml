@@ -50,6 +50,7 @@
         <item name="android:textColorPrimary">@color/qwant_text</item>
         <item name="colorControlHighlight">?attr/qwant_rippleColor</item>
         <item name="android:selectableItemBackground">@drawable/qwant_ripple</item>
+        <item name="android:windowSplashScreenBackground">@color/qwant_blue_v2</item>
 
         <!-- Status bar -->
         <item name="qwant_systembar_background">@color/qwant_background</item>
@@ -91,6 +92,9 @@
         <!-- Tabs -->
         <item name="qwant_tabs_foregroundColor">@color/qwant_blue</item>
         <item name="qwant_tabs_selectedColor">@color/qwant_tabs_selected</item>
+
+        <!-- V2 -->
+        <item name="qwant_logo_background">@color/qwant_blue_v2</item>
     </style>
 
     <style name="ThemeQwantNoActionBarPrivacy" parent="ThemeQwantNoActionBar">
@@ -131,6 +135,9 @@
         <!-- Tabs -->
         <item name="qwant_tabs_foregroundColor">@color/qwant_purple_medium</item>
         <item name="qwant_tabs_selectedColor">@color/qwant_tabs_selected_private</item>
+
+        <!-- V2 -->
+        <item name="qwant_logo_background">@color/qwant_purple_v2</item>
     </style>
 
     <style name="QwantOverflowButtonStyle" parent="Widget.AppCompat.ActionButton.Overflow">

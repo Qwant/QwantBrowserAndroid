@@ -89,7 +89,7 @@ internal class NativeNotificationBridge(
                     putExtra(EXTRA_ON_CLICK, tag)
                 }
 
-                PendingIntent.getActivity(context, requestId, intent, 0).apply {
+                PendingIntent.getActivity(context, requestId, intent, PendingIntent.FLAG_IMMUTABLE).apply {
                     builder.setContentIntent(this)
                 }
             }

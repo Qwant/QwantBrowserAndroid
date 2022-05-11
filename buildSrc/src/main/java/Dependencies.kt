@@ -7,14 +7,14 @@ private object Versions {
     const val kotlin = "1.5.10"
     const val coroutines = "1.5.0"
 
-    const val androidx_appcompat = "1.3.0-rc01"
+    const val androidx_appcompat = "1.4.1"
     /* const val androidx_annotation = "1.1.0"
     const val androidx_loader = "1.1.0" */
     const val androidx_localbroadcastmanager = "1.0.0"
     const val androidx_constraintlayout = "1.1.3"
     const val androidx_preference = "1.0.0"
 
-    const val workmanager = "2.0.0"
+    const val workmanager = "2.7.1"
     const val google_material = "1.0.0"
 
     const val android_gradle_plugin = "7.0.0"
