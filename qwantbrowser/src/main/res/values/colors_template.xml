@@ -22,6 +22,16 @@
 
     <color name="qwant_menu_background">@color/true_white</color>
 
+    <color name="qwant_suggest_background">@color/true_white</color>
+    <color name="qwant_suggest_text_light">@color/qwant_grey_v2</color>
+    <color name="qwant_suggest_text_bold">@color/qwant_black_v2</color>
+    <color name="qwant_suggest_arrow_color">@color/qwant_suggest_text_light</color>
+    <color name="qwant_suggest_clipboard_text">@color/qwant_suggest_text_light</color>
+
+    <color name="qwant_searchbar_background">@color/true_white</color>
+    <color name="qwant_searchbar_text">@color/qwant_black_v2</color>
+    <color name="qwant_searchbar_hint">@color/qwant_grey_light_v2</color>
+
     <!-- Privacy colors -->
     <color name="qwant_ripple_private">@color/qwant_purple_lighter</color>
     <color name="qwant_tabs_selected_private">@color/qwant_purple_lighter</color>

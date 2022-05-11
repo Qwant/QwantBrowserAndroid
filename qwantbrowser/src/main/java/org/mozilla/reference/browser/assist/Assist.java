@@ -10,9 +10,12 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -20,25 +23,25 @@ import android.webkit.GeolocationPermissions;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.AutoCompleteTextView;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import org.jetbrains.annotations.NotNull;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.AppCompatImageView;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.RecyclerView;
+
 import org.mozilla.reference.browser.IntentReceiverActivity;
 import org.mozilla.reference.browser.QwantUtils;
 import org.mozilla.reference.browser.R;
 
+import com.google.android.material.textfield.TextInputEditText;
+
 import java.net.MalformedURLException;
 import java.net.URL;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import java.util.ArrayList;
 
 import static android.content.ClipDescription.MIMETYPE_TEXT_HTML;
 import static android.content.ClipDescription.MIMETYPE_TEXT_PLAIN;
@@ -46,43 +49,33 @@ import static android.content.ClipDescription.MIMETYPE_TEXT_PLAIN;
 public class Assist extends Activity {
     public static final int MAX_SUGGEST_TEXT_LENGTH = 30;
 
-    AutoCompleteTextView search_text;
+    TextInputEditText search_text;
     WebView webview;
     TextView clipboard_text;
-    LinearLayout home_layout;
     LinearLayout clipboard_layout;
+    LinearLayout search_input_layout;
     SuggestAdapter suggest_adapter;
-    HistoryAdapter history_adapter;
-    LinearLayout history_layout;
-    RecyclerView history_list;
+    RecyclerView suggest_recyclerview;
     Intent new_tab_intent;
     CharSequence clipboard_full_text;
     boolean clipboard_is_url = false;
+
+    boolean back_to_webview = false;
 
     // Geoloc permission
     final int QWANT_PERMISSIONS_REQUEST_FINE_LOCATION = 0;
     private String permission_request_origin;
     private GeolocationPermissions.Callback permission_request_callback;
 
-    @SuppressLint("SetJavaScriptEnabled")
-    @Override protected void onCreate(Bundle savedInstanceState) {
+    ArrayList<String> suggestItems = new ArrayList<>();
+
+    @SuppressLint({"SetJavaScriptEnabled"})
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.assist_main);
 
-        search_text = findViewById(R.id.search_text);
-        home_layout = findViewById(R.id.home_layout);
-
-        history_list = findViewById(R.id.history_list);
-        history_layout = findViewById(R.id.history_layout);
-        history_adapter = new HistoryAdapter(this, history_layout);
-        history_list.setLayoutManager(new LinearLayoutManager(this));
-        TextView link_erase_history = findViewById(R.id.link_erase_history);
-        link_erase_history.setOnClickListener(v -> history_adapter.clear_history());
-        history_list.setAdapter(history_adapter);
-
-        suggest_adapter = new SuggestAdapter(this, R.layout.assist_suggestlist_item, history_adapter);
-
-        // Intent for opening url in browser
+        // Intent for opening url in browser. URL is set at just before starting activity.
         new_tab_intent = new Intent(this, IntentReceiverActivity.class);
         new_tab_intent.setPackage(getPackageName());
         new_tab_intent.setAction(Intent.ACTION_VIEW);
@@ -91,17 +84,18 @@ public class Assist extends Activity {
         webview.getSettings().setJavaScriptEnabled(true);
         webview.getSettings().setUserAgentString("Mozilla/5.0 (Android 10; Mobile; rv:77.0) Gecko/77.0 Firefox/77.0 QwantMobile/4.0");
 
-        // MAPS SETTINGS
+        // Maps settings
         webview.getSettings().setGeolocationEnabled(true);
         webview.getSettings().setBuiltInZoomControls(true);
-        // local storage emulation
+        // Local storage emulation
         webview.getSettings().setAppCacheEnabled(true);
         webview.getSettings().setDatabaseEnabled(true);
         webview.getSettings().setDomStorageEnabled(true);
 
         webview.setWebViewClient(new WebViewClient() {
             // If we get out of qwant.com, it opens in the browser, else stay in webview
-            @Override public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 Uri uri = Uri.parse(url);
                 String host = uri.getHost();
                 if (host != null && host.contains("qwant.com")) {
@@ -111,15 +105,16 @@ public class Assist extends Activity {
                 startActivity(new_tab_intent);
                 return true;
             }
-            // Show webview and hide home on first user request
-            @Override public void onPageFinished(WebView view, String url) {
+
+            // Show webview after first user request has finished
+            @Override
+            public void onPageFinished(WebView view, String url) {
                 if (webview.getVisibility() == View.INVISIBLE /* && !webview.getUrl().contains("preload") */) {
                     webview.setVisibility(View.VISIBLE);
                     search_text.clearFocus();
-                    search_text.dismissDropDown();
                     webview.requestFocus();
-                    home_layout.setVisibility(View.INVISIBLE);
                 }
+                back_to_webview = true;
             }
         });
         webview.setWebChromeClient(new WebChromeClient() {
@@ -131,9 +126,9 @@ public class Assist extends Activity {
                 if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
                     final AlertDialog.Builder builder = new AlertDialog.Builder(Assist.this);
                     builder.setMessage("Your GPS seems to be disabled, do you want to enable it?")
-                        .setCancelable(false)
-                        .setPositiveButton("Yes", (dialog, id) -> startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS)))
-                        .setNegativeButton("No", (dialog, id) -> dialog.cancel());
+                            .setCancelable(false)
+                            .setPositiveButton("Yes", (dialog, id) -> startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)))
+                            .setNegativeButton("No", (dialog, id) -> dialog.cancel());
                     final AlertDialog alert = builder.create();
                     alert.show();
                     callback.invoke(origin, false, false);
@@ -141,16 +136,16 @@ public class Assist extends Activity {
                     if (ContextCompat.checkSelfPermission(Assist.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                         if (ActivityCompat.shouldShowRequestPermissionRationale(Assist.this, Manifest.permission.READ_CONTACTS)) {
                             new AlertDialog.Builder(Assist.this)
-                                .setMessage("We can not provide location without this permission")
-                                .setNeutralButton("Understood ...", (dialogInterface, i) -> {
-                                    permission_request_origin = origin;
-                                    permission_request_callback = callback;
-                                    ActivityCompat.requestPermissions(Assist.this, new String[] { Manifest.permission.ACCESS_FINE_LOCATION }, QWANT_PERMISSIONS_REQUEST_FINE_LOCATION);
-                                }).show();
+                                    .setMessage("We can not provide location without this permission")
+                                    .setNeutralButton("Understood ...", (dialogInterface, i) -> {
+                                        permission_request_origin = origin;
+                                        permission_request_callback = callback;
+                                        ActivityCompat.requestPermissions(Assist.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, QWANT_PERMISSIONS_REQUEST_FINE_LOCATION);
+                                    }).show();
                         } else {
                             permission_request_origin = origin;
                             permission_request_callback = callback;
-                            ActivityCompat.requestPermissions(Assist.this, new String[] { Manifest.permission.ACCESS_FINE_LOCATION }, 0);
+                            ActivityCompat.requestPermissions(Assist.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
                         }
                     } else {
                         callback.invoke(origin, true, true);
@@ -161,20 +156,12 @@ public class Assist extends Activity {
         // Hide webview and preload SERP for speed of next user request (cache)
         webview.setVisibility(View.INVISIBLE);
 
-        ImageView cancel_cross = findViewById(R.id.widget_search_bar_cross);
+        AppCompatImageView cancel_cross = findViewById(R.id.widget_search_bar_cross);
         cancel_cross.setVisibility(View.INVISIBLE);
-        cancel_cross.setOnClickListener((e) -> {
-            reset_searchbar();
-        });
+        cancel_cross.setOnClickListener((e) -> reset_searchbar());
 
-        ImageView img_magnifier = findViewById(R.id.widget_search_bar_magnifier);
-        img_magnifier.setOnClickListener((e) -> launch_search());
-
-        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
         clipboard_layout = findViewById(R.id.clipboard_layout);
         clipboard_text = findViewById(R.id.clipboard_text);
-        clipboard.addPrimaryClipChangedListener(() -> reload_clipboard(clipboard));
-        reload_clipboard(clipboard);
         LinearLayout clipboard_text_layout = findViewById(R.id.clipboard_text_layout);
         clipboard_text_layout.setOnClickListener(v -> {
             if (clipboard_is_url) {
@@ -187,8 +174,11 @@ public class Assist extends Activity {
             }
         });
 
-        search_text.setAdapter(suggest_adapter);
-        search_text.setDropDownBackgroundResource(R.drawable.white_rectangle);
+        search_text = findViewById(R.id.search_text);
+        suggest_recyclerview = findViewById(R.id.suggest_recyclerview);
+        suggest_adapter = new SuggestAdapter(this, suggestItems);
+        suggest_recyclerview.setAdapter(suggest_adapter);
+
         // On keyboard validation (button "enter")
         search_text.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
@@ -197,41 +187,81 @@ public class Assist extends Activity {
             }
             return false;
         });
-        // On click on suggest item
-        search_text.setOnItemClickListener((adapter, view, position, id) -> {
-            SuggestItem selected_item = suggest_adapter.getItem(position);
-            if (selected_item != null) {
-                search_text.setText(selected_item.display_text);
-                search_text.setSelection(search_text.getText().length());
-                launch_search();
-            }
-        });
+
         search_text.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void afterTextChanged(Editable s) {}
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (count == 0) {
+                String newSearch = s.toString().trim();
+                if (newSearch.length() == 0) {
                     cancel_cross.setVisibility(View.INVISIBLE);
                     webview.setVisibility(View.INVISIBLE);
-                    home_layout.setVisibility(View.VISIBLE);
+                    suggest_recyclerview.setVisibility(View.INVISIBLE);
                 } else {
+                    new RefreshSuggestionsTask(suggestItems, suggest_adapter).execute(newSearch);
                     cancel_cross.setVisibility(View.VISIBLE);
+                    webview.setVisibility(View.INVISIBLE);
+                    suggest_recyclerview.setVisibility(View.VISIBLE);
                 }
             }
         });
+
+        search_input_layout = findViewById(R.id.widget_search_bar_layout);
         search_text.setOnFocusChangeListener((v, hasFocus) -> {
+            Log.d("QWANT_BROWSER_ASSIST", "focus changed: " + hasFocus);
             if (hasFocus) {
+                search_input_layout.setBackgroundResource(R.drawable.search_bar_background_shadowed_focus);
                 if (search_text.getText().length() == 0) {
                     webview.setVisibility(View.INVISIBLE);
-                    home_layout.setVisibility(View.VISIBLE);
+                    suggest_recyclerview.setVisibility(View.INVISIBLE);
                 } else {
-                    search_text.showDropDown();
+                    webview.setVisibility(View.INVISIBLE);
+                    suggest_recyclerview.setVisibility(View.VISIBLE);
                 }
             } else {
-                search_text.dismissDropDown();
+                search_input_layout.setBackgroundResource(R.drawable.search_bar_background_shadowed_unfocus);
             }
         });
+
         reset_searchbar();
+    }
+
+    public void updateSearchField(String text, boolean launchSearch) {
+        search_text.setText(text);
+        search_text.setSelection(text.length());
+        if (launchSearch) launch_search();
+    }
+
+    private static class RefreshSuggestionsTask extends AsyncTask<String, ArrayList<String>, ArrayList<String>> {
+        ArrayList<String> data;
+        SuggestAdapter adapter;
+        String search_terms;
+
+        RefreshSuggestionsTask(ArrayList<String> suggest_data, SuggestAdapter adapter) {
+            this.data = suggest_data;
+            this.adapter = adapter;
+        }
+
+        protected ArrayList<String> doInBackground(String... search_strings) {
+            search_terms = (search_strings.length > 0) ? search_strings[0] : "";
+            return SuggestRequest.getSuggestions(search_terms);
+        }
+
+        protected void onPostExecute(ArrayList<String> result) {
+            data.clear();
+            data.addAll(result);
+            adapter.notifyChange(search_terms);
+        }
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) {
+            ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            clipboard.addPrimaryClipChangedListener(() -> reload_clipboard());
+            reload_clipboard();
+        }
     }
 
     // Geoloc permission callback
@@ -254,22 +284,26 @@ public class Assist extends Activity {
     }
 
     @Override public void onBackPressed() {
-        if (home_layout.getVisibility() == View.INVISIBLE) {
-            home_layout.setVisibility(View.VISIBLE);
+        Log.d("QWANT_BROWSER_ASSIST", "back pressed");
+        if (suggest_recyclerview.getVisibility() == View.VISIBLE) {
+            Log.d("QWANT_BROWSER_ASSIST", "back pressed on suggest. hiding suggest");
+            suggest_recyclerview.setVisibility(View.INVISIBLE);
+            Log.d("QWANT_BROWSER_ASSIST", "back pressed on suggest. back_to_webview is " + back_to_webview);
+            if (back_to_webview) {
+                Log.d("QWANT_BROWSER_ASSIST", "back pressed on suggest. should show webview now");
+                webview.setVisibility(View.VISIBLE);
+            } else {
+                Log.d("QWANT_BROWSER_ASSIST", "back pressed on suggest. should show home now");
+            }
+        } else if (webview.getVisibility() == View.VISIBLE) {
+            Log.d("QWANT_BROWSER_ASSIST", "back pressed on webview. back to home !");
+            webview.setVisibility(View.INVISIBLE);
+            back_to_webview = false;
             reset_searchbar();
         } else {
+            Log.d("QWANT_BROWSER_ASSIST", "back pressed on home. quit !");
             super.onBackPressed();
         }
-    }
-
-    @Override protected void onSaveInstanceState(@NotNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        history_adapter.write_on_disk();
-    }
-
-    @Override protected void onRestoreInstanceState(@NotNull Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        history_adapter.read_from_disk();
     }
 
     void reset_searchbar() {
@@ -279,7 +313,8 @@ public class Assist extends Activity {
         if (imm != null) imm.showSoftInput(search_text, 0);
     }
 
-    void reload_clipboard(ClipboardManager clipboard) {
+    void reload_clipboard() {
+        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
         clipboard_is_url = false;
         if (clipboard.hasPrimaryClip() &&
         (clipboard.getPrimaryClipDescription().hasMimeType(MIMETYPE_TEXT_PLAIN) || clipboard.getPrimaryClipDescription().hasMimeType(MIMETYPE_TEXT_HTML))) {
@@ -294,7 +329,7 @@ public class Assist extends Activity {
                 try {
                     URL url = new URL(clipboard_text);
                     clipboard_is_url = true;
-                } catch (MalformedURLException e) {}
+                } catch (MalformedURLException ignored) {}
             }
 
             if (clipboard_text != null && clipboard_text.length() > 0) {
@@ -317,8 +352,8 @@ public class Assist extends Activity {
     public void launch_search(String query) {
         search_text.setText(query);
         if (query.length() > 0) {
-            // home_layout.requestFocus(); // While webview is loading. Webview take focus after load
-            home_layout.setVisibility(View.INVISIBLE);
+            back_to_webview = true;
+            webview.setVisibility(View.VISIBLE);
             webview.loadUrl(QwantUtils.Companion.getHomepage(getApplicationContext(),
                     query, true, null, null, null,
                     null, null, null, null,
@@ -328,10 +363,7 @@ public class Assist extends Activity {
             InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(search_text.getWindowToken(), 0);
             search_text.clearFocus();
-            search_text.dismissDropDown();
             webview.requestFocus();
-            // Record history
-            history_adapter.add_history_item(query.trim());
         }
     }
 }

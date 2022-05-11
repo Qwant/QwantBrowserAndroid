@@ -127,7 +127,7 @@
             android:name="org.mozilla.reference.browser.assist.Assist"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:windowSoftInputMode="stateAlwaysVisible"
-            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+            android:theme="@style/ThemeQwantNoActionBar"
             android:launchMode="singleTask"
             android:exported="true">
             <intent-filter>

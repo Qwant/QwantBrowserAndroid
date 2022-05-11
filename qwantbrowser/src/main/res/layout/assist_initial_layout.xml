@@ -4,28 +4,29 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/background_assist_rounded">
+    android:background="@drawable/search_bar_background">
 
     <ImageView
-        android:src="@drawable/flat_icon"
+        android:src="@drawable/qwant_logo_v2_round"
         android:id="@+id/custom_notification_widget_logo"
         android:layout_marginStart="2dp"
         android:layout_width="45dp"
         android:layout_height="45dp"
-        android:padding="10dp" />
+        android:padding="8dp" />
 
     <TextView
         android:id="@+id/custom_notification_widget_text"
         android:layout_height="match_parent"
         android:layout_width="0dp"
         android:layout_weight="1"
-        android:text=""
-        android:gravity="center" />
+        android:text="@string/qwant_widget_text"
+        android:textColor="@color/qwant_black"
+        android:gravity="center_vertical" />
 
     <ImageView
-        android:src="@drawable/assist_icon_search"
+        android:src="@drawable/icons_regular_icon_search"
         android:id="@+id/custom_notification_widget_magnifier"
         android:layout_height="match_parent"
-        android:layout_width="20dp"
-        android:layout_marginEnd="20dp"/>
+        android:layout_width="28dp"
+        android:layout_marginEnd="16dp" />
 </LinearLayout>

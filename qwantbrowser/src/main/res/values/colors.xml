@@ -68,4 +68,15 @@
     <color name="qwant_purple_medium">#a125be</color>
     <color name="qwant_purple_dark">#110626</color>
     <color name="qwant_purple_lighter">#f2dbf8</color>
+
+    <!-- v2 colors -->
+    <color name="qwant_black_v2">#050506</color>
+    <color name="qwant_blue_v2">#5c97ff</color>
+    <color name="qwant_blue_light_v2">#99beff</color>
+    <color name="qwant_purple_v2">#ac99ff</color>
+    <color name="qwant_grey_darker_v2">#131416</color>
+    <color name="qwant_grey_dark_v2">#2f3237</color>
+    <color name="qwant_grey_v2">#4b5058</color>
+    <color name="qwant_grey_500_v2">#676e79</color>
+    <color name="qwant_grey_light_v2">#a7acb4</color>
 </resources>

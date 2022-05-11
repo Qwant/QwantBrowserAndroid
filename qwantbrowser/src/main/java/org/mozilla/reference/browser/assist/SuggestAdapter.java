@@ -1,100 +1,106 @@
 package org.mozilla.reference.browser.assist;
 
-import android.content.Context;
-import android.util.Log;
+import android.annotation.SuppressLint;
+import android.graphics.Typeface;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.Filter;
-import android.widget.Filterable;
-import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import org.jetbrains.annotations.NotNull;
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.AppCompatImageView;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.RecyclerView;
+
 import org.mozilla.reference.browser.R;
 
 import java.util.ArrayList;
 
-import static org.mozilla.reference.browser.assist.SuggestItem.Type.QWANT_SUGGEST;
+public class SuggestAdapter extends RecyclerView.Adapter<SuggestAdapter.SuggestViewHolder> {
+    private final LayoutInflater inflater;
+    private final Assist assist;
+    private final ArrayList<String> suggestItems;
 
-class SuggestAdapter extends ArrayAdapter<SuggestItem> implements Filterable {
-    private final static String LOGTAG = "QwantAssist";
+    private String searchText = "";
 
-    private ArrayList<SuggestItem> suggest_data;
-    private final HistoryAdapter history_adapter;
-    private final Context _context;
+    private final int color_normal;
+    private final int color_bold;
 
-    SuggestAdapter(Context context, int resource, HistoryAdapter history_adapter) {
-        super(context, resource);
-        this.suggest_data = new ArrayList<>();
-        this.history_adapter = history_adapter;
-        _context = context;
+    public SuggestAdapter(Assist assist, ArrayList<String> suggestItems) {
+        inflater = LayoutInflater.from(assist);
+        this.assist = assist;
+        this.suggestItems = suggestItems;
+        this.color_normal = ContextCompat.getColor(assist, R.color.qwant_suggest_text_light);
+        this.color_bold = ContextCompat.getColor(assist, R.color.qwant_suggest_text_bold);
     }
 
-    @Override public int getCount() {
-        return suggest_data.size();
-    }
-    @Override public SuggestItem getItem(int index) {
-        if (index < suggest_data.size()) return suggest_data.get(index);
-        return new SuggestItem(QWANT_SUGGEST, "");
+    @NonNull @Override
+    public SuggestViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = inflater.inflate(R.layout.assist_suggestlist_item, parent, false);
+        return new SuggestViewHolder(view);
     }
 
-    @NotNull
-    @Override public View getView(int position, View listItemView, ViewGroup parent) {
-        if (listItemView == null) {
-            listItemView = LayoutInflater.from(_context).inflate(R.layout.assist_suggestlist_item, parent, false);
-        }
+    @Override
+    public void onBindViewHolder(@NonNull SuggestViewHolder holder, int position) {
+        if (position < suggestItems.size()) {
+            String text = suggestItems.get(position);
+            int normal_start = text.indexOf(searchText);
+            if (normal_start != -1) {
+                SpannableStringBuilder spannedText = new SpannableStringBuilder();
+                spannedText.append(text);
+                if (normal_start == 0) {
+                    spannedText.setSpan(new ForegroundColorSpan(this.color_normal), 0, searchText.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+                    spannedText.setSpan(new StyleSpan(Typeface.NORMAL), 0, searchText.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
 
-        TextView name = listItemView.findViewById(R.id.suggest_text);
-
-        if (position < suggest_data.size()) {
-            SuggestItem item = suggest_data.get(position);
-
-            ImageView image = listItemView.findViewById(R.id.suggest_icon);
-            if (item.type == QWANT_SUGGEST) {
-                image.setImageResource(R.drawable.icon_search);
-            } else if (item.type == SuggestItem.Type.HISTORY) {
-                image.setImageResource(R.drawable.icon_clock);
-            } else {
-                Log.w(LOGTAG, "unknown suggest type. Keeping default image");
-            }
-
-            String display_text = (item.display_text.length() > Assist.MAX_SUGGEST_TEXT_LENGTH) ? item.display_text.substring(0, Assist.MAX_SUGGEST_TEXT_LENGTH) : item.display_text;
-            name.setText(display_text);
-        } else {
-            name.setText("");
-        }
-
-        return listItemView;
-    }
-
-    // Get suggest data from qwant and local history, filtered by "constraint" string
-    @NotNull
-    @Override public Filter getFilter() {
-        return new Filter() {
-            @Override protected FilterResults performFiltering(CharSequence constraint) {
-                FilterResults filterResults = new FilterResults();
-                if (constraint != null && constraint.length() > 0) {
-                    try {
-                        suggest_data = SuggestRequest.getSuggestions(constraint.toString());
-                        suggest_data.addAll(history_adapter.filter_as_suggestitem(constraint.toString()));
-                    } catch(Exception e) {
-                        Log.e(LOGTAG, "suggest adapter filtering failed: " + e.getMessage());
-                    }
-                    filterResults.values = suggest_data;
-                    filterResults.count = suggest_data.size();
-                }
-                return filterResults;
-            }
-
-            @Override protected void publishResults(CharSequence constraint, FilterResults results) {
-                if (results != null && results.count > 0) {
-                    notifyDataSetChanged();
+                    spannedText.setSpan(new ForegroundColorSpan(this.color_bold), searchText.length(), text.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+                    spannedText.setSpan(new StyleSpan(Typeface.BOLD), searchText.length(), text.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
                 } else {
-                    notifyDataSetInvalidated();
+                    spannedText.setSpan(new ForegroundColorSpan(this.color_bold), 0, normal_start, Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+                    spannedText.setSpan(new StyleSpan(Typeface.BOLD), 0, normal_start, Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+
+                    spannedText.setSpan(new ForegroundColorSpan(this.color_normal), normal_start, searchText.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+                    spannedText.setSpan(new StyleSpan(Typeface.NORMAL), normal_start, searchText.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+
+                    spannedText.setSpan(new ForegroundColorSpan(this.color_bold), normal_start + searchText.length(), text.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+                    spannedText.setSpan(new StyleSpan(Typeface.BOLD), normal_start + searchText.length(), text.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
                 }
+                holder.suggest_text.setText(spannedText);
+            } else {
+                holder.suggest_text.setText(text);
             }
-        };
+            holder.suggestlist_item_layout.setOnClickListener(view -> this.assist.updateSearchField(text, true));
+            holder.suggest_arrow.setOnClickListener(view -> this.assist.updateSearchField(text, false));
+        }
+    }
+
+    @Override
+    public int getItemCount() {
+        if (suggestItems != null)
+            return suggestItems.size();
+        return 0;
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    public void notifyChange(String searchText) {
+        this.searchText = searchText;
+        this.notifyDataSetChanged();
+    }
+
+    static class SuggestViewHolder extends RecyclerView.ViewHolder {
+        LinearLayout suggestlist_item_layout;
+        TextView suggest_text;
+        AppCompatImageView suggest_arrow;
+
+        public SuggestViewHolder(View itemView) {
+            super(itemView);
+            suggestlist_item_layout = itemView.findViewById(R.id.suggestlist_item_layout);
+            suggest_text = itemView.findViewById(R.id.suggest_text);
+            suggest_arrow = itemView.findViewById(R.id.suggest_arrow);
+        }
     }
 }

@@ -71,7 +71,7 @@
     <string name="assist_recent_search">RICERCHE RECENTI</string>
     <string name="assist_on_this_device">SU QUESTO DISPOSITIVO</string>
     <string name="assist_clear_history">Eliminare</string>
-    <string name="assist_clipboard">APPUNTI</string>
+    <string name="assist_clipboard">Appunti</string>
 
     <string name="qwant_widget_text">Che cosa stai cercando ?</string>
     <!-- <string name="privacy_policy_url">https://about.qwant.com/it/riservatezza-happ/</string> -->

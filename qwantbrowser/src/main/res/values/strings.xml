@@ -72,9 +72,9 @@
     <string name="assist_recent_search">RECENT SEARCHES</string>
     <string name="assist_on_this_device">ON THIS DEVICE</string>
     <string name="assist_clear_history">Delete</string>
-    <string name="assist_clipboard">CLIPBOARD</string>
+    <string name="assist_clipboard">Clipboard</string>
 
-    <string name="qwant_widget_text">What are you looking for ?</string>
+    <string name="qwant_widget_text">Search in private</string>
 
     <string name="addon_settings_recommended_header" translatable="false">Recommended</string>
 

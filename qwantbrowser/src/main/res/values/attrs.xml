@@ -72,4 +72,5 @@
     <attr name="qwant_tabs_foregroundColor" format="reference|color" />
     <attr name="qwant_tabs_selectedColor" format="reference|color" />
 
+    <attr name="qwant_logo_background" format="reference|color" />
 </resources>

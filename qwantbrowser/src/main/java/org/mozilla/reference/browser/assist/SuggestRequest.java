@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 class SuggestRequest {
-    private final static String LOGTAG = "QwantAssist";
+    private final static String LOGTAG = "QWANT_BROWSER_ASSIST";
     private final static String BASE_URL = "https://api.qwant.com/api/suggest/?client=opensearch&q=";
 
     private static InputStream getHttpStream(URL url) throws Exception {
@@ -23,15 +23,15 @@ class SuggestRequest {
                 return urlConnection.getInputStream();
             }
         } catch (Exception e) {
-            throw new Exception("Request connection for suggest failed");
+            throw new Exception("Request connection for suggest failed: " + e);
         }
         return null;
     }
 
-    static ArrayList<SuggestItem> getSuggestions(String filter_string) {
+    static ArrayList<String> getSuggestions(String filter_string) {
         try {
-            ArrayList<SuggestItem> result = new ArrayList<>();
-            InputStream inputStream = getHttpStream(new URL(BASE_URL + filter_string + "&lang=" + Locale.getDefault().toString()));
+            ArrayList<String> result = new ArrayList<>();
+            InputStream inputStream = getHttpStream(new URL(BASE_URL + filter_string + "&lang=" + Locale.getDefault()));
             if (inputStream != null) {
                 JsonReader reader = new JsonReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
                 try {
@@ -39,7 +39,7 @@ class SuggestRequest {
                     reader.skipValue();
                     reader.beginArray();
                     while (reader.hasNext()) {
-                        result.add(new SuggestItem(SuggestItem.Type.QWANT_SUGGEST, reader.nextString()));
+                        result.add(reader.nextString());
                     }
                     reader.endArray();
                     reader.endArray();
@@ -51,7 +51,7 @@ class SuggestRequest {
             }
             return result;
         } catch (Exception e) {
-            Log.e(LOGTAG, "Impossible de rapatrier les données de suggest");
+            Log.e(LOGTAG, "Impossible de rapatrier les données de suggest:" + e.getMessage());
         }
         return new ArrayList<>();
     }
