@@ -1,0 +1,191 @@
+{
+    "name": {
+        "message": "Qwant VIPrivacy Android (Standalone)"
+    },
+    "short_name": {
+        "message": "Qwant VIPrivacy (Standalone)"
+    },
+    "description": {
+        "message": "TODO"
+    },
+    "your_browser": {
+        "message": "your browser"
+    },
+    "back": {
+        "message": "Back"
+    },
+    "protection_level": {
+        "message": "Level of protection"
+    },
+    "protection_level_standard": {
+        "message": "Standard"
+    },
+    "protection_level_strict": {
+        "message": "Strict"
+    },
+    "protection_level_disabled": {
+        "message": "Disabled"
+    },
+    "protection_level_standard_description": {
+        "message": "Blocks most trackers and cookies efficiently."
+    },
+    "protection_level_strict_description": {
+        "message": "Blocks all trackers and cookies, may affect some sites."
+    },
+    "protection_level_disabled_description": {
+        "message": "The browsing protection is disabled."
+    },
+    "popup_main_protection_enabled": {
+        "message": "Protection enabled "
+    },
+    "popup_main_protection_disabled": {
+        "message": "Protection disabled"
+    },
+    "popup_main_nbr_blocked_elements": {
+        "message": "%count% items blocked"
+    },
+    "popup_main_nbr_blocked_elements_domain": {
+        "message": "on <b>%domain%</b>"
+    },
+    "popup_main_problem_disable_protection": {
+        "message": "A problem on this site. Try to deactivate"
+    },
+    "global_stats": {
+        "message": "Cumulative statistics"
+    },
+    "popup_stats_blocked_trackers": {
+        "message": "Blocked Trackers "
+    },
+    "popup_stats_time_saved": {
+        "message": "Time saved"
+    },
+    "popup_settings_help_label": {
+        "message": "Help"
+    },
+    "popup_settings_help_know_more_label": {
+        "message": "Learn about Qwant VIPrivacy"
+    },
+    "popup_settings_help_know_more_link": {
+        "message": "https://about.qwant.com/extension"
+    },
+    "popup_settings_help_new_label": {
+        "message": "What’s new? "
+    },
+    "popup_settings_help_new_link": {
+        "message": "https://qwant.com#new_link_en"
+    },
+    "popup_settings_help_feedback_label": {
+        "message": "Share your experience"
+    },
+    "popup_settings_help_feedback_link": {
+        "message": "https://fr.surveymonkey.com/r/X6C38SF"
+    },
+    "popup_settings_telemetry_label": {
+        "message": "Help Qwant improve the extension by sending anonymous error reports and usage statistics"
+    },
+    "popup_stats_table_domains_label": {
+        "message": "Domains"
+    },
+    "popup_stats_table_trackers_label": {
+        "message": "Trackers/Cookies"
+    },
+    "popup_stats_trackers": {
+        "message": "Trackers"
+    },
+    "popup_stats_blocked_elements": {
+        "message": "Blocked trackers"
+    },
+    "missing_permissions_default_search_engine_title": {
+        "message": "Qwant is your default search engine"
+    },
+    "missing_permissions_default_search_engine_description": {
+        "message": "Every query you put in the address bar goes to Qwant "
+    },
+    "missing_permissions_disabled_title": {
+        "message": "The protection is disabled"
+    },
+    "missing_permissions_disabled_description": {
+        "message": "The trackers and cookies blocking is not activated."
+    },
+    "missing_permissions_cta_button_popup": {
+        "message": "Enable protection"
+    },
+    "onboarding_stepper_back": {
+        "message": "Back"
+    },
+    "onboarding_stepper_authorize": {
+        "message": "Authorize"
+    },
+    "onboarding_stepper_finish": {
+        "message": "Finish"
+    },
+    "onboarding_stepper_i_understand": {
+        "message": "I understand"
+    },
+    "onboarding_stepper_lets_go": {
+        "message": "Lets go"
+    },
+    "onboarding_stepper_next_step": {
+        "message": "Next step"
+    },
+    "onboarding_step_request_permissions_title": {
+        "message": "Browse safely with Qwant VIP"
+    },
+    "onboarding_step_request_permissions_description": {
+        "message": "Qwant VIPrivacy blocks trackers and refuses cookies for you. Your personal data is protected on all sites when you browse. Click \"Authorize\" enable the protection. If you ignore this step, Qwant VIPrivacy will not be installed. "
+    },
+    "onboarding_step_protection_level_title": {
+        "message": "Choose your level of protection"
+    },
+    "onboarding_step_protection_level_description": {
+        "message": "You can change your choice at any time by clicking on the Qwant VIPrivacy icon."
+    },
+    "onboarding_step_pin_extension_title": {
+        "message": "Pin Qwant VIPrivacy on %browser% and follow your statistics in real time"
+    },
+    "onboarding_step_pin_extension_description": {
+        "message": " "
+    },
+    "onboarding_step_telemetry_title": {
+        "message": "Help us improve Qwant VIPrivacy"
+    },
+    "onboarding_step_telemetry_description": {
+        "message": "Share your feedback anonymously to help us improve your protection. "
+    },
+    "onboarding_step_telemetry_section_title": {
+        "message": "Share this information "
+    },
+    "onboarding_step_permissions_rejected_title": {
+        "message": "Thank you, Qwant is your default search engine but…"
+    },
+    "onboarding_step_permissions_rejected_subtitle": {
+        "message": "Beware you are not completely protected"
+    },
+    "onboarding_step_permissions_rejected_description": {
+        "message": " "
+    },
+    "onboarding_step_thank_you_title": {
+        "message": "Thank you for installing Qwant VIPrivacy"
+    },
+    "onboarding_step_thank_you_description": {
+        "message": " "
+    },
+    "blocking_pages_page_title": {
+        "message": "Access denied"
+    },
+    "blocking_pages_rule_content_title": {
+        "message": "Blocked by %name%"
+    },
+    "blocking_pages_rule_content_description": {
+        "message": "%name% prevented this page from loading because it was flagged as a tracking resource."
+    },
+    "blocking_pages_btn_proceed": {
+        "message": "Proceed anyway"
+    },
+    "loading_reload_cta": {
+        "message": "Reload"
+    },
+    "uninstall_url": {
+        "message": "https://www.surveymonkey.com/r/TPSHFH5"
+    }
+}
