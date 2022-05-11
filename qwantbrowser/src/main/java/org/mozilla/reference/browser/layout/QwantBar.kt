@@ -14,7 +14,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
-import androidx.preference.PreferenceManager
+import androidx.core.content.res.ResourcesCompat
 import kotlinx.android.synthetic.main.component_qwantbar.view.*
 import kotlinx.coroutines.*
 import mozilla.components.browser.menu.BrowserMenuBuilder
@@ -183,7 +183,6 @@ class QwantBar @JvmOverloads constructor(
         val tabsCount = context.components.core.store.state.getNormalOrPrivateTabs(isPrivateTab).size
 
         // Tabs buttons
-        // TODO change tabs buttons
         reference = WeakReference(qwantbar_button_tabs)
         tabButtonBox = qwantbar_button_tabs.findViewById(R.id.counter_box)
         tabButtonText = qwantbar_button_tabs.findViewById(R.id.counter_text)
@@ -269,6 +268,9 @@ class QwantBar @JvmOverloads constructor(
             currentPrivacyEnabled = enabled
             qwantbar_button_tabs_privacy.visibility = if (enabled) VISIBLE else GONE
             qwantbar_button_nav_tabs_privacy.visibility = if (enabled) VISIBLE else GONE
+
+            qwantbar_button_nav_home.setImageDrawable(ResourcesCompat.getDrawable(context.resources, R.drawable.qwant_logo_v2_square, context.theme))
+
             this.setHighlight(currentSelection)
             this.updateTabCount()
         }
@@ -367,8 +369,8 @@ class QwantBar @JvmOverloads constructor(
         checkSession(session?.content?.url)
         val private = session?.content?.private ?: false
         Log.d("QWANT_BROWSER", "Set privacy from checkSession")
-        this.setPrivacyMode(private)
         context.setTheme(if (private) R.style.ThemeQwantNoActionBarPrivacy else R.style.ThemeQwantNoActionBar)
+        this.setPrivacyMode(private)
     }
 
     private fun checkSession() {

@@ -41,7 +41,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:scaleType="center"
-            android:src="@drawable/brands_logos_qwant_letter_colored"
+            android:src="@drawable/qwant_logo_v2_square"
             android:stateListAnimator="@animator/qwantbar_zoom_animator" />
 
         <!-- <mozilla.components.ui.tabcounter.TabCounter
