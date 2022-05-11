@@ -20,7 +20,7 @@ class PrivacySettingsFragment: BaseSettingsFragment(){
     }
 
     override fun setupPreferences() {
-        val trackingProtectionNormalKey = context?.getPreferenceKey(R.string.pref_key_tracking_protection_normal)
+       /*  val trackingProtectionNormalKey = context?.getPreferenceKey(R.string.pref_key_tracking_protection_normal)
         val trackingProtectionPrivateKey = context?.getPreferenceKey(R.string.pref_key_tracking_protection_private)
 
         val prefTrackingProtectionNormal = findPreference(trackingProtectionNormalKey)
@@ -31,7 +31,7 @@ class PrivacySettingsFragment: BaseSettingsFragment(){
         }
         prefTrackingProtectionPrivate.onPreferenceChangeListener = getChangeListenerForTrackingProtection { enabled ->
             requireComponents.core.createTrackingProtectionPolicy(privateMode = enabled)
-        }
+        } */
 
         val prefClearData = findPreference(context?.getPreferenceKey(R.string.pref_key_privacy_cleardata))
         val prefClearDataOnClose = findPreference(context?.getPreferenceKey(R.string.pref_key_privacy_cleardata_on_close_content))
@@ -70,7 +70,7 @@ class PrivacySettingsFragment: BaseSettingsFragment(){
         } else getString(R.string.disabled)
     }
 
-    private fun getChangeListenerForTrackingProtection(
+    /* private fun getChangeListenerForTrackingProtection(
         createTrackingProtectionPolicy: (Boolean) -> TrackingProtectionPolicy
     ): OnPreferenceChangeListener {
         return OnPreferenceChangeListener { _, value ->
@@ -78,5 +78,5 @@ class PrivacySettingsFragment: BaseSettingsFragment(){
             requireComponents.useCases.settingsUseCases.updateTrackingProtection.invoke(policy)
             true
         }
-    }
+    } */
 }

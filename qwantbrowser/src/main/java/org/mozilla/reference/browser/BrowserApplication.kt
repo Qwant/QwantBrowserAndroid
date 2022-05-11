@@ -81,19 +81,7 @@ open class BrowserApplication : Application(), Application.ActivityLifecycleCall
             onSelectTabOverride = { _, sessionId ->
                 components.useCases.tabsUseCases.selectTab(sessionId)
             },
-            onExtensionsLoaded = { _ ->
-                /* components.core.addonUpdater.registerForFutureUpdates(extensions)
-
-                val checker = components.core.supportedAddonsChecker
-                val hasUnsupportedAddons = extensions.any { it.isUnsupported() }
-                if (hasUnsupportedAddons) {
-                    checker.registerForChecks()
-                } else {
-                    // As checks are a persistent subscriptions, we have to make sure
-                    // we remove any previous subscriptions.
-                    checker.unregisterForChecks()
-                } */
-            },
+            onExtensionsLoaded = {},
             onUpdatePermissionRequest = components.core.addonUpdater::onUpdatePermissionRequest
         )
     }

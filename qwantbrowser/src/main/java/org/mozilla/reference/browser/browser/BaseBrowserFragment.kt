@@ -4,6 +4,7 @@
 
 package org.mozilla.reference.browser.browser
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -14,8 +15,10 @@ import android.view.ViewGroup
 import androidx.annotation.CallSuper
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
+import com.qwant.android.webext.WebExtensionActionPopupActivity
 import kotlinx.android.synthetic.main.fragment_browser.*
 import kotlinx.android.synthetic.main.fragment_browser.view.*
+import mozilla.components.browser.state.state.WebExtensionState
 import mozilla.components.feature.downloads.DownloadsFeature
 import mozilla.components.feature.app.links.AppLinksFeature
 import mozilla.components.feature.downloads.manager.FetchDownloadManager
@@ -31,6 +34,7 @@ import mozilla.components.support.base.feature.PermissionsFeature
 import mozilla.components.support.base.feature.UserInteractionHandler
 import mozilla.components.support.base.feature.ViewBoundFeatureWrapper
 import mozilla.components.support.base.log.logger.Logger
+import mozilla.components.support.webextensions.WebExtensionPopupFeature
 import org.mozilla.reference.browser.AppPermissionCodes.REQUEST_CODE_APP_PERMISSIONS
 import org.mozilla.reference.browser.AppPermissionCodes.REQUEST_CODE_DOWNLOAD_PERMISSIONS
 import org.mozilla.reference.browser.AppPermissionCodes.REQUEST_CODE_PROMPT_PERMISSIONS
@@ -60,12 +64,14 @@ abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler, Activit
     private val pictureInPictureIntegration = ViewBoundFeatureWrapper<PictureInPictureIntegration>()
     private val swipeRefreshFeature = ViewBoundFeatureWrapper<SwipeRefreshFeature>()
     private val windowFeature = ViewBoundFeatureWrapper<WindowFeature>()
+    private val webExtensionPopupFeature = ViewBoundFeatureWrapper<WebExtensionPopupFeature>()
 
     private val backButtonHandler: List<ViewBoundFeatureWrapper<*>> = listOf(
         fullScreenFeature,
         findInPageIntegration,
         toolbarIntegration,
-        sessionFeature
+        sessionFeature,
+        webExtensionPopupFeature
     )
     private val webAuthnFeature = ViewBoundFeatureWrapper<WebAuthnFeature>()
 
@@ -242,6 +248,20 @@ abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler, Activit
             owner = this,
             view = view
         )
+
+        webExtensionPopupFeature.set(
+            feature = WebExtensionPopupFeature(requireComponents.core.store, ::openWebExtPopup),
+            owner = this,
+            view = view
+        )
+    }
+
+    private fun openWebExtPopup(webExtensionState: WebExtensionState) {
+        val intent = Intent(context, WebExtensionActionPopupActivity::class.java)
+        intent.putExtra("web_extension_id", webExtensionState.id)
+        intent.putExtra("web_extension_name", webExtensionState.name)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(intent)
     }
 
     private fun viewportFitChanged(viewportFit: Int) {

@@ -53,11 +53,16 @@
             android:autoRemoveFromRecents="false"
             android:label="@string/app_name" /> -->
 
+        <activity android:name="com.qwant.android.webext.WebExtensionActionPopupActivity" />
+
+
         <activity
             android:name=".addons.AddonsActivity"
             android:label="@string/mozac_feature_addons_addons"
             android:exported="false"
             android:parentActivityName=".BrowserActivity" />
+
+        <activity android:name="com.qwant.android.webext.ABPRemovalActivity" />
 
         <activity
             android:name=".addons.AddonDetailsActivity"
