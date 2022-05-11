@@ -56,16 +56,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!-- <org.mozilla.reference.browser.compat.toolbar.BrowserToolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:layout_gravity="top"
-            mozac:browserToolbarSuggestionForegroundColor="?attr/qwant_toolbar_SuggestionBackgroundColor"
-            mozac:browserToolbarSuggestionBackgroundColor="?attr/qwant_toolbar_SuggestionForegroundColor"
-            android:background="?attr/qwant_toolbar_BackgroundColor" /> -->
-
-        <mozilla.components.browser.toolbar.BrowserToolbar
+        <org.mozilla.reference.browser.compat.toolbar.BrowserToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="56dp"
