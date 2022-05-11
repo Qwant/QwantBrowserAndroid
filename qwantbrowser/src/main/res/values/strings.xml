@@ -5,6 +5,9 @@
 <resources>
     <string name="app_name">Qwant</string>
 
+    <string name="qwant_useragent" translatable="false">Mozilla/5.0 (Android 10; Mobile; rv:100.0) Gecko/100.0 Firefox/100.0 QwantMobile/4.2</string>
+    <!-- <string name="qwant_useragent" translatable="false">Mozilla/5.0 (Android 10; Mobile; rv:77.0) Gecko/77.0 Firefox/77.0 h QwantMobile/4.2</string> -->
+
     <!-- Menu option on the toolbar to open a new tab-->
     <string name="menu_action_add_tab">New tab</string>
     <string name="menu_action_add_tab_private">New private tab</string>

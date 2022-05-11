@@ -68,7 +68,7 @@ class Core(private val context: Context) {
             trackingProtectionPolicy = TrackingProtectionPolicy.recommended(), // createTrackingProtectionPolicy(prefs),
             historyTrackingDelegate = HistoryDelegate(lazy { historyStorage }),
             testingModeEnabled = false,
-            userAgentString = "Mozilla/5.0 (Android 10; Mobile; rv:77.0) Gecko/77.0 Firefox/77.0 QwantMobile/4.0"
+            userAgentString = context.getString(R.string.qwant_useragent)
         )
         EngineProvider.createEngine(context, defaultSettings)
     }
