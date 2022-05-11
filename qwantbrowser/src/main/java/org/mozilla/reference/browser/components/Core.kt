@@ -60,12 +60,12 @@ class Core(private val context: Context) {
      * configuration (see build variants).
      */
     val engine: Engine by lazy {
-        val prefs = PreferenceManager.getDefaultSharedPreferences(context)
+        // val prefs = PreferenceManager.getDefaultSharedPreferences(context)
 
         val defaultSettings = DefaultSettings(
             requestInterceptor = AppRequestInterceptor(context),
             remoteDebuggingEnabled = false, // prefs.getBoolean(context.getPreferenceKey(pref_key_remote_debugging), false),
-            trackingProtectionPolicy = createTrackingProtectionPolicy(prefs),
+            trackingProtectionPolicy = TrackingProtectionPolicy.recommended(), // createTrackingProtectionPolicy(prefs),
             historyTrackingDelegate = HistoryDelegate(lazy { historyStorage }),
             testingModeEnabled = false,
             userAgentString = "Mozilla/5.0 (Android 10; Mobile; rv:77.0) Gecko/77.0 Firefox/77.0 QwantMobile/4.0"

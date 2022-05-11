@@ -6,7 +6,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <androidx.preference.PreferenceCategory
+    <!-- <androidx.preference.PreferenceCategory
         android:title="@string/tracker_category" >
 
         <org.mozilla.reference.browser.settings.QwantPreferenceSwitch
@@ -21,7 +21,7 @@
             android:key="@string/pref_key_tracking_protection_private"
             app:iconSpaceReserved="false"/>
 
-    </androidx.preference.PreferenceCategory>
+    </androidx.preference.PreferenceCategory> -->
 
     <androidx.preference.PreferenceCategory
         android:title="@string/settings_privacy_personal_data">
