@@ -16,6 +16,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.preference.PreferenceManager
@@ -31,6 +32,7 @@ import mozilla.components.support.base.feature.ActivityResultHandler
 import mozilla.components.support.base.feature.UserInteractionHandler
 import mozilla.components.support.base.feature.ViewBoundFeatureWrapper
 import mozilla.components.support.base.log.logger.Logger
+import mozilla.components.support.ktx.android.content.getColorFromAttr
 import mozilla.components.support.utils.SafeIntent
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
 import org.mozilla.reference.browser.browser.BrowserFragment
@@ -44,8 +46,7 @@ import org.mozilla.reference.browser.storage.history.HistoryFragment
 import org.mozilla.reference.browser.tabs.QwantTabsFragment
 import java.util.*
 import kotlin.system.exitProcess
-import androidx.core.view.WindowInsetsControllerCompat
-import mozilla.components.support.ktx.android.content.getColorFromAttr
+
 
 /**
  * Activity that holds the [BrowserFragment].
@@ -57,11 +58,6 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
 
     private val tab: SessionState?
         get() = components.core.store.state.findCustomTabOrSelectedTab(sessionId)
-
-    /* private val webExtensionPopupFeature by lazy {
-        WebExtensionPopupFeature(components.core.store, ::openPopup)
-    } */
-    // private var viewModel: MainViewModel? = null
 
     private var darkmode: Int = 0
 
