@@ -54,6 +54,10 @@ android {
         }
     }
 
+    aaptOptions {
+        ignoreAssetsPattern  '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+    }
+
     testOptions {
         execution 'ANDROIDX_TEST_ORCHESTRATOR'
     }
@@ -255,6 +259,7 @@ dependencies {
     implementation Deps.androidx_localbroadcastmanager
 
     implementation Deps.keyboardvisibilityevent
+    // implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
     androidTestImplementation Deps.uiautomator
 
