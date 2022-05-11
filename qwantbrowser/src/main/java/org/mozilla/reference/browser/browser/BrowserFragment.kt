@@ -78,7 +78,7 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
 
         awesomeBar.setOnEditSuggestionListener { search ->
             toolbar.edit.updateUrl(search, shouldAutoComplete = true, shouldHighlight = false)
-            toolbar.edit.views.url.setSelection(search.length)
+            // toolbar.edit.views.url.setSelection(search.length)
         }
 
         /* toolbarControlFeature.set(

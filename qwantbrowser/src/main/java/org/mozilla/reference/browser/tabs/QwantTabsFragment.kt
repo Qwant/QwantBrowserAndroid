@@ -27,6 +27,7 @@ import java.lang.ref.WeakReference
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import mozilla.components.browser.state.selector.selectedTab
+import mozilla.components.browser.state.state.TabSessionState
 
 
 class QwantTabsFragment : Fragment(), UserInteractionHandler {
@@ -155,15 +156,15 @@ class QwantTabsFragment : Fragment(), UserInteractionHandler {
         this.updateTabCount()
     }
 
-    private fun tabSelected(tab: Tab?) {
+    private fun tabSelected(tab: TabSessionState?) {
         if (tab != null) {
             requireComponents.useCases.tabsUseCases.selectTab.invoke(tab.id)
             this.closeTabsTray()
         }
     }
 
-    private fun tabsChanged(tabs: Tabs) {
-        tabsAdapter?.tabChanged(tabs)
+    private fun tabsChanged() {
+        tabsAdapter?.tabChanged()
         this.updateTabCount()
     }
 

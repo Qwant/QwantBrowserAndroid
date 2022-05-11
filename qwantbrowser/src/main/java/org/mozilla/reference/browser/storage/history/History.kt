@@ -25,9 +25,6 @@ class History(val context: Context) : HistoryStorage {
 
     override suspend fun recordVisit(uri: String, visit: PageVisit) {
         val now = System.currentTimeMillis()
-        if (visit.redirectSource != RedirectSource.NOT_A_SOURCE) {
-            return
-        }
 
         if (uri.startsWith("https://www.qwant.com")) {
             return
@@ -43,11 +40,7 @@ class History(val context: Context) : HistoryStorage {
     }
 
     fun recordVisit(uri: String, visit: PageVisit, timestamp: Long) {
-        if (visit.redirectSource != RedirectSource.NOT_A_SOURCE) {
-            return
-        }
-
-        if (uri.startsWith("https://www.qwant.com")) {
+         if (uri.startsWith("https://www.qwant.com")) {
             return
         }
 
@@ -95,7 +88,9 @@ class History(val context: Context) : HistoryStorage {
                     url = it.key,
                     title = pageMeta[it.key]?.title,
                     visitTime = it.value[0].timestamp,
-                    visitType = it.value[0].type
+                    visitType = it.value[0].type,
+                    previewImageUrl = null,
+                    isRemote = false
                 ))
             } else if (i >= endIndex) {
                 return visits
@@ -121,7 +116,9 @@ class History(val context: Context) : HistoryStorage {
                             url = it.key,
                             title = pageMeta[it.key]?.title,
                             visitTime = visit.timestamp,
-                            visitType = visit.type
+                            visitType = visit.type,
+                            previewImageUrl = null,
+                            isRemote = false
                     ))
                 }
             }
@@ -211,6 +208,10 @@ class History(val context: Context) : HistoryStorage {
 
     override suspend fun warmUp() {
         this.restore()
+    }
+
+    override fun canAddUri(uri: String): Boolean {
+        return true
     }
 
     override fun cleanup() {

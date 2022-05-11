@@ -8,11 +8,10 @@ import android.widget.*
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import mozilla.components.browser.state.state.TabSessionState
 import mozilla.components.browser.tabstray.thumbnail.TabThumbnailView
 import mozilla.components.browser.thumbnails.loader.ThumbnailLoader
 import mozilla.components.concept.base.images.ImageLoadRequest
-import mozilla.components.concept.tabstray.Tab
-import mozilla.components.concept.tabstray.Tabs
 import mozilla.components.support.ktx.android.content.getColorFromAttr
 import mozilla.components.support.ktx.android.util.dpToPx
 import org.mozilla.reference.browser.R
@@ -22,15 +21,15 @@ import java.net.URISyntaxException
 
 class TabsAdapter(
         private val context: Context,
-        private val selectedCallback: (tab: Tab?) -> Unit
+        private val selectedCallback: (tab: TabSessionState?) -> Unit
 )  : BaseAdapter() {
-    var tabs: Tabs? = null
+    var tabs = context.components.core.store.state.tabs
 
     internal class TabListItemViewHolder(
-            item_layout: View,
-            private val context: Context,
-            private val selectedCallback: (tab: Tab?) -> Unit,
-            private val deletedCallback: (tab: Tab?) -> Unit
+        item_layout: View,
+        private val context: Context,
+        private val selectedCallback: (tab: TabSessionState?) -> Unit,
+        private val deletedCallback: (tab: TabSessionState?) -> Unit
     ) : RecyclerView.ViewHolder(item_layout) {
         private var itemMainLayout: LinearLayout = item_layout.findViewById(R.id.tablist_item_layout)
         private var itemPreview: TabThumbnailView = item_layout.findViewById(R.id.tablist_item_preview)
@@ -40,13 +39,14 @@ class TabsAdapter(
 
         private val thumbnailLoader = ThumbnailLoader(context.components.core.thumbnailStorage)
 
-        fun setup(tab: Tab, isSelected: Boolean) {
-            val title = if (tab.title.length > MAX_TITLE_LENGTH) tab.title.substring(0, MAX_TITLE_LENGTH - 3) + "..." else tab.title
+        fun setup(tab: TabSessionState, isSelected: Boolean) {
+            val content = tab.content
+            val title = if (content.title.length > MAX_TITLE_LENGTH) content.title.substring(0, MAX_TITLE_LENGTH - 3) + "..." else content.title
 
             val host: String = try {
-                URI(tab.url).host ?: tab.url
+                URI(content.url).host ?: content.url
             } catch (e: URISyntaxException) {
-                tab.url
+                content.url
             }
 
             this.itemTitle.text = title
@@ -66,15 +66,15 @@ class TabsAdapter(
             }
         }
 
-        private fun setThumbnail(tab: Tab) {
-            if (tab.thumbnail == null) {
+        private fun setThumbnail(tab: TabSessionState) {
+            if (tab.content.thumbnail == null) {
                 val thumbnailSize = 100.dpToPx(this.itemPreview.context.resources.displayMetrics)
                 thumbnailLoader.loadIntoView(
                     this.itemPreview,
                     ImageLoadRequest(id = tab.id, size = thumbnailSize)
                 )
-            } else if (tab.thumbnail != null) {
-                this.itemPreview.setImageBitmap(tab.thumbnail)
+            } else if (tab.content.thumbnail != null) {
+                this.itemPreview.setImageBitmap(tab.content.thumbnail)
             }
         }
 
@@ -112,17 +112,17 @@ class TabsAdapter(
         // viewHolder.setThumbnail(tabSession.toTab())
         // viewHolder.setSelected(selectedState)
 
-        val tab = this.getItem(position) as Tab
+        val tab = this.getItem(position) as TabSessionState
         val selectedState = (context.components.core.store.state.selectedTabId == tab.id)
 
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val newView = inflater.inflate(R.layout.tablist_item, parent, false)
-        val viewHolder = TabListItemViewHolder(newView, context, selectedCallback, {
+        val viewHolder = TabListItemViewHolder(newView, context, selectedCallback) {
             if (it != null) {
                 context.components.useCases.tabsUseCases.removeTab.invoke(it.id)
                 // this.tabChanged()
             }
-        })
+        }
         viewHolder.setup(tab, selectedState)
         newView.tag = viewHolder
 
@@ -130,7 +130,9 @@ class TabsAdapter(
     }
 
     override fun getItem(position: Int): Any {
-        return tabs!!.list[tabs!!.list.count() - 1 - position]
+        // context.components.core.store.state.tabs
+        // return tabs!!.list[tabs!!.list.count() - 1 - position]
+        return tabs[tabs.count() - 1 - position]
     }
 
     override fun getItemId(position: Int): Long {
@@ -138,11 +140,11 @@ class TabsAdapter(
     }
 
     override fun getCount(): Int {
-        return tabs?.list?.count() ?: 0
+        return tabs.count()
     }
 
-    fun tabChanged(tabs: Tabs) {
-        this.tabs = tabs
+    fun tabChanged() {
+        this.tabs = context.components.core.store.state.tabs
         this.notifyDataSetChanged()
     }
 }

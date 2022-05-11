@@ -5,7 +5,6 @@
 package org.mozilla.reference.browser
 
 import android.content.Context
-import android.util.Log
 import com.qwant.android.webext.QwantWebExtFeature
 import mozilla.components.browser.engine.gecko.GeckoEngine
 import mozilla.components.browser.engine.gecko.fetch.GeckoViewFetchClient
@@ -38,8 +37,6 @@ object EngineProvider {
 
     fun createEngine(context: Context, defaultSettings: DefaultSettings): Engine {
         val runtime = getOrCreateRuntime(context)
-
-        Log.d("QWANT_BROWSER", "Creating engine with ua: ${defaultSettings.userAgentString}")
 
         return GeckoEngine(context, defaultSettings, runtime).also {
             QwantWebExtFeature.install(it)
