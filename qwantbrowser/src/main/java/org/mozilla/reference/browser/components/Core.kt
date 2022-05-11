@@ -46,8 +46,8 @@ import mozilla.components.feature.pwa.ManifestStorage
 import mozilla.components.feature.pwa.WebAppShortcutManager
 import mozilla.components.feature.search.middleware.SearchMiddleware
 import mozilla.components.feature.search.region.RegionMiddleware
-// import mozilla.components.feature.sitepermissions.SitePermissionsStorage
 import mozilla.components.service.location.LocationService
+import mozilla.components.support.base.worker.Frequency
 import org.mozilla.reference.browser.addons.QwantAddonCollectionProvider
 
 
@@ -151,12 +151,11 @@ class Core(private val context: Context) {
 
     // Addons
     val addonManager by lazy {
-        val addonUpdater = DefaultAddonUpdater(context, AddonUpdater.Frequency(1, TimeUnit.DAYS))
         AddonManager(store, engine, addonCollectionProvider, addonUpdater)
     }
 
     val addonUpdater by lazy {
-        DefaultAddonUpdater(context, AddonUpdater.Frequency(1, TimeUnit.DAYS))
+        DefaultAddonUpdater(context, Frequency(1, TimeUnit.DAYS))
     }
 
 

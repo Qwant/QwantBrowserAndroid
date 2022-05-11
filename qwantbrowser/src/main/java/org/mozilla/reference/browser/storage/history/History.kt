@@ -89,7 +89,8 @@ class History(val context: Context) : HistoryStorage {
                     title = pageMeta[it.key]?.title,
                     visitTime = it.value[0].timestamp,
                     visitType = it.value[0].type,
-                    previewImageUrl = null
+                    previewImageUrl = null,
+                    isRemote = false
                 ))
             } else if (i >= endIndex) {
                 return visits
@@ -116,7 +117,8 @@ class History(val context: Context) : HistoryStorage {
                             title = pageMeta[it.key]?.title,
                             visitTime = visit.timestamp,
                             visitType = visit.type,
-                            previewImageUrl = null
+                            previewImageUrl = null,
+                            isRemote = false
                     ))
                 }
             }

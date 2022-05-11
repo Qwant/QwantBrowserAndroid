@@ -271,6 +271,10 @@ class BrowserToolbar @JvmOverloads constructor(
         display.removeBrowserAction(action)
     }
 
+    override fun removeNavigationAction(action: Toolbar.Action) {
+        // TODO ???
+    }
+
     /**
      * Removes a previously added page action (see [addPageAction]). If the provided
      * action was never added, this method has no effect.

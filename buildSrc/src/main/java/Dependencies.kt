@@ -20,7 +20,7 @@ private object Versions {
     const val android_gradle_plugin = "7.0.0"
     // const val android_gradle_plugin = "3.4.1"
 
-    const val mozilla_android_components = "97.0.20220108190339" // "94.0.20210918190139"
+    const val mozilla_android_components = "100.0.20220323190349" // "94.0.20210918190139"
     // const val mozilla_android_components_old = "90.0.20210509143123"
 
     const val thirdparty_sentry = "1.7.10"

@@ -16,7 +16,7 @@ public class WidgetProvider extends AppWidgetProvider {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.assist_initial_layout);
 
         final Intent intent = new Intent(context, Assist.class);
-        final PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+        final PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
         views.setOnClickPendingIntent(R.id.custom_notification_widget_layout, pendingIntent);
 
         ComponentName watchWidget = new ComponentName(context, WidgetProvider.class);
