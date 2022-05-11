@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="onboarding_image_padding_vertical">26dp</dimen>
+    <dimen name="onboarding_title_size">26sp</dimen>
+    <dimen name="onboarding_title_line_height">28sp</dimen>
+    <dimen name="onboarding_title_padding_top">0dp</dimen>
+</resources>
