@@ -53,7 +53,7 @@
 </ul>
 <p>Private Browsing <strong>doesn\'t make you anonymous</strong> on the Internet. Your employer or Internet service provider can still know what page you visit.</p>
      ]]></string>
-    
+
     <string name="default_notification_channel">Browser</string>
 
     <!-- About content -->
