@@ -327,7 +327,7 @@ class QwantBar @JvmOverloads constructor(
         qwantbar_layout_navbar.visibility = View.GONE
         this.setBarHeight(58)
 
-        if (context.components.core.store.state.selectedTab?.content?.url?.startsWith("https://www.qwant.com") == true)
+        if (context.components.core.store.state.selectedTab?.content?.url?.startsWith(context.getString(R.string.homepage_startwith_filter)) == true)
             this.setHighlight(QwantBarSelection.SEARCH)
     }
 
