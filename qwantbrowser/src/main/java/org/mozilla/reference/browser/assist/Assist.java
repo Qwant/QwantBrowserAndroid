@@ -81,6 +81,8 @@ public class Assist extends Activity {
         new_tab_intent.setAction(Intent.ACTION_VIEW);
 
         webview = findViewById(R.id.webview);
+        webview.getSettings().setBuiltInZoomControls (false);
+        webview.getSettings().setDisplayZoomControls(false);
         webview.getSettings().setJavaScriptEnabled(true);
         webview.getSettings().setUserAgentString(getString(R.string.qwant_useragent));
 
