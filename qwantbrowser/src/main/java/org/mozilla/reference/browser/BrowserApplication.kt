@@ -14,7 +14,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import mozilla.components.browser.state.action.SystemAction
-import mozilla.components.feature.addons.update.GlobalAddonDependencyProvider
 import mozilla.components.support.base.log.Log
 import mozilla.components.support.base.log.sink.AndroidLogSink
 import mozilla.components.support.ktx.android.content.isMainProcess
@@ -59,11 +58,6 @@ open class BrowserApplication : Application(), Application.ActivityLifecycleCall
         components.core.engine.warmUp()
         restoreBrowserState()
 
-        GlobalAddonDependencyProvider.initialize(
-                components.core.addonManager,
-                components.core.addonUpdater
-        )
-
         WebExtensionSupport.initialize(
             runtime = components.core.engine,
             store = components.core.store,
@@ -81,8 +75,7 @@ open class BrowserApplication : Application(), Application.ActivityLifecycleCall
             onSelectTabOverride = { _, sessionId ->
                 components.useCases.tabsUseCases.selectTab(sessionId)
             },
-            onExtensionsLoaded = {},
-            onUpdatePermissionRequest = components.core.addonUpdater::onUpdatePermissionRequest
+            onExtensionsLoaded = {}
         )
     }
 
