@@ -10,6 +10,7 @@ import mozilla.components.support.utils.StorageUtils.levenshteinDistance
 import mozilla.components.support.utils.segmentAwareDomainMatch
 import java.io.*
 import java.util.*
+import org.mozilla.reference.browser.R
 
 data class Visit(val timestamp: Long, val type: VisitType): Serializable
 data class PageObservation(val title: String?) : Serializable
@@ -26,7 +27,7 @@ class History(val context: Context) : HistoryStorage {
     override suspend fun recordVisit(uri: String, visit: PageVisit) {
         val now = System.currentTimeMillis()
 
-        if (uri.startsWith("https://www.qwant.com")) {
+        if (uri.startsWith(context.getString(R.string.homepage_startwith_filter))) {
             return
         }
 
@@ -40,7 +41,7 @@ class History(val context: Context) : HistoryStorage {
     }
 
     fun recordVisit(uri: String, visit: PageVisit, timestamp: Long) {
-         if (uri.startsWith("https://www.qwant.com")) {
+         if (uri.startsWith(context.getString(R.string.homepage_startwith_filter))) {
             return
         }
 
@@ -168,6 +169,7 @@ class History(val context: Context) : HistoryStorage {
     override suspend fun deleteEverything() = synchronized(pages + pageMeta) {
         pages.clear()
         pageMeta.clear()
+        this.persist()
     }
 
     override suspend fun deleteVisitsSince(since: Long) = synchronized(pages) {

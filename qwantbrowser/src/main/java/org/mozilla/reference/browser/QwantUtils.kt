@@ -4,8 +4,8 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.util.Log
-import android.widget.Toast
 import androidx.preference.PreferenceManager
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import mozilla.components.concept.engine.Engine
@@ -117,6 +117,8 @@ class QwantUtils {
                     browsingData = browsingData,
                     success, error
                 )
+            } else {
+                error(Throwable(message = "disabled"))
             }
         }
 
@@ -129,8 +131,10 @@ class QwantUtils {
                 success: (() -> Unit)?,
                 error: ((Throwable) -> Unit)?
         ) {
+            var clearHistoryJob: Job? = null
+
             if (history) {
-                MainScope().launch {
+                clearHistoryJob = MainScope().launch {
                     context.components.core.historyStorage.deleteEverything()
                 }
             }
@@ -142,10 +146,21 @@ class QwantUtils {
                 context.components.useCases.tabsUseCases.removePrivateTabs.invoke()
             }
 
+            val onBrowsingDataComplete: () -> Unit = {
+                if (clearHistoryJob?.isActive == true) {
+                    clearHistoryJob.invokeOnCompletion {
+                        if (it != null) error(it)
+                        else success?.invoke()
+                    }
+                } else {
+                    success?.invoke()
+                }
+            }
+
             if (browsingData != null) {
-                context.components.core.engine.clearData(browsingData, onSuccess = success ?: {}, onError = error ?: {})
+                context.components.core.engine.clearData(browsingData, onSuccess = onBrowsingDataComplete, onError = error ?: {})
             } else {
-                success?.invoke()
+                onBrowsingDataComplete()
             }
         }
     }
