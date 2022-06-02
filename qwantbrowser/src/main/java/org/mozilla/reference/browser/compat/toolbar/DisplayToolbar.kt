@@ -151,8 +151,7 @@ class DisplayToolbar internal constructor(
         BOTTOM
     }
 
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    internal val views = DisplayToolbarViews(
+    val views = DisplayToolbarViews(
             browserActions = rootView.findViewById(R.id.mozac_browser_toolbar_browser_actions),
             pageActions = rootView.findViewById(R.id.mozac_browser_toolbar_page_actions),
             navigationActions = rootView.findViewById(R.id.mozac_browser_toolbar_navigation_actions),
@@ -687,7 +686,7 @@ class DisplayToolbar internal constructor(
  * Internal holder for view references.
  */
 @Suppress("LongParameterList")
-internal class DisplayToolbarViews(
+class DisplayToolbarViews(
         val browserActions: ActionContainer,
         val pageActions: ActionContainer,
         val navigationActions: ActionContainer,

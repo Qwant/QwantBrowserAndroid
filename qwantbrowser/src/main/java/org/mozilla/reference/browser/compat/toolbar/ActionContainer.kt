@@ -19,7 +19,7 @@ import mozilla.components.concept.toolbar.Toolbar
 /**
  * A container [View] for displaying [Toolbar.Action] objects.
  */
-internal class ActionContainer @JvmOverloads constructor(
+class ActionContainer @JvmOverloads constructor(
         context: Context,
         attrs: AttributeSet? = null,
         defStyleAttr: Int = 0

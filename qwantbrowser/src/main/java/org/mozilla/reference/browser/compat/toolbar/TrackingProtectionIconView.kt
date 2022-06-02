@@ -24,7 +24,7 @@ import mozilla.components.concept.toolbar.Toolbar.SiteTrackingProtection.ON_TRAC
  * Internal widget to display the different icons of tracking protection, relies on the
  * [SiteTrackingProtection] state of each page.
  */
-internal class TrackingProtectionIconView @JvmOverloads constructor(
+class TrackingProtectionIconView @JvmOverloads constructor(
         context: Context,
         attrs: AttributeSet? = null,
         defStyleAttr: Int = 0

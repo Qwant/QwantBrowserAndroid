@@ -89,8 +89,7 @@ class EditToolbar internal constructor(
                 logger.error("Error while processing autocomplete input", throwable)
             }
 
-    @VisibleForTesting(otherwise = PRIVATE)
-    internal val views = EditToolbarViews(
+    val views = EditToolbarViews(
             background = rootView.findViewById<ImageView>(R.id.mozac_browser_toolbar_background),
             icon = rootView.findViewById<ImageView>(R.id.mozac_browser_toolbar_edit_icon),
             editActions = rootView.findViewById<ActionContainer>(R.id.mozac_browser_toolbar_edit_actions),
@@ -277,6 +276,7 @@ class EditToolbar internal constructor(
         // updateUrl(searchTerms)
         // views.url.setSelection(views.url.text.length)
         // focus()
+        views.url.setSelection(views.url.text.length)
 
         // editListener?.onTextChanged(searchTerms)
     }
@@ -331,7 +331,7 @@ class EditToolbar internal constructor(
 /**
  * Internal holder for view references.
  */
-internal class EditToolbarViews(
+class EditToolbarViews(
         val background: ImageView,
         val icon: ImageView,
         val editActions: ActionContainer,

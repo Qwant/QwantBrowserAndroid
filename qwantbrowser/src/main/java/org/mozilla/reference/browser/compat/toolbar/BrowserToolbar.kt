@@ -222,7 +222,6 @@ class BrowserToolbar @JvmOverloads constructor(
         if (state == State.EDIT) {
             edit.editSuggestion(searchTerms)
         }
-
         this.searchTerms = searchTerms
     }
 
@@ -315,7 +314,7 @@ class BrowserToolbar @JvmOverloads constructor(
      */
     override fun editMode() {
         val urlValue = if (searchTerms.isEmpty()) url else searchTerms
-        edit.updateUrl(urlValue.toString(), false)
+        edit.updateUrl(urlValue.toString(), true)
         updateState(State.EDIT)
         edit.focus()
         edit.selectAll()

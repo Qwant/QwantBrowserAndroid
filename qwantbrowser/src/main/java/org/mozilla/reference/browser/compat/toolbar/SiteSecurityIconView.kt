@@ -15,7 +15,7 @@ import mozilla.components.concept.toolbar.Toolbar.SiteSecurity
  * Internal widget to display the different icons of site security, relies on the
  * [SiteSecurity] state of each page.
  */
-internal class SiteSecurityIconView @JvmOverloads constructor(
+class SiteSecurityIconView @JvmOverloads constructor(
         context: Context,
         attrs: AttributeSet? = null,
         defStyleAttr: Int = 0

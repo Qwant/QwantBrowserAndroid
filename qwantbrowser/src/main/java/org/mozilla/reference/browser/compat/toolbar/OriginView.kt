@@ -24,7 +24,7 @@ private const val URL_VIEW_WEIGHT = 4.3f
 /**
  * View displaying the URL and optionally the title of a website.
  */
-internal class OriginView @JvmOverloads constructor(
+class OriginView @JvmOverloads constructor(
         context: Context,
         attrs: AttributeSet? = null,
         defStyleAttr: Int = 0
