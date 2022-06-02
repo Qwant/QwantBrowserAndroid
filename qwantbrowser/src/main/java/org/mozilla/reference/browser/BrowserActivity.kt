@@ -20,6 +20,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.preference.PreferenceManager
+import com.qwant.android.onboarding.OnboardingActivity
 import com.qwant.android.webext.ABPRemovalActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import mozilla.components.browser.state.selector.findCustomTabOrSelectedTab
@@ -73,6 +74,14 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
     override fun onCreate(savedInstanceState: Bundle?) {
         PACKAGE_NAME = packageName
 
+        setContentView(R.layout.activity_main)
+        super.onCreate(savedInstanceState)
+
+        if (intent.action == "CLOSE_APP") { // should be called with flag Intent.FLAG_ACTIVITY_NEW_TASK
+            this.quitApp()
+            return
+        }
+
         this.loadLocale()
 
         Log.d("QWANT_BROWSER_T", "load browser activity")
@@ -89,9 +98,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
 
         Log.d("QWANT_BROWSER_T", "darkmode: $darkmode")
 
-        setContentView(R.layout.activity_main)
 
-        super.onCreate(savedInstanceState)
 
         val statusbarBackground = getColorFromAttr(R.attr.qwant_systembar_background)
         window?.statusBarColor = statusbarBackground
@@ -152,22 +159,27 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
             qwantbar.visibility = if (visible) View.GONE else View.VISIBLE
         }
 
-        this.checkFirstLaunch()
-
         qwantbar.updateTabCount()
+
         this.removeABP()
+        this.checkFirstLaunch()
+        this.launchOnboardingIfNecessary()
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        this.showBrowserFragment()
     }
 
     fun removeABP() {
         components.core.engine.listInstalledWebExtensions({ list ->
             list.forEach { ext ->
                 if (ext.id == "{d10d0bf8-f5b5-c8b4-a8b2-2b9879e08c5d}") { // adblockplus ID
-                    Log.d("QWANT_BROWSER_EXTENSION", "ABP Extension found: ${ext.getMetadata()}")
+                    Log.i("QWANT_BROWSER_EXTENSION", "ABP Extension found: deleting")
                     components.core.engine.uninstallWebExtension(ext,
                         onSuccess = {
-                            Log.d("QWANT_BROWSER_EXTENSION", "ABP uninstalled")
-                            Log.d("QWANT_BROWSER_EXTENSION", "Should show sorry activity")
                             val intent = Intent(this, ABPRemovalActivity::class.java)
+                            // intent.flags = Intent.FLAG_ACTIVITY_NO_ANIMATION
                             startActivity(intent)
                         },
                         onError = { _, throwable ->
@@ -179,22 +191,28 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         })
     }
 
-    override fun onNewIntent(intent: Intent?) {
-        super.onNewIntent(intent)
-        this.showBrowserFragment()
+    fun launchOnboardingIfNecessary() {
+        val prefkey = resources.getString(R.string.pref_key_show_onboarding)
+        val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        val shouldShowOnboarding = prefs.getBoolean(prefkey, false)
+        if (shouldShowOnboarding) {
+            val i = Intent(this, OnboardingActivity::class.java)
+            i.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
+            startActivity(i)
+        }
     }
 
     private fun checkFirstLaunch() {
-        val prefkey = resources.getString(R.string.pref_key_first_launch)
+        val prefkeyFirstLaunch = resources.getString(R.string.pref_key_first_launch)
         val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-        val firstLaunch = prefs.getBoolean(prefkey, true)
+        val prefEditor: SharedPreferences.Editor = prefs.edit()
+        val firstLaunch = prefs.getBoolean(prefkeyFirstLaunch, true)
         if (firstLaunch) {
-            val prefEditor: SharedPreferences.Editor = prefs.edit()
-            prefEditor.putBoolean(prefkey, false)
-            prefEditor.apply()
-
+            prefEditor.putBoolean(resources.getString(R.string.pref_key_show_onboarding), true)
+            prefEditor.putBoolean(prefkeyFirstLaunch, false)
             components.useCases.tabsUseCases.addTab.invoke(QwantUtils.getHomepage(applicationContext))
         }
+        prefEditor.apply()
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
@@ -539,13 +557,21 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         QwantUtils.clearDataOnQuit(this,
             success = {
                 Toast.makeText(this, R.string.cleardata_done, Toast.LENGTH_LONG).show()
-                finishAffinity()
-                exitProcess(0)
+                this.trueQuit()
             },
             error = {
-                Toast.makeText(this, R.string.cleardata_failed, Toast.LENGTH_LONG).show()
+                if (it.message == "disabled") {
+                    this.trueQuit()
+                } else {
+                    Toast.makeText(this, R.string.cleardata_failed, Toast.LENGTH_LONG).show()
+                }
             }
         )
+    }
+
+    private fun trueQuit() {
+        finishAffinity()
+        exitProcess(0)
     }
 
     companion object {

@@ -43,6 +43,7 @@
     <string name="pref_key_first_launch_40" translatable="false">pref_key_first_launch_40</string>
     <string name="pref_key_first_launch_402" translatable="false">pref_key_first_launch_402</string>
     <string name="pref_key_first_launch_403" translatable="false">pref_key_first_launch_403</string>
+    <string name="pref_key_show_onboarding" translatable="false">pref_key_show_onboarding</string>
 
     <string name="pref_key_cleardata_content_history" translatable="false">pref_key_cleardata_content_history</string>
     <string name="pref_key_cleardata_content_tabs" translatable="false">pref_key_cleardata_content_tabs</string>
