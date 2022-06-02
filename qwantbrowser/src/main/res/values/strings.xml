@@ -72,15 +72,12 @@
     <string name="addon_permissions_dialog_add">Add</string>
     <string name="addon_permissions_dialog_cancel">Cancel</string>
 
-    <string name="assist_recent_search">RECENT SEARCHES</string>
-    <string name="assist_on_this_device">ON THIS DEVICE</string>
     <string name="assist_clear_history">Delete</string>
     <string name="assist_clipboard">Clipboard</string>
 
-    <string name="qwant_widget_text">Search in private</string>
+    <string name="qwant_widget_text">Search in private mode</string>
 
     <string name="addon_settings_recommended_header" translatable="false">Recommended</string>
-
 
     <string name="bookmarks">Bookmarks</string>
 
@@ -192,9 +189,11 @@
     <string name="homepage_startwith_filter" translatable="false">https://www.qwant.com/</string>
     <string name="qwantmaps_startwith_filter" translatable="false">https://www.qwant.com/maps/</string>
     <string name="qwantmaps_result_startwith_filter" translatable="false">https://www.qwant.com/maps/place/</string>
-    <string name="qwantmusic_startwith_filter" translatable="false">https://www.qwant.com/music/</string>
+    <string name="qwantmusic_startwith_filter" translatable="false">https://legacy.qwant.com/music/</string>
+
     <string name="settings_page_base" translatable="false">https://www.qwant.com/settings</string>
     <string name="settings_page_startwith_filter" translatable="false">https://www.qwant.com/settings?client=qwantbrowser</string>
+
     <!-- <string name="privacy_policy_url">https://about.qwant.com/privacy-happ/</string> -->
     <string name="privacy_policy_url">https://about.qwant.com/legal/privacy/</string>
 
@@ -643,4 +642,24 @@
     <string name="addon_disabled_failed">Failed to disable</string>
     <string name="addon_uninstall_ok">Successfully uninstalled</string>
     <string name="addon_uninstall_failed">Failed to uninstall</string>
+
+    <string name="onboarding_anonymous_title">Welcome to Qwant, dear unknown user</string>
+    <string name="onboarding_anonymous_text_top">Search in complete privacy:</string>
+    <string name="onboarding_anonymous_bullet_1">Zero tracking of your searches</string>
+    <string name="onboarding_anonymous_bullet_2">Zero advertising tracking</string>
+    <string name="onboarding_anonymous_bullet_3">Zero sale of your personal data</string>
+    <string name="onboarding_anonymous_validate">Next</string>
+    
+    <string name="onboarding_navigation_title">Surf safely on all websites</string>
+    <string name="onboarding_navigation_bullet_1">Fewer cookies, no more intrusive banners!</string>
+    <string name="onboarding_navigation_bullet_2">Fewer trackers, finally free!</string>
+    <string name="onboarding_navigation_text_bottom">Check us out and try your first search!</string>
+    <string name="onboarding_navigation_validate">Let\'s get started!</string>
+
+    <string name="onboarding_adblockplus_title">Qwant VIPrivacy replaces Adblock Plus</string>
+    <string name="onboarding_adblockplus_bullet_1">Less cookies, no more intrusive banners!</string>
+    <string name="onboarding_adblockplus_bullet_2">Block Trackers, finally free!</string>
+    <string name="onboarding_adblockplus_validate">Close</string>
+    <string name="onboarding_adblockplus_more">Learn more</string>
+    <string name="onboarding_adblockplus_more_url">https://about.qwant.com/en/extension</string>
 </resources>

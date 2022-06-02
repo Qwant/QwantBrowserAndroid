@@ -54,35 +54,10 @@
             android:label="@string/app_name" /> -->
 
         <activity android:name="com.qwant.android.webext.WebExtensionActionPopupActivity" />
-
-
-        <activity
-            android:name=".addons.AddonsActivity"
-            android:label="@string/mozac_feature_addons_addons"
-            android:exported="false"
-            android:parentActivityName=".BrowserActivity" />
-
-        <activity android:name="com.qwant.android.webext.ABPRemovalActivity" />
-
-        <activity
-            android:name=".addons.AddonDetailsActivity"
-            android:exported="false"
-            android:label="@string/mozac_feature_addons_addons" />
-
-        <activity android:name=".addons.InstalledAddonDetailsActivity"
-            android:label="@string/mozac_feature_addons_addons"
-            android:parentActivityName=".addons.AddonsActivity"
-            android:exported="false" />
-
-        <activity
-            android:name=".addons.PermissionsDetailsActivity"
-            android:label="@string/mozac_feature_addons_addons"
-            android:exported="false" />
-
-        <activity
-            android:name=".addons.AddonSettingsActivity"
-            android:label="@string/mozac_feature_addons_addons"
-            android:exported="false" />
+        <activity android:name="com.qwant.android.onboarding.OnboardingActivity"
+            android:screenOrientation="portrait" />
+        <activity android:name="com.qwant.android.webext.ABPRemovalActivity"
+            android:screenOrientation="portrait" />
 
         <activity android:name=".IntentReceiverActivity"
             android:exported="true">

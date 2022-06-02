@@ -68,12 +68,10 @@
     <string name="addon_permissions_dialog_add">Aggiungi</string>
     <string name="addon_permissions_dialog_cancel">Annulla</string>
 
-    <string name="assist_recent_search">RICERCHE RECENTI</string>
-    <string name="assist_on_this_device">SU QUESTO DISPOSITIVO</string>
     <string name="assist_clear_history">Eliminare</string>
     <string name="assist_clipboard">Appunti</string>
 
-    <string name="qwant_widget_text">Che cosa stai cercando ?</string>
+    <string name="qwant_widget_text">Fai le tue ricerche in modalità privata</string>
     <!-- <string name="privacy_policy_url">https://about.qwant.com/it/riservatezza-happ/</string> -->
     <string name="privacy_policy_url">https://about.qwant.com/it/legal/riservatezza/</string>
 
@@ -315,8 +313,25 @@
     <string name="addon_enabled_failed">Impossibile abilitare</string>
     <string name="addon_enabled_ok">Abilitato con successo</string>
     <string name="close_tabs_confirm">Vuoi davvero chiudere tutte le schede ?</string>
-    <string name="close_tabs_confirm_private">Vuoi davvero chiudere tutte le schede private?</string>
+    <string name="close_tabs_confirm_private">Vuoi davvero chiudere tutte le schede private ?</string>
     <string name="history_clear_all_confirm_title">Elimina cronologia</string>
-    <string name="history_clear_all_confirm_message">Vuoi davvero eliminare tutta la cronologia?</string>
+    <string name="history_clear_all_confirm_message">Vuoi davvero eliminare tutta la cronologia ?</string>
     <string name="history_clear_all_confirm_ok">Cancella tutto</string>
+    <string name="onboarding_adblockplus_more_url">https://about.qwant.com/it/extension</string>
+    <string name="onboarding_adblockplus_title">Qwant VIPrivacy sostituisce Adblock Plus</string>
+    <string name="onboarding_adblockplus_bullet_1">Meno cookie, basta banner intrusivi !</string>
+    <string name="onboarding_adblockplus_bullet_2">Blocco dei software di tracciamento, finalmente sei libero !</string>
+    <string name="onboarding_adblockplus_validate">Chiudi</string>
+    <string name="onboarding_adblockplus_more">Scopri di più</string>
+    <string name="onboarding_anonymous_title">Caro anonimo, benvenuto su Qwant</string>
+    <string name="onboarding_anonymous_text_top">Qui puoi fare le tue ricerche con la massima riservatezza:</string>
+    <string name="onboarding_anonymous_bullet_1">Zero tracciamento delle tue ricerche</string>
+    <string name="onboarding_anonymous_bullet_2">Zero tracciamento pubblicitario</string>
+    <string name="onboarding_anonymous_bullet_3">Zero vendita dei tuoi dati personali</string>
+    <string name="onboarding_anonymous_validate">Continuare</string>
+    <string name="onboarding_navigation_title">Navigare in sicurezza su tutti i siti web</string>
+    <string name="onboarding_navigation_bullet_1">Meno cookie, niente più banner invadenti !</string>
+    <string name="onboarding_navigation_bullet_2">Blocco dei tracker, finalmente gratuito !</string>
+    <string name="onboarding_navigation_text_bottom">Scoprite di più su di noi e fate la vostra prima ricerca !</string>
+    <string name="onboarding_navigation_validate">Andiamo !</string>
 </resources>

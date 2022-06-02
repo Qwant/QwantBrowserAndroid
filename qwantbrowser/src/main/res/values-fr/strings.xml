@@ -63,7 +63,7 @@
 
     <string name="menu_share_with">Partager avec…</string>
 
-    <string name="toast_copied">Copié!</string>
+    <string name="toast_copied">Copié !</string>
 
     <!-- <string name="privacy_policy_url">https://about.qwant.com/fr/confidentialite-happ/</string> -->
     <string name="privacy_policy_url">https://about.qwant.com/fr/legal/confidentialite/</string>
@@ -72,8 +72,6 @@
     <string name="addon_permissions_dialog_add">Ajouter</string>
     <string name="addon_permissions_dialog_cancel">Annuler</string>
 
-    <string name="assist_recent_search">RECHERCHE RECENTES</string>
-    <string name="assist_on_this_device">SUR CET APPAREIL</string>
     <string name="assist_clear_history">Effacer</string>
     <string name="assist_clipboard">Presse papier</string>
 
@@ -334,8 +332,8 @@
     <string name="cleardata_failed_engine">Erreur en supprimant les données du moteur</string>
     <string name="cleardata_tabs">Onglets normaux ouverts</string>
     <string name="cleardata_tabs_private">Onglets privés ouverts</string>
-    <string name="close_tabs_confirm">Voulez-vous vraiment fermer tous les onglets</string>
-    <string name="close_tabs_confirm_private">Voulez-vous vraiment fermer tous les onglets privés</string>
+    <string name="close_tabs_confirm">Voulez-vous vraiment fermer tous les onglets ?</string>
+    <string name="close_tabs_confirm_private">Voulez-vous vraiment fermer tous les onglets privés ?</string>
     <string name="close_tabs_done">Tous les onglets ont été fermés</string>
     <string name="close_tabs_done_private">Tous les onglets privés ont été fermés</string>
     <string name="history_cleaned_ok">Historique effacée</string>
@@ -352,4 +350,21 @@
     <string name="history_clear_all_confirm_title">Effacer mon historique</string>
     <string name="history_clear_all_confirm_message">Voulez-vous vraiment supprimer tout votre historique ?</string>
     <string name="history_clear_all_confirm_ok">Effacer tout</string>
+    <string name="onboarding_adblockplus_more_url">https://about.qwant.com/extension</string>
+    <string name="onboarding_adblockplus_title">Qwant VIPrivacy remplace Adblock Plus</string>
+    <string name="onboarding_adblockplus_bullet_1">Moins de cookies, fini les bandeaux intrusifs !</string>
+    <string name="onboarding_adblockplus_bullet_2">Bloquage des traqueurs, enfin libre !</string>
+    <string name="onboarding_adblockplus_validate">Fermer</string>
+    <string name="onboarding_adblockplus_more">En savoir plus</string>
+    <string name="onboarding_anonymous_title">Bienvenue chez Qwant, cher inconnu</string>
+    <string name="onboarding_anonymous_text_top">Ici, faites vos recherches en toute confidentialité :</string>
+    <string name="onboarding_anonymous_bullet_1">Zéro tracking de vos recherches</string>
+    <string name="onboarding_anonymous_bullet_2">Zéro tracking publicitaire</string>
+    <string name="onboarding_anonymous_bullet_3">Zéro vente de vos données personnelles</string>
+    <string name="onboarding_anonymous_validate">Continuer</string>
+    <string name="onboarding_navigation_title">Naviguez protégé sur tous les sites internet</string>
+    <string name="onboarding_navigation_bullet_1">Moins de cookies, fini les bandeaux intrusifs !</string>
+    <string name="onboarding_navigation_bullet_2">Moins de traqueurs, enfin libre !</string>
+    <string name="onboarding_navigation_text_bottom">Découvrez-nous et faites votre première recherche !</string>
+    <string name="onboarding_navigation_validate">C\'est parti !</string>
 </resources>
