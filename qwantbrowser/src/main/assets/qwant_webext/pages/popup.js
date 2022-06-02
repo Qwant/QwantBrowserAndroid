@@ -1,6 +1,6 @@
 (self["webpackChunkqwant_viprivacy"] = self["webpackChunkqwant_viprivacy"] || []).push([[787],{
 
-/***/ 1922:
+/***/ 5826:
 /***/ ((__unused_webpack_module, __unused_webpack___webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -1717,22 +1717,1812 @@ function renderMatches(matches) {
 
 // EXTERNAL MODULE: ./Extension/src/common/translators/i18n.js
 var i18n = __webpack_require__(7122);
-// EXTERNAL MODULE: ./node_modules/mobx-react/dist/mobxreact.esm.js + 17 modules
-var mobxreact_esm = __webpack_require__(2497);
+// EXTERNAL MODULE: ./node_modules/mobx/dist/mobx.esm.js
+var mobx_esm = __webpack_require__(1056);
+;// CONCATENATED MODULE: ./node_modules/mobx-react-lite/es/utils/assertEnvironment.js
+
+
+if (!react.useState) {
+    throw new Error("mobx-react-lite requires React with Hooks support");
+}
+if (!mobx_esm/* makeObservable */.rC) {
+    throw new Error("mobx-react-lite@3 requires mobx at least version 6 to be available");
+}
+
+;// CONCATENATED MODULE: ./node_modules/mobx-react-lite/es/utils/reactBatchedUpdates.js
+
+
+;// CONCATENATED MODULE: ./node_modules/mobx-react-lite/es/utils/observerBatching.js
+
+function defaultNoopBatch(callback) {
+    callback();
+}
+function observerBatching(reactionScheduler) {
+    if (!reactionScheduler) {
+        reactionScheduler = defaultNoopBatch;
+        if (false) {}
+    }
+    (0,mobx_esm/* configure */.jQ)({ reactionScheduler: reactionScheduler });
+}
+var isObserverBatched = function () {
+    if (false) {}
+    return true;
+};
+
+;// CONCATENATED MODULE: ./node_modules/mobx-react-lite/es/utils/printDebugValue.js
+
+function printDebugValue(v) {
+    return (0,mobx_esm/* getDependencyTree */.Gf)(v);
+}
+
+;// CONCATENATED MODULE: ./node_modules/mobx-react-lite/es/utils/FinalizationRegistryWrapper.js
+var FinalizationRegistryLocal = typeof FinalizationRegistry === "undefined" ? undefined : FinalizationRegistry;
+
+
+;// CONCATENATED MODULE: ./node_modules/mobx-react-lite/es/utils/reactionCleanupTrackingCommon.js
+function createTrackingData(reaction) {
+    var trackingData = {
+        reaction: reaction,
+        mounted: false,
+        changedBeforeMount: false,
+        cleanAt: Date.now() + CLEANUP_LEAKED_REACTIONS_AFTER_MILLIS
+    };
+    return trackingData;
+}
+/**
+ * The minimum time before we'll clean up a Reaction created in a render
+ * for a component that hasn't managed to run its effects. This needs to
+ * be big enough to ensure that a component won't turn up and have its
+ * effects run without being re-rendered.
+ */
+var CLEANUP_LEAKED_REACTIONS_AFTER_MILLIS = 10000;
+/**
+ * The frequency with which we'll check for leaked reactions.
+ */
+var CLEANUP_TIMER_LOOP_MILLIS = 10000;
+
+;// CONCATENATED MODULE: ./node_modules/mobx-react-lite/es/utils/createReactionCleanupTrackingUsingFinalizationRegister.js
+
+/**
+ * FinalizationRegistry-based uncommitted reaction cleanup
+ */
+function createReactionCleanupTrackingUsingFinalizationRegister(FinalizationRegistry) {
+    var cleanupTokenToReactionTrackingMap = new Map();
+    var globalCleanupTokensCounter = 1;
+    var registry = new FinalizationRegistry(function cleanupFunction(token) {
+        var trackedReaction = cleanupTokenToReactionTrackingMap.get(token);
+        if (trackedReaction) {
+            trackedReaction.reaction.dispose();
+            cleanupTokenToReactionTrackingMap.delete(token);
+        }
+    });
+    return {
+        addReactionToTrack: function (reactionTrackingRef, reaction, objectRetainedByReact) {
+            var token = globalCleanupTokensCounter++;
+            registry.register(objectRetainedByReact, token, reactionTrackingRef);
+            reactionTrackingRef.current = createTrackingData(reaction);
+            reactionTrackingRef.current.finalizationRegistryCleanupToken = token;
+            cleanupTokenToReactionTrackingMap.set(token, reactionTrackingRef.current);
+            return reactionTrackingRef.current;
+        },
+        recordReactionAsCommitted: function (reactionRef) {
+            registry.unregister(reactionRef);
+            if (reactionRef.current && reactionRef.current.finalizationRegistryCleanupToken) {
+                cleanupTokenToReactionTrackingMap.delete(reactionRef.current.finalizationRegistryCleanupToken);
+            }
+        },
+        forceCleanupTimerToRunNowForTests: function () {
+            // When FinalizationRegistry in use, this this is no-op
+        },
+        resetCleanupScheduleForTests: function () {
+            // When FinalizationRegistry in use, this this is no-op
+        }
+    };
+}
+
+;// CONCATENATED MODULE: ./node_modules/mobx-react-lite/es/utils/createTimerBasedReactionCleanupTracking.js
+var __values = (undefined && undefined.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
+
+/**
+ * timers, gc-style, uncommitted reaction cleanup
+ */
+function createTimerBasedReactionCleanupTracking() {
+    /**
+     * Reactions created by components that have yet to be fully mounted.
+     */
+    var uncommittedReactionRefs = new Set();
+    /**
+     * Latest 'uncommitted reactions' cleanup timer handle.
+     */
+    var reactionCleanupHandle;
+    /* istanbul ignore next */
+    /**
+     * Only to be used by test functions; do not export outside of mobx-react-lite
+     */
+    function forceCleanupTimerToRunNowForTests() {
+        // This allows us to control the execution of the cleanup timer
+        // to force it to run at awkward times in unit tests.
+        if (reactionCleanupHandle) {
+            clearTimeout(reactionCleanupHandle);
+            cleanUncommittedReactions();
+        }
+    }
+    /* istanbul ignore next */
+    function resetCleanupScheduleForTests() {
+        var e_1, _a;
+        if (uncommittedReactionRefs.size > 0) {
+            try {
+                for (var uncommittedReactionRefs_1 = __values(uncommittedReactionRefs), uncommittedReactionRefs_1_1 = uncommittedReactionRefs_1.next(); !uncommittedReactionRefs_1_1.done; uncommittedReactionRefs_1_1 = uncommittedReactionRefs_1.next()) {
+                    var ref = uncommittedReactionRefs_1_1.value;
+                    var tracking = ref.current;
+                    if (tracking) {
+                        tracking.reaction.dispose();
+                        ref.current = null;
+                    }
+                }
+            }
+            catch (e_1_1) { e_1 = { error: e_1_1 }; }
+            finally {
+                try {
+                    if (uncommittedReactionRefs_1_1 && !uncommittedReactionRefs_1_1.done && (_a = uncommittedReactionRefs_1.return)) _a.call(uncommittedReactionRefs_1);
+                }
+                finally { if (e_1) throw e_1.error; }
+            }
+            uncommittedReactionRefs.clear();
+        }
+        if (reactionCleanupHandle) {
+            clearTimeout(reactionCleanupHandle);
+            reactionCleanupHandle = undefined;
+        }
+    }
+    function ensureCleanupTimerRunning() {
+        if (reactionCleanupHandle === undefined) {
+            reactionCleanupHandle = setTimeout(cleanUncommittedReactions, CLEANUP_TIMER_LOOP_MILLIS);
+        }
+    }
+    function scheduleCleanupOfReactionIfLeaked(ref) {
+        uncommittedReactionRefs.add(ref);
+        ensureCleanupTimerRunning();
+    }
+    function recordReactionAsCommitted(reactionRef) {
+        uncommittedReactionRefs.delete(reactionRef);
+    }
+    /**
+     * Run by the cleanup timer to dispose any outstanding reactions
+     */
+    function cleanUncommittedReactions() {
+        reactionCleanupHandle = undefined;
+        // Loop through all the candidate leaked reactions; those older
+        // than CLEANUP_LEAKED_REACTIONS_AFTER_MILLIS get tidied.
+        var now = Date.now();
+        uncommittedReactionRefs.forEach(function (ref) {
+            var tracking = ref.current;
+            if (tracking) {
+                if (now >= tracking.cleanAt) {
+                    // It's time to tidy up this leaked reaction.
+                    tracking.reaction.dispose();
+                    ref.current = null;
+                    uncommittedReactionRefs.delete(ref);
+                }
+            }
+        });
+        if (uncommittedReactionRefs.size > 0) {
+            // We've just finished a round of cleanups but there are still
+            // some leak candidates outstanding.
+            ensureCleanupTimerRunning();
+        }
+    }
+    return {
+        addReactionToTrack: function (reactionTrackingRef, reaction, 
+        /**
+         * On timer based implementation we don't really need this object,
+         * but we keep the same api
+         */
+        objectRetainedByReact) {
+            reactionTrackingRef.current = createTrackingData(reaction);
+            scheduleCleanupOfReactionIfLeaked(reactionTrackingRef);
+            return reactionTrackingRef.current;
+        },
+        recordReactionAsCommitted: recordReactionAsCommitted,
+        forceCleanupTimerToRunNowForTests: forceCleanupTimerToRunNowForTests,
+        resetCleanupScheduleForTests: resetCleanupScheduleForTests
+    };
+}
+
+;// CONCATENATED MODULE: ./node_modules/mobx-react-lite/es/utils/reactionCleanupTracking.js
+
+
+
+var _a = FinalizationRegistryLocal
+    ? createReactionCleanupTrackingUsingFinalizationRegister(FinalizationRegistryLocal)
+    : createTimerBasedReactionCleanupTracking(), addReactionToTrack = _a.addReactionToTrack, recordReactionAsCommitted = _a.recordReactionAsCommitted, resetCleanupScheduleForTests = _a.resetCleanupScheduleForTests, forceCleanupTimerToRunNowForTests = _a.forceCleanupTimerToRunNowForTests;
+
+
+;// CONCATENATED MODULE: ./node_modules/mobx-react-lite/es/staticRendering.js
+var globalIsUsingStaticRendering = false;
+function staticRendering_enableStaticRendering(enable) {
+    globalIsUsingStaticRendering = enable;
+}
+function isUsingStaticRendering() {
+    return globalIsUsingStaticRendering;
+}
+
+;// CONCATENATED MODULE: ./node_modules/mobx-react-lite/es/useObserver.js
+var __read = (undefined && undefined.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+
+
+
+
+
+function observerComponentNameFor(baseComponentName) {
+    return "observer".concat(baseComponentName);
+}
+/**
+ * We use class to make it easier to detect in heap snapshots by name
+ */
+var ObjectToBeRetainedByReact = /** @class */ (function () {
+    function ObjectToBeRetainedByReact() {
+    }
+    return ObjectToBeRetainedByReact;
+}());
+function objectToBeRetainedByReactFactory() {
+    return new ObjectToBeRetainedByReact();
+}
+function useObserver(fn, baseComponentName) {
+    if (baseComponentName === void 0) { baseComponentName = "observed"; }
+    if (isUsingStaticRendering()) {
+        return fn();
+    }
+    var _a = __read(react.useState(objectToBeRetainedByReactFactory), 1), objectRetainedByReact = _a[0];
+    // Force update, see #2982
+    var _b = __read(react.useState(), 2), setState = _b[1];
+    var forceUpdate = function () { return setState([]); };
+    // StrictMode/ConcurrentMode/Suspense may mean that our component is
+    // rendered and abandoned multiple times, so we need to track leaked
+    // Reactions.
+    var reactionTrackingRef = react.useRef(null);
+    if (!reactionTrackingRef.current) {
+        // First render for this component (or first time since a previous
+        // reaction from an abandoned render was disposed).
+        var newReaction = new mobx_esm/* Reaction */.le(observerComponentNameFor(baseComponentName), function () {
+            // Observable has changed, meaning we want to re-render
+            // BUT if we're a component that hasn't yet got to the useEffect()
+            // stage, we might be a component that _started_ to render, but
+            // got dropped, and we don't want to make state changes then.
+            // (It triggers warnings in StrictMode, for a start.)
+            if (trackingData_1.mounted) {
+                // We have reached useEffect(), so we're mounted, and can trigger an update
+                forceUpdate();
+            }
+            else {
+                // We haven't yet reached useEffect(), so we'll need to trigger a re-render
+                // when (and if) useEffect() arrives.
+                trackingData_1.changedBeforeMount = true;
+            }
+        });
+        var trackingData_1 = addReactionToTrack(reactionTrackingRef, newReaction, objectRetainedByReact);
+    }
+    var reaction = reactionTrackingRef.current.reaction;
+    react.useDebugValue(reaction, printDebugValue);
+    react.useEffect(function () {
+        // Called on first mount only
+        recordReactionAsCommitted(reactionTrackingRef);
+        if (reactionTrackingRef.current) {
+            // Great. We've already got our reaction from our render;
+            // all we need to do is to record that it's now mounted,
+            // to allow future observable changes to trigger re-renders
+            reactionTrackingRef.current.mounted = true;
+            // Got a change before first mount, force an update
+            if (reactionTrackingRef.current.changedBeforeMount) {
+                reactionTrackingRef.current.changedBeforeMount = false;
+                forceUpdate();
+            }
+        }
+        else {
+            // The reaction we set up in our render has been disposed.
+            // This can be due to bad timings of renderings, e.g. our
+            // component was paused for a _very_ long time, and our
+            // reaction got cleaned up
+            // Re-create the reaction
+            reactionTrackingRef.current = {
+                reaction: new mobx_esm/* Reaction */.le(observerComponentNameFor(baseComponentName), function () {
+                    // We've definitely already been mounted at this point
+                    forceUpdate();
+                }),
+                mounted: true,
+                changedBeforeMount: false,
+                cleanAt: Infinity
+            };
+            forceUpdate();
+        }
+        return function () {
+            reactionTrackingRef.current.reaction.dispose();
+            reactionTrackingRef.current = null;
+        };
+    }, []);
+    // render the original component, but have the
+    // reaction track the observables, so that rendering
+    // can be invalidated (see above) once a dependency changes
+    var rendering;
+    var exception;
+    reaction.track(function () {
+        try {
+            rendering = fn();
+        }
+        catch (e) {
+            exception = e;
+        }
+    });
+    if (exception) {
+        throw exception; // re-throw any exceptions caught during rendering
+    }
+    return rendering;
+}
+
+;// CONCATENATED MODULE: ./node_modules/mobx-react-lite/es/observer.js
+
+
+
+var warnObserverOptionsDeprecated = true;
+var hasSymbol = typeof Symbol === "function" && Symbol.for;
+// Using react-is had some issues (and operates on elements, not on types), see #608 / #609
+var ReactForwardRefSymbol = hasSymbol
+    ? Symbol.for("react.forward_ref")
+    : typeof react.forwardRef === "function" && (0,react.forwardRef)(function (props) { return null; })["$$typeof"];
+var ReactMemoSymbol = hasSymbol
+    ? Symbol.for("react.memo")
+    : typeof react.memo === "function" && (0,react.memo)(function (props) { return null; })["$$typeof"];
+// n.b. base case is not used for actual typings or exported in the typing files
+function observer(baseComponent, 
+// TODO remove in next major
+options) {
+    var _a;
+    if (false) {}
+    if (ReactMemoSymbol && baseComponent["$$typeof"] === ReactMemoSymbol) {
+        throw new Error("[mobx-react-lite] You are trying to use `observer` on a function component wrapped in either another `observer` or `React.memo`. The observer already applies 'React.memo' for you.");
+    }
+    // The working of observer is explained step by step in this talk: https://www.youtube.com/watch?v=cPF4iBedoF0&feature=youtu.be&t=1307
+    if (isUsingStaticRendering()) {
+        return baseComponent;
+    }
+    var useForwardRef = (_a = options === null || options === void 0 ? void 0 : options.forwardRef) !== null && _a !== void 0 ? _a : false;
+    var render = baseComponent;
+    var baseComponentName = baseComponent.displayName || baseComponent.name;
+    // If already wrapped with forwardRef, unwrap,
+    // so we can patch render and apply memo
+    if (ReactForwardRefSymbol && baseComponent["$$typeof"] === ReactForwardRefSymbol) {
+        useForwardRef = true;
+        render = baseComponent["render"];
+        if (typeof render !== "function") {
+            throw new Error("[mobx-react-lite] `render` property of ForwardRef was not a function");
+        }
+    }
+    var observerComponent = function (props, ref) {
+        return useObserver(function () { return render(props, ref); }, baseComponentName);
+    };
+    // Don't set `displayName` for anonymous components,
+    // so the `displayName` can be customized by user, see #3192.
+    if (baseComponentName !== "") {
+        ;
+        observerComponent.displayName = baseComponentName;
+    }
+    // Support legacy context: `contextTypes` must be applied before `memo`
+    if (baseComponent.contextTypes) {
+        ;
+        observerComponent.contextTypes = baseComponent.contextTypes;
+    }
+    if (useForwardRef) {
+        // `forwardRef` must be applied prior `memo`
+        // `forwardRef(observer(cmp))` throws:
+        // "forwardRef requires a render function but received a `memo` component. Instead of forwardRef(memo(...)), use memo(forwardRef(...))"
+        observerComponent = (0,react.forwardRef)(observerComponent);
+    }
+    // memo; we are not interested in deep updates
+    // in props; we assume that if deep objects are changed,
+    // this is in observables, which would have been tracked anyway
+    observerComponent = (0,react.memo)(observerComponent);
+    copyStaticProperties(baseComponent, observerComponent);
+    if (false) {}
+    return observerComponent;
+}
+// based on https://github.com/mridgway/hoist-non-react-statics/blob/master/src/index.js
+var hoistBlackList = {
+    $$typeof: true,
+    render: true,
+    compare: true,
+    type: true,
+    // Don't redefine `displayName`,
+    // it's defined as getter-setter pair on `memo` (see #3192).
+    displayName: true
+};
+function copyStaticProperties(base, target) {
+    Object.keys(base).forEach(function (key) {
+        if (!hoistBlackList[key]) {
+            Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(base, key));
+        }
+    });
+}
+
+;// CONCATENATED MODULE: ./node_modules/mobx-react-lite/es/ObserverComponent.js
+
+function ObserverComponent(_a) {
+    var children = _a.children, render = _a.render;
+    var component = children || render;
+    if (typeof component !== "function") {
+        return null;
+    }
+    return useObserver(component);
+}
+if (false) {}
+ObserverComponent.displayName = "Observer";
+
+function ObserverPropsCheck(props, key, componentName, location, propFullName) {
+    var extraKey = key === "children" ? "render" : "children";
+    var hasProp = typeof props[key] === "function";
+    var hasExtraProp = typeof props[extraKey] === "function";
+    if (hasProp && hasExtraProp) {
+        return new Error("MobX Observer: Do not use children and render in the same time in`" + componentName);
+    }
+    if (hasProp || hasExtraProp) {
+        return null;
+    }
+    return new Error("Invalid prop `" +
+        propFullName +
+        "` of type `" +
+        typeof props[key] +
+        "` supplied to" +
+        " `" +
+        componentName +
+        "`, expected `function`.");
+}
+
+;// CONCATENATED MODULE: ./node_modules/mobx-react-lite/es/useLocalObservable.js
+
+
+function useLocalObservable(initializer, annotations) {
+    return useState(function () { return observable(initializer(), annotations, { autoBind: true }); })[0];
+}
+
+;// CONCATENATED MODULE: ./node_modules/mobx-react-lite/es/useAsObservableSource.js
+var useAsObservableSource_read = (undefined && undefined.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+
+
+
+function useAsObservableSource_useAsObservableSource(current) {
+    if (false)
+        {}
+    var _a = useAsObservableSource_read(useState(function () { return observable(current, {}, { deep: false }); }), 1), res = _a[0];
+    runInAction(function () {
+        Object.assign(res, current);
+    });
+    return res;
+}
+
+;// CONCATENATED MODULE: ./node_modules/mobx-react-lite/es/useLocalStore.js
+
+
+
+
+function useLocalStore(initializer, current) {
+    if (false)
+        {}
+    var source = current && useAsObservableSource(current);
+    return useState(function () { return observable(initializer(source), undefined, { autoBind: true }); })[0];
+}
+
+;// CONCATENATED MODULE: ./node_modules/mobx-react-lite/es/index.js
+
+
+
+
+
+
+observerBatching(react_dom.unstable_batchedUpdates);
+
+
+
+
+
+
+
+function es_useObserver(fn, baseComponentName) {
+    if (baseComponentName === void 0) { baseComponentName = "observed"; }
+    if (false) {}
+    return useObserverOriginal(fn, baseComponentName);
+}
+
+function useStaticRendering(enable) {
+    if (false) {}
+    enableStaticRendering(enable);
+}
+
+;// CONCATENATED MODULE: ./node_modules/mobx-react/dist/mobxreact.esm.js
+
+
+
+
+
+var symbolId = 0;
+
+function createSymbol(name) {
+  if (typeof Symbol === "function") {
+    return Symbol(name);
+  }
+
+  var symbol = "__$mobx-react " + name + " (" + symbolId + ")";
+  symbolId++;
+  return symbol;
+}
+
+var createdSymbols = {};
+function newSymbol(name) {
+  if (!createdSymbols[name]) {
+    createdSymbols[name] = createSymbol(name);
+  }
+
+  return createdSymbols[name];
+}
+function shallowEqual(objA, objB) {
+  //From: https://github.com/facebook/fbjs/blob/c69904a511b900266935168223063dd8772dfc40/packages/fbjs/src/core/shallowEqual.js
+  if (is(objA, objB)) {
+    return true;
+  }
+
+  if (typeof objA !== "object" || objA === null || typeof objB !== "object" || objB === null) {
+    return false;
+  }
+
+  var keysA = Object.keys(objA);
+  var keysB = Object.keys(objB);
+
+  if (keysA.length !== keysB.length) {
+    return false;
+  }
+
+  for (var i = 0; i < keysA.length; i++) {
+    if (!Object.hasOwnProperty.call(objB, keysA[i]) || !is(objA[keysA[i]], objB[keysA[i]])) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+function is(x, y) {
+  // From: https://github.com/facebook/fbjs/blob/c69904a511b900266935168223063dd8772dfc40/packages/fbjs/src/core/shallowEqual.js
+  if (x === y) {
+    return x !== 0 || 1 / x === 1 / y;
+  } else {
+    return x !== x && y !== y;
+  }
+} // based on https://github.com/mridgway/hoist-non-react-statics/blob/master/src/index.js
+
+
+var mobxreact_esm_hoistBlackList = {
+  $$typeof: 1,
+  render: 1,
+  compare: 1,
+  type: 1,
+  childContextTypes: 1,
+  contextType: 1,
+  contextTypes: 1,
+  defaultProps: 1,
+  getDefaultProps: 1,
+  getDerivedStateFromError: 1,
+  getDerivedStateFromProps: 1,
+  mixins: 1,
+  displayName: 1,
+  propTypes: 1
+};
+function mobxreact_esm_copyStaticProperties(base, target) {
+  var protoProps = Object.getOwnPropertyNames(Object.getPrototypeOf(base));
+  Object.getOwnPropertyNames(base).forEach(function (key) {
+    if (!mobxreact_esm_hoistBlackList[key] && protoProps.indexOf(key) === -1) {
+      Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(base, key));
+    }
+  });
+}
+/**
+ * Helper to set `prop` to `this` as non-enumerable (hidden prop)
+ * @param target
+ * @param prop
+ * @param value
+ */
+
+function setHiddenProp(target, prop, value) {
+  if (!Object.hasOwnProperty.call(target, prop)) {
+    Object.defineProperty(target, prop, {
+      enumerable: false,
+      configurable: true,
+      writable: true,
+      value: value
+    });
+  } else {
+    target[prop] = value;
+  }
+}
+/**
+ * Utilities for patching componentWillUnmount, to make sure @disposeOnUnmount works correctly icm with user defined hooks
+ * and the handler provided by mobx-react
+ */
+
+var mobxMixins = /*#__PURE__*/newSymbol("patchMixins");
+var mobxPatchedDefinition = /*#__PURE__*/newSymbol("patchedDefinition");
+
+function getMixins(target, methodName) {
+  var mixins = target[mobxMixins] = target[mobxMixins] || {};
+  var methodMixins = mixins[methodName] = mixins[methodName] || {};
+  methodMixins.locks = methodMixins.locks || 0;
+  methodMixins.methods = methodMixins.methods || [];
+  return methodMixins;
+}
+
+function wrapper(realMethod, mixins) {
+  var _this = this;
+
+  for (var _len = arguments.length, args = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
+    args[_key - 2] = arguments[_key];
+  }
+
+  // locks are used to ensure that mixins are invoked only once per invocation, even on recursive calls
+  mixins.locks++;
+
+  try {
+    var retVal;
+
+    if (realMethod !== undefined && realMethod !== null) {
+      retVal = realMethod.apply(this, args);
+    }
+
+    return retVal;
+  } finally {
+    mixins.locks--;
+
+    if (mixins.locks === 0) {
+      mixins.methods.forEach(function (mx) {
+        mx.apply(_this, args);
+      });
+    }
+  }
+}
+
+function wrapFunction(realMethod, mixins) {
+  var fn = function fn() {
+    for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+      args[_key2] = arguments[_key2];
+    }
+
+    wrapper.call.apply(wrapper, [this, realMethod, mixins].concat(args));
+  };
+
+  return fn;
+}
+
+function patch(target, methodName, mixinMethod) {
+  var mixins = getMixins(target, methodName);
+
+  if (mixins.methods.indexOf(mixinMethod) < 0) {
+    mixins.methods.push(mixinMethod);
+  }
+
+  var oldDefinition = Object.getOwnPropertyDescriptor(target, methodName);
+
+  if (oldDefinition && oldDefinition[mobxPatchedDefinition]) {
+    // already patched definition, do not repatch
+    return;
+  }
+
+  var originalMethod = target[methodName];
+  var newDefinition = createDefinition(target, methodName, oldDefinition ? oldDefinition.enumerable : undefined, mixins, originalMethod);
+  Object.defineProperty(target, methodName, newDefinition);
+}
+
+function createDefinition(target, methodName, enumerable, mixins, originalMethod) {
+  var _ref;
+
+  var wrappedFunc = wrapFunction(originalMethod, mixins);
+  return _ref = {}, _ref[mobxPatchedDefinition] = true, _ref.get = function get() {
+    return wrappedFunc;
+  }, _ref.set = function set(value) {
+    if (this === target) {
+      wrappedFunc = wrapFunction(value, mixins);
+    } else {
+      // when it is an instance of the prototype/a child prototype patch that particular case again separately
+      // since we need to store separate values depending on wether it is the actual instance, the prototype, etc
+      // e.g. the method for super might not be the same as the method for the prototype which might be not the same
+      // as the method for the instance
+      var newDefinition = createDefinition(this, methodName, enumerable, mixins, value);
+      Object.defineProperty(this, methodName, newDefinition);
+    }
+  }, _ref.configurable = true, _ref.enumerable = enumerable, _ref;
+}
+
+var mobxAdminProperty = mobx_esm/* $mobx */.so || "$mobx";
+var mobxObserverProperty = /*#__PURE__*/newSymbol("isMobXReactObserver");
+var mobxIsUnmounted = /*#__PURE__*/newSymbol("isUnmounted");
+var skipRenderKey = /*#__PURE__*/newSymbol("skipRender");
+var isForcingUpdateKey = /*#__PURE__*/newSymbol("isForcingUpdate");
+function makeClassComponentObserver(componentClass) {
+  var target = componentClass.prototype;
+
+  if (componentClass[mobxObserverProperty]) {
+    var displayName = getDisplayName(target);
+    console.warn("The provided component class (" + displayName + ") \n                has already been declared as an observer component.");
+  } else {
+    componentClass[mobxObserverProperty] = true;
+  }
+
+  if (target.componentWillReact) throw new Error("The componentWillReact life-cycle event is no longer supported");
+
+  if (componentClass["__proto__"] !== react.PureComponent) {
+    if (!target.shouldComponentUpdate) target.shouldComponentUpdate = observerSCU;else if (target.shouldComponentUpdate !== observerSCU) // n.b. unequal check, instead of existence check, as @observer might be on superclass as well
+      throw new Error("It is not allowed to use shouldComponentUpdate in observer based components.");
+  } // this.props and this.state are made observable, just to make sure @computed fields that
+  // are defined inside the component, and which rely on state or props, re-compute if state or props change
+  // (otherwise the computed wouldn't update and become stale on props change, since props are not observable)
+  // However, this solution is not without it's own problems: https://github.com/mobxjs/mobx-react/issues?utf8=%E2%9C%93&q=is%3Aissue+label%3Aobservable-props-or-not+
+
+
+  makeObservableProp(target, "props");
+  makeObservableProp(target, "state");
+  var baseRender = target.render;
+
+  if (typeof baseRender !== "function") {
+    var _displayName = getDisplayName(target);
+
+    throw new Error("[mobx-react] class component (" + _displayName + ") is missing `render` method." + "\n`observer` requires `render` being a function defined on prototype." + "\n`render = () => {}` or `render = function() {}` is not supported.");
+  }
+
+  target.render = function () {
+    return makeComponentReactive.call(this, baseRender);
+  };
+
+  patch(target, "componentWillUnmount", function () {
+    var _this$render$mobxAdmi;
+
+    if (isUsingStaticRendering() === true) return;
+    (_this$render$mobxAdmi = this.render[mobxAdminProperty]) == null ? void 0 : _this$render$mobxAdmi.dispose();
+    this[mobxIsUnmounted] = true;
+
+    if (!this.render[mobxAdminProperty]) {
+      // Render may have been hot-swapped and/or overriden by a subclass.
+      var _displayName2 = getDisplayName(this);
+
+      console.warn("The reactive render of an observer class component (" + _displayName2 + ") \n                was overriden after MobX attached. This may result in a memory leak if the \n                overriden reactive render was not properly disposed.");
+    }
+  });
+  return componentClass;
+} // Generates a friendly name for debugging
+
+function getDisplayName(comp) {
+  return comp.displayName || comp.name || comp.constructor && (comp.constructor.displayName || comp.constructor.name) || "<component>";
+}
+
+function makeComponentReactive(render) {
+  var _this = this;
+
+  if (isUsingStaticRendering() === true) return render.call(this);
+  /**
+   * If props are shallowly modified, react will render anyway,
+   * so atom.reportChanged() should not result in yet another re-render
+   */
+
+  setHiddenProp(this, skipRenderKey, false);
+  /**
+   * forceUpdate will re-assign this.props. We don't want that to cause a loop,
+   * so detect these changes
+   */
+
+  setHiddenProp(this, isForcingUpdateKey, false);
+  var initialName = getDisplayName(this);
+  var baseRender = render.bind(this);
+  var isRenderingPending = false;
+  var reaction = new mobx_esm/* Reaction */.le(initialName + ".render()", function () {
+    if (!isRenderingPending) {
+      // N.B. Getting here *before mounting* means that a component constructor has side effects (see the relevant test in misc.js)
+      // This unidiomatic React usage but React will correctly warn about this so we continue as usual
+      // See #85 / Pull #44
+      isRenderingPending = true;
+
+      if (_this[mobxIsUnmounted] !== true) {
+        var hasError = true;
+
+        try {
+          setHiddenProp(_this, isForcingUpdateKey, true);
+          if (!_this[skipRenderKey]) react.Component.prototype.forceUpdate.call(_this);
+          hasError = false;
+        } finally {
+          setHiddenProp(_this, isForcingUpdateKey, false);
+          if (hasError) reaction.dispose();
+        }
+      }
+    }
+  });
+  reaction["reactComponent"] = this;
+  reactiveRender[mobxAdminProperty] = reaction;
+  this.render = reactiveRender;
+
+  function reactiveRender() {
+    isRenderingPending = false;
+    var exception = undefined;
+    var rendering = undefined;
+    reaction.track(function () {
+      try {
+        rendering = (0,mobx_esm/* _allowStateChanges */.$$)(false, baseRender);
+      } catch (e) {
+        exception = e;
+      }
+    });
+
+    if (exception) {
+      throw exception;
+    }
+
+    return rendering;
+  }
+
+  return reactiveRender.call(this);
+}
+
+function observerSCU(nextProps, nextState) {
+  if (isUsingStaticRendering()) {
+    console.warn("[mobx-react] It seems that a re-rendering of a React component is triggered while in static (server-side) mode. Please make sure components are rendered only once server-side.");
+  } // update on any state changes (as is the default)
+
+
+  if (this.state !== nextState) {
+    return true;
+  } // update if props are shallowly not equal, inspired by PureRenderMixin
+  // we could return just 'false' here, and avoid the `skipRender` checks etc
+  // however, it is nicer if lifecycle events are triggered like usually,
+  // so we return true here if props are shallowly modified.
+
+
+  return !shallowEqual(this.props, nextProps);
+}
+
+function makeObservableProp(target, propName) {
+  var valueHolderKey = newSymbol("reactProp_" + propName + "_valueHolder");
+  var atomHolderKey = newSymbol("reactProp_" + propName + "_atomHolder");
+
+  function getAtom() {
+    if (!this[atomHolderKey]) {
+      setHiddenProp(this, atomHolderKey, (0,mobx_esm/* createAtom */.cp)("reactive " + propName));
+    }
+
+    return this[atomHolderKey];
+  }
+
+  Object.defineProperty(target, propName, {
+    configurable: true,
+    enumerable: true,
+    get: function get() {
+      var prevReadState = false; // Why this check? BC?
+      // @ts-expect-error
+
+      if (mobx_esm/* _allowStateReadsStart */.wM && mobx_esm/* _allowStateReadsEnd */.mJ) {
+        prevReadState = (0,mobx_esm/* _allowStateReadsStart */.wM)(true);
+      }
+
+      getAtom.call(this).reportObserved(); // Why this check? BC?
+      // @ts-expect-error
+
+      if (mobx_esm/* _allowStateReadsStart */.wM && mobx_esm/* _allowStateReadsEnd */.mJ) {
+        (0,mobx_esm/* _allowStateReadsEnd */.mJ)(prevReadState);
+      }
+
+      return this[valueHolderKey];
+    },
+    set: function set(v) {
+      if (!this[isForcingUpdateKey] && !shallowEqual(this[valueHolderKey], v)) {
+        setHiddenProp(this, valueHolderKey, v);
+        setHiddenProp(this, skipRenderKey, true);
+        getAtom.call(this).reportChanged();
+        setHiddenProp(this, skipRenderKey, false);
+      } else {
+        setHiddenProp(this, valueHolderKey, v);
+      }
+    }
+  });
+}
+
+/**
+ * Observer function / decorator
+ */
+
+function mobxreact_esm_observer(component) {
+  if (component["isMobxInjector"] === true) {
+    console.warn("Mobx observer: You are trying to use `observer` on a component that already has `inject`. Please apply `observer` before applying `inject`");
+  }
+
+  if (Object.prototype.isPrototypeOf.call(react.Component, component) || Object.prototype.isPrototypeOf.call(react.PureComponent, component)) {
+    // Class component
+    return makeClassComponentObserver(component);
+  } else {
+    // Function component
+    return observer(component);
+  }
+}
+
+function mobxreact_esm_extends() {
+  mobxreact_esm_extends = Object.assign || function (target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i];
+
+      for (var key in source) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+          target[key] = source[key];
+        }
+      }
+    }
+
+    return target;
+  };
+
+  return mobxreact_esm_extends.apply(this, arguments);
+}
+
+function _objectWithoutPropertiesLoose(source, excluded) {
+  if (source == null) return {};
+  var target = {};
+  var sourceKeys = Object.keys(source);
+  var key, i;
+
+  for (i = 0; i < sourceKeys.length; i++) {
+    key = sourceKeys[i];
+    if (excluded.indexOf(key) >= 0) continue;
+    target[key] = source[key];
+  }
+
+  return target;
+}
+
+var _excluded = ["children"];
+var MobXProviderContext = /*#__PURE__*/react.createContext({});
+function Provider(props) {
+  var children = props.children,
+      stores = _objectWithoutPropertiesLoose(props, _excluded);
+
+  var parentValue = react.useContext(MobXProviderContext);
+  var mutableProviderRef = react.useRef(mobxreact_esm_extends({}, parentValue, stores));
+  var value = mutableProviderRef.current;
+
+  if (false) { var newValue; }
+
+  return react.createElement(MobXProviderContext.Provider, {
+    value: value
+  }, children);
+}
+Provider.displayName = "MobXProvider";
+
+/**
+ * Store Injection
+ */
+
+function createStoreInjector(grabStoresFn, component, injectNames, makeReactive) {
+  // Support forward refs
+  var Injector = React__default.forwardRef(function (props, ref) {
+    var newProps = mobxreact_esm_extends({}, props);
+
+    var context = React__default.useContext(MobXProviderContext);
+    Object.assign(newProps, grabStoresFn(context || {}, newProps) || {});
+
+    if (ref) {
+      newProps.ref = ref;
+    }
+
+    return React__default.createElement(component, newProps);
+  });
+  if (makeReactive) Injector = mobxreact_esm_observer(Injector);
+  Injector["isMobxInjector"] = true; // assigned late to suppress observer warning
+  // Static fields from component should be visible on the generated Injector
+
+  mobxreact_esm_copyStaticProperties(component, Injector);
+  Injector["wrappedComponent"] = component;
+  Injector.displayName = getInjectName(component, injectNames);
+  return Injector;
+}
+
+function getInjectName(component, injectNames) {
+  var displayName;
+  var componentName = component.displayName || component.name || component.constructor && component.constructor.name || "Component";
+  if (injectNames) displayName = "inject-with-" + injectNames + "(" + componentName + ")";else displayName = "inject(" + componentName + ")";
+  return displayName;
+}
+
+function grabStoresByName(storeNames) {
+  return function (baseStores, nextProps) {
+    storeNames.forEach(function (storeName) {
+      if (storeName in nextProps // prefer props over stores
+      ) return;
+      if (!(storeName in baseStores)) throw new Error("MobX injector: Store '" + storeName + "' is not available! Make sure it is provided by some Provider");
+      nextProps[storeName] = baseStores[storeName];
+    });
+    return nextProps;
+  };
+}
+/**
+ * higher order component that injects stores to a child.
+ * takes either a varargs list of strings, which are stores read from the context,
+ * or a function that manually maps the available stores from the context to props:
+ * storesToProps(mobxStores, props, context) => newProps
+ */
+
+
+function inject() {
+  for (var _len = arguments.length, storeNames = new Array(_len), _key = 0; _key < _len; _key++) {
+    storeNames[_key] = arguments[_key];
+  }
+
+  if (typeof arguments[0] === "function") {
+    var grabStoresFn = arguments[0];
+    return function (componentClass) {
+      return createStoreInjector(grabStoresFn, componentClass, grabStoresFn.name, true);
+    };
+  } else {
+    return function (componentClass) {
+      return createStoreInjector(grabStoresByName(storeNames), componentClass, storeNames.join("-"), false);
+    };
+  }
+}
+
+var protoStoreKey = /*#__PURE__*/(/* unused pure expression or super */ null && (newSymbol("disposeOnUnmountProto")));
+var instStoreKey = /*#__PURE__*/(/* unused pure expression or super */ null && (newSymbol("disposeOnUnmountInst")));
+
+function runDisposersOnWillUnmount() {
+  var _this = this;
+  [].concat(this[protoStoreKey] || [], this[instStoreKey] || []).forEach(function (propKeyOrFunction) {
+    var prop = typeof propKeyOrFunction === "string" ? _this[propKeyOrFunction] : propKeyOrFunction;
+
+    if (prop !== undefined && prop !== null) {
+      if (Array.isArray(prop)) prop.map(function (f) {
+        return f();
+      });else prop();
+    }
+  });
+}
+
+function disposeOnUnmount(target, propertyKeyOrFunction) {
+  if (Array.isArray(propertyKeyOrFunction)) {
+    return propertyKeyOrFunction.map(function (fn) {
+      return disposeOnUnmount(target, fn);
+    });
+  }
+
+  var c = Object.getPrototypeOf(target).constructor;
+  var c2 = Object.getPrototypeOf(target.constructor); // Special case for react-hot-loader
+
+  var c3 = Object.getPrototypeOf(Object.getPrototypeOf(target));
+
+  if (!(c === React__default.Component || c === React__default.PureComponent || c2 === React__default.Component || c2 === React__default.PureComponent || c3 === React__default.Component || c3 === React__default.PureComponent)) {
+    throw new Error("[mobx-react] disposeOnUnmount only supports direct subclasses of React.Component or React.PureComponent.");
+  }
+
+  if (typeof propertyKeyOrFunction !== "string" && typeof propertyKeyOrFunction !== "function" && !Array.isArray(propertyKeyOrFunction)) {
+    throw new Error("[mobx-react] disposeOnUnmount only works if the parameter is either a property key or a function.");
+  } // decorator's target is the prototype, so it doesn't have any instance properties like props
+
+
+  var isDecorator = typeof propertyKeyOrFunction === "string"; // add property key / function we want run (disposed) to the store
+
+  var componentWasAlreadyModified = !!target[protoStoreKey] || !!target[instStoreKey];
+  var store = isDecorator ? // decorators are added to the prototype store
+  target[protoStoreKey] || (target[protoStoreKey] = []) : // functions are added to the instance store
+  target[instStoreKey] || (target[instStoreKey] = []);
+  store.push(propertyKeyOrFunction); // tweak the component class componentWillUnmount if not done already
+
+  if (!componentWasAlreadyModified) {
+    patch(target, "componentWillUnmount", runDisposersOnWillUnmount);
+  } // return the disposer as is if invoked as a non decorator
+
+
+  if (typeof propertyKeyOrFunction !== "string") {
+    return propertyKeyOrFunction;
+  }
+}
+
+function createChainableTypeChecker(validator) {
+  function checkType(isRequired, props, propName, componentName, location, propFullName) {
+    for (var _len = arguments.length, rest = new Array(_len > 6 ? _len - 6 : 0), _key = 6; _key < _len; _key++) {
+      rest[_key - 6] = arguments[_key];
+    }
+
+    return (0,mobx_esm/* untracked */.rg)(function () {
+      componentName = componentName || "<<anonymous>>";
+      propFullName = propFullName || propName;
+
+      if (props[propName] == null) {
+        if (isRequired) {
+          var actual = props[propName] === null ? "null" : "undefined";
+          return new Error("The " + location + " `" + propFullName + "` is marked as required " + "in `" + componentName + "`, but its value is `" + actual + "`.");
+        }
+
+        return null;
+      } else {
+        // @ts-ignore rest arg is necessary for some React internals - fails tests otherwise
+        return validator.apply(void 0, [props, propName, componentName, location, propFullName].concat(rest));
+      }
+    });
+  }
+
+  var chainedCheckType = checkType.bind(null, false); // Add isRequired to satisfy Requirable
+
+  chainedCheckType.isRequired = checkType.bind(null, true);
+  return chainedCheckType;
+} // Copied from React.PropTypes
+
+
+function isSymbol(propType, propValue) {
+  // Native Symbol.
+  if (propType === "symbol") {
+    return true;
+  } // 19.4.3.5 Symbol.prototype[@@toStringTag] === 'Symbol'
+
+
+  if (propValue["@@toStringTag"] === "Symbol") {
+    return true;
+  } // Fallback for non-spec compliant Symbols which are polyfilled.
+
+
+  if (typeof Symbol === "function" && propValue instanceof Symbol) {
+    return true;
+  }
+
+  return false;
+} // Copied from React.PropTypes
+
+
+function getPropType(propValue) {
+  var propType = typeof propValue;
+
+  if (Array.isArray(propValue)) {
+    return "array";
+  }
+
+  if (propValue instanceof RegExp) {
+    // Old webkits (at least until Android 4.0) return 'function' rather than
+    // 'object' for typeof a RegExp. We'll normalize this here so that /bla/
+    // passes PropTypes.object.
+    return "object";
+  }
+
+  if (isSymbol(propType, propValue)) {
+    return "symbol";
+  }
+
+  return propType;
+} // This handles more types than `getPropType`. Only used for error messages.
+// Copied from React.PropTypes
+
+
+function getPreciseType(propValue) {
+  var propType = getPropType(propValue);
+
+  if (propType === "object") {
+    if (propValue instanceof Date) {
+      return "date";
+    } else if (propValue instanceof RegExp) {
+      return "regexp";
+    }
+  }
+
+  return propType;
+}
+
+function createObservableTypeCheckerCreator(allowNativeType, mobxType) {
+  return createChainableTypeChecker(function (props, propName, componentName, location, propFullName) {
+    return (0,mobx_esm/* untracked */.rg)(function () {
+      if (allowNativeType) {
+        if (getPropType(props[propName]) === mobxType.toLowerCase()) return null;
+      }
+
+      var mobxChecker;
+
+      switch (mobxType) {
+        case "Array":
+          mobxChecker = mobx_esm/* isObservableArray */.Ei;
+          break;
+
+        case "Object":
+          mobxChecker = mobx_esm/* isObservableObject */.Pb;
+          break;
+
+        case "Map":
+          mobxChecker = mobx_esm/* isObservableMap */.LJ;
+          break;
+
+        default:
+          throw new Error("Unexpected mobxType: " + mobxType);
+      }
+
+      var propValue = props[propName];
+
+      if (!mobxChecker(propValue)) {
+        var preciseType = getPreciseType(propValue);
+        var nativeTypeExpectationMessage = allowNativeType ? " or javascript `" + mobxType.toLowerCase() + "`" : "";
+        return new Error("Invalid prop `" + propFullName + "` of type `" + preciseType + "` supplied to" + " `" + componentName + "`, expected `mobx.Observable" + mobxType + "`" + nativeTypeExpectationMessage + ".");
+      }
+
+      return null;
+    });
+  });
+}
+
+function createObservableArrayOfTypeChecker(allowNativeType, typeChecker) {
+  return createChainableTypeChecker(function (props, propName, componentName, location, propFullName) {
+    for (var _len2 = arguments.length, rest = new Array(_len2 > 5 ? _len2 - 5 : 0), _key2 = 5; _key2 < _len2; _key2++) {
+      rest[_key2 - 5] = arguments[_key2];
+    }
+
+    return (0,mobx_esm/* untracked */.rg)(function () {
+      if (typeof typeChecker !== "function") {
+        return new Error("Property `" + propFullName + "` of component `" + componentName + "` has " + "invalid PropType notation.");
+      } else {
+        var error = createObservableTypeCheckerCreator(allowNativeType, "Array")(props, propName, componentName, location, propFullName);
+        if (error instanceof Error) return error;
+        var propValue = props[propName];
+
+        for (var i = 0; i < propValue.length; i++) {
+          error = typeChecker.apply(void 0, [propValue, i, componentName, location, propFullName + "[" + i + "]"].concat(rest));
+          if (error instanceof Error) return error;
+        }
+
+        return null;
+      }
+    });
+  });
+}
+
+var observableArray = /*#__PURE__*/createObservableTypeCheckerCreator(false, "Array");
+var observableArrayOf = /*#__PURE__*/createObservableArrayOfTypeChecker.bind(null, false);
+var observableMap = /*#__PURE__*/createObservableTypeCheckerCreator(false, "Map");
+var observableObject = /*#__PURE__*/createObservableTypeCheckerCreator(false, "Object");
+var arrayOrObservableArray = /*#__PURE__*/createObservableTypeCheckerCreator(true, "Array");
+var arrayOrObservableArrayOf = /*#__PURE__*/createObservableArrayOfTypeChecker.bind(null, true);
+var objectOrObservableObject = /*#__PURE__*/createObservableTypeCheckerCreator(true, "Object");
+var PropTypes = {
+  observableArray: observableArray,
+  observableArrayOf: observableArrayOf,
+  observableMap: observableMap,
+  observableObject: observableObject,
+  arrayOrObservableArray: arrayOrObservableArray,
+  arrayOrObservableArrayOf: arrayOrObservableArrayOf,
+  objectOrObservableObject: objectOrObservableObject
+};
+
+if (!react.Component) throw new Error("mobx-react requires React to be available");
+if (!mobx_esm/* observable */.LO) throw new Error("mobx-react requires mobx to be available");
+
+
+
 ;// CONCATENATED MODULE: ./node_modules/use-error-boundary/lib/index.module.js
 var c=function(r){var t,e;function n(t){var e;return(e=r.call(this,t)||this).state={hasError:!1,error:null},e}e=r,(t=n).prototype=Object.create(e.prototype),t.prototype.constructor=t,t.__proto__=e,n.getDerivedStateFromError=function(r){return{hasError:!0,error:r}};var o=n.prototype;return o.componentDidCatch=function(r,t){return this.props.onDidCatch(r,t)},o.render=function(){var r=this.state,t=this.props,e=t.render,n=t.children,o=t.renderError;return r.hasError?o?o({error:r.error}):null:e?e():n||null},n}(react.PureComponent),u=function(r,t){switch(t.type){case"catch":return{didCatch:!0,error:t.error};case"reset":return{didCatch:!1,error:null};default:return r}};function a(t){var a=(0,react.useReducer)(u,{didCatch:!1,error:null}),i=a[0],d=a[1],h=(0,react.useRef)(null);function l(){return e=function(r,e){d({type:"catch",error:r}),t&&t.onDidCatch&&t.onDidCatch(r,e)},function(t){return react.createElement(c,{onDidCatch:e,children:t.children,render:t.render,renderError:t.renderError})};var e}var p,s=(0,react.useCallback)(function(){h.current=l(),d({type:"reset"})},[]);return{ErrorBoundary:(p=h.current,null!==p?p:(h.current=l(),h.current)),didCatch:i.didCatch,error:i.error,reset:s}}/* harmony default export */ const index_module = ((/* unused pure expression or super */ null && (a)));
 
-// EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/initializerDefineProperty.js
-var initializerDefineProperty = __webpack_require__(5497);
-// EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/applyDecoratedDescriptor.js
-var applyDecoratedDescriptor = __webpack_require__(6813);
+;// CONCATENATED MODULE: ./node_modules/@babel/runtime/helpers/esm/initializerDefineProperty.js
+function _initializerDefineProperty(target, property, descriptor, context) {
+  if (!descriptor) return;
+  Object.defineProperty(target, property, {
+    enumerable: descriptor.enumerable,
+    configurable: descriptor.configurable,
+    writable: descriptor.writable,
+    value: descriptor.initializer ? descriptor.initializer.call(context) : void 0
+  });
+}
+;// CONCATENATED MODULE: ./node_modules/@babel/runtime/helpers/esm/applyDecoratedDescriptor.js
+function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) {
+  var desc = {};
+  Object.keys(descriptor).forEach(function (key) {
+    desc[key] = descriptor[key];
+  });
+  desc.enumerable = !!desc.enumerable;
+  desc.configurable = !!desc.configurable;
+
+  if ('value' in desc || desc.initializer) {
+    desc.writable = true;
+  }
+
+  desc = decorators.slice().reverse().reduce(function (desc, decorator) {
+    return decorator(target, property, desc) || desc;
+  }, desc);
+
+  if (context && desc.initializer !== void 0) {
+    desc.value = desc.initializer ? desc.initializer.call(context) : void 0;
+    desc.initializer = undefined;
+  }
+
+  if (desc.initializer === void 0) {
+    Object.defineProperty(target, property, desc);
+    desc = null;
+  }
+
+  return desc;
+}
 // EXTERNAL MODULE: ./node_modules/webextension-polyfill/dist/browser-polyfill.js
 var browser_polyfill = __webpack_require__(3679);
 var browser_polyfill_default = /*#__PURE__*/__webpack_require__.n(browser_polyfill);
-// EXTERNAL MODULE: ./node_modules/mobx/dist/mobx.esm.js
-var mobx_esm = __webpack_require__(1056);
-// EXTERNAL MODULE: ./node_modules/punycode/punycode.es6.js
-var punycode_es6 = __webpack_require__(2860);
+;// CONCATENATED MODULE: ./node_modules/punycode/punycode.es6.js
+
+
+/** Highest positive signed 32-bit float value */
+const maxInt = 2147483647; // aka. 0x7FFFFFFF or 2^31-1
+
+/** Bootstring parameters */
+const base = 36;
+const tMin = 1;
+const tMax = 26;
+const skew = 38;
+const damp = 700;
+const initialBias = 72;
+const initialN = 128; // 0x80
+const delimiter = '-'; // '\x2D'
+
+/** Regular expressions */
+const regexPunycode = /^xn--/;
+const regexNonASCII = /[^\0-\x7E]/; // non-ASCII chars
+const regexSeparators = /[\x2E\u3002\uFF0E\uFF61]/g; // RFC 3490 separators
+
+/** Error messages */
+const errors = {
+	'overflow': 'Overflow: input needs wider integers to process',
+	'not-basic': 'Illegal input >= 0x80 (not a basic code point)',
+	'invalid-input': 'Invalid input'
+};
+
+/** Convenience shortcuts */
+const baseMinusTMin = base - tMin;
+const floor = Math.floor;
+const stringFromCharCode = String.fromCharCode;
+
+/*--------------------------------------------------------------------------*/
+
+/**
+ * A generic error utility function.
+ * @private
+ * @param {String} type The error type.
+ * @returns {Error} Throws a `RangeError` with the applicable error message.
+ */
+function punycode_es6_error(type) {
+	throw new RangeError(errors[type]);
+}
+
+/**
+ * A generic `Array#map` utility function.
+ * @private
+ * @param {Array} array The array to iterate over.
+ * @param {Function} callback The function that gets called for every array
+ * item.
+ * @returns {Array} A new array of values returned by the callback function.
+ */
+function map(array, fn) {
+	const result = [];
+	let length = array.length;
+	while (length--) {
+		result[length] = fn(array[length]);
+	}
+	return result;
+}
+
+/**
+ * A simple `Array#map`-like wrapper to work with domain name strings or email
+ * addresses.
+ * @private
+ * @param {String} domain The domain name or email address.
+ * @param {Function} callback The function that gets called for every
+ * character.
+ * @returns {Array} A new string of characters returned by the callback
+ * function.
+ */
+function mapDomain(string, fn) {
+	const parts = string.split('@');
+	let result = '';
+	if (parts.length > 1) {
+		// In email addresses, only the domain name should be punycoded. Leave
+		// the local part (i.e. everything up to `@`) intact.
+		result = parts[0] + '@';
+		string = parts[1];
+	}
+	// Avoid `split(regex)` for IE8 compatibility. See #17.
+	string = string.replace(regexSeparators, '\x2E');
+	const labels = string.split('.');
+	const encoded = map(labels, fn).join('.');
+	return result + encoded;
+}
+
+/**
+ * Creates an array containing the numeric code points of each Unicode
+ * character in the string. While JavaScript uses UCS-2 internally,
+ * this function will convert a pair of surrogate halves (each of which
+ * UCS-2 exposes as separate characters) into a single code point,
+ * matching UTF-16.
+ * @see `punycode.ucs2.encode`
+ * @see <https://mathiasbynens.be/notes/javascript-encoding>
+ * @memberOf punycode.ucs2
+ * @name decode
+ * @param {String} string The Unicode input string (UCS-2).
+ * @returns {Array} The new array of code points.
+ */
+function ucs2decode(string) {
+	const output = [];
+	let counter = 0;
+	const length = string.length;
+	while (counter < length) {
+		const value = string.charCodeAt(counter++);
+		if (value >= 0xD800 && value <= 0xDBFF && counter < length) {
+			// It's a high surrogate, and there is a next character.
+			const extra = string.charCodeAt(counter++);
+			if ((extra & 0xFC00) == 0xDC00) { // Low surrogate.
+				output.push(((value & 0x3FF) << 10) + (extra & 0x3FF) + 0x10000);
+			} else {
+				// It's an unmatched surrogate; only append this code unit, in case the
+				// next code unit is the high surrogate of a surrogate pair.
+				output.push(value);
+				counter--;
+			}
+		} else {
+			output.push(value);
+		}
+	}
+	return output;
+}
+
+/**
+ * Creates a string based on an array of numeric code points.
+ * @see `punycode.ucs2.decode`
+ * @memberOf punycode.ucs2
+ * @name encode
+ * @param {Array} codePoints The array of numeric code points.
+ * @returns {String} The new Unicode string (UCS-2).
+ */
+const ucs2encode = array => String.fromCodePoint(...array);
+
+/**
+ * Converts a basic code point into a digit/integer.
+ * @see `digitToBasic()`
+ * @private
+ * @param {Number} codePoint The basic numeric code point value.
+ * @returns {Number} The numeric value of a basic code point (for use in
+ * representing integers) in the range `0` to `base - 1`, or `base` if
+ * the code point does not represent a value.
+ */
+const basicToDigit = function(codePoint) {
+	if (codePoint - 0x30 < 0x0A) {
+		return codePoint - 0x16;
+	}
+	if (codePoint - 0x41 < 0x1A) {
+		return codePoint - 0x41;
+	}
+	if (codePoint - 0x61 < 0x1A) {
+		return codePoint - 0x61;
+	}
+	return base;
+};
+
+/**
+ * Converts a digit/integer into a basic code point.
+ * @see `basicToDigit()`
+ * @private
+ * @param {Number} digit The numeric value of a basic code point.
+ * @returns {Number} The basic code point whose value (when used for
+ * representing integers) is `digit`, which needs to be in the range
+ * `0` to `base - 1`. If `flag` is non-zero, the uppercase form is
+ * used; else, the lowercase form is used. The behavior is undefined
+ * if `flag` is non-zero and `digit` has no uppercase form.
+ */
+const digitToBasic = function(digit, flag) {
+	//  0..25 map to ASCII a..z or A..Z
+	// 26..35 map to ASCII 0..9
+	return digit + 22 + 75 * (digit < 26) - ((flag != 0) << 5);
+};
+
+/**
+ * Bias adaptation function as per section 3.4 of RFC 3492.
+ * https://tools.ietf.org/html/rfc3492#section-3.4
+ * @private
+ */
+const adapt = function(delta, numPoints, firstTime) {
+	let k = 0;
+	delta = firstTime ? floor(delta / damp) : delta >> 1;
+	delta += floor(delta / numPoints);
+	for (/* no initialization */; delta > baseMinusTMin * tMax >> 1; k += base) {
+		delta = floor(delta / baseMinusTMin);
+	}
+	return floor(k + (baseMinusTMin + 1) * delta / (delta + skew));
+};
+
+/**
+ * Converts a Punycode string of ASCII-only symbols to a string of Unicode
+ * symbols.
+ * @memberOf punycode
+ * @param {String} input The Punycode string of ASCII-only symbols.
+ * @returns {String} The resulting string of Unicode symbols.
+ */
+const decode = function(input) {
+	// Don't use UCS-2.
+	const output = [];
+	const inputLength = input.length;
+	let i = 0;
+	let n = initialN;
+	let bias = initialBias;
+
+	// Handle the basic code points: let `basic` be the number of input code
+	// points before the last delimiter, or `0` if there is none, then copy
+	// the first basic code points to the output.
+
+	let basic = input.lastIndexOf(delimiter);
+	if (basic < 0) {
+		basic = 0;
+	}
+
+	for (let j = 0; j < basic; ++j) {
+		// if it's not a basic code point
+		if (input.charCodeAt(j) >= 0x80) {
+			punycode_es6_error('not-basic');
+		}
+		output.push(input.charCodeAt(j));
+	}
+
+	// Main decoding loop: start just after the last delimiter if any basic code
+	// points were copied; start at the beginning otherwise.
+
+	for (let index = basic > 0 ? basic + 1 : 0; index < inputLength; /* no final expression */) {
+
+		// `index` is the index of the next character to be consumed.
+		// Decode a generalized variable-length integer into `delta`,
+		// which gets added to `i`. The overflow checking is easier
+		// if we increase `i` as we go, then subtract off its starting
+		// value at the end to obtain `delta`.
+		let oldi = i;
+		for (let w = 1, k = base; /* no condition */; k += base) {
+
+			if (index >= inputLength) {
+				punycode_es6_error('invalid-input');
+			}
+
+			const digit = basicToDigit(input.charCodeAt(index++));
+
+			if (digit >= base || digit > floor((maxInt - i) / w)) {
+				punycode_es6_error('overflow');
+			}
+
+			i += digit * w;
+			const t = k <= bias ? tMin : (k >= bias + tMax ? tMax : k - bias);
+
+			if (digit < t) {
+				break;
+			}
+
+			const baseMinusT = base - t;
+			if (w > floor(maxInt / baseMinusT)) {
+				punycode_es6_error('overflow');
+			}
+
+			w *= baseMinusT;
+
+		}
+
+		const out = output.length + 1;
+		bias = adapt(i - oldi, out, oldi == 0);
+
+		// `i` was supposed to wrap around from `out` to `0`,
+		// incrementing `n` each time, so we'll fix that now:
+		if (floor(i / out) > maxInt - n) {
+			punycode_es6_error('overflow');
+		}
+
+		n += floor(i / out);
+		i %= out;
+
+		// Insert `n` at position `i` of the output.
+		output.splice(i++, 0, n);
+
+	}
+
+	return String.fromCodePoint(...output);
+};
+
+/**
+ * Converts a string of Unicode symbols (e.g. a domain name label) to a
+ * Punycode string of ASCII-only symbols.
+ * @memberOf punycode
+ * @param {String} input The string of Unicode symbols.
+ * @returns {String} The resulting Punycode string of ASCII-only symbols.
+ */
+const encode = function(input) {
+	const output = [];
+
+	// Convert the input in UCS-2 to an array of Unicode code points.
+	input = ucs2decode(input);
+
+	// Cache the length.
+	let inputLength = input.length;
+
+	// Initialize the state.
+	let n = initialN;
+	let delta = 0;
+	let bias = initialBias;
+
+	// Handle the basic code points.
+	for (const currentValue of input) {
+		if (currentValue < 0x80) {
+			output.push(stringFromCharCode(currentValue));
+		}
+	}
+
+	let basicLength = output.length;
+	let handledCPCount = basicLength;
+
+	// `handledCPCount` is the number of code points that have been handled;
+	// `basicLength` is the number of basic code points.
+
+	// Finish the basic string with a delimiter unless it's empty.
+	if (basicLength) {
+		output.push(delimiter);
+	}
+
+	// Main encoding loop:
+	while (handledCPCount < inputLength) {
+
+		// All non-basic code points < n have been handled already. Find the next
+		// larger one:
+		let m = maxInt;
+		for (const currentValue of input) {
+			if (currentValue >= n && currentValue < m) {
+				m = currentValue;
+			}
+		}
+
+		// Increase `delta` enough to advance the decoder's <n,i> state to <m,0>,
+		// but guard against overflow.
+		const handledCPCountPlusOne = handledCPCount + 1;
+		if (m - n > floor((maxInt - delta) / handledCPCountPlusOne)) {
+			punycode_es6_error('overflow');
+		}
+
+		delta += (m - n) * handledCPCountPlusOne;
+		n = m;
+
+		for (const currentValue of input) {
+			if (currentValue < n && ++delta > maxInt) {
+				punycode_es6_error('overflow');
+			}
+			if (currentValue == n) {
+				// Represent delta as a generalized variable-length integer.
+				let q = delta;
+				for (let k = base; /* no condition */; k += base) {
+					const t = k <= bias ? tMin : (k >= bias + tMax ? tMax : k - bias);
+					if (q < t) {
+						break;
+					}
+					const qMinusT = q - t;
+					const baseMinusT = base - t;
+					output.push(
+						stringFromCharCode(digitToBasic(t + qMinusT % baseMinusT, 0))
+					);
+					q = floor(qMinusT / baseMinusT);
+				}
+
+				output.push(stringFromCharCode(digitToBasic(q, 0)));
+				bias = adapt(delta, handledCPCountPlusOne, handledCPCount == basicLength);
+				delta = 0;
+				++handledCPCount;
+			}
+		}
+
+		++delta;
+		++n;
+
+	}
+	return output.join('');
+};
+
+/**
+ * Converts a Punycode string representing a domain name or an email address
+ * to Unicode. Only the Punycoded parts of the input will be converted, i.e.
+ * it doesn't matter if you call it on a string that has already been
+ * converted to Unicode.
+ * @memberOf punycode
+ * @param {String} input The Punycoded domain name or email address to
+ * convert to Unicode.
+ * @returns {String} The Unicode representation of the given Punycode
+ * string.
+ */
+const toUnicode = function(input) {
+	return mapDomain(input, function(string) {
+		return regexPunycode.test(string)
+			? decode(string.slice(4).toLowerCase())
+			: string;
+	});
+};
+
+/**
+ * Converts a Unicode string representing a domain name or an email address to
+ * Punycode. Only the non-ASCII parts of the domain name will be converted,
+ * i.e. it doesn't matter if you call it with a domain that's already in
+ * ASCII.
+ * @memberOf punycode
+ * @param {String} input The domain name or email address to convert, as a
+ * Unicode string.
+ * @returns {String} The Punycode representation of the given domain name or
+ * email address.
+ */
+const toASCII = function(input) {
+	return mapDomain(input, function(string) {
+		return regexNonASCII.test(string)
+			? 'xn--' + encode(string)
+			: string;
+	});
+};
+
+/*--------------------------------------------------------------------------*/
+
+/** Define the public API */
+const punycode = {
+	/**
+	 * A string representing the current Punycode.js version number.
+	 * @memberOf punycode
+	 * @type String
+	 */
+	'version': '2.1.0',
+	/**
+	 * An object of methods to convert from JavaScript's internal character
+	 * representation (UCS-2) to Unicode code points, and back.
+	 * @see <https://mathiasbynens.be/notes/javascript-encoding>
+	 * @memberOf punycode
+	 * @type Object
+	 */
+	'ucs2': {
+		'decode': ucs2decode,
+		'encode': ucs2encode
+	},
+	'decode': decode,
+	'encode': encode,
+	'toASCII': toASCII,
+	'toUnicode': toUnicode
+};
+
+
+/* harmony default export */ const punycode_es6 = (punycode);
+
 // EXTERNAL MODULE: ./Extension/src/pages/services/messenger.js
 var messenger = __webpack_require__(7916);
 ;// CONCATENATED MODULE: ./Extension/src/pages/popup/constants.js
@@ -1777,61 +3567,61 @@ let PopupStore = (_class = class PopupStore {
   constructor() {
     this.TOTAL_BLOCKED_GROUP_ID = 'total';
 
-    (0,initializerDefineProperty/* default */.Z)(this, "isInitialDataReceived", _descriptor, this);
+    _initializerDefineProperty(this, "isInitialDataReceived", _descriptor, this);
 
-    (0,initializerDefineProperty/* default */.Z)(this, "applicationFilteringDisabled", _descriptor2, this);
+    _initializerDefineProperty(this, "applicationFilteringDisabled", _descriptor2, this);
 
-    (0,initializerDefineProperty/* default */.Z)(this, "applicationAvailable", _descriptor3, this);
+    _initializerDefineProperty(this, "applicationAvailable", _descriptor3, this);
 
-    (0,initializerDefineProperty/* default */.Z)(this, "canAddRemoveRule", _descriptor4, this);
+    _initializerDefineProperty(this, "canAddRemoveRule", _descriptor4, this);
 
-    (0,initializerDefineProperty/* default */.Z)(this, "url", _descriptor5, this);
+    _initializerDefineProperty(this, "url", _descriptor5, this);
 
-    (0,initializerDefineProperty/* default */.Z)(this, "annoyanceCountTotal", _descriptor6, this);
+    _initializerDefineProperty(this, "annoyanceCountTotal", _descriptor6, this);
 
-    (0,initializerDefineProperty/* default */.Z)(this, "totalRequests", _descriptor7, this);
+    _initializerDefineProperty(this, "totalRequests", _descriptor7, this);
 
-    (0,initializerDefineProperty/* default */.Z)(this, "totalBlocked", _descriptor8, this);
+    _initializerDefineProperty(this, "totalBlocked", _descriptor8, this);
 
-    (0,initializerDefineProperty/* default */.Z)(this, "blockedDomains", _descriptor9, this);
+    _initializerDefineProperty(this, "blockedDomains", _descriptor9, this);
 
-    (0,initializerDefineProperty/* default */.Z)(this, "totalBlockedTab", _descriptor10, this);
+    _initializerDefineProperty(this, "totalBlockedTab", _descriptor10, this);
 
-    (0,initializerDefineProperty/* default */.Z)(this, "blockedDomainsTab", _descriptor11, this);
+    _initializerDefineProperty(this, "blockedDomainsTab", _descriptor11, this);
 
-    (0,initializerDefineProperty/* default */.Z)(this, "totalBlockedCookieBannersTab", _descriptor12, this);
+    _initializerDefineProperty(this, "totalBlockedCookieBannersTab", _descriptor12, this);
 
-    (0,initializerDefineProperty/* default */.Z)(this, "documentAllowlisted", _descriptor13, this);
+    _initializerDefineProperty(this, "documentAllowlisted", _descriptor13, this);
 
-    (0,initializerDefineProperty/* default */.Z)(this, "userAllowlisted", _descriptor14, this);
+    _initializerDefineProperty(this, "userAllowlisted", _descriptor14, this);
 
-    (0,initializerDefineProperty/* default */.Z)(this, "showInfoAboutFullVersion", _descriptor15, this);
+    _initializerDefineProperty(this, "showInfoAboutFullVersion", _descriptor15, this);
 
-    (0,initializerDefineProperty/* default */.Z)(this, "isEdgeBrowser", _descriptor16, this);
+    _initializerDefineProperty(this, "isEdgeBrowser", _descriptor16, this);
 
-    (0,initializerDefineProperty/* default */.Z)(this, "stats", _descriptor17, this);
+    _initializerDefineProperty(this, "stats", _descriptor17, this);
 
-    (0,initializerDefineProperty/* default */.Z)(this, "selectedTimeRange", _descriptor18, this);
+    _initializerDefineProperty(this, "selectedTimeRange", _descriptor18, this);
 
-    (0,initializerDefineProperty/* default */.Z)(this, "selectedBlockedType", _descriptor19, this);
+    _initializerDefineProperty(this, "selectedBlockedType", _descriptor19, this);
 
-    (0,initializerDefineProperty/* default */.Z)(this, "promoNotification", _descriptor20, this);
+    _initializerDefineProperty(this, "promoNotification", _descriptor20, this);
 
-    (0,initializerDefineProperty/* default */.Z)(this, "hasCustomRulesToReset", _descriptor21, this);
+    _initializerDefineProperty(this, "hasCustomRulesToReset", _descriptor21, this);
 
-    (0,initializerDefineProperty/* default */.Z)(this, "settings", _descriptor22, this);
+    _initializerDefineProperty(this, "settings", _descriptor22, this);
 
-    (0,initializerDefineProperty/* default */.Z)(this, "installDate", _descriptor23, this);
+    _initializerDefineProperty(this, "installDate", _descriptor23, this);
 
     this.currentTabId = null;
 
-    (0,initializerDefineProperty/* default */.Z)(this, "getPopupData", _descriptor24, this);
+    _initializerDefineProperty(this, "getPopupData", _descriptor24, this);
 
-    (0,initializerDefineProperty/* default */.Z)(this, "changeApplicationFilteringDisabled", _descriptor25, this);
+    _initializerDefineProperty(this, "changeApplicationFilteringDisabled", _descriptor25, this);
 
-    (0,initializerDefineProperty/* default */.Z)(this, "toggleAllowlisted", _descriptor26, this);
+    _initializerDefineProperty(this, "toggleAllowlisted", _descriptor26, this);
 
-    (0,initializerDefineProperty/* default */.Z)(this, "getStatisticsData", _descriptor27, this);
+    _initializerDefineProperty(this, "getStatisticsData", _descriptor27, this);
 
     this.getDataByRange = (stats, range) => {
       switch (range) {
@@ -1876,24 +3666,24 @@ let PopupStore = (_class = class PopupStore {
       }
     };
 
-    (0,initializerDefineProperty/* default */.Z)(this, "setSelectedBlockedType", _descriptor28, this);
+    _initializerDefineProperty(this, "setSelectedBlockedType", _descriptor28, this);
 
-    (0,initializerDefineProperty/* default */.Z)(this, "setSelectedTimeRange", _descriptor29, this);
+    _initializerDefineProperty(this, "setSelectedTimeRange", _descriptor29, this);
 
-    (0,initializerDefineProperty/* default */.Z)(this, "closePromoNotification", _descriptor30, this);
+    _initializerDefineProperty(this, "closePromoNotification", _descriptor30, this);
 
-    (0,initializerDefineProperty/* default */.Z)(this, "openPromoNotificationUrl", _descriptor31, this);
+    _initializerDefineProperty(this, "openPromoNotificationUrl", _descriptor31, this);
 
-    (0,initializerDefineProperty/* default */.Z)(this, "updateBlockedStats", _descriptor32, this);
+    _initializerDefineProperty(this, "updateBlockedStats", _descriptor32, this);
 
-    (0,initializerDefineProperty/* default */.Z)(this, "onSettingUpdated", _descriptor33, this);
+    _initializerDefineProperty(this, "onSettingUpdated", _descriptor33, this);
 
     (0,mobx_esm/* makeObservable */.rC)(this);
   }
 
   get currentSite() {
     if (this.applicationAvailable) {
-      return this.domainName ? punycode_es6/* default.toUnicode */.ZP.toUnicode(this.domainName) : this.url;
+      return this.domainName ? punycode_es6.toUnicode(this.domainName) : this.url;
     }
 
     return this.url;
@@ -1984,168 +3774,168 @@ let PopupStore = (_class = class PopupStore {
     return this.settings.values[this.settings.names.PROTECTION_LEVEL];
   }
 
-}, (_descriptor = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "isInitialDataReceived", [mobx_esm/* observable */.LO], {
+}, (_descriptor = _applyDecoratedDescriptor(_class.prototype, "isInitialDataReceived", [mobx_esm/* observable */.LO], {
   configurable: true,
   enumerable: true,
   writable: true,
   initializer: function () {
     return false;
   }
-}), _descriptor2 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "applicationFilteringDisabled", [mobx_esm/* observable */.LO], {
+}), _descriptor2 = _applyDecoratedDescriptor(_class.prototype, "applicationFilteringDisabled", [mobx_esm/* observable */.LO], {
   configurable: true,
   enumerable: true,
   writable: true,
   initializer: function () {
     return null;
   }
-}), _descriptor3 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "applicationAvailable", [mobx_esm/* observable */.LO], {
+}), _descriptor3 = _applyDecoratedDescriptor(_class.prototype, "applicationAvailable", [mobx_esm/* observable */.LO], {
   configurable: true,
   enumerable: true,
   writable: true,
   initializer: function () {
     return true;
   }
-}), _descriptor4 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "canAddRemoveRule", [mobx_esm/* observable */.LO], {
+}), _descriptor4 = _applyDecoratedDescriptor(_class.prototype, "canAddRemoveRule", [mobx_esm/* observable */.LO], {
   configurable: true,
   enumerable: true,
   writable: true,
   initializer: function () {
     return true;
   }
-}), _descriptor5 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "url", [mobx_esm/* observable */.LO], {
+}), _descriptor5 = _applyDecoratedDescriptor(_class.prototype, "url", [mobx_esm/* observable */.LO], {
   configurable: true,
   enumerable: true,
   writable: true,
   initializer: function () {
     return null;
   }
-}), _descriptor6 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "annoyanceCountTotal", [mobx_esm/* observable */.LO], {
+}), _descriptor6 = _applyDecoratedDescriptor(_class.prototype, "annoyanceCountTotal", [mobx_esm/* observable */.LO], {
   configurable: true,
   enumerable: true,
   writable: true,
   initializer: function () {
     return 0;
   }
-}), _descriptor7 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "totalRequests", [mobx_esm/* observable */.LO], {
+}), _descriptor7 = _applyDecoratedDescriptor(_class.prototype, "totalRequests", [mobx_esm/* observable */.LO], {
   configurable: true,
   enumerable: true,
   writable: true,
   initializer: function () {
     return 0;
   }
-}), _descriptor8 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "totalBlocked", [mobx_esm/* observable */.LO], {
+}), _descriptor8 = _applyDecoratedDescriptor(_class.prototype, "totalBlocked", [mobx_esm/* observable */.LO], {
   configurable: true,
   enumerable: true,
   writable: true,
   initializer: function () {
     return 0;
   }
-}), _descriptor9 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "blockedDomains", [mobx_esm/* observable */.LO], {
+}), _descriptor9 = _applyDecoratedDescriptor(_class.prototype, "blockedDomains", [mobx_esm/* observable */.LO], {
   configurable: true,
   enumerable: true,
   writable: true,
   initializer: function () {
     return {};
   }
-}), _descriptor10 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "totalBlockedTab", [mobx_esm/* observable */.LO], {
+}), _descriptor10 = _applyDecoratedDescriptor(_class.prototype, "totalBlockedTab", [mobx_esm/* observable */.LO], {
   configurable: true,
   enumerable: true,
   writable: true,
   initializer: function () {
     return 0;
   }
-}), _descriptor11 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "blockedDomainsTab", [mobx_esm/* observable */.LO], {
+}), _descriptor11 = _applyDecoratedDescriptor(_class.prototype, "blockedDomainsTab", [mobx_esm/* observable */.LO], {
   configurable: true,
   enumerable: true,
   writable: true,
   initializer: function () {
     return {};
   }
-}), _descriptor12 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "totalBlockedCookieBannersTab", [mobx_esm/* observable */.LO], {
+}), _descriptor12 = _applyDecoratedDescriptor(_class.prototype, "totalBlockedCookieBannersTab", [mobx_esm/* observable */.LO], {
   configurable: true,
   enumerable: true,
   writable: true,
   initializer: function () {
     return 0;
   }
-}), _descriptor13 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "documentAllowlisted", [mobx_esm/* observable */.LO], {
+}), _descriptor13 = _applyDecoratedDescriptor(_class.prototype, "documentAllowlisted", [mobx_esm/* observable */.LO], {
   configurable: true,
   enumerable: true,
   writable: true,
   initializer: function () {
     return null;
   }
-}), _descriptor14 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "userAllowlisted", [mobx_esm/* observable */.LO], {
+}), _descriptor14 = _applyDecoratedDescriptor(_class.prototype, "userAllowlisted", [mobx_esm/* observable */.LO], {
   configurable: true,
   enumerable: true,
   writable: true,
   initializer: function () {
     return null;
   }
-}), _descriptor15 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "showInfoAboutFullVersion", [mobx_esm/* observable */.LO], {
+}), _descriptor15 = _applyDecoratedDescriptor(_class.prototype, "showInfoAboutFullVersion", [mobx_esm/* observable */.LO], {
   configurable: true,
   enumerable: true,
   writable: true,
   initializer: function () {
     return true;
   }
-}), _descriptor16 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "isEdgeBrowser", [mobx_esm/* observable */.LO], {
+}), _descriptor16 = _applyDecoratedDescriptor(_class.prototype, "isEdgeBrowser", [mobx_esm/* observable */.LO], {
   configurable: true,
   enumerable: true,
   writable: true,
   initializer: function () {
     return false;
   }
-}), _descriptor17 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "stats", [mobx_esm/* observable */.LO], {
+}), _descriptor17 = _applyDecoratedDescriptor(_class.prototype, "stats", [mobx_esm/* observable */.LO], {
   configurable: true,
   enumerable: true,
   writable: true,
   initializer: function () {
     return null;
   }
-}), _descriptor18 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "selectedTimeRange", [mobx_esm/* observable */.LO], {
+}), _descriptor18 = _applyDecoratedDescriptor(_class.prototype, "selectedTimeRange", [mobx_esm/* observable */.LO], {
   configurable: true,
   enumerable: true,
   writable: true,
   initializer: function () {
     return TIME_RANGES.WEEK;
   }
-}), _descriptor19 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "selectedBlockedType", [mobx_esm/* observable */.LO], {
+}), _descriptor19 = _applyDecoratedDescriptor(_class.prototype, "selectedBlockedType", [mobx_esm/* observable */.LO], {
   configurable: true,
   enumerable: true,
   writable: true,
   initializer: function () {
     return this.TOTAL_BLOCKED_GROUP_ID;
   }
-}), _descriptor20 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "promoNotification", [mobx_esm/* observable */.LO], {
+}), _descriptor20 = _applyDecoratedDescriptor(_class.prototype, "promoNotification", [mobx_esm/* observable */.LO], {
   configurable: true,
   enumerable: true,
   writable: true,
   initializer: function () {
     return null;
   }
-}), _descriptor21 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "hasCustomRulesToReset", [mobx_esm/* observable */.LO], {
+}), _descriptor21 = _applyDecoratedDescriptor(_class.prototype, "hasCustomRulesToReset", [mobx_esm/* observable */.LO], {
   configurable: true,
   enumerable: true,
   writable: true,
   initializer: function () {
     return false;
   }
-}), _descriptor22 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "settings", [mobx_esm/* observable */.LO], {
+}), _descriptor22 = _applyDecoratedDescriptor(_class.prototype, "settings", [mobx_esm/* observable */.LO], {
   configurable: true,
   enumerable: true,
   writable: true,
   initializer: function () {
     return null;
   }
-}), _descriptor23 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "installDate", [mobx_esm/* observable */.LO], {
+}), _descriptor23 = _applyDecoratedDescriptor(_class.prototype, "installDate", [mobx_esm/* observable */.LO], {
   configurable: true,
   enumerable: true,
   writable: true,
   initializer: function () {
     return null;
   }
-}), _descriptor24 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "getPopupData", [mobx_esm/* action */.aD], {
+}), _descriptor24 = _applyDecoratedDescriptor(_class.prototype, "getPopupData", [mobx_esm/* action */.aD], {
   configurable: true,
   enumerable: true,
   writable: true,
@@ -2201,7 +3991,7 @@ let PopupStore = (_class = class PopupStore {
       });
     };
   }
-}), _descriptor25 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "changeApplicationFilteringDisabled", [mobx_esm/* action */.aD], {
+}), _descriptor25 = _applyDecoratedDescriptor(_class.prototype, "changeApplicationFilteringDisabled", [mobx_esm/* action */.aD], {
   configurable: true,
   enumerable: true,
   writable: true,
@@ -2213,7 +4003,7 @@ let PopupStore = (_class = class PopupStore {
       });
     };
   }
-}), (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "currentSite", [mobx_esm/* computed */.Fl], Object.getOwnPropertyDescriptor(_class.prototype, "currentSite"), _class.prototype), (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "currentStatusMessage", [mobx_esm/* computed */.Fl], Object.getOwnPropertyDescriptor(_class.prototype, "currentStatusMessage"), _class.prototype), _descriptor26 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "toggleAllowlisted", [mobx_esm/* action */.aD], {
+}), _applyDecoratedDescriptor(_class.prototype, "currentSite", [mobx_esm/* computed */.Fl], Object.getOwnPropertyDescriptor(_class.prototype, "currentSite"), _class.prototype), _applyDecoratedDescriptor(_class.prototype, "currentStatusMessage", [mobx_esm/* computed */.Fl], Object.getOwnPropertyDescriptor(_class.prototype, "currentStatusMessage"), _class.prototype), _descriptor26 = _applyDecoratedDescriptor(_class.prototype, "toggleAllowlisted", [mobx_esm/* action */.aD], {
   configurable: true,
   enumerable: true,
   writable: true,
@@ -2245,7 +4035,7 @@ let PopupStore = (_class = class PopupStore {
       });
     };
   }
-}), (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "popupState", [mobx_esm/* computed */.Fl], Object.getOwnPropertyDescriptor(_class.prototype, "popupState"), _class.prototype), _descriptor27 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "getStatisticsData", [mobx_esm/* action */.aD], {
+}), _applyDecoratedDescriptor(_class.prototype, "popupState", [mobx_esm/* computed */.Fl], Object.getOwnPropertyDescriptor(_class.prototype, "popupState"), _class.prototype), _descriptor27 = _applyDecoratedDescriptor(_class.prototype, "getStatisticsData", [mobx_esm/* action */.aD], {
   configurable: true,
   enumerable: true,
   writable: true,
@@ -2259,7 +4049,7 @@ let PopupStore = (_class = class PopupStore {
       });
     };
   }
-}), (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "statsDataByType", [mobx_esm/* computed */.Fl], Object.getOwnPropertyDescriptor(_class.prototype, "statsDataByType"), _class.prototype), _descriptor28 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "setSelectedBlockedType", [mobx_esm/* action */.aD], {
+}), _applyDecoratedDescriptor(_class.prototype, "statsDataByType", [mobx_esm/* computed */.Fl], Object.getOwnPropertyDescriptor(_class.prototype, "statsDataByType"), _class.prototype), _descriptor28 = _applyDecoratedDescriptor(_class.prototype, "setSelectedBlockedType", [mobx_esm/* action */.aD], {
   configurable: true,
   enumerable: true,
   writable: true,
@@ -2268,7 +4058,7 @@ let PopupStore = (_class = class PopupStore {
       this.selectedBlockedType = value;
     };
   }
-}), _descriptor29 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "setSelectedTimeRange", [mobx_esm/* action */.aD], {
+}), _descriptor29 = _applyDecoratedDescriptor(_class.prototype, "setSelectedTimeRange", [mobx_esm/* action */.aD], {
   configurable: true,
   enumerable: true,
   writable: true,
@@ -2277,7 +4067,7 @@ let PopupStore = (_class = class PopupStore {
       this.selectedTimeRange = value;
     };
   }
-}), _descriptor30 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "closePromoNotification", [mobx_esm/* action */.aD], {
+}), _descriptor30 = _applyDecoratedDescriptor(_class.prototype, "closePromoNotification", [mobx_esm/* action */.aD], {
   configurable: true,
   enumerable: true,
   writable: true,
@@ -2289,7 +4079,7 @@ let PopupStore = (_class = class PopupStore {
       });
     };
   }
-}), _descriptor31 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "openPromoNotificationUrl", [mobx_esm/* action */.aD], {
+}), _descriptor31 = _applyDecoratedDescriptor(_class.prototype, "openPromoNotificationUrl", [mobx_esm/* action */.aD], {
   configurable: true,
   enumerable: true,
   writable: true,
@@ -2310,7 +4100,7 @@ let PopupStore = (_class = class PopupStore {
       });
     };
   }
-}), _descriptor32 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "updateBlockedStats", [mobx_esm/* action */.aD], {
+}), _descriptor32 = _applyDecoratedDescriptor(_class.prototype, "updateBlockedStats", [mobx_esm/* action */.aD], {
   configurable: true,
   enumerable: true,
   writable: true,
@@ -2323,7 +4113,7 @@ let PopupStore = (_class = class PopupStore {
       this.annoyanceCountTotal = tabInfo.annoyanceCountTotal;
     };
   }
-}), _descriptor33 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "onSettingUpdated", [mobx_esm/* action */.aD], {
+}), _descriptor33 = _applyDecoratedDescriptor(_class.prototype, "onSettingUpdated", [mobx_esm/* action */.aD], {
   configurable: true,
   enumerable: true,
   writable: true,
@@ -2336,16 +4126,9437 @@ let PopupStore = (_class = class PopupStore {
       this.settings.values[name] = value;
     };
   }
-}), (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "appearanceTheme", [mobx_esm/* computed */.Fl], Object.getOwnPropertyDescriptor(_class.prototype, "appearanceTheme"), _class.prototype), (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "protectionLevel", [mobx_esm/* computed */.Fl], Object.getOwnPropertyDescriptor(_class.prototype, "protectionLevel"), _class.prototype)), _class);
+}), _applyDecoratedDescriptor(_class.prototype, "appearanceTheme", [mobx_esm/* computed */.Fl], Object.getOwnPropertyDescriptor(_class.prototype, "appearanceTheme"), _class.prototype), _applyDecoratedDescriptor(_class.prototype, "protectionLevel", [mobx_esm/* computed */.Fl], Object.getOwnPropertyDescriptor(_class.prototype, "protectionLevel"), _class.prototype)), _class);
 const popupStore = /*#__PURE__*/(0,react.createContext)(new PopupStore());
-// EXTERNAL MODULE: ./Extension/src/pages/options/stores/RootStore.js + 9 modules
-var RootStore = __webpack_require__(1442);
-// EXTERNAL MODULE: ./Extension/src/background/utils/optional-permissions.js
-var optional_permissions = __webpack_require__(5753);
-// EXTERNAL MODULE: ./Extension/src/pages/popup/components/MainContainer/Main/PermissionsMissing/index.jsx + 1 modules
-var PermissionsMissing = __webpack_require__(9234);
-// EXTERNAL MODULE: ./Extension/src/background/extension-api/browser.js
-var browser = __webpack_require__(2273);
+// EXTERNAL MODULE: ./Extension/src/common/log.js
+var log = __webpack_require__(9224);
+// EXTERNAL MODULE: ./node_modules/xstate/es/_virtual/_tslib.js
+var _tslib = __webpack_require__(3388);
+// EXTERNAL MODULE: ./node_modules/xstate/es/types.js
+var types = __webpack_require__(1329);
+// EXTERNAL MODULE: ./node_modules/xstate/es/constants.js
+var es_constants = __webpack_require__(1231);
+// EXTERNAL MODULE: ./node_modules/xstate/es/utils.js
+var utils = __webpack_require__(8351);
+;// CONCATENATED MODULE: ./node_modules/xstate/es/stateUtils.js
+
+
+
+var isLeafNode = function (stateNode) {
+  return stateNode.type === 'atomic' || stateNode.type === 'final';
+};
+function getChildren(stateNode) {
+  return Object.keys(stateNode.states).map(function (key) {
+    return stateNode.states[key];
+  });
+}
+function getAllStateNodes(stateNode) {
+  var stateNodes = [stateNode];
+
+  if (isLeafNode(stateNode)) {
+    return stateNodes;
+  }
+
+  return stateNodes.concat((0,utils/* flatten */.xH)(getChildren(stateNode).map(getAllStateNodes)));
+}
+function getConfiguration(prevStateNodes, stateNodes) {
+  var e_1, _a, e_2, _b, e_3, _c, e_4, _d;
+
+  var prevConfiguration = new Set(prevStateNodes);
+  var prevAdjList = getAdjList(prevConfiguration);
+  var configuration = new Set(stateNodes);
+
+  try {
+    // add all ancestors
+    for (var configuration_1 = (0,_tslib/* __values */.XA)(configuration), configuration_1_1 = configuration_1.next(); !configuration_1_1.done; configuration_1_1 = configuration_1.next()) {
+      var s = configuration_1_1.value;
+      var m = s.parent;
+
+      while (m && !configuration.has(m)) {
+        configuration.add(m);
+        m = m.parent;
+      }
+    }
+  } catch (e_1_1) {
+    e_1 = {
+      error: e_1_1
+    };
+  } finally {
+    try {
+      if (configuration_1_1 && !configuration_1_1.done && (_a = configuration_1.return)) _a.call(configuration_1);
+    } finally {
+      if (e_1) throw e_1.error;
+    }
+  }
+
+  var adjList = getAdjList(configuration);
+
+  try {
+    // add descendants
+    for (var configuration_2 = (0,_tslib/* __values */.XA)(configuration), configuration_2_1 = configuration_2.next(); !configuration_2_1.done; configuration_2_1 = configuration_2.next()) {
+      var s = configuration_2_1.value; // if previously active, add existing child nodes
+
+      if (s.type === 'compound' && (!adjList.get(s) || !adjList.get(s).length)) {
+        if (prevAdjList.get(s)) {
+          prevAdjList.get(s).forEach(function (sn) {
+            return configuration.add(sn);
+          });
+        } else {
+          s.initialStateNodes.forEach(function (sn) {
+            return configuration.add(sn);
+          });
+        }
+      } else {
+        if (s.type === 'parallel') {
+          try {
+            for (var _e = (e_3 = void 0, (0,_tslib/* __values */.XA)(getChildren(s))), _f = _e.next(); !_f.done; _f = _e.next()) {
+              var child = _f.value;
+
+              if (child.type === 'history') {
+                continue;
+              }
+
+              if (!configuration.has(child)) {
+                configuration.add(child);
+
+                if (prevAdjList.get(child)) {
+                  prevAdjList.get(child).forEach(function (sn) {
+                    return configuration.add(sn);
+                  });
+                } else {
+                  child.initialStateNodes.forEach(function (sn) {
+                    return configuration.add(sn);
+                  });
+                }
+              }
+            }
+          } catch (e_3_1) {
+            e_3 = {
+              error: e_3_1
+            };
+          } finally {
+            try {
+              if (_f && !_f.done && (_c = _e.return)) _c.call(_e);
+            } finally {
+              if (e_3) throw e_3.error;
+            }
+          }
+        }
+      }
+    }
+  } catch (e_2_1) {
+    e_2 = {
+      error: e_2_1
+    };
+  } finally {
+    try {
+      if (configuration_2_1 && !configuration_2_1.done && (_b = configuration_2.return)) _b.call(configuration_2);
+    } finally {
+      if (e_2) throw e_2.error;
+    }
+  }
+
+  try {
+    // add all ancestors
+    for (var configuration_3 = (0,_tslib/* __values */.XA)(configuration), configuration_3_1 = configuration_3.next(); !configuration_3_1.done; configuration_3_1 = configuration_3.next()) {
+      var s = configuration_3_1.value;
+      var m = s.parent;
+
+      while (m && !configuration.has(m)) {
+        configuration.add(m);
+        m = m.parent;
+      }
+    }
+  } catch (e_4_1) {
+    e_4 = {
+      error: e_4_1
+    };
+  } finally {
+    try {
+      if (configuration_3_1 && !configuration_3_1.done && (_d = configuration_3.return)) _d.call(configuration_3);
+    } finally {
+      if (e_4) throw e_4.error;
+    }
+  }
+
+  return configuration;
+}
+
+function getValueFromAdj(baseNode, adjList) {
+  var childStateNodes = adjList.get(baseNode);
+
+  if (!childStateNodes) {
+    return {}; // todo: fix?
+  }
+
+  if (baseNode.type === 'compound') {
+    var childStateNode = childStateNodes[0];
+
+    if (childStateNode) {
+      if (isLeafNode(childStateNode)) {
+        return childStateNode.key;
+      }
+    } else {
+      return {};
+    }
+  }
+
+  var stateValue = {};
+  childStateNodes.forEach(function (csn) {
+    stateValue[csn.key] = getValueFromAdj(csn, adjList);
+  });
+  return stateValue;
+}
+
+function getAdjList(configuration) {
+  var e_5, _a;
+
+  var adjList = new Map();
+
+  try {
+    for (var configuration_4 = (0,_tslib/* __values */.XA)(configuration), configuration_4_1 = configuration_4.next(); !configuration_4_1.done; configuration_4_1 = configuration_4.next()) {
+      var s = configuration_4_1.value;
+
+      if (!adjList.has(s)) {
+        adjList.set(s, []);
+      }
+
+      if (s.parent) {
+        if (!adjList.has(s.parent)) {
+          adjList.set(s.parent, []);
+        }
+
+        adjList.get(s.parent).push(s);
+      }
+    }
+  } catch (e_5_1) {
+    e_5 = {
+      error: e_5_1
+    };
+  } finally {
+    try {
+      if (configuration_4_1 && !configuration_4_1.done && (_a = configuration_4.return)) _a.call(configuration_4);
+    } finally {
+      if (e_5) throw e_5.error;
+    }
+  }
+
+  return adjList;
+}
+function getValue(rootNode, configuration) {
+  var config = getConfiguration([rootNode], configuration);
+  return getValueFromAdj(rootNode, getAdjList(config));
+}
+function has(iterable, item) {
+  if (Array.isArray(iterable)) {
+    return iterable.some(function (member) {
+      return member === item;
+    });
+  }
+
+  if (iterable instanceof Set) {
+    return iterable.has(item);
+  }
+
+  return false; // TODO: fix
+}
+function nextEvents(configuration) {
+  return (0,_tslib/* __spreadArray */.ev)([], (0,_tslib/* __read */.CR)(new Set((0,utils/* flatten */.xH)((0,_tslib/* __spreadArray */.ev)([], (0,_tslib/* __read */.CR)(configuration.map(function (sn) {
+    return sn.ownEvents;
+  })), false)))), false);
+}
+function isInFinalState(configuration, stateNode) {
+  if (stateNode.type === 'compound') {
+    return getChildren(stateNode).some(function (s) {
+      return s.type === 'final' && has(configuration, s);
+    });
+  }
+
+  if (stateNode.type === 'parallel') {
+    return getChildren(stateNode).every(function (sn) {
+      return isInFinalState(configuration, sn);
+    });
+  }
+
+  return false;
+}
+function getMeta(configuration) {
+  if (configuration === void 0) {
+    configuration = [];
+  }
+
+  return configuration.reduce(function (acc, stateNode) {
+    if (stateNode.meta !== undefined) {
+      acc[stateNode.id] = stateNode.meta;
+    }
+
+    return acc;
+  }, {});
+}
+function getTagsFromConfiguration(configuration) {
+  return new Set((0,utils/* flatten */.xH)(configuration.map(function (sn) {
+    return sn.tags;
+  })));
+}
+
+
+
+// EXTERNAL MODULE: ./node_modules/xstate/es/actions.js
+var es_actions = __webpack_require__(1020);
+// EXTERNAL MODULE: ./node_modules/xstate/es/environment.js
+var environment = __webpack_require__(8685);
+;// CONCATENATED MODULE: ./node_modules/xstate/es/State.js
+
+
+
+
+
+
+
+function stateValuesEqual(a, b) {
+  if (a === b) {
+    return true;
+  }
+
+  if (a === undefined || b === undefined) {
+    return false;
+  }
+
+  if ((0,utils/* isString */.HD)(a) || (0,utils/* isString */.HD)(b)) {
+    return a === b;
+  }
+
+  var aKeys = Object.keys(a);
+  var bKeys = Object.keys(b);
+  return aKeys.length === bKeys.length && aKeys.every(function (key) {
+    return stateValuesEqual(a[key], b[key]);
+  });
+}
+function isStateConfig(state) {
+  if (typeof state !== 'object' || state === null) {
+    return false;
+  }
+
+  return 'value' in state && '_event' in state;
+}
+/**
+ * @deprecated Use `isStateConfig(object)` or `state instanceof State` instead.
+ */
+
+var isState = (/* unused pure expression or super */ null && (isStateConfig));
+function bindActionToState(action, state) {
+  var exec = action.exec;
+
+  var boundAction = (0,_tslib/* __assign */.pi)((0,_tslib/* __assign */.pi)({}, action), {
+    exec: exec !== undefined ? function () {
+      return exec(state.context, state.event, {
+        action: action,
+        state: state,
+        _event: state._event
+      });
+    } : undefined
+  });
+
+  return boundAction;
+}
+
+var State =
+/*#__PURE__*/
+
+/** @class */
+function () {
+  /**
+   * Creates a new State instance.
+   * @param value The state value
+   * @param context The extended state
+   * @param historyValue The tree representing historical values of the state nodes
+   * @param history The previous state
+   * @param actions An array of action objects to execute as side-effects
+   * @param activities A mapping of activities and whether they are started (`true`) or stopped (`false`).
+   * @param meta
+   * @param events Internal event queue. Should be empty with run-to-completion semantics.
+   * @param configuration
+   */
+  function State(config) {
+    var _this = this;
+
+    var _a;
+
+    this.actions = [];
+    this.activities = es_constants/* EMPTY_ACTIVITY_MAP */.qP;
+    this.meta = {};
+    this.events = [];
+    this.value = config.value;
+    this.context = config.context;
+    this._event = config._event;
+    this._sessionid = config._sessionid;
+    this.event = this._event.data;
+    this.historyValue = config.historyValue;
+    this.history = config.history;
+    this.actions = config.actions || [];
+    this.activities = config.activities || es_constants/* EMPTY_ACTIVITY_MAP */.qP;
+    this.meta = getMeta(config.configuration);
+    this.events = config.events || [];
+    this.matches = this.matches.bind(this);
+    this.toStrings = this.toStrings.bind(this);
+    this.configuration = config.configuration;
+    this.transitions = config.transitions;
+    this.children = config.children;
+    this.done = !!config.done;
+    this.tags = (_a = Array.isArray(config.tags) ? new Set(config.tags) : config.tags) !== null && _a !== void 0 ? _a : new Set();
+    this.machine = config.machine;
+    Object.defineProperty(this, 'nextEvents', {
+      get: function () {
+        return nextEvents(_this.configuration);
+      }
+    });
+  }
+  /**
+   * Creates a new State instance for the given `stateValue` and `context`.
+   * @param stateValue
+   * @param context
+   */
+
+
+  State.from = function (stateValue, context) {
+    if (stateValue instanceof State) {
+      if (stateValue.context !== context) {
+        return new State({
+          value: stateValue.value,
+          context: context,
+          _event: stateValue._event,
+          _sessionid: null,
+          historyValue: stateValue.historyValue,
+          history: stateValue.history,
+          actions: [],
+          activities: stateValue.activities,
+          meta: {},
+          events: [],
+          configuration: [],
+          transitions: [],
+          children: {}
+        });
+      }
+
+      return stateValue;
+    }
+
+    var _event = es_actions/* initEvent */.bf;
+    return new State({
+      value: stateValue,
+      context: context,
+      _event: _event,
+      _sessionid: null,
+      historyValue: undefined,
+      history: undefined,
+      actions: [],
+      activities: undefined,
+      meta: undefined,
+      events: [],
+      configuration: [],
+      transitions: [],
+      children: {}
+    });
+  };
+  /**
+   * Creates a new State instance for the given `config`.
+   * @param config The state config
+   */
+
+
+  State.create = function (config) {
+    return new State(config);
+  };
+  /**
+   * Creates a new `State` instance for the given `stateValue` and `context` with no actions (side-effects).
+   * @param stateValue
+   * @param context
+   */
+
+
+  State.inert = function (stateValue, context) {
+    if (stateValue instanceof State) {
+      if (!stateValue.actions.length) {
+        return stateValue;
+      }
+
+      var _event = es_actions/* initEvent */.bf;
+      return new State({
+        value: stateValue.value,
+        context: context,
+        _event: _event,
+        _sessionid: null,
+        historyValue: stateValue.historyValue,
+        history: stateValue.history,
+        activities: stateValue.activities,
+        configuration: stateValue.configuration,
+        transitions: [],
+        children: {}
+      });
+    }
+
+    return State.from(stateValue, context);
+  };
+  /**
+   * Returns an array of all the string leaf state node paths.
+   * @param stateValue
+   * @param delimiter The character(s) that separate each subpath in the string state node path.
+   */
+
+
+  State.prototype.toStrings = function (stateValue, delimiter) {
+    var _this = this;
+
+    if (stateValue === void 0) {
+      stateValue = this.value;
+    }
+
+    if (delimiter === void 0) {
+      delimiter = '.';
+    }
+
+    if ((0,utils/* isString */.HD)(stateValue)) {
+      return [stateValue];
+    }
+
+    var valueKeys = Object.keys(stateValue);
+    return valueKeys.concat.apply(valueKeys, (0,_tslib/* __spreadArray */.ev)([], (0,_tslib/* __read */.CR)(valueKeys.map(function (key) {
+      return _this.toStrings(stateValue[key], delimiter).map(function (s) {
+        return key + delimiter + s;
+      });
+    })), false));
+  };
+
+  State.prototype.toJSON = function () {
+    var _a = this;
+        _a.configuration;
+        _a.transitions;
+        var tags = _a.tags;
+        _a.machine;
+        var jsonValues = (0,_tslib/* __rest */._T)(_a, ["configuration", "transitions", "tags", "machine"]);
+
+    return (0,_tslib/* __assign */.pi)((0,_tslib/* __assign */.pi)({}, jsonValues), {
+      tags: Array.from(tags)
+    });
+  };
+
+  State.prototype.matches = function (parentStateValue) {
+    return (0,utils/* matchesState */.W)(parentStateValue, this.value);
+  };
+  /**
+   * Whether the current state configuration has a state node with the specified `tag`.
+   * @param tag
+   */
+
+
+  State.prototype.hasTag = function (tag) {
+    return this.tags.has(tag);
+  };
+  /**
+   * Determines whether sending the `event` will cause a non-forbidden transition
+   * to be selected, even if the transitions have no actions nor
+   * change the state value.
+   *
+   * @param event The event to test
+   * @returns Whether the event will cause a transition
+   */
+
+
+  State.prototype.can = function (event) {
+    var _a;
+
+    if (environment/* IS_PRODUCTION */.M) {
+      (0,utils/* warn */.ZK)(!!this.machine, "state.can(...) used outside of a machine-created State object; this will always return false.");
+    }
+
+    var transitionData = (_a = this.machine) === null || _a === void 0 ? void 0 : _a.getTransitionData(this, event);
+    return !!(transitionData === null || transitionData === void 0 ? void 0 : transitionData.transitions.length) && // Check that at least one transition is not forbidden
+    transitionData.transitions.some(function (t) {
+      return t.target !== undefined || t.actions.length;
+    });
+  };
+
+  return State;
+}();
+
+
+
+// EXTERNAL MODULE: ./node_modules/xstate/es/actionTypes.js
+var actionTypes = __webpack_require__(127);
+;// CONCATENATED MODULE: ./node_modules/xstate/es/scheduler.js
+
+
+var defaultOptions = {
+  deferEvents: false
+};
+
+var Scheduler =
+/*#__PURE__*/
+
+/** @class */
+function () {
+  function Scheduler(options) {
+    this.processingEvent = false;
+    this.queue = [];
+    this.initialized = false;
+    this.options = (0,_tslib/* __assign */.pi)((0,_tslib/* __assign */.pi)({}, defaultOptions), options);
+  }
+
+  Scheduler.prototype.initialize = function (callback) {
+    this.initialized = true;
+
+    if (callback) {
+      if (!this.options.deferEvents) {
+        this.schedule(callback);
+        return;
+      }
+
+      this.process(callback);
+    }
+
+    this.flushEvents();
+  };
+
+  Scheduler.prototype.schedule = function (task) {
+    if (!this.initialized || this.processingEvent) {
+      this.queue.push(task);
+      return;
+    }
+
+    if (this.queue.length !== 0) {
+      throw new Error('Event queue should be empty when it is not processing events');
+    }
+
+    this.process(task);
+    this.flushEvents();
+  };
+
+  Scheduler.prototype.clear = function () {
+    this.queue = [];
+  };
+
+  Scheduler.prototype.flushEvents = function () {
+    var nextCallback = this.queue.shift();
+
+    while (nextCallback) {
+      this.process(nextCallback);
+      nextCallback = this.queue.shift();
+    }
+  };
+
+  Scheduler.prototype.process = function (callback) {
+    this.processingEvent = true;
+
+    try {
+      callback();
+    } catch (e) {
+      // there is no use to keep the future events
+      // as the situation is not anymore the same
+      this.clear();
+      throw e;
+    } finally {
+      this.processingEvent = false;
+    }
+  };
+
+  return Scheduler;
+}();
+
+
+
+;// CONCATENATED MODULE: ./node_modules/xstate/es/serviceScope.js
+/**
+ * Maintains a stack of the current service in scope.
+ * This is used to provide the correct service to spawn().
+ */
+var serviceStack = [];
+var provide = function (service, fn) {
+  serviceStack.push(service);
+  var result = fn(service);
+  serviceStack.pop();
+  return result;
+};
+var serviceScope_consume = function (fn) {
+  return fn(serviceStack[serviceStack.length - 1]);
+};
+
+
+
+;// CONCATENATED MODULE: ./node_modules/xstate/es/Actor.js
+
+
+
+
+function createNullActor(id) {
+  var _a;
+
+  return _a = {
+    id: id,
+    send: function () {
+      return void 0;
+    },
+    subscribe: function () {
+      return {
+        unsubscribe: function () {
+          return void 0;
+        }
+      };
+    },
+    getSnapshot: function () {
+      return undefined;
+    },
+    toJSON: function () {
+      return {
+        id: id
+      };
+    }
+  }, _a[utils/* symbolObservable */.L$] = function () {
+    return this;
+  }, _a;
+}
+/**
+ * Creates a deferred actor that is able to be invoked given the provided
+ * invocation information in its `.meta` value.
+ *
+ * @param invokeDefinition The meta information needed to invoke the actor.
+ */
+
+function createInvocableActor(invokeDefinition, machine, context, _event) {
+  var _a;
+
+  var invokeSrc = (0,utils/* toInvokeSource */.j)(invokeDefinition.src);
+  var serviceCreator = (_a = machine === null || machine === void 0 ? void 0 : machine.options.services) === null || _a === void 0 ? void 0 : _a[invokeSrc.type];
+  var resolvedData = invokeDefinition.data ? (0,utils/* mapContext */.QX)(invokeDefinition.data, context, _event) : undefined;
+  var tempActor = serviceCreator ? Actor_createDeferredActor(serviceCreator, invokeDefinition.id, resolvedData) : createNullActor(invokeDefinition.id); // @ts-ignore
+
+  tempActor.meta = invokeDefinition;
+  return tempActor;
+}
+function Actor_createDeferredActor(entity, id, data) {
+  var tempActor = createNullActor(id); // @ts-ignore
+
+  tempActor.deferred = true;
+
+  if ((0,utils/* isMachine */.O4)(entity)) {
+    // "mute" the existing service scope so potential spawned actors within the `.initialState` stay deferred here
+    var initialState_1 = tempActor.state = provide(undefined, function () {
+      return (data ? entity.withContext(data) : entity).initialState;
+    });
+
+    tempActor.getSnapshot = function () {
+      return initialState_1;
+    };
+  }
+
+  return tempActor;
+}
+function isActor(item) {
+  try {
+    return typeof item.send === 'function';
+  } catch (e) {
+    return false;
+  }
+}
+function isSpawnedActor(item) {
+  return isActor(item) && 'id' in item;
+} // TODO: refactor the return type, this could be written in a better way but it's best to avoid unneccessary breaking changes now
+
+function toActorRef(actorRefLike) {
+  var _a;
+
+  return (0,_tslib/* __assign */.pi)((_a = {
+    subscribe: function () {
+      return {
+        unsubscribe: function () {
+          return void 0;
+        }
+      };
+    },
+    id: 'anonymous',
+    getSnapshot: function () {
+      return undefined;
+    }
+  }, _a[utils/* symbolObservable */.L$] = function () {
+    return this;
+  }, _a), actorRefLike);
+}
+
+
+
+;// CONCATENATED MODULE: ./node_modules/xstate/es/registry.js
+var children = /*#__PURE__*/new Map();
+var sessionIdIndex = 0;
+var registry = {
+  bookId: function () {
+    return "x:".concat(sessionIdIndex++);
+  },
+  register: function (id, actor) {
+    children.set(id, actor);
+    return id;
+  },
+  get: function (id) {
+    return children.get(id);
+  },
+  free: function (id) {
+    children.delete(id);
+  }
+};
+
+
+
+;// CONCATENATED MODULE: ./node_modules/xstate/es/devTools.js
+
+
+function getGlobal() {
+  if (typeof globalThis !== 'undefined') {
+    return globalThis;
+  }
+
+  if (typeof self !== 'undefined') {
+    return self;
+  }
+
+  if (typeof window !== 'undefined') {
+    return window;
+  }
+
+  if (typeof __webpack_require__.g !== 'undefined') {
+    return __webpack_require__.g;
+  }
+
+  if (!environment/* IS_PRODUCTION */.M) {
+    console.warn('XState could not find a global object in this environment. Please let the maintainers know and raise an issue here: https://github.com/statelyai/xstate/issues');
+  }
+}
+
+function getDevTools() {
+  var global = getGlobal();
+
+  if (global && '__xstate__' in global) {
+    return global.__xstate__;
+  }
+
+  return undefined;
+}
+
+function registerService(service) {
+  if (!getGlobal()) {
+    return;
+  }
+
+  var devTools = getDevTools();
+
+  if (devTools) {
+    devTools.register(service);
+  }
+}
+
+
+
+;// CONCATENATED MODULE: ./node_modules/xstate/es/behaviors.js
+
+
+
+
+/**
+ * Returns an actor behavior from a reducer and its initial state.
+ *
+ * @param transition The pure reducer that returns the next state given the current state and event.
+ * @param initialState The initial state of the reducer.
+ * @returns An actor behavior
+ */
+
+function fromReducer(transition, initialState) {
+  return {
+    transition: transition,
+    initialState: initialState
+  };
+}
+function fromPromise(promiseFn) {
+  var initialState = {
+    error: undefined,
+    data: undefined,
+    status: 'pending'
+  };
+  return {
+    transition: function (state, event, _a) {
+      var parent = _a.parent,
+          id = _a.id,
+          observers = _a.observers;
+
+      switch (event.type) {
+        case 'fulfill':
+          parent === null || parent === void 0 ? void 0 : parent.send(doneInvoke(id, event.data));
+          return {
+            error: undefined,
+            data: event.data,
+            status: 'fulfilled'
+          };
+
+        case 'reject':
+          parent === null || parent === void 0 ? void 0 : parent.send(error(id, event.error));
+          observers.forEach(function (observer) {
+            observer.error(event.error);
+          });
+          return {
+            error: event.error,
+            data: undefined,
+            status: 'rejected'
+          };
+
+        default:
+          return state;
+      }
+    },
+    initialState: initialState,
+    start: function (_a) {
+      var self = _a.self;
+      promiseFn().then(function (data) {
+        self.send({
+          type: 'fulfill',
+          data: data
+        });
+      }, function (reason) {
+        self.send({
+          type: 'reject',
+          error: reason
+        });
+      });
+      return initialState;
+    }
+  };
+}
+function spawnBehavior(behavior, options) {
+  if (options === void 0) {
+    options = {};
+  }
+
+  var state = behavior.initialState;
+  var observers = new Set();
+  var mailbox = [];
+  var flushing = false;
+
+  var flush = function () {
+    if (flushing) {
+      return;
+    }
+
+    flushing = true;
+
+    while (mailbox.length > 0) {
+      var event_1 = mailbox.shift();
+      state = behavior.transition(state, event_1, actorCtx);
+      observers.forEach(function (observer) {
+        return observer.next(state);
+      });
+    }
+
+    flushing = false;
+  };
+
+  var actor = toActorRef({
+    id: options.id,
+    send: function (event) {
+      mailbox.push(event);
+      flush();
+    },
+    getSnapshot: function () {
+      return state;
+    },
+    subscribe: function (next, handleError, complete) {
+      var observer = (0,utils/* toObserver */.zM)(next, handleError, complete);
+      observers.add(observer);
+      observer.next(state);
+      return {
+        unsubscribe: function () {
+          observers.delete(observer);
+        }
+      };
+    }
+  });
+  var actorCtx = {
+    parent: options.parent,
+    self: actor,
+    id: options.id || 'anonymous',
+    observers: observers
+  };
+  state = behavior.start ? behavior.start(actorCtx) : state;
+  return actor;
+}
+
+
+
+;// CONCATENATED MODULE: ./node_modules/xstate/es/interpreter.js
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var DEFAULT_SPAWN_OPTIONS = {
+  sync: false,
+  autoForward: false
+};
+var InterpreterStatus;
+
+(function (InterpreterStatus) {
+  InterpreterStatus[InterpreterStatus["NotStarted"] = 0] = "NotStarted";
+  InterpreterStatus[InterpreterStatus["Running"] = 1] = "Running";
+  InterpreterStatus[InterpreterStatus["Stopped"] = 2] = "Stopped";
+})(InterpreterStatus || (InterpreterStatus = {}));
+
+var Interpreter =
+/*#__PURE__*/
+
+/** @class */
+function () {
+  /**
+   * Creates a new Interpreter instance (i.e., service) for the given machine with the provided options, if any.
+   *
+   * @param machine The machine to be interpreted
+   * @param options Interpreter options
+   */
+  function Interpreter(machine, options) {
+    var _this = this;
+
+    if (options === void 0) {
+      options = Interpreter.defaultOptions;
+    }
+
+    this.machine = machine;
+    this.scheduler = new Scheduler();
+    this.delayedEventsMap = {};
+    this.listeners = new Set();
+    this.contextListeners = new Set();
+    this.stopListeners = new Set();
+    this.doneListeners = new Set();
+    this.eventListeners = new Set();
+    this.sendListeners = new Set();
+    /**
+     * Whether the service is started.
+     */
+
+    this.initialized = false;
+    this.status = InterpreterStatus.NotStarted;
+    this.children = new Map();
+    this.forwardTo = new Set();
+    /**
+     * Alias for Interpreter.prototype.start
+     */
+
+    this.init = this.start;
+    /**
+     * Sends an event to the running interpreter to trigger a transition.
+     *
+     * An array of events (batched) can be sent as well, which will send all
+     * batched events to the running interpreter. The listeners will be
+     * notified only **once** when all events are processed.
+     *
+     * @param event The event(s) to send
+     */
+
+    this.send = function (event, payload) {
+      if ((0,utils/* isArray */.kJ)(event)) {
+        _this.batch(event);
+
+        return _this.state;
+      }
+
+      var _event = (0,utils/* toSCXMLEvent */.g5)((0,utils/* toEventObject */._v)(event, payload));
+
+      if (_this.status === InterpreterStatus.Stopped) {
+        // do nothing
+        if (!environment/* IS_PRODUCTION */.M) {
+          (0,utils/* warn */.ZK)(false, "Event \"".concat(_event.name, "\" was sent to stopped service \"").concat(_this.machine.id, "\". This service has already reached its final state, and will not transition.\nEvent: ").concat(JSON.stringify(_event.data)));
+        }
+
+        return _this.state;
+      }
+
+      if (_this.status !== InterpreterStatus.Running && !_this.options.deferEvents) {
+        throw new Error("Event \"".concat(_event.name, "\" was sent to uninitialized service \"").concat(_this.machine.id // tslint:disable-next-line:max-line-length
+        , "\". Make sure .start() is called for this service, or set { deferEvents: true } in the service options.\nEvent: ").concat(JSON.stringify(_event.data)));
+      }
+
+      _this.scheduler.schedule(function () {
+        // Forward copy of event to child actors
+        _this.forward(_event);
+
+        var nextState = _this.nextState(_event);
+
+        _this.update(nextState, _event);
+      });
+
+      return _this._state; // TODO: deprecate (should return void)
+      // tslint:disable-next-line:semicolon
+    };
+
+    this.sendTo = function (event, to) {
+      var isParent = _this.parent && (to === types/* SpecialTargets.Parent */.K.Parent || _this.parent.id === to);
+      var target = isParent ? _this.parent : (0,utils/* isString */.HD)(to) ? _this.children.get(to) || registry.get(to) : (0,utils/* isActor */.Bc)(to) ? to : undefined;
+
+      if (!target) {
+        if (!isParent) {
+          throw new Error("Unable to send event to child '".concat(to, "' from service '").concat(_this.id, "'."));
+        } // tslint:disable-next-line:no-console
+
+
+        if (!environment/* IS_PRODUCTION */.M) {
+          (0,utils/* warn */.ZK)(false, "Service '".concat(_this.id, "' has no parent: unable to send event ").concat(event.type));
+        }
+
+        return;
+      }
+
+      if ('machine' in target) {
+        // Send SCXML events to machines
+        target.send((0,_tslib/* __assign */.pi)((0,_tslib/* __assign */.pi)({}, event), {
+          name: event.name === actionTypes/* error */.vU ? "".concat((0,es_actions/* error */.vU)(_this.id)) : event.name,
+          origin: _this.sessionId
+        }));
+      } else {
+        // Send normal events to other targets
+        target.send(event.data);
+      }
+    };
+
+    var resolvedOptions = (0,_tslib/* __assign */.pi)((0,_tslib/* __assign */.pi)({}, Interpreter.defaultOptions), options);
+
+    var clock = resolvedOptions.clock,
+        logger = resolvedOptions.logger,
+        parent = resolvedOptions.parent,
+        id = resolvedOptions.id;
+    var resolvedId = id !== undefined ? id : machine.id;
+    this.id = resolvedId;
+    this.logger = logger;
+    this.clock = clock;
+    this.parent = parent;
+    this.options = resolvedOptions;
+    this.scheduler = new Scheduler({
+      deferEvents: this.options.deferEvents
+    });
+    this.sessionId = registry.bookId();
+  }
+
+  Object.defineProperty(Interpreter.prototype, "initialState", {
+    get: function () {
+      var _this = this;
+
+      if (this._initialState) {
+        return this._initialState;
+      }
+
+      return provide(this, function () {
+        _this._initialState = _this.machine.initialState;
+        return _this._initialState;
+      });
+    },
+    enumerable: false,
+    configurable: true
+  });
+  Object.defineProperty(Interpreter.prototype, "state", {
+    get: function () {
+      if (!environment/* IS_PRODUCTION */.M) {
+        (0,utils/* warn */.ZK)(this.status !== InterpreterStatus.NotStarted, "Attempted to read state from uninitialized service '".concat(this.id, "'. Make sure the service is started first."));
+      }
+
+      return this._state;
+    },
+    enumerable: false,
+    configurable: true
+  });
+  /**
+   * Executes the actions of the given state, with that state's `context` and `event`.
+   *
+   * @param state The state whose actions will be executed
+   * @param actionsConfig The action implementations to use
+   */
+
+  Interpreter.prototype.execute = function (state, actionsConfig) {
+    var e_1, _a;
+
+    try {
+      for (var _b = (0,_tslib/* __values */.XA)(state.actions), _c = _b.next(); !_c.done; _c = _b.next()) {
+        var action = _c.value;
+        this.exec(action, state, actionsConfig);
+      }
+    } catch (e_1_1) {
+      e_1 = {
+        error: e_1_1
+      };
+    } finally {
+      try {
+        if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+      } finally {
+        if (e_1) throw e_1.error;
+      }
+    }
+  };
+
+  Interpreter.prototype.update = function (state, _event) {
+    var e_2, _a, e_3, _b, e_4, _c, e_5, _d;
+
+    var _this = this; // Attach session ID to state
+
+
+    state._sessionid = this.sessionId; // Update state
+
+    this._state = state; // Execute actions
+
+    if (this.options.execute) {
+      this.execute(this.state);
+    } // Update children
+
+
+    this.children.forEach(function (child) {
+      _this.state.children[child.id] = child;
+    }); // Dev tools
+
+    if (this.devTools) {
+      this.devTools.send(_event.data, state);
+    } // Execute listeners
+
+
+    if (state.event) {
+      try {
+        for (var _e = (0,_tslib/* __values */.XA)(this.eventListeners), _f = _e.next(); !_f.done; _f = _e.next()) {
+          var listener = _f.value;
+          listener(state.event);
+        }
+      } catch (e_2_1) {
+        e_2 = {
+          error: e_2_1
+        };
+      } finally {
+        try {
+          if (_f && !_f.done && (_a = _e.return)) _a.call(_e);
+        } finally {
+          if (e_2) throw e_2.error;
+        }
+      }
+    }
+
+    try {
+      for (var _g = (0,_tslib/* __values */.XA)(this.listeners), _h = _g.next(); !_h.done; _h = _g.next()) {
+        var listener = _h.value;
+        listener(state, state.event);
+      }
+    } catch (e_3_1) {
+      e_3 = {
+        error: e_3_1
+      };
+    } finally {
+      try {
+        if (_h && !_h.done && (_b = _g.return)) _b.call(_g);
+      } finally {
+        if (e_3) throw e_3.error;
+      }
+    }
+
+    try {
+      for (var _j = (0,_tslib/* __values */.XA)(this.contextListeners), _k = _j.next(); !_k.done; _k = _j.next()) {
+        var contextListener = _k.value;
+        contextListener(this.state.context, this.state.history ? this.state.history.context : undefined);
+      }
+    } catch (e_4_1) {
+      e_4 = {
+        error: e_4_1
+      };
+    } finally {
+      try {
+        if (_k && !_k.done && (_c = _j.return)) _c.call(_j);
+      } finally {
+        if (e_4) throw e_4.error;
+      }
+    }
+
+    var isDone = isInFinalState(state.configuration || [], this.machine);
+
+    if (this.state.configuration && isDone) {
+      // get final child state node
+      var finalChildStateNode = state.configuration.find(function (sn) {
+        return sn.type === 'final' && sn.parent === _this.machine;
+      });
+      var doneData = finalChildStateNode && finalChildStateNode.doneData ? (0,utils/* mapContext */.QX)(finalChildStateNode.doneData, state.context, _event) : undefined;
+
+      try {
+        for (var _l = (0,_tslib/* __values */.XA)(this.doneListeners), _m = _l.next(); !_m.done; _m = _l.next()) {
+          var listener = _m.value;
+          listener((0,es_actions/* doneInvoke */.Sl)(this.id, doneData));
+        }
+      } catch (e_5_1) {
+        e_5 = {
+          error: e_5_1
+        };
+      } finally {
+        try {
+          if (_m && !_m.done && (_d = _l.return)) _d.call(_l);
+        } finally {
+          if (e_5) throw e_5.error;
+        }
+      }
+
+      this.stop();
+    }
+  };
+  /*
+   * Adds a listener that is notified whenever a state transition happens. The listener is called with
+   * the next state and the event object that caused the state transition.
+   *
+   * @param listener The state listener
+   */
+
+
+  Interpreter.prototype.onTransition = function (listener) {
+    this.listeners.add(listener); // Send current state to listener
+
+    if (this.status === InterpreterStatus.Running) {
+      listener(this.state, this.state.event);
+    }
+
+    return this;
+  };
+
+  Interpreter.prototype.subscribe = function (nextListenerOrObserver, _, // TODO: error listener
+  completeListener) {
+    var _this = this;
+
+    if (!nextListenerOrObserver) {
+      return {
+        unsubscribe: function () {
+          return void 0;
+        }
+      };
+    }
+
+    var listener;
+    var resolvedCompleteListener = completeListener;
+
+    if (typeof nextListenerOrObserver === 'function') {
+      listener = nextListenerOrObserver;
+    } else {
+      listener = nextListenerOrObserver.next.bind(nextListenerOrObserver);
+      resolvedCompleteListener = nextListenerOrObserver.complete.bind(nextListenerOrObserver);
+    }
+
+    this.listeners.add(listener); // Send current state to listener
+
+    if (this.status === InterpreterStatus.Running) {
+      listener(this.state);
+    }
+
+    if (resolvedCompleteListener) {
+      this.onDone(resolvedCompleteListener);
+    }
+
+    return {
+      unsubscribe: function () {
+        listener && _this.listeners.delete(listener);
+        resolvedCompleteListener && _this.doneListeners.delete(resolvedCompleteListener);
+      }
+    };
+  };
+  /**
+   * Adds an event listener that is notified whenever an event is sent to the running interpreter.
+   * @param listener The event listener
+   */
+
+
+  Interpreter.prototype.onEvent = function (listener) {
+    this.eventListeners.add(listener);
+    return this;
+  };
+  /**
+   * Adds an event listener that is notified whenever a `send` event occurs.
+   * @param listener The event listener
+   */
+
+
+  Interpreter.prototype.onSend = function (listener) {
+    this.sendListeners.add(listener);
+    return this;
+  };
+  /**
+   * Adds a context listener that is notified whenever the state context changes.
+   * @param listener The context listener
+   */
+
+
+  Interpreter.prototype.onChange = function (listener) {
+    this.contextListeners.add(listener);
+    return this;
+  };
+  /**
+   * Adds a listener that is notified when the machine is stopped.
+   * @param listener The listener
+   */
+
+
+  Interpreter.prototype.onStop = function (listener) {
+    this.stopListeners.add(listener);
+    return this;
+  };
+  /**
+   * Adds a state listener that is notified when the statechart has reached its final state.
+   * @param listener The state listener
+   */
+
+
+  Interpreter.prototype.onDone = function (listener) {
+    this.doneListeners.add(listener);
+    return this;
+  };
+  /**
+   * Removes a listener.
+   * @param listener The listener to remove
+   */
+
+
+  Interpreter.prototype.off = function (listener) {
+    this.listeners.delete(listener);
+    this.eventListeners.delete(listener);
+    this.sendListeners.delete(listener);
+    this.stopListeners.delete(listener);
+    this.doneListeners.delete(listener);
+    this.contextListeners.delete(listener);
+    return this;
+  };
+  /**
+   * Starts the interpreter from the given state, or the initial state.
+   * @param initialState The state to start the statechart from
+   */
+
+
+  Interpreter.prototype.start = function (initialState) {
+    var _this = this;
+
+    if (this.status === InterpreterStatus.Running) {
+      // Do not restart the service if it is already started
+      return this;
+    } // yes, it's a hack but we need the related cache to be populated for some things to work (like delayed transitions)
+    // this is usually called by `machine.getInitialState` but if we rehydrate from a state we might bypass this call
+    // we also don't want to call this method here as it resolves the full initial state which might involve calling assign actions
+    // and that could potentially lead to some unwanted side-effects (even such as creating some rogue actors)
+
+
+    this.machine._init();
+
+    registry.register(this.sessionId, this);
+    this.initialized = true;
+    this.status = InterpreterStatus.Running;
+    var resolvedState = initialState === undefined ? this.initialState : provide(this, function () {
+      return isStateConfig(initialState) ? _this.machine.resolveState(initialState) : _this.machine.resolveState(State.from(initialState, _this.machine.context));
+    });
+
+    if (this.options.devTools) {
+      this.attachDev();
+    }
+
+    this.scheduler.initialize(function () {
+      _this.update(resolvedState, es_actions/* initEvent */.bf);
+    });
+    return this;
+  };
+  /**
+   * Stops the interpreter and unsubscribe all listeners.
+   *
+   * This will also notify the `onStop` listeners.
+   */
+
+
+  Interpreter.prototype.stop = function () {
+    var e_6, _a, e_7, _b, e_8, _c, e_9, _d, e_10, _e;
+
+    var _this = this;
+
+    try {
+      for (var _f = (0,_tslib/* __values */.XA)(this.listeners), _g = _f.next(); !_g.done; _g = _f.next()) {
+        var listener = _g.value;
+        this.listeners.delete(listener);
+      }
+    } catch (e_6_1) {
+      e_6 = {
+        error: e_6_1
+      };
+    } finally {
+      try {
+        if (_g && !_g.done && (_a = _f.return)) _a.call(_f);
+      } finally {
+        if (e_6) throw e_6.error;
+      }
+    }
+
+    try {
+      for (var _h = (0,_tslib/* __values */.XA)(this.stopListeners), _j = _h.next(); !_j.done; _j = _h.next()) {
+        var listener = _j.value; // call listener, then remove
+
+        listener();
+        this.stopListeners.delete(listener);
+      }
+    } catch (e_7_1) {
+      e_7 = {
+        error: e_7_1
+      };
+    } finally {
+      try {
+        if (_j && !_j.done && (_b = _h.return)) _b.call(_h);
+      } finally {
+        if (e_7) throw e_7.error;
+      }
+    }
+
+    try {
+      for (var _k = (0,_tslib/* __values */.XA)(this.contextListeners), _l = _k.next(); !_l.done; _l = _k.next()) {
+        var listener = _l.value;
+        this.contextListeners.delete(listener);
+      }
+    } catch (e_8_1) {
+      e_8 = {
+        error: e_8_1
+      };
+    } finally {
+      try {
+        if (_l && !_l.done && (_c = _k.return)) _c.call(_k);
+      } finally {
+        if (e_8) throw e_8.error;
+      }
+    }
+
+    try {
+      for (var _m = (0,_tslib/* __values */.XA)(this.doneListeners), _o = _m.next(); !_o.done; _o = _m.next()) {
+        var listener = _o.value;
+        this.doneListeners.delete(listener);
+      }
+    } catch (e_9_1) {
+      e_9 = {
+        error: e_9_1
+      };
+    } finally {
+      try {
+        if (_o && !_o.done && (_d = _m.return)) _d.call(_m);
+      } finally {
+        if (e_9) throw e_9.error;
+      }
+    }
+
+    if (!this.initialized) {
+      // Interpreter already stopped; do nothing
+      return this;
+    }
+
+    (0,_tslib/* __spreadArray */.ev)([], (0,_tslib/* __read */.CR)(this.state.configuration), false).sort(function (a, b) {
+      return b.order - a.order;
+    }).forEach(function (stateNode) {
+      var e_11, _a;
+
+      try {
+        for (var _b = (0,_tslib/* __values */.XA)(stateNode.definition.exit), _c = _b.next(); !_c.done; _c = _b.next()) {
+          var action = _c.value;
+
+          _this.exec(action, _this.state);
+        }
+      } catch (e_11_1) {
+        e_11 = {
+          error: e_11_1
+        };
+      } finally {
+        try {
+          if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+        } finally {
+          if (e_11) throw e_11.error;
+        }
+      }
+    }); // Stop all children
+
+
+    this.children.forEach(function (child) {
+      if ((0,utils/* isFunction */.mf)(child.stop)) {
+        child.stop();
+      }
+    });
+
+    try {
+      // Cancel all delayed events
+      for (var _p = (0,_tslib/* __values */.XA)(Object.keys(this.delayedEventsMap)), _q = _p.next(); !_q.done; _q = _p.next()) {
+        var key = _q.value;
+        this.clock.clearTimeout(this.delayedEventsMap[key]);
+      }
+    } catch (e_10_1) {
+      e_10 = {
+        error: e_10_1
+      };
+    } finally {
+      try {
+        if (_q && !_q.done && (_e = _p.return)) _e.call(_p);
+      } finally {
+        if (e_10) throw e_10.error;
+      }
+    }
+
+    this.scheduler.clear();
+    this.initialized = false;
+    this.status = InterpreterStatus.Stopped;
+    registry.free(this.sessionId);
+    return this;
+  };
+
+  Interpreter.prototype.batch = function (events) {
+    var _this = this;
+
+    if (this.status === InterpreterStatus.NotStarted && this.options.deferEvents) {
+      // tslint:disable-next-line:no-console
+      if (!environment/* IS_PRODUCTION */.M) {
+        (0,utils/* warn */.ZK)(false, "".concat(events.length, " event(s) were sent to uninitialized service \"").concat(this.machine.id, "\" and are deferred. Make sure .start() is called for this service.\nEvent: ").concat(JSON.stringify(event)));
+      }
+    } else if (this.status !== InterpreterStatus.Running) {
+      throw new Error( // tslint:disable-next-line:max-line-length
+      "".concat(events.length, " event(s) were sent to uninitialized service \"").concat(this.machine.id, "\". Make sure .start() is called for this service, or set { deferEvents: true } in the service options."));
+    }
+
+    this.scheduler.schedule(function () {
+      var e_12, _a;
+
+      var nextState = _this.state;
+      var batchChanged = false;
+      var batchedActions = [];
+
+      var _loop_1 = function (event_1) {
+        var _event = (0,utils/* toSCXMLEvent */.g5)(event_1);
+
+        _this.forward(_event);
+
+        nextState = provide(_this, function () {
+          return _this.machine.transition(nextState, _event);
+        });
+        batchedActions.push.apply(batchedActions, (0,_tslib/* __spreadArray */.ev)([], (0,_tslib/* __read */.CR)(nextState.actions.map(function (a) {
+          return bindActionToState(a, nextState);
+        })), false));
+        batchChanged = batchChanged || !!nextState.changed;
+      };
+
+      try {
+        for (var events_1 = (0,_tslib/* __values */.XA)(events), events_1_1 = events_1.next(); !events_1_1.done; events_1_1 = events_1.next()) {
+          var event_1 = events_1_1.value;
+
+          _loop_1(event_1);
+        }
+      } catch (e_12_1) {
+        e_12 = {
+          error: e_12_1
+        };
+      } finally {
+        try {
+          if (events_1_1 && !events_1_1.done && (_a = events_1.return)) _a.call(events_1);
+        } finally {
+          if (e_12) throw e_12.error;
+        }
+      }
+
+      nextState.changed = batchChanged;
+      nextState.actions = batchedActions;
+
+      _this.update(nextState, (0,utils/* toSCXMLEvent */.g5)(events[events.length - 1]));
+    });
+  };
+  /**
+   * Returns a send function bound to this interpreter instance.
+   *
+   * @param event The event to be sent by the sender.
+   */
+
+
+  Interpreter.prototype.sender = function (event) {
+    return this.send.bind(this, event);
+  };
+  /**
+   * Returns the next state given the interpreter's current state and the event.
+   *
+   * This is a pure method that does _not_ update the interpreter's state.
+   *
+   * @param event The event to determine the next state
+   */
+
+
+  Interpreter.prototype.nextState = function (event) {
+    var _this = this;
+
+    var _event = (0,utils/* toSCXMLEvent */.g5)(event);
+
+    if (_event.name.indexOf(actionTypes/* errorPlatform */.Mg) === 0 && !this.state.nextEvents.some(function (nextEvent) {
+      return nextEvent.indexOf(actionTypes/* errorPlatform */.Mg) === 0;
+    })) {
+      throw _event.data.data;
+    }
+
+    var nextState = provide(this, function () {
+      return _this.machine.transition(_this.state, _event);
+    });
+    return nextState;
+  };
+
+  Interpreter.prototype.forward = function (event) {
+    var e_13, _a;
+
+    try {
+      for (var _b = (0,_tslib/* __values */.XA)(this.forwardTo), _c = _b.next(); !_c.done; _c = _b.next()) {
+        var id = _c.value;
+        var child = this.children.get(id);
+
+        if (!child) {
+          throw new Error("Unable to forward event '".concat(event, "' from interpreter '").concat(this.id, "' to nonexistant child '").concat(id, "'."));
+        }
+
+        child.send(event);
+      }
+    } catch (e_13_1) {
+      e_13 = {
+        error: e_13_1
+      };
+    } finally {
+      try {
+        if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+      } finally {
+        if (e_13) throw e_13.error;
+      }
+    }
+  };
+
+  Interpreter.prototype.defer = function (sendAction) {
+    var _this = this;
+
+    this.delayedEventsMap[sendAction.id] = this.clock.setTimeout(function () {
+      if (sendAction.to) {
+        _this.sendTo(sendAction._event, sendAction.to);
+      } else {
+        _this.send(sendAction._event);
+      }
+    }, sendAction.delay);
+  };
+
+  Interpreter.prototype.cancel = function (sendId) {
+    this.clock.clearTimeout(this.delayedEventsMap[sendId]);
+    delete this.delayedEventsMap[sendId];
+  };
+
+  Interpreter.prototype.exec = function (action, state, actionFunctionMap) {
+    if (actionFunctionMap === void 0) {
+      actionFunctionMap = this.machine.options.actions;
+    }
+
+    var context = state.context,
+        _event = state._event;
+    var actionOrExec = action.exec || (0,es_actions/* getActionFunction */.o$)(action.type, actionFunctionMap);
+    var exec = (0,utils/* isFunction */.mf)(actionOrExec) ? actionOrExec : actionOrExec ? actionOrExec.exec : action.exec;
+
+    if (exec) {
+      try {
+        return exec(context, _event.data, {
+          action: action,
+          state: this.state,
+          _event: _event
+        });
+      } catch (err) {
+        if (this.parent) {
+          this.parent.send({
+            type: 'xstate.error',
+            data: err
+          });
+        }
+
+        throw err;
+      }
+    }
+
+    switch (action.type) {
+      case actionTypes/* send */.lW:
+        var sendAction = action;
+
+        if (typeof sendAction.delay === 'number') {
+          this.defer(sendAction);
+          return;
+        } else {
+          if (sendAction.to) {
+            this.sendTo(sendAction._event, sendAction.to);
+          } else {
+            this.send(sendAction._event);
+          }
+        }
+
+        break;
+
+      case actionTypes/* cancel */.al:
+        this.cancel(action.sendId);
+        break;
+
+      case actionTypes/* start */.BL:
+        {
+          if (this.status !== InterpreterStatus.Running) {
+            return;
+          }
+
+          var activity = action.activity; // If the activity will be stopped right after it's started
+          // (such as in transient states)
+          // don't bother starting the activity.
+
+          if (!this.state.activities[activity.id || activity.type]) {
+            break;
+          } // Invoked services
+
+
+          if (activity.type === types/* ActionTypes.Invoke */.M.Invoke) {
+            var invokeSource = (0,utils/* toInvokeSource */.j)(activity.src);
+            var serviceCreator = this.machine.options.services ? this.machine.options.services[invokeSource.type] : undefined;
+            var id = activity.id,
+                data = activity.data;
+
+            if (!environment/* IS_PRODUCTION */.M) {
+              (0,utils/* warn */.ZK)(!('forward' in activity), // tslint:disable-next-line:max-line-length
+              "`forward` property is deprecated (found in invocation of '".concat(activity.src, "' in in machine '").concat(this.machine.id, "'). ") + "Please use `autoForward` instead.");
+            }
+
+            var autoForward = 'autoForward' in activity ? activity.autoForward : !!activity.forward;
+
+            if (!serviceCreator) {
+              // tslint:disable-next-line:no-console
+              if (!environment/* IS_PRODUCTION */.M) {
+                (0,utils/* warn */.ZK)(false, "No service found for invocation '".concat(activity.src, "' in machine '").concat(this.machine.id, "'."));
+              }
+
+              return;
+            }
+
+            var resolvedData = data ? (0,utils/* mapContext */.QX)(data, context, _event) : undefined;
+
+            if (typeof serviceCreator === 'string') {
+              // TODO: warn
+              return;
+            }
+
+            var source = (0,utils/* isFunction */.mf)(serviceCreator) ? serviceCreator(context, _event.data, {
+              data: resolvedData,
+              src: invokeSource,
+              meta: activity.meta
+            }) : serviceCreator;
+
+            if (!source) {
+              // TODO: warn?
+              return;
+            }
+
+            var options = void 0;
+
+            if ((0,utils/* isMachine */.O4)(source)) {
+              source = resolvedData ? source.withContext(resolvedData) : source;
+              options = {
+                autoForward: autoForward
+              };
+            }
+
+            this.spawn(source, id, options);
+          } else {
+            this.spawnActivity(activity);
+          }
+
+          break;
+        }
+
+      case actionTypes/* stop */.sT:
+        {
+          this.stopChild(action.activity.id);
+          break;
+        }
+
+      case actionTypes/* log */.cM:
+        var label = action.label,
+            value = action.value;
+
+        if (label) {
+          this.logger(label, value);
+        } else {
+          this.logger(value);
+        }
+
+        break;
+
+      default:
+        if (!environment/* IS_PRODUCTION */.M) {
+          (0,utils/* warn */.ZK)(false, "No implementation found for action type '".concat(action.type, "'"));
+        }
+
+        break;
+    }
+
+    return undefined;
+  };
+
+  Interpreter.prototype.removeChild = function (childId) {
+    var _a;
+
+    this.children.delete(childId);
+    this.forwardTo.delete(childId); // this.state might not exist at the time this is called,
+    // such as when a child is added then removed while initializing the state
+
+    (_a = this.state) === null || _a === void 0 ? true : delete _a.children[childId];
+  };
+
+  Interpreter.prototype.stopChild = function (childId) {
+    var child = this.children.get(childId);
+
+    if (!child) {
+      return;
+    }
+
+    this.removeChild(childId);
+
+    if ((0,utils/* isFunction */.mf)(child.stop)) {
+      child.stop();
+    }
+  };
+
+  Interpreter.prototype.spawn = function (entity, name, options) {
+    if ((0,utils/* isPromiseLike */.y8)(entity)) {
+      return this.spawnPromise(Promise.resolve(entity), name);
+    } else if ((0,utils/* isFunction */.mf)(entity)) {
+      return this.spawnCallback(entity, name);
+    } else if (isSpawnedActor(entity)) {
+      return this.spawnActor(entity, name);
+    } else if ((0,utils/* isObservable */.bi)(entity)) {
+      return this.spawnObservable(entity, name);
+    } else if ((0,utils/* isMachine */.O4)(entity)) {
+      return this.spawnMachine(entity, (0,_tslib/* __assign */.pi)((0,_tslib/* __assign */.pi)({}, options), {
+        id: name
+      }));
+    } else if ((0,utils/* isBehavior */.HV)(entity)) {
+      return this.spawnBehavior(entity, name);
+    } else {
+      throw new Error("Unable to spawn entity \"".concat(name, "\" of type \"").concat(typeof entity, "\"."));
+    }
+  };
+
+  Interpreter.prototype.spawnMachine = function (machine, options) {
+    var _this = this;
+
+    if (options === void 0) {
+      options = {};
+    }
+
+    var childService = new Interpreter(machine, (0,_tslib/* __assign */.pi)((0,_tslib/* __assign */.pi)({}, this.options), {
+      parent: this,
+      id: options.id || machine.id
+    }));
+
+    var resolvedOptions = (0,_tslib/* __assign */.pi)((0,_tslib/* __assign */.pi)({}, DEFAULT_SPAWN_OPTIONS), options);
+
+    if (resolvedOptions.sync) {
+      childService.onTransition(function (state) {
+        _this.send(actionTypes/* update */.Vx, {
+          state: state,
+          id: childService.id
+        });
+      });
+    }
+
+    var actor = childService;
+    this.children.set(childService.id, actor);
+
+    if (resolvedOptions.autoForward) {
+      this.forwardTo.add(childService.id);
+    }
+
+    childService.onDone(function (doneEvent) {
+      _this.removeChild(childService.id);
+
+      _this.send((0,utils/* toSCXMLEvent */.g5)(doneEvent, {
+        origin: childService.id
+      }));
+    }).start();
+    return actor;
+  };
+
+  Interpreter.prototype.spawnBehavior = function (behavior, id) {
+    var actorRef = spawnBehavior(behavior, {
+      id: id,
+      parent: this
+    });
+    this.children.set(id, actorRef);
+    return actorRef;
+  };
+
+  Interpreter.prototype.spawnPromise = function (promise, id) {
+    var _a;
+
+    var _this = this;
+
+    var canceled = false;
+    var resolvedData;
+    promise.then(function (response) {
+      if (!canceled) {
+        resolvedData = response;
+
+        _this.removeChild(id);
+
+        _this.send((0,utils/* toSCXMLEvent */.g5)((0,es_actions/* doneInvoke */.Sl)(id, response), {
+          origin: id
+        }));
+      }
+    }, function (errorData) {
+      if (!canceled) {
+        _this.removeChild(id);
+
+        var errorEvent = (0,es_actions/* error */.vU)(id, errorData);
+
+        try {
+          // Send "error.platform.id" to this (parent).
+          _this.send((0,utils/* toSCXMLEvent */.g5)(errorEvent, {
+            origin: id
+          }));
+        } catch (error) {
+          (0,utils/* reportUnhandledExceptionOnInvocation */.v4)(errorData, error, id);
+
+          if (_this.devTools) {
+            _this.devTools.send(errorEvent, _this.state);
+          }
+
+          if (_this.machine.strict) {
+            // it would be better to always stop the state machine if unhandled
+            // exception/promise rejection happens but because we don't want to
+            // break existing code so enforce it on strict mode only especially so
+            // because documentation says that onError is optional
+            _this.stop();
+          }
+        }
+      }
+    });
+    var actor = (_a = {
+      id: id,
+      send: function () {
+        return void 0;
+      },
+      subscribe: function (next, handleError, complete) {
+        var observer = (0,utils/* toObserver */.zM)(next, handleError, complete);
+        var unsubscribed = false;
+        promise.then(function (response) {
+          if (unsubscribed) {
+            return;
+          }
+
+          observer.next(response);
+
+          if (unsubscribed) {
+            return;
+          }
+
+          observer.complete();
+        }, function (err) {
+          if (unsubscribed) {
+            return;
+          }
+
+          observer.error(err);
+        });
+        return {
+          unsubscribe: function () {
+            return unsubscribed = true;
+          }
+        };
+      },
+      stop: function () {
+        canceled = true;
+      },
+      toJSON: function () {
+        return {
+          id: id
+        };
+      },
+      getSnapshot: function () {
+        return resolvedData;
+      }
+    }, _a[utils/* symbolObservable */.L$] = function () {
+      return this;
+    }, _a);
+    this.children.set(id, actor);
+    return actor;
+  };
+
+  Interpreter.prototype.spawnCallback = function (callback, id) {
+    var _a;
+
+    var _this = this;
+
+    var canceled = false;
+    var receivers = new Set();
+    var listeners = new Set();
+    var emitted;
+
+    var receive = function (e) {
+      emitted = e;
+      listeners.forEach(function (listener) {
+        return listener(e);
+      });
+
+      if (canceled) {
+        return;
+      }
+
+      _this.send((0,utils/* toSCXMLEvent */.g5)(e, {
+        origin: id
+      }));
+    };
+
+    var callbackStop;
+
+    try {
+      callbackStop = callback(receive, function (newListener) {
+        receivers.add(newListener);
+      });
+    } catch (err) {
+      this.send((0,es_actions/* error */.vU)(id, err));
+    }
+
+    if ((0,utils/* isPromiseLike */.y8)(callbackStop)) {
+      // it turned out to be an async function, can't reliably check this before calling `callback`
+      // because transpiled async functions are not recognizable
+      return this.spawnPromise(callbackStop, id);
+    }
+
+    var actor = (_a = {
+      id: id,
+      send: function (event) {
+        return receivers.forEach(function (receiver) {
+          return receiver(event);
+        });
+      },
+      subscribe: function (next) {
+        var observer = (0,utils/* toObserver */.zM)(next);
+        listeners.add(observer.next);
+        return {
+          unsubscribe: function () {
+            listeners.delete(observer.next);
+          }
+        };
+      },
+      stop: function () {
+        canceled = true;
+
+        if ((0,utils/* isFunction */.mf)(callbackStop)) {
+          callbackStop();
+        }
+      },
+      toJSON: function () {
+        return {
+          id: id
+        };
+      },
+      getSnapshot: function () {
+        return emitted;
+      }
+    }, _a[utils/* symbolObservable */.L$] = function () {
+      return this;
+    }, _a);
+    this.children.set(id, actor);
+    return actor;
+  };
+
+  Interpreter.prototype.spawnObservable = function (source, id) {
+    var _a;
+
+    var _this = this;
+
+    var emitted;
+    var subscription = source.subscribe(function (value) {
+      emitted = value;
+
+      _this.send((0,utils/* toSCXMLEvent */.g5)(value, {
+        origin: id
+      }));
+    }, function (err) {
+      _this.removeChild(id);
+
+      _this.send((0,utils/* toSCXMLEvent */.g5)((0,es_actions/* error */.vU)(id, err), {
+        origin: id
+      }));
+    }, function () {
+      _this.removeChild(id);
+
+      _this.send((0,utils/* toSCXMLEvent */.g5)((0,es_actions/* doneInvoke */.Sl)(id), {
+        origin: id
+      }));
+    });
+    var actor = (_a = {
+      id: id,
+      send: function () {
+        return void 0;
+      },
+      subscribe: function (next, handleError, complete) {
+        return source.subscribe(next, handleError, complete);
+      },
+      stop: function () {
+        return subscription.unsubscribe();
+      },
+      getSnapshot: function () {
+        return emitted;
+      },
+      toJSON: function () {
+        return {
+          id: id
+        };
+      }
+    }, _a[utils/* symbolObservable */.L$] = function () {
+      return this;
+    }, _a);
+    this.children.set(id, actor);
+    return actor;
+  };
+
+  Interpreter.prototype.spawnActor = function (actor, name) {
+    this.children.set(name, actor);
+    return actor;
+  };
+
+  Interpreter.prototype.spawnActivity = function (activity) {
+    var implementation = this.machine.options && this.machine.options.activities ? this.machine.options.activities[activity.type] : undefined;
+
+    if (!implementation) {
+      if (!environment/* IS_PRODUCTION */.M) {
+        (0,utils/* warn */.ZK)(false, "No implementation found for activity '".concat(activity.type, "'"));
+      } // tslint:disable-next-line:no-console
+
+
+      return;
+    } // Start implementation
+
+
+    var dispose = implementation(this.state.context, activity);
+    this.spawnEffect(activity.id, dispose);
+  };
+
+  Interpreter.prototype.spawnEffect = function (id, dispose) {
+    var _a;
+
+    this.children.set(id, (_a = {
+      id: id,
+      send: function () {
+        return void 0;
+      },
+      subscribe: function () {
+        return {
+          unsubscribe: function () {
+            return void 0;
+          }
+        };
+      },
+      stop: dispose || undefined,
+      getSnapshot: function () {
+        return undefined;
+      },
+      toJSON: function () {
+        return {
+          id: id
+        };
+      }
+    }, _a[utils/* symbolObservable */.L$] = function () {
+      return this;
+    }, _a));
+  };
+
+  Interpreter.prototype.attachDev = function () {
+    var global = getGlobal();
+
+    if (this.options.devTools && global) {
+      if (global.__REDUX_DEVTOOLS_EXTENSION__) {
+        var devToolsOptions = typeof this.options.devTools === 'object' ? this.options.devTools : undefined;
+        this.devTools = global.__REDUX_DEVTOOLS_EXTENSION__.connect((0,_tslib/* __assign */.pi)((0,_tslib/* __assign */.pi)({
+          name: this.id,
+          autoPause: true,
+          stateSanitizer: function (state) {
+            return {
+              value: state.value,
+              context: state.context,
+              actions: state.actions
+            };
+          }
+        }, devToolsOptions), {
+          features: (0,_tslib/* __assign */.pi)({
+            jump: false,
+            skip: false
+          }, devToolsOptions ? devToolsOptions.features : undefined)
+        }), this.machine);
+        this.devTools.init(this.state);
+      } // add XState-specific dev tooling hook
+
+
+      registerService(this);
+    }
+  };
+
+  Interpreter.prototype.toJSON = function () {
+    return {
+      id: this.id
+    };
+  };
+
+  Interpreter.prototype[utils/* symbolObservable */.L$] = function () {
+    return this;
+  };
+
+  Interpreter.prototype.getSnapshot = function () {
+    if (this.status === InterpreterStatus.NotStarted) {
+      return this.initialState;
+    }
+
+    return this._state;
+  };
+  /**
+   * The default interpreter options:
+   *
+   * - `clock` uses the global `setTimeout` and `clearTimeout` functions
+   * - `logger` uses the global `console.log()` method
+   */
+
+
+  Interpreter.defaultOptions = {
+    execute: true,
+    deferEvents: true,
+    clock: {
+      setTimeout: function (fn, ms) {
+        return setTimeout(fn, ms);
+      },
+      clearTimeout: function (id) {
+        return clearTimeout(id);
+      }
+    },
+    logger: /*#__PURE__*/console.log.bind(console),
+    devTools: false
+  };
+  Interpreter.interpret = interpret;
+  return Interpreter;
+}();
+
+var resolveSpawnOptions = function (nameOrOptions) {
+  if (isString(nameOrOptions)) {
+    return __assign(__assign({}, DEFAULT_SPAWN_OPTIONS), {
+      name: nameOrOptions
+    });
+  }
+
+  return __assign(__assign(__assign({}, DEFAULT_SPAWN_OPTIONS), {
+    name: uniqueId()
+  }), nameOrOptions);
+};
+
+function spawn(entity, nameOrOptions) {
+  var resolvedOptions = resolveSpawnOptions(nameOrOptions);
+  return consume(function (service) {
+    if (!IS_PRODUCTION) {
+      var isLazyEntity = isMachine(entity) || isFunction(entity);
+      warn(!!service || isLazyEntity, "Attempted to spawn an Actor (ID: \"".concat(isMachine(entity) ? entity.id : 'undefined', "\") outside of a service. This will have no effect."));
+    }
+
+    if (service) {
+      return service.spawn(entity, resolvedOptions.name, resolvedOptions);
+    } else {
+      return createDeferredActor(entity, resolvedOptions.name);
+    }
+  });
+}
+/**
+ * Creates a new Interpreter instance for the given machine with the provided options, if any.
+ *
+ * @param machine The machine to interpret
+ * @param options Interpreter options
+ */
+
+function interpret(machine, options) {
+  var interpreter = new Interpreter(machine, options);
+  return interpreter;
+}
+
+
+
+;// CONCATENATED MODULE: ./node_modules/xstate/es/invokeUtils.js
+
+
+
+
+
+
+function toInvokeSource(src) {
+  if (typeof src === 'string') {
+    var simpleSrc = {
+      type: src
+    };
+
+    simpleSrc.toString = function () {
+      return src;
+    }; // v4 compat - TODO: remove in v5
+
+
+    return simpleSrc;
+  }
+
+  return src;
+}
+function toInvokeDefinition(invokeConfig) {
+  return (0,_tslib/* __assign */.pi)((0,_tslib/* __assign */.pi)({
+    type: actionTypes/* invoke */.dw
+  }, invokeConfig), {
+    toJSON: function () {
+      invokeConfig.onDone;
+          invokeConfig.onError;
+          var invokeDef = (0,_tslib/* __rest */._T)(invokeConfig, ["onDone", "onError"]);
+
+      return (0,_tslib/* __assign */.pi)((0,_tslib/* __assign */.pi)({}, invokeDef), {
+        type: actionTypes/* invoke */.dw,
+        src: toInvokeSource(invokeConfig.src)
+      });
+    }
+  });
+}
+
+
+
+;// CONCATENATED MODULE: ./node_modules/xstate/es/StateNode.js
+
+
+
+
+
+
+
+
+
+
+
+
+var NULL_EVENT = '';
+var STATE_IDENTIFIER = '#';
+var WILDCARD = '*';
+var EMPTY_OBJECT = {};
+
+var isStateId = function (str) {
+  return str[0] === STATE_IDENTIFIER;
+};
+
+var createDefaultOptions = function () {
+  return {
+    actions: {},
+    guards: {},
+    services: {},
+    activities: {},
+    delays: {}
+  };
+};
+
+var validateArrayifiedTransitions = function (stateNode, event, transitions) {
+  var hasNonLastUnguardedTarget = transitions.slice(0, -1).some(function (transition) {
+    return !('cond' in transition) && !('in' in transition) && ((0,utils/* isString */.HD)(transition.target) || (0,utils/* isMachine */.O4)(transition.target));
+  });
+  var eventText = event === NULL_EVENT ? 'the transient event' : "event '".concat(event, "'");
+  (0,utils/* warn */.ZK)(!hasNonLastUnguardedTarget, "One or more transitions for ".concat(eventText, " on state '").concat(stateNode.id, "' are unreachable. ") + "Make sure that the default transition is the last one defined.");
+};
+
+var StateNode_StateNode =
+/*#__PURE__*/
+
+/** @class */
+function () {
+  function StateNode(
+  /**
+   * The raw config used to create the machine.
+   */
+  config, options,
+  /**
+   * The initial extended state
+   */
+  _context, // TODO: this is unsafe, but we're removing it in v5 anyway
+  _stateInfo) {
+    var _this = this;
+
+    if (_context === void 0) {
+      _context = 'context' in config ? config.context : undefined;
+    }
+
+    var _a;
+
+    this.config = config;
+    this._context = _context;
+    /**
+     * The order this state node appears. Corresponds to the implicit SCXML document order.
+     */
+
+    this.order = -1;
+    this.__xstatenode = true;
+    this.__cache = {
+      events: undefined,
+      relativeValue: new Map(),
+      initialStateValue: undefined,
+      initialState: undefined,
+      on: undefined,
+      transitions: undefined,
+      candidates: {},
+      delayedTransitions: undefined
+    };
+    this.idMap = {};
+    this.tags = [];
+    this.options = Object.assign(createDefaultOptions(), options);
+    this.parent = _stateInfo === null || _stateInfo === void 0 ? void 0 : _stateInfo.parent;
+    this.key = this.config.key || (_stateInfo === null || _stateInfo === void 0 ? void 0 : _stateInfo.key) || this.config.id || '(machine)';
+    this.machine = this.parent ? this.parent.machine : this;
+    this.path = this.parent ? this.parent.path.concat(this.key) : [];
+    this.delimiter = this.config.delimiter || (this.parent ? this.parent.delimiter : es_constants/* STATE_DELIMITER */.iS);
+    this.id = this.config.id || (0,_tslib/* __spreadArray */.ev)([this.machine.key], (0,_tslib/* __read */.CR)(this.path), false).join(this.delimiter);
+    this.version = this.parent ? this.parent.version : this.config.version;
+    this.type = this.config.type || (this.config.parallel ? 'parallel' : this.config.states && Object.keys(this.config.states).length ? 'compound' : this.config.history ? 'history' : 'atomic');
+    this.schema = this.parent ? this.machine.schema : (_a = this.config.schema) !== null && _a !== void 0 ? _a : {};
+    this.description = this.config.description;
+
+    if (!environment/* IS_PRODUCTION */.M) {
+      (0,utils/* warn */.ZK)(!('parallel' in this.config), "The \"parallel\" property is deprecated and will be removed in version 4.1. ".concat(this.config.parallel ? "Replace with `type: 'parallel'`" : "Use `type: '".concat(this.type, "'`"), " in the config for state node '").concat(this.id, "' instead."));
+    }
+
+    this.initial = this.config.initial;
+    this.states = this.config.states ? (0,utils/* mapValues */.Q8)(this.config.states, function (stateConfig, key) {
+      var _a;
+
+      var stateNode = new StateNode(stateConfig, {}, undefined, {
+        parent: _this,
+        key: key
+      });
+      Object.assign(_this.idMap, (0,_tslib/* __assign */.pi)((_a = {}, _a[stateNode.id] = stateNode, _a), stateNode.idMap));
+      return stateNode;
+    }) : EMPTY_OBJECT; // Document order
+
+    var order = 0;
+
+    function dfs(stateNode) {
+      var e_1, _a;
+
+      stateNode.order = order++;
+
+      try {
+        for (var _b = (0,_tslib/* __values */.XA)(getChildren(stateNode)), _c = _b.next(); !_c.done; _c = _b.next()) {
+          var child = _c.value;
+          dfs(child);
+        }
+      } catch (e_1_1) {
+        e_1 = {
+          error: e_1_1
+        };
+      } finally {
+        try {
+          if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+        } finally {
+          if (e_1) throw e_1.error;
+        }
+      }
+    }
+
+    dfs(this); // History config
+
+    this.history = this.config.history === true ? 'shallow' : this.config.history || false;
+    this._transient = !!this.config.always || (!this.config.on ? false : Array.isArray(this.config.on) ? this.config.on.some(function (_a) {
+      var event = _a.event;
+      return event === NULL_EVENT;
+    }) : NULL_EVENT in this.config.on);
+    this.strict = !!this.config.strict; // TODO: deprecate (entry)
+
+    this.onEntry = (0,utils/* toArray */.qo)(this.config.entry || this.config.onEntry).map(function (action) {
+      return (0,es_actions/* toActionObject */.Q8)(action);
+    }); // TODO: deprecate (exit)
+
+    this.onExit = (0,utils/* toArray */.qo)(this.config.exit || this.config.onExit).map(function (action) {
+      return (0,es_actions/* toActionObject */.Q8)(action);
+    });
+    this.meta = this.config.meta;
+    this.doneData = this.type === 'final' ? this.config.data : undefined;
+    this.invoke = (0,utils/* toArray */.qo)(this.config.invoke).map(function (invokeConfig, i) {
+      var _a, _b;
+
+      if ((0,utils/* isMachine */.O4)(invokeConfig)) {
+        var invokeId = (0,utils/* createInvokeId */.bx)(_this.id, i);
+        _this.machine.options.services = (0,_tslib/* __assign */.pi)((_a = {}, _a[invokeId] = invokeConfig, _a), _this.machine.options.services);
+        return toInvokeDefinition({
+          src: invokeId,
+          id: invokeId
+        });
+      } else if ((0,utils/* isString */.HD)(invokeConfig.src)) {
+        var invokeId = invokeConfig.id || (0,utils/* createInvokeId */.bx)(_this.id, i);
+        return toInvokeDefinition((0,_tslib/* __assign */.pi)((0,_tslib/* __assign */.pi)({}, invokeConfig), {
+          id: invokeId,
+          src: invokeConfig.src
+        }));
+      } else if ((0,utils/* isMachine */.O4)(invokeConfig.src) || (0,utils/* isFunction */.mf)(invokeConfig.src)) {
+        var invokeId = invokeConfig.id || (0,utils/* createInvokeId */.bx)(_this.id, i);
+        _this.machine.options.services = (0,_tslib/* __assign */.pi)((_b = {}, _b[invokeId] = invokeConfig.src, _b), _this.machine.options.services);
+        return toInvokeDefinition((0,_tslib/* __assign */.pi)((0,_tslib/* __assign */.pi)({
+          id: invokeId
+        }, invokeConfig), {
+          src: invokeId
+        }));
+      } else {
+        var invokeSource = invokeConfig.src;
+        return toInvokeDefinition((0,_tslib/* __assign */.pi)((0,_tslib/* __assign */.pi)({
+          id: (0,utils/* createInvokeId */.bx)(_this.id, i)
+        }, invokeConfig), {
+          src: invokeSource
+        }));
+      }
+    });
+    this.activities = (0,utils/* toArray */.qo)(this.config.activities).concat(this.invoke).map(function (activity) {
+      return (0,es_actions/* toActivityDefinition */.XA)(activity);
+    });
+    this.transition = this.transition.bind(this);
+    this.tags = (0,utils/* toArray */.qo)(this.config.tags); // TODO: this is the real fix for initialization once
+    // state node getters are deprecated
+    // if (!this.parent) {
+    //   this._init();
+    // }
+  }
+
+  StateNode.prototype._init = function () {
+    if (this.__cache.transitions) {
+      return;
+    }
+
+    getAllStateNodes(this).forEach(function (stateNode) {
+      return stateNode.on;
+    });
+  };
+  /**
+   * Clones this state machine with custom options and context.
+   *
+   * @param options Options (actions, guards, activities, services) to recursively merge with the existing options.
+   * @param context Custom context (will override predefined context)
+   */
+
+
+  StateNode.prototype.withConfig = function (options, context) {
+    var _a = this.options,
+        actions = _a.actions,
+        activities = _a.activities,
+        guards = _a.guards,
+        services = _a.services,
+        delays = _a.delays;
+    return new StateNode(this.config, {
+      actions: (0,_tslib/* __assign */.pi)((0,_tslib/* __assign */.pi)({}, actions), options.actions),
+      activities: (0,_tslib/* __assign */.pi)((0,_tslib/* __assign */.pi)({}, activities), options.activities),
+      guards: (0,_tslib/* __assign */.pi)((0,_tslib/* __assign */.pi)({}, guards), options.guards),
+      services: (0,_tslib/* __assign */.pi)((0,_tslib/* __assign */.pi)({}, services), options.services),
+      delays: (0,_tslib/* __assign */.pi)((0,_tslib/* __assign */.pi)({}, delays), options.delays)
+    }, context !== null && context !== void 0 ? context : this.context);
+  };
+  /**
+   * Clones this state machine with custom context.
+   *
+   * @param context Custom context (will override predefined context, not recursive)
+   */
+
+
+  StateNode.prototype.withContext = function (context) {
+    return new StateNode(this.config, this.options, context);
+  };
+
+  Object.defineProperty(StateNode.prototype, "context", {
+    get: function () {
+      return (0,utils/* isFunction */.mf)(this._context) ? this._context() : this._context;
+    },
+    enumerable: false,
+    configurable: true
+  });
+  Object.defineProperty(StateNode.prototype, "definition", {
+    /**
+     * The well-structured state node definition.
+     */
+    get: function () {
+      return {
+        id: this.id,
+        key: this.key,
+        version: this.version,
+        context: this.context,
+        type: this.type,
+        initial: this.initial,
+        history: this.history,
+        states: (0,utils/* mapValues */.Q8)(this.states, function (state) {
+          return state.definition;
+        }),
+        on: this.on,
+        transitions: this.transitions,
+        entry: this.onEntry,
+        exit: this.onExit,
+        activities: this.activities || [],
+        meta: this.meta,
+        order: this.order || -1,
+        data: this.doneData,
+        invoke: this.invoke,
+        description: this.description,
+        tags: this.tags
+      };
+    },
+    enumerable: false,
+    configurable: true
+  });
+
+  StateNode.prototype.toJSON = function () {
+    return this.definition;
+  };
+
+  Object.defineProperty(StateNode.prototype, "on", {
+    /**
+     * The mapping of events to transitions.
+     */
+    get: function () {
+      if (this.__cache.on) {
+        return this.__cache.on;
+      }
+
+      var transitions = this.transitions;
+      return this.__cache.on = transitions.reduce(function (map, transition) {
+        map[transition.eventType] = map[transition.eventType] || [];
+        map[transition.eventType].push(transition);
+        return map;
+      }, {});
+    },
+    enumerable: false,
+    configurable: true
+  });
+  Object.defineProperty(StateNode.prototype, "after", {
+    get: function () {
+      return this.__cache.delayedTransitions || (this.__cache.delayedTransitions = this.getDelayedTransitions(), this.__cache.delayedTransitions);
+    },
+    enumerable: false,
+    configurable: true
+  });
+  Object.defineProperty(StateNode.prototype, "transitions", {
+    /**
+     * All the transitions that can be taken from this state node.
+     */
+    get: function () {
+      return this.__cache.transitions || (this.__cache.transitions = this.formatTransitions(), this.__cache.transitions);
+    },
+    enumerable: false,
+    configurable: true
+  });
+
+  StateNode.prototype.getCandidates = function (eventName) {
+    if (this.__cache.candidates[eventName]) {
+      return this.__cache.candidates[eventName];
+    }
+
+    var transient = eventName === NULL_EVENT;
+    var candidates = this.transitions.filter(function (transition) {
+      var sameEventType = transition.eventType === eventName; // null events should only match against eventless transitions
+
+      return transient ? sameEventType : sameEventType || transition.eventType === WILDCARD;
+    });
+    this.__cache.candidates[eventName] = candidates;
+    return candidates;
+  };
+  /**
+   * All delayed transitions from the config.
+   */
+
+
+  StateNode.prototype.getDelayedTransitions = function () {
+    var _this = this;
+
+    var afterConfig = this.config.after;
+
+    if (!afterConfig) {
+      return [];
+    }
+
+    var mutateEntryExit = function (delay, i) {
+      var delayRef = (0,utils/* isFunction */.mf)(delay) ? "".concat(_this.id, ":delay[").concat(i, "]") : delay;
+      var eventType = (0,es_actions/* after */.e4)(delayRef, _this.id);
+
+      _this.onEntry.push((0,es_actions/* send */.lW)(eventType, {
+        delay: delay
+      }));
+
+      _this.onExit.push((0,es_actions/* cancel */.al)(eventType));
+
+      return eventType;
+    };
+
+    var delayedTransitions = (0,utils/* isArray */.kJ)(afterConfig) ? afterConfig.map(function (transition, i) {
+      var eventType = mutateEntryExit(transition.delay, i);
+      return (0,_tslib/* __assign */.pi)((0,_tslib/* __assign */.pi)({}, transition), {
+        event: eventType
+      });
+    }) : (0,utils/* flatten */.xH)(Object.keys(afterConfig).map(function (delay, i) {
+      var configTransition = afterConfig[delay];
+      var resolvedTransition = (0,utils/* isString */.HD)(configTransition) ? {
+        target: configTransition
+      } : configTransition;
+      var resolvedDelay = !isNaN(+delay) ? +delay : delay;
+      var eventType = mutateEntryExit(resolvedDelay, i);
+      return (0,utils/* toArray */.qo)(resolvedTransition).map(function (transition) {
+        return (0,_tslib/* __assign */.pi)((0,_tslib/* __assign */.pi)({}, transition), {
+          event: eventType,
+          delay: resolvedDelay
+        });
+      });
+    }));
+    return delayedTransitions.map(function (delayedTransition) {
+      var delay = delayedTransition.delay;
+      return (0,_tslib/* __assign */.pi)((0,_tslib/* __assign */.pi)({}, _this.formatTransition(delayedTransition)), {
+        delay: delay
+      });
+    });
+  };
+  /**
+   * Returns the state nodes represented by the current state value.
+   *
+   * @param state The state value or State instance
+   */
+
+
+  StateNode.prototype.getStateNodes = function (state) {
+    var _a;
+
+    var _this = this;
+
+    if (!state) {
+      return [];
+    }
+
+    var stateValue = state instanceof State ? state.value : (0,utils/* toStateValue */.WM)(state, this.delimiter);
+
+    if ((0,utils/* isString */.HD)(stateValue)) {
+      var initialStateValue = this.getStateNode(stateValue).initial;
+      return initialStateValue !== undefined ? this.getStateNodes((_a = {}, _a[stateValue] = initialStateValue, _a)) : [this, this.states[stateValue]];
+    }
+
+    var subStateKeys = Object.keys(stateValue);
+    var subStateNodes = [this];
+    subStateNodes.push.apply(subStateNodes, (0,_tslib/* __spreadArray */.ev)([], (0,_tslib/* __read */.CR)((0,utils/* flatten */.xH)(subStateKeys.map(function (subStateKey) {
+      return _this.getStateNode(subStateKey).getStateNodes(stateValue[subStateKey]);
+    }))), false));
+    return subStateNodes;
+  };
+  /**
+   * Returns `true` if this state node explicitly handles the given event.
+   *
+   * @param event The event in question
+   */
+
+
+  StateNode.prototype.handles = function (event) {
+    var eventType = (0,utils/* getEventType */.x6)(event);
+    return this.events.includes(eventType);
+  };
+  /**
+   * Resolves the given `state` to a new `State` instance relative to this machine.
+   *
+   * This ensures that `.events` and `.nextEvents` represent the correct values.
+   *
+   * @param state The state to resolve
+   */
+
+
+  StateNode.prototype.resolveState = function (state) {
+    var stateFromConfig = state instanceof State ? state : State.create(state);
+    var configuration = Array.from(getConfiguration([], this.getStateNodes(stateFromConfig.value)));
+    return new State((0,_tslib/* __assign */.pi)((0,_tslib/* __assign */.pi)({}, stateFromConfig), {
+      value: this.resolve(stateFromConfig.value),
+      configuration: configuration,
+      done: isInFinalState(configuration, this),
+      tags: getTagsFromConfiguration(configuration),
+      machine: this.machine
+    }));
+  };
+
+  StateNode.prototype.transitionLeafNode = function (stateValue, state, _event) {
+    var stateNode = this.getStateNode(stateValue);
+    var next = stateNode.next(state, _event);
+
+    if (!next || !next.transitions.length) {
+      return this.next(state, _event);
+    }
+
+    return next;
+  };
+
+  StateNode.prototype.transitionCompoundNode = function (stateValue, state, _event) {
+    var subStateKeys = Object.keys(stateValue);
+    var stateNode = this.getStateNode(subStateKeys[0]);
+
+    var next = stateNode._transition(stateValue[subStateKeys[0]], state, _event);
+
+    if (!next || !next.transitions.length) {
+      return this.next(state, _event);
+    }
+
+    return next;
+  };
+
+  StateNode.prototype.transitionParallelNode = function (stateValue, state, _event) {
+    var e_2, _a;
+
+    var transitionMap = {};
+
+    try {
+      for (var _b = (0,_tslib/* __values */.XA)(Object.keys(stateValue)), _c = _b.next(); !_c.done; _c = _b.next()) {
+        var subStateKey = _c.value;
+        var subStateValue = stateValue[subStateKey];
+
+        if (!subStateValue) {
+          continue;
+        }
+
+        var subStateNode = this.getStateNode(subStateKey);
+
+        var next = subStateNode._transition(subStateValue, state, _event);
+
+        if (next) {
+          transitionMap[subStateKey] = next;
+        }
+      }
+    } catch (e_2_1) {
+      e_2 = {
+        error: e_2_1
+      };
+    } finally {
+      try {
+        if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+      } finally {
+        if (e_2) throw e_2.error;
+      }
+    }
+
+    var stateTransitions = Object.keys(transitionMap).map(function (key) {
+      return transitionMap[key];
+    });
+    var enabledTransitions = (0,utils/* flatten */.xH)(stateTransitions.map(function (st) {
+      return st.transitions;
+    }));
+    var willTransition = stateTransitions.some(function (st) {
+      return st.transitions.length > 0;
+    });
+
+    if (!willTransition) {
+      return this.next(state, _event);
+    }
+
+    var entryNodes = (0,utils/* flatten */.xH)(stateTransitions.map(function (t) {
+      return t.entrySet;
+    }));
+    var configuration = (0,utils/* flatten */.xH)(Object.keys(transitionMap).map(function (key) {
+      return transitionMap[key].configuration;
+    }));
+    return {
+      transitions: enabledTransitions,
+      entrySet: entryNodes,
+      exitSet: (0,utils/* flatten */.xH)(stateTransitions.map(function (t) {
+        return t.exitSet;
+      })),
+      configuration: configuration,
+      source: state,
+      actions: (0,utils/* flatten */.xH)(Object.keys(transitionMap).map(function (key) {
+        return transitionMap[key].actions;
+      }))
+    };
+  };
+
+  StateNode.prototype._transition = function (stateValue, state, _event) {
+    // leaf node
+    if ((0,utils/* isString */.HD)(stateValue)) {
+      return this.transitionLeafNode(stateValue, state, _event);
+    } // hierarchical node
+
+
+    if (Object.keys(stateValue).length === 1) {
+      return this.transitionCompoundNode(stateValue, state, _event);
+    } // orthogonal node
+
+
+    return this.transitionParallelNode(stateValue, state, _event);
+  };
+
+  StateNode.prototype.getTransitionData = function (state, event) {
+    return this._transition(state.value, state, (0,utils/* toSCXMLEvent */.g5)(event));
+  };
+
+  StateNode.prototype.next = function (state, _event) {
+    var e_3, _a;
+
+    var _this = this;
+
+    var eventName = _event.name;
+    var actions = [];
+    var nextStateNodes = [];
+    var selectedTransition;
+
+    try {
+      for (var _b = (0,_tslib/* __values */.XA)(this.getCandidates(eventName)), _c = _b.next(); !_c.done; _c = _b.next()) {
+        var candidate = _c.value;
+        var cond = candidate.cond,
+            stateIn = candidate.in;
+        var resolvedContext = state.context;
+        var isInState = stateIn ? (0,utils/* isString */.HD)(stateIn) && isStateId(stateIn) ? // Check if in state by ID
+        state.matches((0,utils/* toStateValue */.WM)(this.getStateNodeById(stateIn).path, this.delimiter)) : // Check if in state by relative grandparent
+        (0,utils/* matchesState */.W)((0,utils/* toStateValue */.WM)(stateIn, this.delimiter), (0,utils/* path */.ET)(this.path.slice(0, -2))(state.value)) : true;
+        var guardPassed = false;
+
+        try {
+          guardPassed = !cond || (0,utils/* evaluateGuard */.vx)(this.machine, cond, resolvedContext, _event, state);
+        } catch (err) {
+          throw new Error("Unable to evaluate guard '".concat(cond.name || cond.type, "' in transition for event '").concat(eventName, "' in state node '").concat(this.id, "':\n").concat(err.message));
+        }
+
+        if (guardPassed && isInState) {
+          if (candidate.target !== undefined) {
+            nextStateNodes = candidate.target;
+          }
+
+          actions.push.apply(actions, (0,_tslib/* __spreadArray */.ev)([], (0,_tslib/* __read */.CR)(candidate.actions), false));
+          selectedTransition = candidate;
+          break;
+        }
+      }
+    } catch (e_3_1) {
+      e_3 = {
+        error: e_3_1
+      };
+    } finally {
+      try {
+        if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+      } finally {
+        if (e_3) throw e_3.error;
+      }
+    }
+
+    if (!selectedTransition) {
+      return undefined;
+    }
+
+    if (!nextStateNodes.length) {
+      return {
+        transitions: [selectedTransition],
+        entrySet: [],
+        exitSet: [],
+        configuration: state.value ? [this] : [],
+        source: state,
+        actions: actions
+      };
+    }
+
+    var allNextStateNodes = (0,utils/* flatten */.xH)(nextStateNodes.map(function (stateNode) {
+      return _this.getRelativeStateNodes(stateNode, state.historyValue);
+    }));
+    var isInternal = !!selectedTransition.internal;
+    var reentryNodes = isInternal ? [] : (0,utils/* flatten */.xH)(allNextStateNodes.map(function (n) {
+      return _this.nodesFromChild(n);
+    }));
+    return {
+      transitions: [selectedTransition],
+      entrySet: reentryNodes,
+      exitSet: isInternal ? [] : [this],
+      configuration: allNextStateNodes,
+      source: state,
+      actions: actions
+    };
+  };
+
+  StateNode.prototype.nodesFromChild = function (childStateNode) {
+    if (childStateNode.escapes(this)) {
+      return [];
+    }
+
+    var nodes = [];
+    var marker = childStateNode;
+
+    while (marker && marker !== this) {
+      nodes.push(marker);
+      marker = marker.parent;
+    }
+
+    nodes.push(this); // inclusive
+
+    return nodes;
+  };
+  /**
+   * Whether the given state node "escapes" this state node. If the `stateNode` is equal to or the parent of
+   * this state node, it does not escape.
+   */
+
+
+  StateNode.prototype.escapes = function (stateNode) {
+    if (this === stateNode) {
+      return false;
+    }
+
+    var parent = this.parent;
+
+    while (parent) {
+      if (parent === stateNode) {
+        return false;
+      }
+
+      parent = parent.parent;
+    }
+
+    return true;
+  };
+
+  StateNode.prototype.getActions = function (transition, currentContext, _event, prevState) {
+    var e_4, _a, e_5, _b;
+
+    var prevConfig = getConfiguration([], prevState ? this.getStateNodes(prevState.value) : [this]);
+    var resolvedConfig = transition.configuration.length ? getConfiguration(prevConfig, transition.configuration) : prevConfig;
+
+    try {
+      for (var resolvedConfig_1 = (0,_tslib/* __values */.XA)(resolvedConfig), resolvedConfig_1_1 = resolvedConfig_1.next(); !resolvedConfig_1_1.done; resolvedConfig_1_1 = resolvedConfig_1.next()) {
+        var sn = resolvedConfig_1_1.value;
+
+        if (!has(prevConfig, sn)) {
+          transition.entrySet.push(sn);
+        }
+      }
+    } catch (e_4_1) {
+      e_4 = {
+        error: e_4_1
+      };
+    } finally {
+      try {
+        if (resolvedConfig_1_1 && !resolvedConfig_1_1.done && (_a = resolvedConfig_1.return)) _a.call(resolvedConfig_1);
+      } finally {
+        if (e_4) throw e_4.error;
+      }
+    }
+
+    try {
+      for (var prevConfig_1 = (0,_tslib/* __values */.XA)(prevConfig), prevConfig_1_1 = prevConfig_1.next(); !prevConfig_1_1.done; prevConfig_1_1 = prevConfig_1.next()) {
+        var sn = prevConfig_1_1.value;
+
+        if (!has(resolvedConfig, sn) || has(transition.exitSet, sn.parent)) {
+          transition.exitSet.push(sn);
+        }
+      }
+    } catch (e_5_1) {
+      e_5 = {
+        error: e_5_1
+      };
+    } finally {
+      try {
+        if (prevConfig_1_1 && !prevConfig_1_1.done && (_b = prevConfig_1.return)) _b.call(prevConfig_1);
+      } finally {
+        if (e_5) throw e_5.error;
+      }
+    }
+
+    var doneEvents = (0,utils/* flatten */.xH)(transition.entrySet.map(function (sn) {
+      var events = [];
+
+      if (sn.type !== 'final') {
+        return events;
+      }
+
+      var parent = sn.parent;
+
+      if (!parent.parent) {
+        return events;
+      }
+
+      events.push((0,es_actions/* done */.aT)(sn.id, sn.doneData), // TODO: deprecate - final states should not emit done events for their own state.
+      (0,es_actions/* done */.aT)(parent.id, sn.doneData ? (0,utils/* mapContext */.QX)(sn.doneData, currentContext, _event) : undefined));
+      var grandparent = parent.parent;
+
+      if (grandparent.type === 'parallel') {
+        if (getChildren(grandparent).every(function (parentNode) {
+          return isInFinalState(transition.configuration, parentNode);
+        })) {
+          events.push((0,es_actions/* done */.aT)(grandparent.id));
+        }
+      }
+
+      return events;
+    }));
+    transition.exitSet.sort(function (a, b) {
+      return b.order - a.order;
+    });
+    transition.entrySet.sort(function (a, b) {
+      return a.order - b.order;
+    });
+    var entryStates = new Set(transition.entrySet);
+    var exitStates = new Set(transition.exitSet);
+
+    var _c = (0,_tslib/* __read */.CR)([(0,utils/* flatten */.xH)(Array.from(entryStates).map(function (stateNode) {
+      return (0,_tslib/* __spreadArray */.ev)((0,_tslib/* __spreadArray */.ev)([], (0,_tslib/* __read */.CR)(stateNode.activities.map(function (activity) {
+        return (0,es_actions/* start */.BL)(activity);
+      })), false), (0,_tslib/* __read */.CR)(stateNode.onEntry), false);
+    })).concat(doneEvents.map(es_actions/* raise */.OU)), (0,utils/* flatten */.xH)(Array.from(exitStates).map(function (stateNode) {
+      return (0,_tslib/* __spreadArray */.ev)((0,_tslib/* __spreadArray */.ev)([], (0,_tslib/* __read */.CR)(stateNode.onExit), false), (0,_tslib/* __read */.CR)(stateNode.activities.map(function (activity) {
+        return (0,es_actions/* stop */.sT)(activity);
+      })), false);
+    }))], 2),
+        entryActions = _c[0],
+        exitActions = _c[1];
+
+    var actions = (0,es_actions/* toActionObjects */.AE)(exitActions.concat(transition.actions).concat(entryActions), this.machine.options.actions);
+    return actions;
+  };
+  /**
+   * Determines the next state given the current `state` and sent `event`.
+   *
+   * @param state The current State instance or state value
+   * @param event The event that was sent at the current state
+   * @param context The current context (extended state) of the current state
+   */
+
+
+  StateNode.prototype.transition = function (state, event, context) {
+    if (state === void 0) {
+      state = this.initialState;
+    }
+
+    var _event = (0,utils/* toSCXMLEvent */.g5)(event);
+
+    var currentState;
+
+    if (state instanceof State) {
+      currentState = context === undefined ? state : this.resolveState(State.from(state, context));
+    } else {
+      var resolvedStateValue = (0,utils/* isString */.HD)(state) ? this.resolve((0,utils/* pathToStateValue */.on)(this.getResolvedPath(state))) : this.resolve(state);
+      var resolvedContext = context !== null && context !== void 0 ? context : this.machine.context;
+      currentState = this.resolveState(State.from(resolvedStateValue, resolvedContext));
+    }
+
+    if (!environment/* IS_PRODUCTION */.M && _event.name === WILDCARD) {
+      throw new Error("An event cannot have the wildcard type ('".concat(WILDCARD, "')"));
+    }
+
+    if (this.strict) {
+      if (!this.events.includes(_event.name) && !(0,utils/* isBuiltInEvent */.JQ)(_event.name)) {
+        throw new Error("Machine '".concat(this.id, "' does not accept event '").concat(_event.name, "'"));
+      }
+    }
+
+    var stateTransition = this._transition(currentState.value, currentState, _event) || {
+      transitions: [],
+      configuration: [],
+      entrySet: [],
+      exitSet: [],
+      source: currentState,
+      actions: []
+    };
+    var prevConfig = getConfiguration([], this.getStateNodes(currentState.value));
+    var resolvedConfig = stateTransition.configuration.length ? getConfiguration(prevConfig, stateTransition.configuration) : prevConfig;
+    stateTransition.configuration = (0,_tslib/* __spreadArray */.ev)([], (0,_tslib/* __read */.CR)(resolvedConfig), false);
+    return this.resolveTransition(stateTransition, currentState, currentState.context, _event);
+  };
+
+  StateNode.prototype.resolveRaisedTransition = function (state, _event, originalEvent) {
+    var _a;
+
+    var currentActions = state.actions;
+    state = this.transition(state, _event); // Save original event to state
+    // TODO: this should be the raised event! Delete in V5 (breaking)
+
+    state._event = originalEvent;
+    state.event = originalEvent.data;
+
+    (_a = state.actions).unshift.apply(_a, (0,_tslib/* __spreadArray */.ev)([], (0,_tslib/* __read */.CR)(currentActions), false));
+
+    return state;
+  };
+
+  StateNode.prototype.resolveTransition = function (stateTransition, currentState, context, _event) {
+    var e_6, _a;
+
+    var _this = this;
+
+    if (_event === void 0) {
+      _event = es_actions/* initEvent */.bf;
+    }
+
+    var configuration = stateTransition.configuration; // Transition will "apply" if:
+    // - this is the initial state (there is no current state)
+    // - OR there are transitions
+
+    var willTransition = !currentState || stateTransition.transitions.length > 0;
+    var resolvedStateValue = willTransition ? getValue(this.machine, configuration) : undefined;
+    var historyValue = currentState ? currentState.historyValue ? currentState.historyValue : stateTransition.source ? this.machine.historyValue(currentState.value) : undefined : undefined;
+    var actions = this.getActions(stateTransition, context, _event, currentState);
+    var activities = currentState ? (0,_tslib/* __assign */.pi)({}, currentState.activities) : {};
+
+    try {
+      for (var actions_1 = (0,_tslib/* __values */.XA)(actions), actions_1_1 = actions_1.next(); !actions_1_1.done; actions_1_1 = actions_1.next()) {
+        var action = actions_1_1.value;
+
+        if (action.type === actionTypes/* start */.BL) {
+          activities[action.activity.id || action.activity.type] = action;
+        } else if (action.type === actionTypes/* stop */.sT) {
+          activities[action.activity.id || action.activity.type] = false;
+        }
+      }
+    } catch (e_6_1) {
+      e_6 = {
+        error: e_6_1
+      };
+    } finally {
+      try {
+        if (actions_1_1 && !actions_1_1.done && (_a = actions_1.return)) _a.call(actions_1);
+      } finally {
+        if (e_6) throw e_6.error;
+      }
+    }
+
+    var _b = (0,_tslib/* __read */.CR)((0,es_actions/* resolveActions */.yC)(this, currentState, context, _event, actions, this.machine.config.preserveActionOrder), 2),
+        resolvedActions = _b[0],
+        updatedContext = _b[1];
+
+    var _c = (0,_tslib/* __read */.CR)((0,utils/* partition */.uK)(resolvedActions, function (action) {
+      return action.type === actionTypes/* raise */.OU || action.type === actionTypes/* send */.lW && action.to === types/* SpecialTargets.Internal */.K.Internal;
+    }), 2),
+        raisedEvents = _c[0],
+        nonRaisedActions = _c[1];
+
+    var invokeActions = resolvedActions.filter(function (action) {
+      var _a;
+
+      return action.type === actionTypes/* start */.BL && ((_a = action.activity) === null || _a === void 0 ? void 0 : _a.type) === actionTypes/* invoke */.dw;
+    });
+    var children = invokeActions.reduce(function (acc, action) {
+      acc[action.activity.id] = createInvocableActor(action.activity, _this.machine, updatedContext, _event);
+      return acc;
+    }, currentState ? (0,_tslib/* __assign */.pi)({}, currentState.children) : {});
+    var resolvedConfiguration = willTransition ? stateTransition.configuration : currentState ? currentState.configuration : [];
+    var isDone = isInFinalState(resolvedConfiguration, this);
+    var nextState = new State({
+      value: resolvedStateValue || currentState.value,
+      context: updatedContext,
+      _event: _event,
+      // Persist _sessionid between states
+      _sessionid: currentState ? currentState._sessionid : null,
+      historyValue: resolvedStateValue ? historyValue ? (0,utils/* updateHistoryValue */.yv)(historyValue, resolvedStateValue) : undefined : currentState ? currentState.historyValue : undefined,
+      history: !resolvedStateValue || stateTransition.source ? currentState : undefined,
+      actions: resolvedStateValue ? nonRaisedActions : [],
+      activities: resolvedStateValue ? activities : currentState ? currentState.activities : {},
+      events: [],
+      configuration: resolvedConfiguration,
+      transitions: stateTransition.transitions,
+      children: children,
+      done: isDone,
+      tags: currentState === null || currentState === void 0 ? void 0 : currentState.tags,
+      machine: this
+    });
+    var didUpdateContext = context !== updatedContext;
+    nextState.changed = _event.name === actionTypes/* update */.Vx || didUpdateContext; // Dispose of penultimate histories to prevent memory leaks
+
+    var history = nextState.history;
+
+    if (history) {
+      delete history.history;
+    } // There are transient transitions if the machine is not in a final state
+    // and if some of the state nodes have transient ("always") transitions.
+
+
+    var isTransient = !isDone && (this._transient || configuration.some(function (stateNode) {
+      return stateNode._transient;
+    })); // If there are no enabled transitions, check if there are transient transitions.
+    // If there are transient transitions, continue checking for more transitions
+    // because an transient transition should be triggered even if there are no
+    // enabled transitions.
+    //
+    // If we're already working on an transient transition (by checking
+    // if the event is a NULL_EVENT), then stop to prevent an infinite loop.
+    //
+    // Otherwise, if there are no enabled nor transient transitions, we are done.
+
+    if (!willTransition && (!isTransient || _event.name === NULL_EVENT)) {
+      return nextState;
+    }
+
+    var maybeNextState = nextState;
+
+    if (!isDone) {
+      if (isTransient) {
+        maybeNextState = this.resolveRaisedTransition(maybeNextState, {
+          type: actionTypes/* nullEvent */.IA
+        }, _event);
+      }
+
+      while (raisedEvents.length) {
+        var raisedEvent = raisedEvents.shift();
+        maybeNextState = this.resolveRaisedTransition(maybeNextState, raisedEvent._event, _event);
+      }
+    } // Detect if state changed
+
+
+    var changed = maybeNextState.changed || (history ? !!maybeNextState.actions.length || didUpdateContext || typeof history.value !== typeof maybeNextState.value || !stateValuesEqual(maybeNextState.value, history.value) : undefined);
+    maybeNextState.changed = changed; // Preserve original history after raised events
+
+    maybeNextState.history = history;
+    maybeNextState.tags = getTagsFromConfiguration(maybeNextState.configuration);
+    return maybeNextState;
+  };
+  /**
+   * Returns the child state node from its relative `stateKey`, or throws.
+   */
+
+
+  StateNode.prototype.getStateNode = function (stateKey) {
+    if (isStateId(stateKey)) {
+      return this.machine.getStateNodeById(stateKey);
+    }
+
+    if (!this.states) {
+      throw new Error("Unable to retrieve child state '".concat(stateKey, "' from '").concat(this.id, "'; no child states exist."));
+    }
+
+    var result = this.states[stateKey];
+
+    if (!result) {
+      throw new Error("Child state '".concat(stateKey, "' does not exist on '").concat(this.id, "'"));
+    }
+
+    return result;
+  };
+  /**
+   * Returns the state node with the given `stateId`, or throws.
+   *
+   * @param stateId The state ID. The prefix "#" is removed.
+   */
+
+
+  StateNode.prototype.getStateNodeById = function (stateId) {
+    var resolvedStateId = isStateId(stateId) ? stateId.slice(STATE_IDENTIFIER.length) : stateId;
+
+    if (resolvedStateId === this.id) {
+      return this;
+    }
+
+    var stateNode = this.machine.idMap[resolvedStateId];
+
+    if (!stateNode) {
+      throw new Error("Child state node '#".concat(resolvedStateId, "' does not exist on machine '").concat(this.id, "'"));
+    }
+
+    return stateNode;
+  };
+  /**
+   * Returns the relative state node from the given `statePath`, or throws.
+   *
+   * @param statePath The string or string array relative path to the state node.
+   */
+
+
+  StateNode.prototype.getStateNodeByPath = function (statePath) {
+    if (typeof statePath === 'string' && isStateId(statePath)) {
+      try {
+        return this.getStateNodeById(statePath.slice(1));
+      } catch (e) {// try individual paths
+        // throw e;
+      }
+    }
+
+    var arrayStatePath = (0,utils/* toStatePath */.Q9)(statePath, this.delimiter).slice();
+    var currentStateNode = this;
+
+    while (arrayStatePath.length) {
+      var key = arrayStatePath.shift();
+
+      if (!key.length) {
+        break;
+      }
+
+      currentStateNode = currentStateNode.getStateNode(key);
+    }
+
+    return currentStateNode;
+  };
+  /**
+   * Resolves a partial state value with its full representation in this machine.
+   *
+   * @param stateValue The partial state value to resolve.
+   */
+
+
+  StateNode.prototype.resolve = function (stateValue) {
+    var _a;
+
+    var _this = this;
+
+    if (!stateValue) {
+      return this.initialStateValue || EMPTY_OBJECT; // TODO: type-specific properties
+    }
+
+    switch (this.type) {
+      case 'parallel':
+        return (0,utils/* mapValues */.Q8)(this.initialStateValue, function (subStateValue, subStateKey) {
+          return subStateValue ? _this.getStateNode(subStateKey).resolve(stateValue[subStateKey] || subStateValue) : EMPTY_OBJECT;
+        });
+
+      case 'compound':
+        if ((0,utils/* isString */.HD)(stateValue)) {
+          var subStateNode = this.getStateNode(stateValue);
+
+          if (subStateNode.type === 'parallel' || subStateNode.type === 'compound') {
+            return _a = {}, _a[stateValue] = subStateNode.initialStateValue, _a;
+          }
+
+          return stateValue;
+        }
+
+        if (!Object.keys(stateValue).length) {
+          return this.initialStateValue || {};
+        }
+
+        return (0,utils/* mapValues */.Q8)(stateValue, function (subStateValue, subStateKey) {
+          return subStateValue ? _this.getStateNode(subStateKey).resolve(subStateValue) : EMPTY_OBJECT;
+        });
+
+      default:
+        return stateValue || EMPTY_OBJECT;
+    }
+  };
+
+  StateNode.prototype.getResolvedPath = function (stateIdentifier) {
+    if (isStateId(stateIdentifier)) {
+      var stateNode = this.machine.idMap[stateIdentifier.slice(STATE_IDENTIFIER.length)];
+
+      if (!stateNode) {
+        throw new Error("Unable to find state node '".concat(stateIdentifier, "'"));
+      }
+
+      return stateNode.path;
+    }
+
+    return (0,utils/* toStatePath */.Q9)(stateIdentifier, this.delimiter);
+  };
+
+  Object.defineProperty(StateNode.prototype, "initialStateValue", {
+    get: function () {
+      var _a;
+
+      if (this.__cache.initialStateValue) {
+        return this.__cache.initialStateValue;
+      }
+
+      var initialStateValue;
+
+      if (this.type === 'parallel') {
+        initialStateValue = (0,utils/* mapFilterValues */.ib)(this.states, function (state) {
+          return state.initialStateValue || EMPTY_OBJECT;
+        }, function (stateNode) {
+          return !(stateNode.type === 'history');
+        });
+      } else if (this.initial !== undefined) {
+        if (!this.states[this.initial]) {
+          throw new Error("Initial state '".concat(this.initial, "' not found on '").concat(this.key, "'"));
+        }
+
+        initialStateValue = isLeafNode(this.states[this.initial]) ? this.initial : (_a = {}, _a[this.initial] = this.states[this.initial].initialStateValue, _a);
+      } else {
+        // The finite state value of a machine without child states is just an empty object
+        initialStateValue = {};
+      }
+
+      this.__cache.initialStateValue = initialStateValue;
+      return this.__cache.initialStateValue;
+    },
+    enumerable: false,
+    configurable: true
+  });
+
+  StateNode.prototype.getInitialState = function (stateValue, context) {
+    this._init(); // TODO: this should be in the constructor (see note in constructor)
+
+
+    var configuration = this.getStateNodes(stateValue);
+    return this.resolveTransition({
+      configuration: configuration,
+      entrySet: configuration,
+      exitSet: [],
+      transitions: [],
+      source: undefined,
+      actions: []
+    }, undefined, context !== null && context !== void 0 ? context : this.machine.context, undefined);
+  };
+
+  Object.defineProperty(StateNode.prototype, "initialState", {
+    /**
+     * The initial State instance, which includes all actions to be executed from
+     * entering the initial state.
+     */
+    get: function () {
+      var initialStateValue = this.initialStateValue;
+
+      if (!initialStateValue) {
+        throw new Error("Cannot retrieve initial state from simple state '".concat(this.id, "'."));
+      }
+
+      return this.getInitialState(initialStateValue);
+    },
+    enumerable: false,
+    configurable: true
+  });
+  Object.defineProperty(StateNode.prototype, "target", {
+    /**
+     * The target state value of the history state node, if it exists. This represents the
+     * default state value to transition to if no history value exists yet.
+     */
+    get: function () {
+      var target;
+
+      if (this.type === 'history') {
+        var historyConfig = this.config;
+
+        if ((0,utils/* isString */.HD)(historyConfig.target)) {
+          target = isStateId(historyConfig.target) ? (0,utils/* pathToStateValue */.on)(this.machine.getStateNodeById(historyConfig.target).path.slice(this.path.length - 1)) : historyConfig.target;
+        } else {
+          target = historyConfig.target;
+        }
+      }
+
+      return target;
+    },
+    enumerable: false,
+    configurable: true
+  });
+  /**
+   * Returns the leaf nodes from a state path relative to this state node.
+   *
+   * @param relativeStateId The relative state path to retrieve the state nodes
+   * @param history The previous state to retrieve history
+   * @param resolve Whether state nodes should resolve to initial child state nodes
+   */
+
+  StateNode.prototype.getRelativeStateNodes = function (relativeStateId, historyValue, resolve) {
+    if (resolve === void 0) {
+      resolve = true;
+    }
+
+    return resolve ? relativeStateId.type === 'history' ? relativeStateId.resolveHistory(historyValue) : relativeStateId.initialStateNodes : [relativeStateId];
+  };
+
+  Object.defineProperty(StateNode.prototype, "initialStateNodes", {
+    get: function () {
+      var _this = this;
+
+      if (isLeafNode(this)) {
+        return [this];
+      } // Case when state node is compound but no initial state is defined
+
+
+      if (this.type === 'compound' && !this.initial) {
+        if (!environment/* IS_PRODUCTION */.M) {
+          (0,utils/* warn */.ZK)(false, "Compound state node '".concat(this.id, "' has no initial state."));
+        }
+
+        return [this];
+      }
+
+      var initialStateNodePaths = (0,utils/* toStatePaths */.SA)(this.initialStateValue);
+      return (0,utils/* flatten */.xH)(initialStateNodePaths.map(function (initialPath) {
+        return _this.getFromRelativePath(initialPath);
+      }));
+    },
+    enumerable: false,
+    configurable: true
+  });
+  /**
+   * Retrieves state nodes from a relative path to this state node.
+   *
+   * @param relativePath The relative path from this state node
+   * @param historyValue
+   */
+
+  StateNode.prototype.getFromRelativePath = function (relativePath) {
+    if (!relativePath.length) {
+      return [this];
+    }
+
+    var _a = (0,_tslib/* __read */.CR)(relativePath),
+        stateKey = _a[0],
+        childStatePath = _a.slice(1);
+
+    if (!this.states) {
+      throw new Error("Cannot retrieve subPath '".concat(stateKey, "' from node with no states"));
+    }
+
+    var childStateNode = this.getStateNode(stateKey);
+
+    if (childStateNode.type === 'history') {
+      return childStateNode.resolveHistory();
+    }
+
+    if (!this.states[stateKey]) {
+      throw new Error("Child state '".concat(stateKey, "' does not exist on '").concat(this.id, "'"));
+    }
+
+    return this.states[stateKey].getFromRelativePath(childStatePath);
+  };
+
+  StateNode.prototype.historyValue = function (relativeStateValue) {
+    if (!Object.keys(this.states).length) {
+      return undefined;
+    }
+
+    return {
+      current: relativeStateValue || this.initialStateValue,
+      states: (0,utils/* mapFilterValues */.ib)(this.states, function (stateNode, key) {
+        if (!relativeStateValue) {
+          return stateNode.historyValue();
+        }
+
+        var subStateValue = (0,utils/* isString */.HD)(relativeStateValue) ? undefined : relativeStateValue[key];
+        return stateNode.historyValue(subStateValue || stateNode.initialStateValue);
+      }, function (stateNode) {
+        return !stateNode.history;
+      })
+    };
+  };
+  /**
+   * Resolves to the historical value(s) of the parent state node,
+   * represented by state nodes.
+   *
+   * @param historyValue
+   */
+
+
+  StateNode.prototype.resolveHistory = function (historyValue) {
+    var _this = this;
+
+    if (this.type !== 'history') {
+      return [this];
+    }
+
+    var parent = this.parent;
+
+    if (!historyValue) {
+      var historyTarget = this.target;
+      return historyTarget ? (0,utils/* flatten */.xH)((0,utils/* toStatePaths */.SA)(historyTarget).map(function (relativeChildPath) {
+        return parent.getFromRelativePath(relativeChildPath);
+      })) : parent.initialStateNodes;
+    }
+
+    var subHistoryValue = (0,utils/* nestedPath */.gk)(parent.path, 'states')(historyValue).current;
+
+    if ((0,utils/* isString */.HD)(subHistoryValue)) {
+      return [parent.getStateNode(subHistoryValue)];
+    }
+
+    return (0,utils/* flatten */.xH)((0,utils/* toStatePaths */.SA)(subHistoryValue).map(function (subStatePath) {
+      return _this.history === 'deep' ? parent.getFromRelativePath(subStatePath) : [parent.states[subStatePath[0]]];
+    }));
+  };
+
+  Object.defineProperty(StateNode.prototype, "stateIds", {
+    /**
+     * All the state node IDs of this state node and its descendant state nodes.
+     */
+    get: function () {
+      var _this = this;
+
+      var childStateIds = (0,utils/* flatten */.xH)(Object.keys(this.states).map(function (stateKey) {
+        return _this.states[stateKey].stateIds;
+      }));
+      return [this.id].concat(childStateIds);
+    },
+    enumerable: false,
+    configurable: true
+  });
+  Object.defineProperty(StateNode.prototype, "events", {
+    /**
+     * All the event types accepted by this state node and its descendants.
+     */
+    get: function () {
+      var e_7, _a, e_8, _b;
+
+      if (this.__cache.events) {
+        return this.__cache.events;
+      }
+
+      var states = this.states;
+      var events = new Set(this.ownEvents);
+
+      if (states) {
+        try {
+          for (var _c = (0,_tslib/* __values */.XA)(Object.keys(states)), _d = _c.next(); !_d.done; _d = _c.next()) {
+            var stateId = _d.value;
+            var state = states[stateId];
+
+            if (state.states) {
+              try {
+                for (var _e = (e_8 = void 0, (0,_tslib/* __values */.XA)(state.events)), _f = _e.next(); !_f.done; _f = _e.next()) {
+                  var event_1 = _f.value;
+                  events.add("".concat(event_1));
+                }
+              } catch (e_8_1) {
+                e_8 = {
+                  error: e_8_1
+                };
+              } finally {
+                try {
+                  if (_f && !_f.done && (_b = _e.return)) _b.call(_e);
+                } finally {
+                  if (e_8) throw e_8.error;
+                }
+              }
+            }
+          }
+        } catch (e_7_1) {
+          e_7 = {
+            error: e_7_1
+          };
+        } finally {
+          try {
+            if (_d && !_d.done && (_a = _c.return)) _a.call(_c);
+          } finally {
+            if (e_7) throw e_7.error;
+          }
+        }
+      }
+
+      return this.__cache.events = Array.from(events);
+    },
+    enumerable: false,
+    configurable: true
+  });
+  Object.defineProperty(StateNode.prototype, "ownEvents", {
+    /**
+     * All the events that have transitions directly from this state node.
+     *
+     * Excludes any inert events.
+     */
+    get: function () {
+      var events = new Set(this.transitions.filter(function (transition) {
+        return !(!transition.target && !transition.actions.length && transition.internal);
+      }).map(function (transition) {
+        return transition.eventType;
+      }));
+      return Array.from(events);
+    },
+    enumerable: false,
+    configurable: true
+  });
+
+  StateNode.prototype.resolveTarget = function (_target) {
+    var _this = this;
+
+    if (_target === undefined) {
+      // an undefined target signals that the state node should not transition from that state when receiving that event
+      return undefined;
+    }
+
+    return _target.map(function (target) {
+      if (!(0,utils/* isString */.HD)(target)) {
+        return target;
+      }
+
+      var isInternalTarget = target[0] === _this.delimiter; // If internal target is defined on machine,
+      // do not include machine key on target
+
+      if (isInternalTarget && !_this.parent) {
+        return _this.getStateNodeByPath(target.slice(1));
+      }
+
+      var resolvedTarget = isInternalTarget ? _this.key + target : target;
+
+      if (_this.parent) {
+        try {
+          var targetStateNode = _this.parent.getStateNodeByPath(resolvedTarget);
+
+          return targetStateNode;
+        } catch (err) {
+          throw new Error("Invalid transition definition for state node '".concat(_this.id, "':\n").concat(err.message));
+        }
+      } else {
+        return _this.getStateNodeByPath(resolvedTarget);
+      }
+    });
+  };
+
+  StateNode.prototype.formatTransition = function (transitionConfig) {
+    var _this = this;
+
+    var normalizedTarget = (0,utils/* normalizeTarget */.rg)(transitionConfig.target);
+    var internal = 'internal' in transitionConfig ? transitionConfig.internal : normalizedTarget ? normalizedTarget.some(function (_target) {
+      return (0,utils/* isString */.HD)(_target) && _target[0] === _this.delimiter;
+    }) : true;
+    var guards = this.machine.options.guards;
+    var target = this.resolveTarget(normalizedTarget);
+
+    var transition = (0,_tslib/* __assign */.pi)((0,_tslib/* __assign */.pi)({}, transitionConfig), {
+      actions: (0,es_actions/* toActionObjects */.AE)((0,utils/* toArray */.qo)(transitionConfig.actions)),
+      cond: (0,utils/* toGuard */.Qi)(transitionConfig.cond, guards),
+      target: target,
+      source: this,
+      internal: internal,
+      eventType: transitionConfig.event,
+      toJSON: function () {
+        return (0,_tslib/* __assign */.pi)((0,_tslib/* __assign */.pi)({}, transition), {
+          target: transition.target ? transition.target.map(function (t) {
+            return "#".concat(t.id);
+          }) : undefined,
+          source: "#".concat(_this.id)
+        });
+      }
+    });
+
+    return transition;
+  };
+
+  StateNode.prototype.formatTransitions = function () {
+    var e_9, _a;
+
+    var _this = this;
+
+    var onConfig;
+
+    if (!this.config.on) {
+      onConfig = [];
+    } else if (Array.isArray(this.config.on)) {
+      onConfig = this.config.on;
+    } else {
+      var _b = this.config.on,
+          _c = WILDCARD,
+          _d = _b[_c],
+          wildcardConfigs = _d === void 0 ? [] : _d,
+          strictTransitionConfigs_1 = (0,_tslib/* __rest */._T)(_b, [typeof _c === "symbol" ? _c : _c + ""]);
+
+      onConfig = (0,utils/* flatten */.xH)(Object.keys(strictTransitionConfigs_1).map(function (key) {
+        if (!environment/* IS_PRODUCTION */.M && key === NULL_EVENT) {
+          (0,utils/* warn */.ZK)(false, "Empty string transition configs (e.g., `{ on: { '': ... }}`) for transient transitions are deprecated. Specify the transition in the `{ always: ... }` property instead. " + "Please check the `on` configuration for \"#".concat(_this.id, "\"."));
+        }
+
+        var transitionConfigArray = (0,utils/* toTransitionConfigArray */.jh)(key, strictTransitionConfigs_1[key]);
+
+        if (!environment/* IS_PRODUCTION */.M) {
+          validateArrayifiedTransitions(_this, key, transitionConfigArray);
+        }
+
+        return transitionConfigArray;
+      }).concat((0,utils/* toTransitionConfigArray */.jh)(WILDCARD, wildcardConfigs)));
+    }
+
+    var eventlessConfig = this.config.always ? (0,utils/* toTransitionConfigArray */.jh)('', this.config.always) : [];
+    var doneConfig = this.config.onDone ? (0,utils/* toTransitionConfigArray */.jh)(String((0,es_actions/* done */.aT)(this.id)), this.config.onDone) : [];
+
+    if (!environment/* IS_PRODUCTION */.M) {
+      (0,utils/* warn */.ZK)(!(this.config.onDone && !this.parent), "Root nodes cannot have an \".onDone\" transition. Please check the config of \"".concat(this.id, "\"."));
+    }
+
+    var invokeConfig = (0,utils/* flatten */.xH)(this.invoke.map(function (invokeDef) {
+      var settleTransitions = [];
+
+      if (invokeDef.onDone) {
+        settleTransitions.push.apply(settleTransitions, (0,_tslib/* __spreadArray */.ev)([], (0,_tslib/* __read */.CR)((0,utils/* toTransitionConfigArray */.jh)(String((0,es_actions/* doneInvoke */.Sl)(invokeDef.id)), invokeDef.onDone)), false));
+      }
+
+      if (invokeDef.onError) {
+        settleTransitions.push.apply(settleTransitions, (0,_tslib/* __spreadArray */.ev)([], (0,_tslib/* __read */.CR)((0,utils/* toTransitionConfigArray */.jh)(String((0,es_actions/* error */.vU)(invokeDef.id)), invokeDef.onError)), false));
+      }
+
+      return settleTransitions;
+    }));
+    var delayedTransitions = this.after;
+    var formattedTransitions = (0,utils/* flatten */.xH)((0,_tslib/* __spreadArray */.ev)((0,_tslib/* __spreadArray */.ev)((0,_tslib/* __spreadArray */.ev)((0,_tslib/* __spreadArray */.ev)([], (0,_tslib/* __read */.CR)(doneConfig), false), (0,_tslib/* __read */.CR)(invokeConfig), false), (0,_tslib/* __read */.CR)(onConfig), false), (0,_tslib/* __read */.CR)(eventlessConfig), false).map(function (transitionConfig) {
+      return (0,utils/* toArray */.qo)(transitionConfig).map(function (transition) {
+        return _this.formatTransition(transition);
+      });
+    }));
+
+    try {
+      for (var delayedTransitions_1 = (0,_tslib/* __values */.XA)(delayedTransitions), delayedTransitions_1_1 = delayedTransitions_1.next(); !delayedTransitions_1_1.done; delayedTransitions_1_1 = delayedTransitions_1.next()) {
+        var delayedTransition = delayedTransitions_1_1.value;
+        formattedTransitions.push(delayedTransition);
+      }
+    } catch (e_9_1) {
+      e_9 = {
+        error: e_9_1
+      };
+    } finally {
+      try {
+        if (delayedTransitions_1_1 && !delayedTransitions_1_1.done && (_a = delayedTransitions_1.return)) _a.call(delayedTransitions_1);
+      } finally {
+        if (e_9) throw e_9.error;
+      }
+    }
+
+    return formattedTransitions;
+  };
+
+  return StateNode;
+}();
+
+
+
+;// CONCATENATED MODULE: ./node_modules/xstate/es/Machine.js
+
+
+function Machine(config, options, initialContext) {
+  if (initialContext === void 0) {
+    initialContext = config.context;
+  }
+
+  return new StateNode_StateNode(config, options, initialContext);
+}
+function createMachine(config, options) {
+  return new StateNode(config, options);
+}
+
+
+
+;// CONCATENATED MODULE: ./Extension/src/pages/common/components/Editor/savingFSM.js
+
+
+const STATES = {
+  IDLE: 'idle',
+  SAVING: 'saving',
+  SAVED: 'saved'
+};
+const EVENTS = {
+  SAVE: 'save',
+  SUCCESS: 'success',
+  ERROR: 'error',
+  TIMEOUT: 'timeout'
+};
+const SAVED_DISPLAY_TIMEOUT_MS = 1000;
+const savingStateMachine = {
+  initial: 'idle',
+  states: {
+    [STATES.IDLE]: {
+      on: {
+        [EVENTS.SAVE]: STATES.SAVING
+      }
+    },
+    [STATES.SAVING]: {
+      invoke: {
+        src: 'saveData',
+        onDone: {
+          target: STATES.SAVED
+        },
+        onError: {
+          target: STATES.SAVED,
+          actions: (context, event) => {
+            const {
+              data: error
+            } = event;
+            log/* log.error */.c.error(error.message);
+          }
+        }
+      }
+    },
+    [STATES.SAVED]: {
+      after: [{
+        delay: SAVED_DISPLAY_TIMEOUT_MS,
+        target: STATES.IDLE
+      }]
+    }
+  }
+};
+const createSavingService = ({
+  id,
+  services
+}) => {
+  return interpret(Machine({ ...savingStateMachine,
+    id
+  }, {
+    services
+  })).start().onEvent(event => {
+    log/* log.debug */.c.debug(id, event);
+  }).onTransition(state => {
+    log/* log.debug */.c.debug(id, {
+      currentState: state.value
+    });
+  });
+};
+// EXTERNAL MODULE: ./node_modules/@adguard/translate/dist/index.esm.js
+var index_esm = __webpack_require__(8396);
+;// CONCATENATED MODULE: ./Extension/src/common/translators/translator.js
+
+
+/**
+ * Retrieves localised message by key, formats it and converts into string
+ */
+
+const translator_translator = index_esm/* translate.createTranslator */.Iu.createTranslator(i18n/* i18n */.a);
+;// CONCATENATED MODULE: ./Extension/src/pages/helpers.js
+/* eslint-disable max-len */
+
+const isMacOs = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+const getFilenameExtension = filename => {
+  if (!filename) {
+    return undefined;
+  }
+
+  const parts = filename.split('.');
+
+  if (parts.length < 2) {
+    return undefined;
+  }
+
+  return parts[parts.length - 1];
+};
+/**
+ * Handles file upload
+ * @param file
+ * @param requiredExtension
+ * @returns {Promise<string>}
+ */
+
+const handleFileUpload = (file, requiredExtension) => new Promise((resolve, reject) => {
+  if (getFilenameExtension(file.name) !== requiredExtension) {
+    reject(new Error(translator.getMessage('options_popup_import_settings_wrong_file_ext', {
+      extension: requiredExtension
+    })));
+  }
+
+  const reader = new FileReader();
+  reader.readAsText(file, 'UTF-8');
+
+  reader.onload = evt => {
+    resolve(evt.target.result);
+  };
+
+  reader.onerror = () => {
+    reject(new Error(translator.getMessage('options_popup_import_error_file_description')));
+  };
+});
+const hoursToMs = hours => {
+  const MS_IN_HOUR = 1000 * 60 * 60;
+  return hours * MS_IN_HOUR;
+};
+/**
+ * Awaits required period of time
+ * @param timeoutMs
+ * @returns {Promise<unknown>}
+ */
+
+const sleep = timeoutMs => {
+  return new Promise(resolve => {
+    setTimeout(resolve, timeoutMs);
+  });
+};
+const indexOfIgnoreCase = (str, searchString) => {
+  return str.toLowerCase().indexOf(searchString.toLowerCase());
+};
+const containsIgnoreCase = (str, searchString) => {
+  return !!(str && searchString && indexOfIgnoreCase(str, searchString) >= 0);
+};
+const findChunks = (str, searchString, chunks = []) => {
+  const ind = indexOfIgnoreCase(str, searchString);
+
+  if (ind > -1) {
+    chunks.push(str.slice(0, ind));
+    chunks.push(str.slice(ind, ind + searchString.length));
+    const restStr = str.slice(ind + searchString.length);
+
+    if (containsIgnoreCase(restStr, searchString)) {
+      findChunks(restStr, searchString, chunks);
+    } else {
+      chunks.push(restStr);
+    }
+  }
+
+  return chunks.filter(i => !!i);
+};
+const passiveEventSupported = (() => {
+  let passiveSupported = null;
+  return () => {
+    // memoize support to avoid adding multiple test events
+    if (typeof passiveSupported === 'boolean') {
+      return passiveSupported;
+    }
+
+    let supported = false;
+
+    try {
+      const options = {
+        get passive() {
+          supported = true;
+          return false;
+        }
+
+      };
+      window.addEventListener('test', null, options);
+      window.removeEventListener('test', null, options);
+    } catch (err) {
+      supported = false;
+    }
+
+    passiveSupported = supported;
+    return passiveSupported;
+  };
+})();
+const copyToClipboard = text => {
+  const textarea = document.createElement('textarea');
+  textarea.innerText = text;
+  textarea.style = `
+        position: absolute;
+        display: hidden;
+        width: 0;
+        height: 0;
+    `;
+  document.body.appendChild(textarea);
+  textarea.select();
+  document.execCommand('copy');
+  textarea.remove();
+};
+const measureTextWidth = text => {
+  const el = document.createElement('p');
+  el.innerText = text;
+  el.style = `
+        position: absolute;
+        display: hidden;
+        height: 0;
+        white-space: nowrap;
+        font-family: Roboto, "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Ubuntu, Arial, sans-serif;
+        font-size: 14px;
+    `;
+  document.body.appendChild(el);
+  const pxLength = el.clientWidth;
+  el.remove();
+  return pxLength;
+};
+/**
+ * Сalculate the angle of radius vector of the scroll motion
+ * and detect whether scroll is vertical
+ *
+ * @param {number} deltaY - wheel event deltaY value
+ * @param {number} deltaX - wheel event deltaX value
+ * @returns {boolean}
+ */
+
+const isVerticalScroll = (() => {
+  const degToRad = deg => deg * (Math.PI / 180);
+
+  const deg60ToRad = degToRad(60);
+  const deg90ToRad = degToRad(90);
+  const deg120ToRad = degToRad(120);
+  const deg240ToRad = degToRad(240);
+  const deg270ToRad = degToRad(270);
+  const deg300ToRad = degToRad(300);
+  return (deltaY, deltaX) => {
+    if (deltaY === 0) {
+      return false;
+    }
+
+    let angle = Math.atan(deltaX / deltaY);
+    angle = deltaY > 0 ? angle + deg90ToRad : angle + deg270ToRad;
+    return angle > deg60ToRad && angle < deg120ToRad || angle > deg240ToRad && angle < deg300ToRad;
+  };
+})();
+;// CONCATENATED MODULE: ./Extension/src/pages/options/components/Filters/Search/constants.js
+const SEARCH_FILTERS = {
+  ALL: 'all',
+  ENABLED: 'enabled',
+  DISABLED: 'disabled'
+};
+// EXTERNAL MODULE: ./node_modules/lodash/sortBy.js
+var sortBy = __webpack_require__(9219);
+var sortBy_default = /*#__PURE__*/__webpack_require__.n(sortBy);
+;// CONCATENATED MODULE: ./Extension/src/pages/options/components/Filters/helpers.js
+
+/**
+ * Sorts filters by enabled status and displayNumber
+ * @param filters
+ */
+
+const sortFilters = filters => {
+  const sorted = [...filters].sort((a, b) => {
+    // sort by enabled
+    const enabledA = !!a.enabled;
+    const enabledB = !!b.enabled;
+
+    if (enabledA !== enabledB) {
+      return enabledB - enabledA;
+    } // sort by groupId
+
+
+    if (a.groupId !== b.groupId) {
+      return a.groupId - b.groupId;
+    } // sort by display number
+
+
+    if (a.displayNumber && b.displayNumber) {
+      return a.displayNumber - b.displayNumber;
+    }
+
+    if (a.displayNumber) {
+      return 1;
+    }
+
+    if (b.displayNumber) {
+      return -1;
+    }
+
+    return 0;
+  });
+  return sorted;
+};
+/**
+ * Updates filters state without changing order
+ * @param currentFilters
+ * @param newFilters
+ */
+
+const updateFilters = (currentFilters, newFilters) => {
+  const updatedFilters = [...currentFilters];
+  newFilters.forEach(newFilter => {
+    const currentFilterIdx = currentFilters.findIndex(currentFilter => {
+      return currentFilter.filterId === newFilter.filterId;
+    });
+
+    if (currentFilterIdx < 0) {
+      updatedFilters.push(newFilter);
+    } else {
+      updatedFilters[currentFilterIdx] = newFilter;
+    }
+  });
+  return updatedFilters;
+};
+/**
+ * Updates groups state without changing order
+ * @param currentGroups
+ * @param newGroups
+ */
+
+const updateGroups = (currentGroups, newGroups) => {
+  const updatedGroups = [...currentGroups];
+  newGroups.forEach(newGroup => {
+    const currentGroupIdx = currentGroups.findIndex(currentGroup => {
+      return currentGroup.groupId === newGroup.groupId;
+    });
+
+    if (currentGroupIdx < 0) {
+      updatedGroups.push(newGroup);
+    } else {
+      updatedGroups[currentGroupIdx] = newGroup;
+    }
+  });
+  return updatedGroups;
+};
+const sortGroupsOnSearch = groups => {
+  const sortedGroups = sortBy_default()(groups, 'displayNumber').sort((a, b) => {
+    // enabled first
+    if (a.enabled && !b.enabled) {
+      return -1;
+    }
+
+    if (!a.enabled && b.enabled) {
+      return 1;
+    }
+
+    return 0;
+  });
+  return sortedGroups;
+};
+;// CONCATENATED MODULE: ./Extension/src/pages/options/options-storage/OptionsStorage.js
+
+/**
+ * Module used to keep options page settings, which do not need extension level persistence
+ */
+
+class OptionsStorage {
+  constructor() {
+    this.KEYS = {
+      /* allowlist editor wrap setting */
+      ALLOWLIST_EDITOR_WRAP: 'allowlist-editor-wrap',
+
+      /**
+       * Filtering log columns widths
+       */
+      COLUMNS_WIDTHS_PX: 'columns-widths-px',
+
+      /**
+       * Filtering log columns widths
+       */
+      COLUMNS_DATA: 'columns-data',
+
+      /**
+       * Request modal width
+       */
+      REQUEST_INFO_MODAL_WIDTH: 'request-info-modal-width'
+    };
+    this.DEFAULTS = {
+      [this.KEYS.ALLOWLIST_EDITOR_WRAP]: false,
+      [this.KEYS.REQUEST_INFO_MODAL_WIDTH]: null,
+      [this.KEYS.COLUMNS_DATA]: {
+        status: {
+          width: 260
+        },
+        url: {
+          width: 260
+        },
+        type: {
+          width: 100
+        },
+        rule: {
+          width: 260
+        },
+        filter: {
+          width: 260
+        },
+        source: {
+          width: 200
+        }
+      }
+    };
+    this.storage = localStorage;
+  }
+
+  setItem(key, value) {
+    try {
+      this.storage.setItem(key, JSON.stringify(value));
+    } catch (e) {
+      log/* log.debug */.c.debug(e);
+    }
+  }
+
+  getItem(key) {
+    let storedValue;
+
+    try {
+      storedValue = JSON.parse(this.storage.getItem(key));
+    } catch (e) {
+      log/* log.debug */.c.debug(e);
+      storedValue = null;
+    }
+
+    return storedValue === null ? this.DEFAULTS[key] : storedValue;
+  }
+
+}
+;// CONCATENATED MODULE: ./Extension/src/pages/options/options-storage/index.js
+
+const optionsStorage = new OptionsStorage();
+;// CONCATENATED MODULE: ./Extension/src/pages/options/stores/SettingsStore.js
+
+
+
+
+var SettingsStore_class, SettingsStore_descriptor, SettingsStore_descriptor2, SettingsStore_descriptor3, SettingsStore_descriptor4, SettingsStore_descriptor5, SettingsStore_descriptor6, SettingsStore_descriptor7, SettingsStore_descriptor8, SettingsStore_descriptor9, SettingsStore_descriptor10, SettingsStore_descriptor11, SettingsStore_descriptor12, SettingsStore_descriptor13, SettingsStore_descriptor14, SettingsStore_descriptor15, SettingsStore_descriptor16, SettingsStore_descriptor17, SettingsStore_descriptor18, SettingsStore_descriptor19, SettingsStore_descriptor20, SettingsStore_descriptor21, SettingsStore_descriptor22, SettingsStore_descriptor23, SettingsStore_descriptor24, SettingsStore_descriptor25, SettingsStore_descriptor26, SettingsStore_descriptor27, SettingsStore_descriptor28, SettingsStore_descriptor29, SettingsStore_descriptor30, SettingsStore_descriptor31, SettingsStore_descriptor32, SettingsStore_descriptor33, _descriptor34, _descriptor35;
+
+
+
+
+
+
+
+
+
+
+const savingAllowlistService = createSavingService({
+  id: 'allowlist',
+  services: {
+    saveData: async (_, e) => {
+      /**
+       * If saveAllowlist executes faster than MIN_EXECUTION_TIME_REQUIRED_MS we increase
+       * execution time for smoother user experience
+       */
+      const MIN_EXECUTION_TIME_REQUIRED_MS = 500;
+      const start = Date.now();
+      await messenger/* messenger.saveAllowlist */.d.saveAllowlist(e.value);
+      const end = Date.now();
+      const timePassed = end - start;
+
+      if (timePassed < MIN_EXECUTION_TIME_REQUIRED_MS) {
+        await sleep(MIN_EXECUTION_TIME_REQUIRED_MS - timePassed);
+      }
+    }
+  }
+});
+let SettingsStore = (SettingsStore_class = class SettingsStore {
+  constructor(rootStore) {
+    this.KEYS = {
+      ALLOW_ACCEPTABLE_ADS: 'allowAcceptableAds',
+      BLOCK_KNOWN_TRACKERS: 'blockKnownTrackers',
+      STRIP_TRACKING_PARAMETERS: 'stripTrackingParameters'
+    };
+
+    _initializerDefineProperty(this, "settings", SettingsStore_descriptor, this);
+
+    _initializerDefineProperty(this, "optionsReadyToRender", SettingsStore_descriptor2, this);
+
+    _initializerDefineProperty(this, "version", SettingsStore_descriptor3, this);
+
+    _initializerDefineProperty(this, "filters", SettingsStore_descriptor4, this);
+
+    _initializerDefineProperty(this, "categories", SettingsStore_descriptor5, this);
+
+    _initializerDefineProperty(this, "visibleFilters", SettingsStore_descriptor6, this);
+
+    _initializerDefineProperty(this, "rulesCount", SettingsStore_descriptor7, this);
+
+    _initializerDefineProperty(this, "allowAcceptableAds", SettingsStore_descriptor8, this);
+
+    _initializerDefineProperty(this, "blockKnownTrackers", SettingsStore_descriptor9, this);
+
+    _initializerDefineProperty(this, "stripTrackingParameters", SettingsStore_descriptor10, this);
+
+    _initializerDefineProperty(this, "allowlist", SettingsStore_descriptor11, this);
+
+    _initializerDefineProperty(this, "savingAllowlistState", SettingsStore_descriptor12, this);
+
+    _initializerDefineProperty(this, "filtersUpdating", SettingsStore_descriptor13, this);
+
+    _initializerDefineProperty(this, "selectedGroupId", SettingsStore_descriptor14, this);
+
+    _initializerDefineProperty(this, "isChrome", SettingsStore_descriptor15, this);
+
+    _initializerDefineProperty(this, "searchInput", SettingsStore_descriptor16, this);
+
+    _initializerDefineProperty(this, "searchSelect", SettingsStore_descriptor17, this);
+
+    _initializerDefineProperty(this, "allowlistEditorContentChanged", SettingsStore_descriptor18, this);
+
+    _initializerDefineProperty(this, "allowlistEditorWrap", SettingsStore_descriptor19, this);
+
+    _initializerDefineProperty(this, "fullscreenUserRulesEditorIsOpen", SettingsStore_descriptor20, this);
+
+    _initializerDefineProperty(this, "allowlistSizeReset", SettingsStore_descriptor21, this);
+
+    _initializerDefineProperty(this, "setFilterEnabledState", SettingsStore_descriptor22, this);
+
+    _initializerDefineProperty(this, "setAllowlist", SettingsStore_descriptor23, this);
+
+    _initializerDefineProperty(this, "getAllowlist", SettingsStore_descriptor24, this);
+
+    _initializerDefineProperty(this, "appendAllowlist", SettingsStore_descriptor25, this);
+
+    _initializerDefineProperty(this, "saveAllowlist", SettingsStore_descriptor26, this);
+
+    _initializerDefineProperty(this, "setAllowlistEditorContentChangedState", SettingsStore_descriptor27, this);
+
+    _initializerDefineProperty(this, "setSearchInput", SettingsStore_descriptor28, this);
+
+    _initializerDefineProperty(this, "setSearchSelect", SettingsStore_descriptor29, this);
+
+    _initializerDefineProperty(this, "sortFilters", SettingsStore_descriptor30, this);
+
+    _initializerDefineProperty(this, "setFilters", SettingsStore_descriptor31, this);
+
+    _initializerDefineProperty(this, "setVisibleFilters", SettingsStore_descriptor32, this);
+
+    _initializerDefineProperty(this, "sortSearchGroups", SettingsStore_descriptor33, this);
+
+    _initializerDefineProperty(this, "setGroups", _descriptor34, this);
+
+    _initializerDefineProperty(this, "selectVisibleFilters", _descriptor35, this);
+
+    (0,mobx_esm/* makeObservable */.rC)(this);
+    this.rootStore = rootStore;
+    savingAllowlistService.onTransition(state => {
+      (0,mobx_esm/* runInAction */.z)(() => {
+        this.savingAllowlistState = state.value;
+
+        if (state.value === STATES.SAVING) {
+          this.allowlistEditorContentChanged = false;
+        }
+      });
+    });
+  }
+
+  async requestOptionsData(firstRender) {
+    const data = await messenger/* messenger.getOptionsData */.d.getOptionsData();
+
+    if (!data) {
+      log/* log.error */.c.error('requestOptionsData: messenger.getOptionsData empty response. firstRender={0}', firstRender);
+      return;
+    }
+
+    (0,mobx_esm/* runInAction */.z)(() => {
+      this.settings = data.settings; // on first render we sort filters to show enabled on the top
+      // filter should remain on the same place event after being enabled or disabled
+
+      if (firstRender) {
+        this.setFilters(sortFilters(data.filtersMetadata.filters));
+      } else {
+        // on the next filters updates, we update filters keeping order
+        this.setFilters(updateFilters(this.filters, data.filtersMetadata.filters));
+      } // do not rerender groups on its turning on/off while searching
+
+
+      if (this.isSearching) {
+        this.setGroups(updateGroups(this.categories, data.filtersMetadata.categories));
+      } else {
+        this.setGroups(data.filtersMetadata.categories);
+      }
+
+      this.rulesCount = data.filtersInfo.rulesCount;
+      this.version = data.appVersion;
+      this.constants = data.constants;
+      this.setAllowAcceptableAds(data.filtersMetadata.filters);
+      this.setBlockKnownTrackers(data.filtersMetadata.filters);
+      this.setStripTrackingParameters(data.filtersMetadata.filters);
+      this.isChrome = data.environmentOptions.isChrome;
+      this.optionsReadyToRender = true;
+      this.fullscreenUserRulesEditorIsOpen = data.fullscreenUserRulesEditorIsOpen;
+    });
+  }
+
+  updateRulesCount(rulesCount) {
+    this.rulesCount = rulesCount;
+  }
+
+  setSelectedGroupId(dirtyGroupId) {
+    const groupId = Number.parseInt(dirtyGroupId, 10);
+
+    if (Number.isNaN(groupId)) {
+      this.selectedGroupId = null;
+    } else {
+      const groupExists = this.categories.find(category => category.groupId === groupId);
+
+      if (groupExists) {
+        this.selectedGroupId = groupId;
+      } else {
+        this.selectedGroupId = null;
+      }
+    }
+  }
+
+  updateSetting(settingId, value) {
+    this.settings.values[settingId] = value;
+    messenger/* messenger.changeUserSetting */.d.changeUserSetting(settingId, value);
+  }
+
+  async setFilterRelatedSettingState(filterId, optionKey, enabled) {
+    const prevValue = this[optionKey];
+    this[optionKey] = enabled;
+
+    try {
+      const relatedFilter = this.filters.find(f => f.filterId === filterId);
+
+      if (enabled) {
+        await messenger/* messenger.enableFilter */.d.enableFilter(filterId);
+        await this.updateGroupSetting(relatedFilter.groupId, enabled);
+      } else {
+        await messenger/* messenger.disableFilter */.d.disableFilter(filterId);
+      }
+
+      relatedFilter.enabled = enabled;
+      this.refreshFilter(relatedFilter);
+    } catch (e) {
+      (0,mobx_esm/* runInAction */.z)(() => {
+        this[optionKey] = prevValue;
+      });
+    }
+  }
+
+  async setAllowAcceptableAdsState(enabled) {
+    const {
+      SEARCH_AND_SELF_PROMO_FILTER_ID
+    } = this.constants.AntiBannerFiltersId;
+    await this.setFilterRelatedSettingState(SEARCH_AND_SELF_PROMO_FILTER_ID, this.KEYS.ALLOW_ACCEPTABLE_ADS, !enabled);
+  }
+
+  async setBlockKnownTrackersState(enabled) {
+    const {
+      TRACKING_FILTER_ID
+    } = this.constants.AntiBannerFiltersId;
+    await this.setFilterRelatedSettingState(TRACKING_FILTER_ID, this.KEYS.BLOCK_KNOWN_TRACKERS, enabled);
+  }
+
+  async setStripTrackingParametersState(enabled) {
+    const {
+      URL_TRACKING_FILTER_ID
+    } = this.constants.AntiBannerFiltersId;
+    await this.setFilterRelatedSettingState(URL_TRACKING_FILTER_ID, this.KEYS.STRIP_TRACKING_PARAMETERS, enabled);
+  }
+
+  setSetting(filtersId, settingKey, filters) {
+    const relatedFilter = filters.find(f => f.filterId === filtersId);
+    this[settingKey] = !!(relatedFilter !== null && relatedFilter !== void 0 && relatedFilter.enabled) || false;
+  }
+
+  setAllowAcceptableAds(filters) {
+    const {
+      SEARCH_AND_SELF_PROMO_FILTER_ID
+    } = this.constants.AntiBannerFiltersId;
+    this.setSetting(SEARCH_AND_SELF_PROMO_FILTER_ID, this.KEYS.ALLOW_ACCEPTABLE_ADS, filters);
+  }
+
+  setBlockKnownTrackers(filters) {
+    const {
+      TRACKING_FILTER_ID
+    } = this.constants.AntiBannerFiltersId;
+    this.setSetting(TRACKING_FILTER_ID, this.KEYS.BLOCK_KNOWN_TRACKERS, filters);
+  }
+
+  setStripTrackingParameters(filters) {
+    const {
+      URL_TRACKING_FILTER_ID
+    } = this.constants.AntiBannerFiltersId;
+    this.setSetting(URL_TRACKING_FILTER_ID, this.KEYS.STRIP_TRACKING_PARAMETERS, filters);
+  }
+
+  isFilterEnabled(filterId) {
+    const filter = this.filters.find(f => f.filterId === filterId);
+    return filter.enabled;
+  }
+
+  isAllowAcceptableAdsFilterEnabled() {
+    const {
+      SEARCH_AND_SELF_PROMO_FILTER_ID
+    } = this.constants.AntiBannerFiltersId;
+    this.isFilterEnabled(SEARCH_AND_SELF_PROMO_FILTER_ID);
+  }
+
+  isBlockKnownTrackersFilterEnabled() {
+    const {
+      TRACKING_FILTER_ID
+    } = this.constants.AntiBannerFiltersId;
+    this.isFilterEnabled(TRACKING_FILTER_ID);
+  }
+
+  isStripTrackingParametersFilterEnabled() {
+    const {
+      URL_TRACKING_FILTER_ID
+    } = this.constants.AntiBannerFiltersId;
+    this.isFilterEnabled(URL_TRACKING_FILTER_ID);
+  }
+
+  get lastUpdateTime() {
+    return Math.max(...this.filters.map(filter => filter.lastCheckTime || 0));
+  }
+
+  async updateGroupSetting(id, enabled) {
+    await messenger/* messenger.updateGroupStatus */.d.updateGroupStatus(id, enabled);
+    (0,mobx_esm/* runInAction */.z)(() => {
+      const groupId = parseInt(id, 10);
+
+      if (groupId === constants/* ANTIBANNER_GROUPS_ID.OTHER_FILTERS_GROUP_ID */.CI.OTHER_FILTERS_GROUP_ID && this.isAllowAcceptableAdsFilterEnabled()) {
+        this.allowAcceptableAds = enabled;
+      } else if (groupId === constants/* ANTIBANNER_GROUPS_ID.PRIVACY_FILTERS_GROUP_ID */.CI.PRIVACY_FILTERS_GROUP_ID) {// if (this.isBlockKnownTrackersFilterEnabled()) {
+        //     this.blockKnownTrackers = enabled;
+        // }
+        // if (this.isStripTrackingParametersFilterEnabled()) {
+        //     this.stripTrackingParameters = enabled;
+        // }
+      }
+
+      this.categories.forEach(group => {
+        if (group.groupId === groupId) {
+          if (enabled) {
+            // eslint-disable-next-line no-param-reassign
+            group.enabled = true;
+          } else {
+            // eslint-disable-next-line no-param-reassign
+            delete group.enabled;
+          }
+        }
+      });
+    });
+  }
+
+  refreshFilters(updatedFilters) {
+    if (updatedFilters && updatedFilters.length) {
+      updatedFilters.forEach(filter => this.refreshFilter(filter));
+    }
+  }
+
+  refreshFilter(filter) {
+    if (!filter) {
+      return;
+    }
+
+    const idx = this.filters.findIndex(f => f.filterId === filter.filterId);
+
+    if (idx !== -1) {
+      Object.keys(filter).forEach(key => {
+        this.filters[idx][key] = filter[key];
+      });
+    }
+  }
+
+  async updateFilterSetting(rawFilterId, enabled) {
+    const filterId = Number.parseInt(rawFilterId, 10);
+    this.setFilterEnabledState(filterId, enabled);
+
+    try {
+      const filters = await messenger/* messenger.updateFilterStatus */.d.updateFilterStatus(filterId, enabled);
+      this.refreshFilters(filters); // update allow acceptable ads setting
+
+      if (filterId === this.constants.AntiBannerFiltersId.SEARCH_AND_SELF_PROMO_FILTER_ID) {
+        this.allowAcceptableAds = enabled;
+      } else if (filterId === this.constants.AntiBannerFiltersId.TRACKING_FILTER_ID) {
+        this.blockKnownTrackers = enabled;
+      } else if (filterId === this.constants.AntiBannerFiltersId.URL_TRACKING_FILTER_ID) {
+        this.stripTrackingParameters = enabled;
+      }
+    } catch (e) {
+      log/* log.error */.c.error(e);
+      this.setFilterEnabledState(filterId, !enabled);
+    }
+  }
+
+  setFiltersUpdating(value) {
+    this.filtersUpdating = value;
+  }
+
+  async updateFilters() {
+    this.setFiltersUpdating(true);
+
+    try {
+      const filtersUpdates = await messenger/* messenger.updateFilters */.d.updateFilters();
+      this.refreshFilters(filtersUpdates);
+      setTimeout(() => {
+        this.setFiltersUpdating(false);
+      }, 2000);
+      return filtersUpdates;
+    } catch (error) {
+      this.setFiltersUpdating(false);
+      throw error;
+    }
+  }
+
+  async addCustomFilter(filter) {
+    const newFilter = await messenger/* messenger.addCustomFilter */.d.addCustomFilter(filter);
+
+    if (!newFilter) {
+      return;
+    }
+
+    (0,mobx_esm/* runInAction */.z)(() => {
+      this.filters.push(newFilter);
+
+      if (this.searchSelect !== SEARCH_FILTERS.ALL) {
+        this.setSearchSelect(SEARCH_FILTERS.ALL);
+      }
+    });
+  }
+
+  async removeCustomFilter(filterId) {
+    await messenger/* messenger.removeCustomFilter */.d.removeCustomFilter(filterId);
+    (0,mobx_esm/* runInAction */.z)(() => {
+      this.setFilters(this.filters.filter(filter => filter.filterId !== filterId));
+      this.setVisibleFilters(this.visibleFilters.filter(filter => {
+        return filter.filterId !== filterId;
+      }));
+    });
+  }
+
+  get isSearching() {
+    return this.searchSelect !== SEARCH_FILTERS.ALL || this.searchInput;
+  }
+  /**
+   * We do not sort filters on every filters data update for better UI experience
+   * Filters sort happens when user exits from filters group, or changes search filters
+   */
+
+
+  get filtersToRender() {
+    const searchInputString = this.searchInput.replace(constants/* WASTE_CHARACTERS */.XS, '\\$&');
+    const searchQuery = new RegExp(searchInputString, 'ig');
+    let selectedFilters;
+
+    if (this.isSearching) {
+      selectedFilters = this.visibleFilters;
+    } else {
+      selectedFilters = this.filters;
+    }
+
+    return selectedFilters.filter(filter => {
+      if (Number.isInteger(this.selectedGroupId)) {
+        return filter.groupId === this.selectedGroupId;
+      }
+
+      return true;
+    }).filter(filter => {
+      const nameIsMatching = filter.name.match(searchQuery);
+
+      if (nameIsMatching) {
+        return true;
+      }
+
+      if (filter.tagsDetails) {
+        // eslint-disable-next-line max-len
+        const tagKeywordIsMatching = filter.tagsDetails.some(tag => `#${tag.keyword}`.match(searchQuery));
+
+        if (tagKeywordIsMatching) {
+          return true;
+        }
+      } // AG-10491
+
+
+      if (filter.trusted && filter.trusted === true) {
+        const trustedTagMatching = `#${constants/* TRUSTED_TAG */.XR}`.match(searchQuery);
+
+        if (trustedTagMatching) {
+          return true;
+        }
+      }
+
+      return false;
+    });
+  }
+
+  get appearanceTheme() {
+    if (!this.settings) {
+      return null;
+    }
+
+    return this.settings.values[this.settings.names.APPEARANCE_THEME];
+  }
+
+  get showAdguardPromoInfo() {
+    if (!this.settings) {
+      return null;
+    }
+
+    return !this.settings.values[this.settings.names.DISABLE_SHOW_ADGUARD_PROMO_INFO];
+  }
+
+  async hideAdguardPromoInfo() {
+    await this.updateSetting(this.settings.names.DISABLE_SHOW_ADGUARD_PROMO_INFO, true);
+  }
+
+  get allowlistEditorWrapState() {
+    if (this.allowlistEditorWrap === null) {
+      this.allowlistEditorWrap = optionsStorage.getItem(optionsStorage.KEYS.ALLOWLIST_EDITOR_WRAP);
+    }
+
+    return this.allowlistEditorWrap;
+  }
+
+  toggleAllowlistEditorWrap() {
+    this.allowlistEditorWrap = !this.allowlistEditorWrap;
+    optionsStorage.setItem(optionsStorage.KEYS.ALLOWLIST_EDITOR_WRAP, this.allowlistEditorWrap);
+  }
+
+  get footerRateShowState() {
+    return !this.settings.values[this.settings.names.HIDE_RATE_BLOCK];
+  }
+
+  async hideFooterRateShow() {
+    await this.updateSetting(this.settings.names.HIDE_RATE_BLOCK, true);
+  }
+
+  setFullscreenUserRulesEditorState(isOpen) {
+    this.fullscreenUserRulesEditorIsOpen = isOpen;
+  }
+
+  get isFullscreenUserRulesEditorOpen() {
+    return this.fullscreenUserRulesEditorIsOpen;
+  }
+
+  get userFilterEnabledSettingId() {
+    return this.settings.names.USER_FILTER_ENABLED;
+  }
+
+  get userFilterEnabled() {
+    return this.settings.values[this.userFilterEnabledSettingId];
+  }
+
+  setAllowlistSizeReset(value) {
+    this.allowlistSizeReset = value;
+  }
+
+  get protectionLevel() {
+    var _this$settings, _this$settings$values;
+
+    return this === null || this === void 0 ? void 0 : (_this$settings = this.settings) === null || _this$settings === void 0 ? void 0 : (_this$settings$values = _this$settings.values) === null || _this$settings$values === void 0 ? void 0 : _this$settings$values['protection-level'];
+  }
+
+  get arePermissionsRejected() {
+    var _this$settings2, _this$settings2$value;
+
+    return !!(this !== null && this !== void 0 && (_this$settings2 = this.settings) !== null && _this$settings2 !== void 0 && (_this$settings2$value = _this$settings2.values) !== null && _this$settings2$value !== void 0 && _this$settings2$value['permissions-rejected']);
+  }
+
+  async setProtectionLevel(value) {
+    this.updateSetting('protection-level', value);
+  }
+
+}, (SettingsStore_descriptor = _applyDecoratedDescriptor(SettingsStore_class.prototype, "settings", [mobx_esm/* observable */.LO], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: function () {
+    return null;
+  }
+}), SettingsStore_descriptor2 = _applyDecoratedDescriptor(SettingsStore_class.prototype, "optionsReadyToRender", [mobx_esm/* observable */.LO], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: function () {
+    return false;
+  }
+}), SettingsStore_descriptor3 = _applyDecoratedDescriptor(SettingsStore_class.prototype, "version", [mobx_esm/* observable */.LO], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: function () {
+    return null;
+  }
+}), SettingsStore_descriptor4 = _applyDecoratedDescriptor(SettingsStore_class.prototype, "filters", [mobx_esm/* observable */.LO], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: function () {
+    return [];
+  }
+}), SettingsStore_descriptor5 = _applyDecoratedDescriptor(SettingsStore_class.prototype, "categories", [mobx_esm/* observable */.LO], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: function () {
+    return [];
+  }
+}), SettingsStore_descriptor6 = _applyDecoratedDescriptor(SettingsStore_class.prototype, "visibleFilters", [mobx_esm/* observable */.LO], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: function () {
+    return [];
+  }
+}), SettingsStore_descriptor7 = _applyDecoratedDescriptor(SettingsStore_class.prototype, "rulesCount", [mobx_esm/* observable */.LO], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: function () {
+    return 0;
+  }
+}), SettingsStore_descriptor8 = _applyDecoratedDescriptor(SettingsStore_class.prototype, "allowAcceptableAds", [mobx_esm/* observable */.LO], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: function () {
+    return null;
+  }
+}), SettingsStore_descriptor9 = _applyDecoratedDescriptor(SettingsStore_class.prototype, "blockKnownTrackers", [mobx_esm/* observable */.LO], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: function () {
+    return null;
+  }
+}), SettingsStore_descriptor10 = _applyDecoratedDescriptor(SettingsStore_class.prototype, "stripTrackingParameters", [mobx_esm/* observable */.LO], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: function () {
+    return null;
+  }
+}), SettingsStore_descriptor11 = _applyDecoratedDescriptor(SettingsStore_class.prototype, "allowlist", [mobx_esm/* observable */.LO], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: function () {
+    return '';
+  }
+}), SettingsStore_descriptor12 = _applyDecoratedDescriptor(SettingsStore_class.prototype, "savingAllowlistState", [mobx_esm/* observable */.LO], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: function () {
+    return savingAllowlistService.initialState.value;
+  }
+}), SettingsStore_descriptor13 = _applyDecoratedDescriptor(SettingsStore_class.prototype, "filtersUpdating", [mobx_esm/* observable */.LO], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: function () {
+    return false;
+  }
+}), SettingsStore_descriptor14 = _applyDecoratedDescriptor(SettingsStore_class.prototype, "selectedGroupId", [mobx_esm/* observable */.LO], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: function () {
+    return null;
+  }
+}), SettingsStore_descriptor15 = _applyDecoratedDescriptor(SettingsStore_class.prototype, "isChrome", [mobx_esm/* observable */.LO], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: function () {
+    return null;
+  }
+}), SettingsStore_descriptor16 = _applyDecoratedDescriptor(SettingsStore_class.prototype, "searchInput", [mobx_esm/* observable */.LO], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: function () {
+    return '';
+  }
+}), SettingsStore_descriptor17 = _applyDecoratedDescriptor(SettingsStore_class.prototype, "searchSelect", [mobx_esm/* observable */.LO], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: function () {
+    return SEARCH_FILTERS.ALL;
+  }
+}), SettingsStore_descriptor18 = _applyDecoratedDescriptor(SettingsStore_class.prototype, "allowlistEditorContentChanged", [mobx_esm/* observable */.LO], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: function () {
+    return false;
+  }
+}), SettingsStore_descriptor19 = _applyDecoratedDescriptor(SettingsStore_class.prototype, "allowlistEditorWrap", [mobx_esm/* observable */.LO], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: function () {
+    return null;
+  }
+}), SettingsStore_descriptor20 = _applyDecoratedDescriptor(SettingsStore_class.prototype, "fullscreenUserRulesEditorIsOpen", [mobx_esm/* observable */.LO], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: function () {
+    return false;
+  }
+}), SettingsStore_descriptor21 = _applyDecoratedDescriptor(SettingsStore_class.prototype, "allowlistSizeReset", [mobx_esm/* observable */.LO], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: function () {
+    return false;
+  }
+}), _applyDecoratedDescriptor(SettingsStore_class.prototype, "requestOptionsData", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(SettingsStore_class.prototype, "requestOptionsData"), SettingsStore_class.prototype), _applyDecoratedDescriptor(SettingsStore_class.prototype, "updateRulesCount", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(SettingsStore_class.prototype, "updateRulesCount"), SettingsStore_class.prototype), _applyDecoratedDescriptor(SettingsStore_class.prototype, "setSelectedGroupId", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(SettingsStore_class.prototype, "setSelectedGroupId"), SettingsStore_class.prototype), _applyDecoratedDescriptor(SettingsStore_class.prototype, "updateSetting", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(SettingsStore_class.prototype, "updateSetting"), SettingsStore_class.prototype), _applyDecoratedDescriptor(SettingsStore_class.prototype, "setAllowAcceptableAdsState", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(SettingsStore_class.prototype, "setAllowAcceptableAdsState"), SettingsStore_class.prototype), _applyDecoratedDescriptor(SettingsStore_class.prototype, "setBlockKnownTrackersState", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(SettingsStore_class.prototype, "setBlockKnownTrackersState"), SettingsStore_class.prototype), _applyDecoratedDescriptor(SettingsStore_class.prototype, "setStripTrackingParametersState", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(SettingsStore_class.prototype, "setStripTrackingParametersState"), SettingsStore_class.prototype), _applyDecoratedDescriptor(SettingsStore_class.prototype, "setAllowAcceptableAds", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(SettingsStore_class.prototype, "setAllowAcceptableAds"), SettingsStore_class.prototype), _applyDecoratedDescriptor(SettingsStore_class.prototype, "setBlockKnownTrackers", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(SettingsStore_class.prototype, "setBlockKnownTrackers"), SettingsStore_class.prototype), _applyDecoratedDescriptor(SettingsStore_class.prototype, "setStripTrackingParameters", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(SettingsStore_class.prototype, "setStripTrackingParameters"), SettingsStore_class.prototype), _applyDecoratedDescriptor(SettingsStore_class.prototype, "lastUpdateTime", [mobx_esm/* computed */.Fl], Object.getOwnPropertyDescriptor(SettingsStore_class.prototype, "lastUpdateTime"), SettingsStore_class.prototype), _applyDecoratedDescriptor(SettingsStore_class.prototype, "updateGroupSetting", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(SettingsStore_class.prototype, "updateGroupSetting"), SettingsStore_class.prototype), _applyDecoratedDescriptor(SettingsStore_class.prototype, "refreshFilters", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(SettingsStore_class.prototype, "refreshFilters"), SettingsStore_class.prototype), _applyDecoratedDescriptor(SettingsStore_class.prototype, "refreshFilter", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(SettingsStore_class.prototype, "refreshFilter"), SettingsStore_class.prototype), SettingsStore_descriptor22 = _applyDecoratedDescriptor(SettingsStore_class.prototype, "setFilterEnabledState", [mobx_esm/* action */.aD], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: function () {
+    return (rawFilterId, enabled) => {
+      const filterId = parseInt(rawFilterId, 10);
+      this.filters.forEach(filter => {
+        if (filter.filterId === filterId) {
+          // eslint-disable-next-line no-param-reassign
+          filter.enabled = !!enabled;
+        }
+      });
+      this.visibleFilters.forEach(filter => {
+        if (filter.filterId === filterId) {
+          // eslint-disable-next-line no-param-reassign
+          filter.enabled = !!enabled;
+        }
+      });
+    };
+  }
+}), _applyDecoratedDescriptor(SettingsStore_class.prototype, "updateFilterSetting", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(SettingsStore_class.prototype, "updateFilterSetting"), SettingsStore_class.prototype), _applyDecoratedDescriptor(SettingsStore_class.prototype, "setFiltersUpdating", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(SettingsStore_class.prototype, "setFiltersUpdating"), SettingsStore_class.prototype), _applyDecoratedDescriptor(SettingsStore_class.prototype, "updateFilters", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(SettingsStore_class.prototype, "updateFilters"), SettingsStore_class.prototype), _applyDecoratedDescriptor(SettingsStore_class.prototype, "addCustomFilter", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(SettingsStore_class.prototype, "addCustomFilter"), SettingsStore_class.prototype), _applyDecoratedDescriptor(SettingsStore_class.prototype, "removeCustomFilter", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(SettingsStore_class.prototype, "removeCustomFilter"), SettingsStore_class.prototype), SettingsStore_descriptor23 = _applyDecoratedDescriptor(SettingsStore_class.prototype, "setAllowlist", [mobx_esm/* action */.aD], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: function () {
+    return allowlist => {
+      this.allowlist = allowlist;
+    };
+  }
+}), SettingsStore_descriptor24 = _applyDecoratedDescriptor(SettingsStore_class.prototype, "getAllowlist", [mobx_esm/* action */.aD], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: function () {
+    return async () => {
+      try {
+        const {
+          content
+        } = await messenger/* messenger.getAllowlist */.d.getAllowlist();
+        this.setAllowlist(content);
+      } catch (e) {
+        log/* log.debug */.c.debug(e);
+      }
+    };
+  }
+}), SettingsStore_descriptor25 = _applyDecoratedDescriptor(SettingsStore_class.prototype, "appendAllowlist", [mobx_esm/* action */.aD], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: function () {
+    return async allowlist => {
+      await this.saveAllowlist(this.allowlist.concat('\n', allowlist));
+    };
+  }
+}), SettingsStore_descriptor26 = _applyDecoratedDescriptor(SettingsStore_class.prototype, "saveAllowlist", [mobx_esm/* action */.aD], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: function () {
+    return async allowlist => {
+      await savingAllowlistService.send(EVENTS.SAVE, {
+        value: allowlist
+      });
+    };
+  }
+}), SettingsStore_descriptor27 = _applyDecoratedDescriptor(SettingsStore_class.prototype, "setAllowlistEditorContentChangedState", [mobx_esm/* action */.aD], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: function () {
+    return state => {
+      this.allowlistEditorContentChanged = state;
+    };
+  }
+}), SettingsStore_descriptor28 = _applyDecoratedDescriptor(SettingsStore_class.prototype, "setSearchInput", [mobx_esm/* action */.aD], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: function () {
+    return value => {
+      this.searchInput = value;
+      this.sortFilters();
+      this.sortSearchGroups();
+      this.selectVisibleFilters();
+    };
+  }
+}), SettingsStore_descriptor29 = _applyDecoratedDescriptor(SettingsStore_class.prototype, "setSearchSelect", [mobx_esm/* action */.aD], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: function () {
+    return value => {
+      this.searchSelect = value;
+      this.sortFilters();
+      this.sortSearchGroups();
+      this.selectVisibleFilters();
+    };
+  }
+}), _applyDecoratedDescriptor(SettingsStore_class.prototype, "isSearching", [mobx_esm/* computed */.Fl], Object.getOwnPropertyDescriptor(SettingsStore_class.prototype, "isSearching"), SettingsStore_class.prototype), SettingsStore_descriptor30 = _applyDecoratedDescriptor(SettingsStore_class.prototype, "sortFilters", [mobx_esm/* action */.aD], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: function () {
+    return () => {
+      this.setFilters(sortFilters(this.filters));
+    };
+  }
+}), SettingsStore_descriptor31 = _applyDecoratedDescriptor(SettingsStore_class.prototype, "setFilters", [mobx_esm/* action */.aD], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: function () {
+    return filters => {
+      this.filters = filters;
+    };
+  }
+}), SettingsStore_descriptor32 = _applyDecoratedDescriptor(SettingsStore_class.prototype, "setVisibleFilters", [mobx_esm/* action */.aD], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: function () {
+    return visibleFilters => {
+      this.visibleFilters = visibleFilters;
+    };
+  }
+}), SettingsStore_descriptor33 = _applyDecoratedDescriptor(SettingsStore_class.prototype, "sortSearchGroups", [mobx_esm/* action */.aD], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: function () {
+    return () => {
+      this.setGroups(sortGroupsOnSearch(this.categories));
+    };
+  }
+}), _descriptor34 = _applyDecoratedDescriptor(SettingsStore_class.prototype, "setGroups", [mobx_esm/* action */.aD], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: function () {
+    return categories => {
+      this.categories = categories;
+    };
+  }
+}), _descriptor35 = _applyDecoratedDescriptor(SettingsStore_class.prototype, "selectVisibleFilters", [mobx_esm/* action */.aD], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: function () {
+    return () => {
+      this.visibleFilters = this.filters.filter(filter => {
+        let searchMod;
+
+        switch (this.searchSelect) {
+          case SEARCH_FILTERS.ENABLED:
+            searchMod = filter.enabled;
+            break;
+
+          case SEARCH_FILTERS.DISABLED:
+            searchMod = !filter.enabled;
+            break;
+
+          default:
+            searchMod = true;
+        }
+
+        return searchMod;
+      });
+    };
+  }
+}), _applyDecoratedDescriptor(SettingsStore_class.prototype, "filtersToRender", [mobx_esm/* computed */.Fl], Object.getOwnPropertyDescriptor(SettingsStore_class.prototype, "filtersToRender"), SettingsStore_class.prototype), _applyDecoratedDescriptor(SettingsStore_class.prototype, "appearanceTheme", [mobx_esm/* computed */.Fl], Object.getOwnPropertyDescriptor(SettingsStore_class.prototype, "appearanceTheme"), SettingsStore_class.prototype), _applyDecoratedDescriptor(SettingsStore_class.prototype, "showAdguardPromoInfo", [mobx_esm/* computed */.Fl], Object.getOwnPropertyDescriptor(SettingsStore_class.prototype, "showAdguardPromoInfo"), SettingsStore_class.prototype), _applyDecoratedDescriptor(SettingsStore_class.prototype, "hideAdguardPromoInfo", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(SettingsStore_class.prototype, "hideAdguardPromoInfo"), SettingsStore_class.prototype), _applyDecoratedDescriptor(SettingsStore_class.prototype, "allowlistEditorWrapState", [mobx_esm/* computed */.Fl], Object.getOwnPropertyDescriptor(SettingsStore_class.prototype, "allowlistEditorWrapState"), SettingsStore_class.prototype), _applyDecoratedDescriptor(SettingsStore_class.prototype, "toggleAllowlistEditorWrap", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(SettingsStore_class.prototype, "toggleAllowlistEditorWrap"), SettingsStore_class.prototype), _applyDecoratedDescriptor(SettingsStore_class.prototype, "footerRateShowState", [mobx_esm/* computed */.Fl], Object.getOwnPropertyDescriptor(SettingsStore_class.prototype, "footerRateShowState"), SettingsStore_class.prototype), _applyDecoratedDescriptor(SettingsStore_class.prototype, "hideFooterRateShow", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(SettingsStore_class.prototype, "hideFooterRateShow"), SettingsStore_class.prototype), _applyDecoratedDescriptor(SettingsStore_class.prototype, "setFullscreenUserRulesEditorState", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(SettingsStore_class.prototype, "setFullscreenUserRulesEditorState"), SettingsStore_class.prototype), _applyDecoratedDescriptor(SettingsStore_class.prototype, "isFullscreenUserRulesEditorOpen", [mobx_esm/* computed */.Fl], Object.getOwnPropertyDescriptor(SettingsStore_class.prototype, "isFullscreenUserRulesEditorOpen"), SettingsStore_class.prototype), _applyDecoratedDescriptor(SettingsStore_class.prototype, "userFilterEnabledSettingId", [mobx_esm/* computed */.Fl], Object.getOwnPropertyDescriptor(SettingsStore_class.prototype, "userFilterEnabledSettingId"), SettingsStore_class.prototype), _applyDecoratedDescriptor(SettingsStore_class.prototype, "userFilterEnabled", [mobx_esm/* computed */.Fl], Object.getOwnPropertyDescriptor(SettingsStore_class.prototype, "userFilterEnabled"), SettingsStore_class.prototype), _applyDecoratedDescriptor(SettingsStore_class.prototype, "setAllowlistSizeReset", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(SettingsStore_class.prototype, "setAllowlistSizeReset"), SettingsStore_class.prototype), _applyDecoratedDescriptor(SettingsStore_class.prototype, "protectionLevel", [mobx_esm/* computed */.Fl], Object.getOwnPropertyDescriptor(SettingsStore_class.prototype, "protectionLevel"), SettingsStore_class.prototype), _applyDecoratedDescriptor(SettingsStore_class.prototype, "arePermissionsRejected", [mobx_esm/* computed */.Fl], Object.getOwnPropertyDescriptor(SettingsStore_class.prototype, "arePermissionsRejected"), SettingsStore_class.prototype), _applyDecoratedDescriptor(SettingsStore_class.prototype, "setProtectionLevel", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(SettingsStore_class.prototype, "setProtectionLevel"), SettingsStore_class.prototype)), SettingsStore_class);
+/* harmony default export */ const stores_SettingsStore = (SettingsStore);
+// EXTERNAL MODULE: ./node_modules/nanoid/index.browser.js
+var index_browser = __webpack_require__(2380);
+;// CONCATENATED MODULE: ./Extension/src/pages/options/stores/UiStore.js
+
+
+
+
+var UiStore_class, UiStore_descriptor;
+
+
+
+let UiStore = (UiStore_class = class UiStore {
+  constructor(rootStore) {
+    _initializerDefineProperty(this, "notifications", UiStore_descriptor, this);
+
+    this.rootStore = rootStore;
+    (0,mobx_esm/* makeObservable */.rC)(this);
+  }
+
+  addNotification({
+    title = '',
+    description
+  }) {
+    const id = (0,index_browser/* nanoid */.x0)();
+    this.notifications.push({
+      id,
+      title,
+      description
+    });
+    return id;
+  }
+
+  removeNotification(id) {
+    this.notifications = this.notifications.filter(notification => notification.id !== id);
+  }
+
+}, (UiStore_descriptor = _applyDecoratedDescriptor(UiStore_class.prototype, "notifications", [mobx_esm/* observable */.LO], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: function () {
+    return [];
+  }
+}), _applyDecoratedDescriptor(UiStore_class.prototype, "addNotification", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(UiStore_class.prototype, "addNotification"), UiStore_class.prototype), _applyDecoratedDescriptor(UiStore_class.prototype, "removeNotification", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(UiStore_class.prototype, "removeNotification"), UiStore_class.prototype)), UiStore_class);
+/* harmony default export */ const stores_UiStore = (UiStore);
+;// CONCATENATED MODULE: ./Extension/src/pages/options/stores/RootStore.js
+
+
+
+ // Do not allow property change outside of store actions
+
+(0,mobx_esm/* configure */.jQ)({
+  enforceActions: 'observed'
+});
+
+class RootStore {
+  constructor() {
+    this.settingsStore = new stores_SettingsStore(this);
+    this.uiStore = new stores_UiStore(this);
+  }
+
+}
+
+const rootStore = /*#__PURE__*/(0,react.createContext)(new RootStore());
+;// CONCATENATED MODULE: ./Extension/src/background/extension-api/windows.js
+/* eslint-disable no-unused-vars */
+
+/**
+ * This function patches if necessary browser.windows implementation for Firefox for Android
+ */
+const patchWindows = function (browser) {
+  // Make compatible with Android WebExt
+  if (typeof browser.windows === 'undefined') {
+    browser.windows = function () {
+      const defaultWindow = {
+        id: 1,
+        type: 'normal'
+      };
+      const emptyListener = {
+        addListener() {// Doing nothing
+        }
+
+      };
+
+      const create = function (createData) {
+        return Promise.resolve(defaultWindow);
+      };
+
+      const update = function (windowId, data) {
+        return Promise.resolve();
+      };
+
+      const getAll = function (query) {
+        return Promise.resolve(defaultWindow);
+      };
+
+      const getLastFocused = function () {
+        return Promise.resolve(defaultWindow);
+      };
+
+      return {
+        onCreated: emptyListener,
+        onRemoved: emptyListener,
+        onFocusChanged: emptyListener,
+        create,
+        update,
+        getAll,
+        getLastFocused
+      };
+    }();
+  }
+};
+;// CONCATENATED MODULE: ./Extension/src/background/extension-api/browser.js
+
+
+patchWindows((browser_polyfill_default()));
+
+;// CONCATENATED MODULE: ./Extension/src/background/utils/lazy.js
+/**
+ * This function allows cache property in object. Use with javascript getter.
+ *
+ * var Object = {
+ *
+ *      get someProperty(){
+ *          return lazyGet(Object, 'someProperty', function() {
+ *              return calculateSomeProperty();
+ *          });
+ *      }
+ * }
+ *
+ * @param object Object
+ * @param prop Original property name
+ * @param calculateFunc Calculation function
+ * @returns {*}
+ */
+const lazyGet = function (object, prop, calculateFunc) {
+  const cachedProp = `_${prop}`;
+
+  if (cachedProp in object) {
+    return object[cachedProp];
+  }
+
+  const value = calculateFunc.apply(object);
+  object[cachedProp] = value;
+  return value;
+};
+/**
+ * Clear cached property
+ * @param object Object
+ * @param prop Original property name
+ */
+
+const lazyGetClear = function (object, prop) {
+  delete object[`_${prop}`];
+};
+;// CONCATENATED MODULE: ./Extension/src/background/prefs.js
+/**
+ * This file is part of Adguard Browser Extension (https://github.com/AdguardTeam/AdguardBrowserExtension).
+ *
+ * Adguard Browser Extension is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Adguard Browser Extension is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+
+/**
+ * Extension global preferences.
+ */
+
+const prefs = (() => {
+  const Prefs = {
+    get mobile() {
+      return lazyGet(Prefs, 'mobile', () => navigator.userAgent.indexOf('Android') >= 0);
+    },
+
+    get platform() {
+      return lazyGet(Prefs, 'platform', () => window.browser ? 'firefox' : 'chromium');
+    },
+
+    get browser() {
+      return lazyGet(Prefs, 'browser', () => {
+        let browser;
+        let {
+          userAgent
+        } = navigator;
+        userAgent = userAgent.toLowerCase();
+
+        if (userAgent.indexOf('yabrowser') >= 0) {
+          browser = 'YaBrowser';
+        } else if (userAgent.indexOf('edge') >= 0) {
+          browser = 'Edge';
+        } else if (userAgent.indexOf('edg') >= 0) {
+          browser = 'EdgeChromium';
+        } else if (userAgent.indexOf('opera') >= 0 || userAgent.indexOf('opr') >= 0) {
+          browser = 'Opera';
+        } else if (userAgent.indexOf('firefox') >= 0) {
+          browser = 'Firefox';
+        } else {
+          browser = 'Chrome';
+        }
+
+        return browser;
+      });
+    },
+
+    get chromeVersion() {
+      return lazyGet(Prefs, 'chromeVersion', () => {
+        const match = /\sChrome\/(\d+)\./.exec(navigator.userAgent);
+        return match === null ? null : Number.parseInt(match[1], 10);
+      });
+    },
+
+    get firefoxVersion() {
+      return lazyGet(Prefs, 'firefoxVersion', () => {
+        const match = /\sFirefox\/(\d+)\./.exec(navigator.userAgent);
+        return match === null ? null : Number.parseInt(match[1], 10);
+      });
+    },
+
+    /**
+     * https://msdn.microsoft.com/ru-ru/library/hh869301(v=vs.85).aspx
+     * @returns {*}
+     */
+    get edgeVersion() {
+      return lazyGet(Prefs, 'edgeVersion', function () {
+        if (this.browser === 'Edge') {
+          const {
+            userAgent
+          } = navigator;
+          const i = userAgent.indexOf('Edge/');
+
+          if (i < 0) {
+            return {
+              rev: 0,
+              build: 0
+            };
+          }
+
+          const version = userAgent.substring(i + 'Edge/'.length);
+          const parts = version.split('.');
+          return {
+            rev: Number.parseInt(parts[0], 10),
+            build: Number.parseInt(parts[1], 10)
+          };
+        }
+      });
+    },
+
+    /**
+     * Makes sense in case of FF add-on only
+     */
+    speedupStartup() {
+      return false;
+    },
+
+    get ICONS() {
+      return lazyGet(Prefs, 'ICONS', () => ({
+        ICON_GREEN: {
+          '19': browser_polyfill_default().runtime.getURL('assets/icons/green-19.png'),
+          '38': browser_polyfill_default().runtime.getURL('assets/icons/green-38.png')
+        },
+        ICON_GRAY: {
+          '19': browser_polyfill_default().runtime.getURL('assets/icons/gray-19.png'),
+          '38': browser_polyfill_default().runtime.getURL('assets/icons/gray-38.png')
+        }
+      }));
+    },
+
+    // interval 60 seconds in Firefox is set so big due to excessive IO operations on every storage save
+    // https://github.com/AdguardTeam/AdguardBrowserExtension/issues/1006
+    get statsSaveInterval() {
+      return this.browser === 'Firefox' ? 1000 * 60 : 1000;
+    }
+
+  };
+  /**
+   * Collect browser specific features here
+   */
+
+  Prefs.features = function () {
+    // Get the global extension object (browser for FF, chrome for Chromium)
+    const browser = window.browser || window.chrome;
+    const responseContentFilteringSupported = typeof browser !== 'undefined' && typeof browser.webRequest !== 'undefined' && typeof browser.webRequest.filterResponseData !== 'undefined';
+    const canUseInsertCSSAndExecuteScript = // Blink engine based browsers
+    (Prefs.browser === 'Chrome' || Prefs.browser === 'Opera' || Prefs.browser === 'YaBrowser' || Prefs.browser === 'EdgeChromium' // Support for tabs.insertCSS and tabs.executeScript on chrome
+    // requires chrome version above or equal to 39,
+    // as per documentation: https://developers.chrome.com/extensions/tabs
+    // But due to a bug, it requires version >= 50
+    // https://bugs.chromium.org/p/chromium/issues/detail?id=63979
+    ) && Prefs.chromeVersion >= 50 || Prefs.browser === 'Firefox' && typeof browser !== 'undefined' && typeof browser.tabs !== 'undefined' && typeof browser.tabs.insertCSS !== 'undefined'; // Edge browser does not support `runAt` in options of tabs.insertCSS
+    // and tabs.executeScript
+
+    return {
+      responseContentFilteringSupported,
+      canUseInsertCSSAndExecuteScript,
+      hasBackgroundTab: typeof browser !== 'undefined' // Background requests have sense only in case of webext
+
+    };
+  }();
+
+  return Prefs;
+})();
+;// CONCATENATED MODULE: ./Extension/src/background/utils/local-storage.js
+/**
+ * This file is part of Adguard Browser Extension (https://github.com/AdguardTeam/AdguardBrowserExtension).
+ *
+ * Adguard Browser Extension is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Adguard Browser Extension is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+
+/**
+ * Local storage implementation for chromium-based browsers
+ */
+
+const localStorageImpl = function () {
+  const ADGUARD_SETTINGS_PROP = 'adguard-settings';
+  let values = null;
+  /**
+   * Reads data from storage.local
+   * @param path Path
+   */
+
+  async function read(path) {
+    const results = await browser_polyfill_default().storage.local.get(path);
+    return results ? results[path] : null;
+  }
+  /**
+   * Writes data to storage.local
+   * @param path Path
+   * @param data Data to write
+   */
+
+
+  async function write(path, data) {
+    const item = {};
+    item[path] = data;
+    await browser_polyfill_default().storage.local.set(item);
+  }
+  /**
+   * Due to async initialization of storage, we have to check it before accessing values object
+   * @returns {boolean}
+   */
+
+
+  function isInitialized() {
+    return values !== null;
+  }
+  /**
+   * Retrieves value by key from cached values
+   * @param key
+   * @returns {*}
+   */
+
+
+  function getItem(key) {
+    if (!isInitialized()) {
+      return null;
+    }
+
+    return values[key];
+  }
+
+  function setItem(key, value) {
+    if (!isInitialized()) {
+      return;
+    }
+
+    values[key] = value;
+    write(ADGUARD_SETTINGS_PROP, values);
+  }
+
+  function removeItem(key) {
+    if (!isInitialized()) {
+      return;
+    }
+
+    delete values[key];
+    write(ADGUARD_SETTINGS_PROP, values);
+  }
+
+  function hasItem(key) {
+    if (!isInitialized()) {
+      return false;
+    }
+
+    return key in values;
+  }
+  /**
+   * We can't use localStorage object anymore and we've decided to store all data into storage.local
+   * localStorage is affected by cleaning tools: https://github.com/AdguardTeam/AdguardBrowserExtension/issues/681
+   * storage.local has async nature and we have to preload all key-values pairs into memory on extension startup
+   */
+
+
+  async function init() {
+    if (isInitialized()) {
+      // Already initialized
+      return;
+    }
+
+    let items;
+
+    try {
+      items = await read(ADGUARD_SETTINGS_PROP);
+    } catch (e) {
+      log/* log.error */.c.error(e);
+    }
+
+    values = items || Object.create(null);
+  }
+
+  return {
+    getItem,
+    setItem,
+    removeItem,
+    hasItem,
+    init,
+    isInitialized
+  };
+}();
+;// CONCATENATED MODULE: ./Extension/src/background/rules-storage/rules-storage.chrome.js
+/**
+ * This file is part of Adguard Browser Extension (https://github.com/AdguardTeam/AdguardBrowserExtension).
+ *
+ * Adguard Browser Extension is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Adguard Browser Extension is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/**
+ * Filter rules storage implementation
+ */
+
+const chromeRulesStorageImpl = (() => {
+  const read = async path => {
+    const results = await browser_polyfill_default().storage.local.get(path);
+    let lines = [];
+
+    if (results && results[path] instanceof Array) {
+      lines = results[path];
+    }
+
+    return lines;
+  };
+
+  const write = async (path, data) => {
+    const item = {};
+    item[path] = data;
+    await browser_polyfill_default().storage.local.set(item);
+  };
+
+  const remove = async path => {
+    await browser_polyfill_default().storage.local.remove(path);
+  };
+
+  return {
+    read,
+    write,
+    remove
+  };
+})();
+
+/* harmony default export */ const rules_storage_chrome = (chromeRulesStorageImpl);
+;// CONCATENATED MODULE: ./Extension/src/background/rules-storage/rules-storage.firefox.js
+/**
+ * This file is part of Adguard Browser Extension (https://github.com/AdguardTeam/AdguardBrowserExtension).
+ *
+ * Adguard Browser Extension is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Adguard Browser Extension is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
+ */
+// We use chrome rules storage implementation as fallback as it based on storage.local
+
+
+/**
+ * Filter rules storage implementation. Based on the indexedDB
+ *
+ * We have to use indexedDB instead of browser.storage.local due to some problems with the latest one.
+ * browser.storage.local has high memory and disk utilization.
+ *
+ * https://bugzilla.mozilla.org/show_bug.cgi?id=1371255
+ * https://github.com/AdguardTeam/AdguardBrowserExtension/issues/892
+ */
+
+const firefoxRulesStorageImpl = function (initialAPI) {
+  const STORAGE_NAME = 'AdguardRulesStorage';
+  let database;
+
+  function onError(error) {
+    log/* log.error */.c.error('Adguard rulesStorage error: {0}', error.error || error);
+  }
+  /**
+   * Gets value from the database by key
+   */
+
+
+  function getFromDatabase(key) {
+    return new Promise((resolve, reject) => {
+      const transaction = database.transaction(STORAGE_NAME);
+      const table = transaction.objectStore(STORAGE_NAME);
+      const request = table.get(key);
+
+      const eventHandler = event => {
+        const request = event.target;
+
+        if (request.error) {
+          reject(request.error);
+          return;
+        }
+
+        let lines = [];
+        const {
+          result
+        } = request;
+
+        if (result && result.value) {
+          lines = result.value.split(/\r?\n/);
+        }
+
+        resolve(lines);
+      };
+
+      request.onsuccess = eventHandler;
+      request.onerror = eventHandler;
+    });
+  }
+  /**
+   * Puts key and value to the database
+   */
+
+
+  function putToDatabase(key, value) {
+    return new Promise((resolve, reject) => {
+      const transaction = database.transaction(STORAGE_NAME, 'readwrite');
+      const table = transaction.objectStore(STORAGE_NAME);
+      const request = table.put({
+        key,
+        value: value.join('\n')
+      });
+
+      const eventHandler = event => {
+        const request = event.target;
+
+        if (request.error) {
+          reject(request.error);
+        } else {
+          resolve();
+        }
+      };
+
+      request.onsuccess = eventHandler;
+      request.onerror = eventHandler;
+    });
+  }
+  /**
+   * Deletes value from the database
+   */
+
+
+  function deleteFromDatabase(key) {
+    return new Promise((resolve, reject) => {
+      const transaction = database.transaction(STORAGE_NAME, 'readwrite');
+      const table = transaction.objectStore(STORAGE_NAME);
+      const request = table.delete(key);
+
+      const eventHandler = event => {
+        const request = event.target;
+
+        if (request.error) {
+          reject(request.error);
+        } else {
+          resolve();
+        }
+      };
+
+      request.onsuccess = eventHandler;
+      request.onerror = eventHandler;
+    });
+  }
+  /**
+   * Read rules
+   * @param path Path to rules
+   */
+
+
+  const read = async path => {
+    const result = await getFromDatabase(path);
+    return result;
+  };
+  /**
+   * Writes rules
+   * @param path Path to rules
+   * @param data Data to write (Array)
+   */
+
+
+  const write = async (path, data) => {
+    await putToDatabase(path, data);
+  };
+  /**
+   * Removes rules
+   * @param path Path to rules
+   */
+
+
+  const remove = async path => {
+    await deleteFromDatabase(path);
+  };
+  /**
+   * We can detect whether IndexedDB was initialized or not only in an async way
+   */
+
+
+  const init = () => new Promise(resolve => {
+    // Failed in private browsing mode.
+    const request = indexedDB.open(STORAGE_NAME, 1);
+
+    request.onupgradeneeded = function (ev) {
+      database = ev.target.result;
+      database.onerror = onError;
+      database.onabort = onError; // DB doesn't exist => creates new storage
+
+      const table = database.createObjectStore(STORAGE_NAME, {
+        keyPath: 'key'
+      });
+      table.createIndex('value', 'value', {
+        unique: false
+      });
+    };
+
+    request.onsuccess = function (ev) {
+      database = ev.target.result;
+      database.onerror = onError;
+      database.onabort = onError;
+      resolve(api);
+    };
+
+    const onRequestError = function () {
+      onError(this.error); // Fallback to the browser.storage API
+
+      resolve(initialAPI);
+    };
+
+    request.onerror = onRequestError;
+    request.onblocked = onRequestError;
+  });
+
+  const api = {
+    read,
+    write,
+    remove,
+    init,
+
+    /**
+     * IndexedDB isn't initialized in the private mode.
+     * In this case we should switch implementation to the browser.storage (see init method)
+     * This flag helps us to understand which implementation is used now (see update-service.js for example)
+     */
+    isIndexedDB: true
+  };
+  return api;
+}(rules_storage_chrome);
+
+/* harmony default export */ const rules_storage_firefox = (firefoxRulesStorageImpl);
+;// CONCATENATED MODULE: ./Extension/src/background/rules-storage/index.js
+// !IMPORTANT!
+// './rules-storage.__ABSTRACT_BROWSER__' is replaced during webpack compilation
+// with NormalModuleReplacementPlugin to proper browser implementation
+// './rules-storage.chrome' or ./rules-storage.firefox
+
+
+;// CONCATENATED MODULE: ./Extension/src/background/storage.js
+/**
+ * This file is part of Adguard Browser Extension (https://github.com/AdguardTeam/AdguardBrowserExtension).
+ *
+ * Adguard Browser Extension is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Adguard Browser Extension is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+
+
+/**
+ * This class manages local storage
+ */
+
+const storage_localStorage = function (localStorageImpl) {
+  const getItem = function (key) {
+    return localStorageImpl.getItem(key);
+  };
+
+  const setItem = function (key, value) {
+    try {
+      localStorageImpl.setItem(key, value);
+    } catch (ex) {
+      log/* log.error */.c.error(`Error while saving item ${key} to the localStorage: ${ex}`);
+    }
+  };
+
+  const removeItem = function (key) {
+    localStorageImpl.removeItem(key);
+  };
+
+  const hasItem = function (key) {
+    return localStorageImpl.hasItem(key);
+  };
+
+  const init = async function () {
+    if (typeof localStorageImpl.init === 'function') {
+      await localStorageImpl.init();
+    }
+  };
+
+  const isInitialized = function () {
+    // WebExtension storage has async initialization
+    if (typeof localStorageImpl.isInitialized === 'function') {
+      return localStorageImpl.isInitialized();
+    }
+
+    return true;
+  };
+
+  return {
+    getItem,
+    setItem,
+    removeItem,
+    hasItem,
+    init,
+    isInitialized
+  };
+}(localStorageImpl);
+/**
+ * This class manages storage for filters.
+ */
+
+const rulesStorage = (rulesStorageImpl => {
+  function getFilePath(filterId) {
+    return `filterrules_${filterId}.txt`;
+  }
+  /**
+   * Loads filter from the storage
+   *
+   * @param filterId  Filter identifier
+   */
+
+
+  const read = async filterId => {
+    const filePath = getFilePath(filterId);
+    let rules;
+
+    try {
+      rules = await rulesStorageImpl.read(filePath);
+    } catch (e) {
+      log/* log.error */.c.error(`Error while reading rules from file ${filePath} cause: ${e}`);
+    }
+
+    return rules;
+  };
+  /**
+   * Saves filter rules to storage
+   *
+   * @param filterId      Filter identifier
+   * @param filterRules   Filter rules
+   */
+
+
+  const write = async (filterId, filterRules) => {
+    const filePath = getFilePath(filterId);
+
+    try {
+      await rulesStorageImpl.write(filePath, filterRules);
+    } catch (e) {
+      log/* log.error */.c.error(`Error writing filters to file ${filePath}. Cause: ${e}`);
+    }
+  };
+  /**
+   * Removes filter from storage
+   * @param filterId
+   */
+
+
+  const remove = async filterId => {
+    const filePath = getFilePath(filterId);
+
+    try {
+      await rulesStorageImpl.remove(filePath);
+    } catch (e) {
+      log/* log.error */.c.error(`Error removing filter ${filePath}. Cause: ${e}`);
+    }
+  };
+  /**
+   * IndexedDB implementation of the rules storage requires async initialization.
+   * Also in some cases IndexedDB isn't supported, so we have to replace implementation
+   * with the browser.storage
+   */
+
+
+  const init = async () => {
+    if (typeof rulesStorageImpl.init === 'function') {
+      const api = await rulesStorageImpl.init();
+      rulesStorageImpl = api;
+    }
+  };
+
+  return {
+    read,
+    write,
+    remove,
+    init
+  };
+})(rules_storage_firefox);
+;// CONCATENATED MODULE: ./Extension/src/background/utils/collections.js
+/**
+ * Util class for work with collections
+ */
+const collections = (() => {
+  const CollectionUtils = {
+    remove(collection, element) {
+      if (!element || !collection) {
+        return;
+      }
+
+      const index = collection.indexOf(element);
+
+      if (index >= 0) {
+        collection.splice(index, 1);
+      }
+    },
+
+    removeAll(collection, element) {
+      if (!element || !collection) {
+        return;
+      }
+
+      for (let i = collection.length - 1; i >= 0; i -= 1) {
+        if (collection[i] === element) {
+          collection.splice(i, 1);
+        }
+      }
+    },
+
+    /**
+     * Removes elements from collection if predicate returns true
+     * @param collection
+     * @param predicate
+     */
+    removeBy(collection, predicate) {
+      if (!predicate || !collection) {
+        return;
+      }
+
+      for (let i = collection.length - 1; i >= 0; i -= 1) {
+        if (predicate(collection[i])) {
+          collection.splice(i, 1);
+        }
+      }
+    },
+
+    removeRule(collection, rule) {
+      if (!rule || !collection) {
+        return;
+      }
+
+      for (let i = collection.length - 1; i >= 0; i -= 1) {
+        if (rule.getText() === collection[i].getText()) {
+          collection.splice(i, 1);
+        }
+      }
+    },
+
+    removeDuplicates(arr) {
+      if (!arr || arr.length === 1) {
+        return arr;
+      }
+
+      return arr.filter((elem, pos) => arr.indexOf(elem) === pos);
+    },
+
+    getRulesText(collection) {
+      const text = [];
+
+      if (!collection) {
+        return text;
+      }
+
+      for (let i = 0; i < collection.length; i += 1) {
+        text.push(collection[i].getText());
+      }
+
+      return text;
+    },
+
+    /**
+     * Find element in array by property
+     * @param array
+     * @param property
+     * @param value
+     * @returns {*}
+     */
+    find(array, property, value) {
+      if (typeof array.find === 'function') {
+        return array.find(a => a[property] === value);
+      }
+
+      for (let i = 0; i < array.length; i += 1) {
+        const elem = array[i];
+
+        if (elem[property] === value) {
+          return elem;
+        }
+      }
+
+      return null;
+    },
+
+    /**
+     * Checks if specified object is array
+     * We don't use instanceof because it is too slow: http://jsperf.com/instanceof-performance/2
+     * @param obj Object
+     */
+    isArray: Array.isArray || function (obj) {
+      return `${obj}` === '[object Array]';
+    },
+
+    /**
+     * Returns array elements of a, which is not included in b
+     *
+     * @param a
+     * @param b
+     */
+    getArraySubtraction(a, b) {
+      return a.filter(i => b.indexOf(i) < 0);
+    }
+
+  };
+  return CollectionUtils;
+})();
+;// CONCATENATED MODULE: ./Extension/src/common/strings.js
+/**
+ * Util class for work with strings
+ */
+const strings = (() => {
+  const StringUtils = {
+    isEmpty(str) {
+      return !str || str.trim().length === 0;
+    },
+
+    startWith(str, prefix) {
+      return str && str.indexOf(prefix) === 0;
+    },
+
+    endsWith(str, postfix) {
+      return str.endsWith(postfix);
+    },
+
+    substringAfter(str, separator) {
+      if (!str) {
+        return str;
+      }
+
+      const index = str.indexOf(separator);
+      return index < 0 ? '' : str.substring(index + separator.length);
+    },
+
+    substringBefore(str, separator) {
+      if (!str || !separator) {
+        return str;
+      }
+
+      const index = str.indexOf(separator);
+      return index < 0 ? str : str.substring(0, index);
+    },
+
+    contains(str, searchString) {
+      return str && str.indexOf(searchString) >= 0;
+    },
+
+    containsIgnoreCase(str, searchString) {
+      return str && searchString && str.toUpperCase().indexOf(searchString.toUpperCase()) >= 0;
+    },
+
+    replaceAll(str, find, replace) {
+      if (!str) {
+        return str;
+      }
+
+      return str.split(find).join(replace);
+    },
+
+    join(array, separator, startIndex, endIndex) {
+      if (!array) {
+        return null;
+      }
+
+      if (!startIndex) {
+        startIndex = 0;
+      }
+
+      if (!endIndex) {
+        endIndex = array.length;
+      }
+
+      if (startIndex >= endIndex) {
+        return '';
+      }
+
+      const buf = [];
+
+      for (let i = startIndex; i < endIndex; i += 1) {
+        buf.push(array[i]);
+      }
+
+      return buf.join(separator);
+    },
+
+    /**
+     * Get string before regexp first match
+     * @param {string} str
+     * @param {RegExp} rx
+     */
+    getBeforeRegExp(str, rx) {
+      const index = str.search(rx);
+      return str.substring(0, index);
+    },
+
+    /**
+     * Look for any symbol from "chars" array starting at "start" index or from the start of the string
+     *
+     * @param str   String to search
+     * @param chars Chars to search for
+     * @param start Start index (optional, inclusive)
+     * @return int Index of the element found or null
+     */
+    indexOfAny(str, chars, start) {
+      start = start || 0;
+
+      if (typeof str === 'string' && str.length <= start) {
+        return -1;
+      }
+
+      for (let i = start; i < str.length; i += 1) {
+        const c = str.charAt(i);
+
+        if (chars.indexOf(c) > -1) {
+          return i;
+        }
+      }
+
+      return -1;
+    },
+
+    /**
+     * Splits string by a delimiter, ignoring escaped delimiters
+     * @param str               String to split
+     * @param delimiter         Delimiter
+     * @param escapeCharacter   Escape character
+     * @param preserveAllTokens If true - preserve empty entries.
+     */
+    splitByDelimiterWithEscapeCharacter(str, delimiter, escapeCharacter, preserveAllTokens) {
+      const parts = [];
+
+      if (this.isEmpty(str)) {
+        return parts;
+      }
+
+      let sb = [];
+
+      for (let i = 0; i < str.length; i += 1) {
+        const c = str.charAt(i);
+
+        if (c === delimiter) {
+          if (i === 0) {// Ignore
+          } else if (str.charAt(i - 1) === escapeCharacter) {
+            sb.splice(sb.length - 1, 1);
+            sb.push(c);
+          } else if (preserveAllTokens || sb.length > 0) {
+            const part = sb.join('');
+            parts.push(part);
+            sb = [];
+          }
+        } else {
+          sb.push(c);
+        }
+      }
+
+      if (preserveAllTokens || sb.length > 0) {
+        parts.push(sb.join(''));
+      }
+
+      return parts;
+    },
+
+    /**
+     * Serialize HTML element
+     * @param element
+     */
+    elementToString(element) {
+      const s = [];
+      s.push('<');
+      s.push(element.localName);
+      const {
+        attributes
+      } = element;
+
+      for (let i = 0; i < attributes.length; i += 1) {
+        const attr = attributes[i];
+        s.push(' ');
+        s.push(attr.name);
+        s.push('="');
+        const value = attr.value === null ? '' : attr.value.replace(/"/g, '\\"');
+        s.push(value);
+        s.push('"');
+      }
+
+      s.push('>');
+      return s.join('');
+    },
+
+    /**
+     * Checks if the specified string starts with a substr at the specified index.
+     * @param str - String to check
+     * @param startIndex - Index to start checking from
+     * @param substr - Substring to check
+     * @return boolean true if it does start
+     */
+    startsAtIndexWith(str, startIndex, substr) {
+      if (str.length - startIndex < substr.length) {
+        return false;
+      }
+
+      for (let i = 0; i < substr.length; i += 1) {
+        if (str.charAt(startIndex + i) !== substr.charAt(i)) {
+          return false;
+        }
+      }
+
+      return true;
+    },
+
+    /**
+     * Checks if str has unquoted substr
+     * @param str
+     * @param substr
+     */
+    hasUnquotedSubstring(str, substr) {
+      const quotes = ['"', "'", '/'];
+      const stack = [];
+
+      for (let i = 0; i < str.length; i += 1) {
+        const cursor = str[i];
+
+        if (stack.length === 0) {
+          if (this.startsAtIndexWith(str, i, substr)) {
+            return true;
+          }
+        }
+
+        if (quotes.indexOf(cursor) >= 0 && (i === 0 || str[i - 1] !== '\\')) {
+          const last = stack.pop();
+
+          if (!last) {
+            stack.push(cursor);
+          } else if (last !== cursor) {
+            stack.push(last);
+            stack.push(cursor);
+          }
+        }
+      }
+
+      return false;
+    }
+
+  };
+  return StringUtils;
+})();
+;// CONCATENATED MODULE: ./Extension/src/background/utils/dates.js
+/**
+ * Util class for dates
+ */
+const dates = function () {
+  const DateUtils = {
+    isSameHour(a, b) {
+      return this.isSameDay(a, b) && a.getHours() === b.getHours();
+    },
+
+    isSameDay(a, b) {
+      return this.isSameMonth(a, b) && a.getDate() === b.getDate();
+    },
+
+    isSameMonth(a, b) {
+      if (!a || !b) {
+        return false;
+      }
+
+      return a.getYear() === b.getYear() && a.getMonth() === b.getMonth();
+    },
+
+    getDifferenceInHours(a, b) {
+      return (a.getTime() - b.getTime()) / 1000 / 60 / 60;
+    },
+
+    getDifferenceInDays(a, b) {
+      return this.getDifferenceInHours(a, b) / 24;
+    },
+
+    getDifferenceInMonths(a, b) {
+      return this.getDifferenceInDays(a, b) / 30;
+    }
+
+  };
+  return DateUtils;
+}();
+;// CONCATENATED MODULE: ./Extension/src/background/utils/concurrent.js
+/* eslint-disable prefer-rest-params */
+
+/**
+ * Util class for support timeout, retry operations, debounce
+ */
+const concurrent = function () {
+  const ConcurrentUtils = {
+    runAsync(callback, context) {
+      const params = Array.prototype.slice.call(arguments, 2);
+      setTimeout(() => {
+        callback.apply(context, params);
+      }, 0);
+    },
+
+    retryUntil(predicate, main, details) {
+      if (typeof details !== 'object') {
+        details = {};
+      }
+
+      let now = 0;
+      const next = details.next || 200;
+      const until = details.until || 2000;
+
+      const check = function () {
+        if (predicate() === true || now >= until) {
+          main();
+          return;
+        }
+
+        now += next;
+        setTimeout(check, next);
+      };
+
+      setTimeout(check, 1);
+    },
+
+    debounce(func, wait) {
+      let timeout;
+      return function () {
+        const context = this;
+        const args = arguments;
+
+        const later = function () {
+          timeout = null;
+          func.apply(context, args);
+        };
+
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    },
+
+    /**
+     * Returns a new function that, when invoked, invokes `func` at most once per `wait` milliseconds.
+     * https://github.com/component/throttle
+     *
+     * @param {Function} func Function to wrap.
+     * @param {Number} wait Number of milliseconds that must elapse between `func` invocations.
+     * @return {Function} A new function that wraps the `func` function passed in.
+     */
+    throttle(func, wait) {
+      let ctx;
+      let args;
+      let rtn;
+      let timeoutID; // caching
+
+      let last = 0;
+
+      function call() {
+        timeoutID = 0;
+        last = +new Date();
+        rtn = func.apply(ctx, args);
+        ctx = null;
+        args = null;
+      }
+
+      return function throttled() {
+        ctx = this;
+        args = arguments;
+        const delta = new Date() - last;
+
+        if (!timeoutID) {
+          if (delta >= wait) {
+            call();
+          } else {
+            timeoutID = setTimeout(call, wait - delta);
+          }
+        }
+
+        return rtn;
+      };
+    }
+
+  };
+  return ConcurrentUtils;
+}();
+;// CONCATENATED MODULE: ./Extension/src/background/utils/channels.js
+/* eslint-disable prefer-rest-params */
+
+/**
+ * Simple publish-subscribe implementation
+ */
+const channels = (() => {
+  const EventChannels = (() => {
+    const EventChannel = function () {
+      let listeners = null;
+      let listenerCallback = null;
+
+      const addListener = function (callback) {
+        if (typeof callback !== 'function') {
+          throw new Error('Illegal callback');
+        }
+
+        if (listeners !== null) {
+          listeners.push(callback);
+          return;
+        }
+
+        if (listenerCallback !== null) {
+          listeners = [];
+          listeners.push(listenerCallback);
+          listeners.push(callback);
+          listenerCallback = null;
+        } else {
+          listenerCallback = callback;
+        }
+      };
+
+      const removeListener = function (callback) {
+        if (listenerCallback !== null) {
+          listenerCallback = null;
+        } else {
+          const index = listeners.indexOf(callback);
+
+          if (index >= 0) {
+            listeners.splice(index, 1);
+          }
+        }
+      };
+
+      const notify = function () {
+        if (listenerCallback !== null) {
+          return listenerCallback.apply(listenerCallback, arguments);
+        }
+
+        if (listeners !== null) {
+          for (let i = 0; i < listeners.length; i += 1) {
+            const listener = listeners[i];
+            listener.apply(listener, arguments);
+          }
+        }
+      };
+
+      const notifyInReverseOrder = function () {
+        if (listenerCallback !== null) {
+          return listenerCallback.apply(listenerCallback, arguments);
+        }
+
+        if (listeners !== null) {
+          for (let i = listeners.length - 1; i >= 0; i -= 1) {
+            const listener = listeners[i];
+            listener.apply(listener, arguments);
+          }
+        }
+      };
+
+      return {
+        addListener,
+        removeListener,
+        notify,
+        notifyInReverseOrder
+      };
+    };
+
+    const namedChannels = Object.create(null);
+
+    const newChannel = function () {
+      return new EventChannel();
+    };
+
+    const newNamedChannel = function (name) {
+      const channel = newChannel();
+      namedChannels[name] = channel;
+      return channel;
+    };
+
+    const getNamedChannel = function (name) {
+      return namedChannels[name];
+    };
+
+    return {
+      newChannel,
+      newNamedChannel,
+      getNamedChannel
+    };
+  })();
+
+  return EventChannels;
+})();
+;// CONCATENATED MODULE: ./Extension/src/background/utils/workaround.js
+/**
+ * We collect here all workarounds and ugly hacks:)
+ */
+const workaround = function () {
+  const WorkaroundUtils = {
+    /**
+     * Converts blocked counter to the badge text.
+     * Workaround for FF - make 99 max.
+     *
+     * @param blocked Blocked requests count
+     */
+    getBlockedCountText(blocked, isFirefoxBrowser) {
+      const MAX = isFirefoxBrowser ? 99 : 999;
+      let blockedText = blocked === '0' ? '' : blocked;
+
+      if (blocked - 0 > MAX) {
+        blockedText = '\u221E';
+      }
+
+      return blockedText;
+    }
+
+  };
+  return WorkaroundUtils;
+}();
+;// CONCATENATED MODULE: ./Extension/src/background/utils/i18n.js
+
+/**
+ * Simple i18n utils
+ */
+
+const i18n_i18n = function () {
+  function isArrayElement(array, elem) {
+    return array.indexOf(elem) >= 0;
+  }
+
+  function isObjectKey(object, key) {
+    return key in object;
+  }
+
+  return {
+    /**
+     * Tries to find locale in the given collection of locales
+     * @param locales Collection of locales (array or object)
+     * @param locale Locale (e.g. en, en_GB, pt_BR)
+     * @returns matched locale from the locales collection or null
+     */
+    normalize(locales, locale) {
+      if (!locale) {
+        return null;
+      } // Transform Language-Country => Language_Country
+
+
+      locale = locale.replace('-', '_');
+      let search;
+
+      if (collections.isArray(locales)) {
+        search = isArrayElement;
+      } else {
+        search = isObjectKey;
+      }
+
+      if (search(locales, locale)) {
+        return locale;
+      } // Try to search by the language
+
+
+      const parts = locale.split('_');
+      const language = parts[0];
+
+      if (search(locales, language)) {
+        return language;
+      }
+
+      return null;
+    }
+
+  };
+}();
+;// CONCATENATED MODULE: ./Extension/src/background/utils/filters.js
+
+/**
+ * Util class for detect filter type. Includes various filter identifiers
+ */
+
+const filters = (() => {
+  const FilterUtils = {
+    isUserFilterRule(rule) {
+      return rule.getFilterListId() === constants/* ANTIBANNER_FILTERS_ID.USER_FILTER_ID */.gu.USER_FILTER_ID;
+    },
+
+    isAllowlistFilterRule(rule) {
+      return rule.getFilterListId() === constants/* ANTIBANNER_FILTERS_ID.ALLOWLIST_FILTER_ID */.gu.ALLOWLIST_FILTER_ID;
+    }
+
+  }; // Make accessible only constants without functions. They will be passed to content-page
+
+  FilterUtils.ids = constants/* ANTIBANNER_FILTERS_ID */.gu; // Copy filter ids to api
+
+  Object.keys(constants/* ANTIBANNER_FILTERS_ID */.gu).forEach(key => {
+    FilterUtils[key] = constants/* ANTIBANNER_FILTERS_ID */.gu[key];
+  });
+  return FilterUtils;
+})();
+;// CONCATENATED MODULE: ./Extension/src/background/utils/url.js
+/**
+ * This file is part of Adguard Browser Extension (https://github.com/AdguardTeam/AdguardBrowserExtension).
+ *
+ * Adguard Browser Extension is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Adguard Browser Extension is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/* eslint-disable camelcase, no-control-regex, max-len */
+
+
+const url = function () {
+  const RE_V4 = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|0x[0-9a-f][0-9a-f]?|0[0-7]{3})\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|0x[0-9a-f][0-9a-f]?|0[0-7]{3})$/i;
+  const RE_V4_HEX = /^0x([0-9a-f]{8})$/i;
+  const RE_V4_NUMERIC = /^[0-9]+$/;
+  const RE_V4inV6 = /(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+  const RE_BAD_CHARACTERS = /([^0-9a-f:])/i;
+  const RE_BAD_ADDRESS = /([0-9a-f]{5,}|:{3,}|[^:]:$|^:[^:]$)/i;
+  /**
+   * Helper methods to work with URLs
+   */
+
+  const UrlUtils = {
+    isHttpRequest(url) {
+      return url && url.indexOf('http') === 0;
+    },
+
+    isHttpOrWsRequest(url) {
+      return url && (url.indexOf('http') === 0 || url.indexOf('ws') === 0);
+    },
+
+    toPunyCode(domain) {
+      if (!domain) {
+        return '';
+      }
+
+      if (/^[\x00-\x7F]+$/.test(domain)) {
+        return domain;
+      }
+
+      return punycode_es6.toASCII(domain);
+    },
+
+    /**
+     * Retrieves hostname from URL
+     */
+    getHost(url) {
+      if (!url) {
+        return null;
+      }
+
+      let firstIdx = url.indexOf('//');
+
+      if (firstIdx === -1) {
+        /**
+         * It's non hierarchical structured URL (e.g. stun: or turn:)
+         * https://tools.ietf.org/html/rfc4395#section-2.2
+         * https://tools.ietf.org/html/draft-nandakumar-rtcweb-stun-uri-08#appendix-B
+         */
+        firstIdx = url.indexOf(':');
+
+        if (firstIdx === -1) {
+          return null;
+        }
+
+        firstIdx -= 1;
+      }
+
+      const nextSlashIdx = url.indexOf('/', firstIdx + 2);
+      const startParamsIdx = url.indexOf('?', firstIdx + 2);
+      let lastIdx = nextSlashIdx;
+
+      if (startParamsIdx > 0 && (startParamsIdx < nextSlashIdx || nextSlashIdx < 0)) {
+        lastIdx = startParamsIdx;
+      }
+
+      let host = lastIdx === -1 ? url.substring(firstIdx + 2) : url.substring(firstIdx + 2, lastIdx);
+      const portIndex = host.indexOf(':');
+      host = portIndex === -1 ? host : host.substring(0, portIndex); // https://github.com/AdguardTeam/AdguardBrowserExtension/issues/1586
+
+      const lastChar = host.charAt(host.length - 1);
+
+      if (lastChar === '.') {
+        host = host.slice(0, -1);
+      }
+
+      return host;
+    },
+
+    getDomainName(url) {
+      const host = this.getHost(url);
+      return this.getCroppedDomainName(host);
+    },
+
+    getDomainFromURL(url) {
+      if (!url) return null;
+      const parsed = new URL(url);
+      const urlParts = parsed.hostname.replace('www.', '').split('.');
+      return urlParts.slice(0).slice(-(urlParts.length === 4 ? 3 : 2)).join('.');
+    },
+
+    getCroppedDomainName(host) {
+      return strings.startWith(host, 'www.') ? host.substring(4) : host;
+    },
+
+    isIpv4(address) {
+      if (RE_V4.test(address)) {
+        return true;
+      }
+
+      if (RE_V4_HEX.test(address)) {
+        return true;
+      }
+
+      if (RE_V4_NUMERIC.test(address)) {
+        return true;
+      }
+
+      return false;
+    },
+
+    isIpv6(address) {
+      let a4addon = 0;
+      const address4 = address.match(RE_V4inV6);
+
+      if (address4) {
+        const temp4 = address4[0].split('.');
+
+        for (let i = 0; i < 4; i += 1) {
+          if (/^0[0-9]+/.test(temp4[i])) {
+            return false;
+          }
+        }
+
+        address = address.replace(RE_V4inV6, '');
+
+        if (/[0-9]$/.test(address)) {
+          return false;
+        }
+
+        address += temp4.join(':');
+        a4addon = 2;
+      }
+
+      if (RE_BAD_CHARACTERS.test(address)) {
+        return false;
+      }
+
+      if (RE_BAD_ADDRESS.test(address)) {
+        return false;
+      }
+
+      function count(string, substring) {
+        return (string.length - string.replace(new RegExp(substring, 'g'), '').length) / substring.length;
+      }
+
+      const halves = count(address, '::');
+
+      if (halves === 1 && count(address, ':') <= 6 + 2 + a4addon) {
+        return true;
+      }
+
+      if (halves === 0 && count(address, ':') === 7 + a4addon) {
+        return true;
+      }
+
+      return false;
+    },
+
+    urlEquals(u1, u2) {
+      if (!u1 || !u2) {
+        return false;
+      } // eslint-disable-next-line prefer-destructuring
+
+
+      u1 = u1.split(/[#?]/)[0]; // eslint-disable-next-line prefer-destructuring
+
+      u2 = u2.split(/[#?]/)[0];
+      return u1 === u2;
+    }
+
+  };
+  return UrlUtils;
+}();
+;// CONCATENATED MODULE: ./Extension/src/background/utils/common.js
+/**
+ * This file is part of Adguard Browser Extension (https://github.com/AdguardTeam/AdguardBrowserExtension).
+ *
+ * Adguard Browser Extension is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Adguard Browser Extension is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+
+
+
+
+
+
+
+
+
+/**
+ * Background tab id in browsers is defined as -1
+ */
+
+const BACKGROUND_TAB_ID = -1;
+/**
+ * Main frame id is equal to 0
+ */
+
+const MAIN_FRAME_ID = 0;
+/**
+ * Utilities namespace
+ */
+
+const common_utils = {
+  strings: strings,
+  dates: dates,
+  collections: collections,
+  concurrent: concurrent,
+  channels: channels,
+  workaround: workaround,
+  i18n: i18n_i18n,
+  filters: filters,
+  url: url
+};
+/**
+ * Converts chrome tabs into tabs
+ * https://developer.chrome.com/extensions/tabs#type-Tab
+ * @param chromeTab
+ * @returns tab
+ */
+
+function toTabFromChromeTab(chromeTab) {
+  return {
+    tabId: chromeTab.id,
+    url: chromeTab.url,
+    title: chromeTab.title,
+    incognito: chromeTab.incognito,
+    status: chromeTab.status
+  };
+}
+/**
+ * Unload handler. When extension is unload then 'fireUnload' is invoked.
+ * You can add own handler with method 'when'
+ * @type {{when, fireUnload}}
+ */
+
+const unload = function () {
+  const unloadChannel = common_utils.channels.newChannel();
+
+  const when = function (callback) {
+    if (typeof callback !== 'function') {
+      return;
+    }
+
+    unloadChannel.addListener(() => {
+      try {
+        callback();
+      } catch (ex) {
+        log/* log.error */.c.error('Error while invoke unload method');
+        log/* log.error */.c.error(ex);
+      }
+    });
+  };
+
+  const fireUnload = function (reason) {
+    log/* log.info */.c.info(`Unload is fired: ${reason}`);
+    unloadChannel.notifyInReverseOrder(reason);
+  };
+
+  return {
+    when,
+    fireUnload
+  };
+}();
+;// CONCATENATED MODULE: ./Extension/src/background/extension-api/tabs.js
+/**
+ * This file is part of Adguard Browser Extension (https://github.com/AdguardTeam/AdguardBrowserExtension).
+ *
+ * Adguard Browser Extension is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Adguard Browser Extension is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/* eslint-disable max-len */
+
+
+
+
+
+/**
+ * Chromium tabs implementation
+ * @type {{onCreated, onRemoved, onUpdated, onActivated, create, remove, activate, reload, sendMessage, getAll, getActive, fromChromeTab}}
+ */
+
+const tabsImpl = function () {
+  /**
+   * tabId parameter must be integer
+   * @param tabId
+   */
+  function tabIdToInt(tabId) {
+    return Number.parseInt(tabId, 10);
+  }
+
+  function logOperationError(operation, e) {
+    log/* log.error */.c.error('Error while executing operation{1}: {0}', e, operation ? ` '${operation}'` : '');
+  }
+  /**
+   * Returns id of active tab
+   * @returns {Promise<number|null>}
+   */
+
+
+  const getActive = async function () {
+    /**
+     * lastFocusedWindow parameter isn't supported by Opera
+     * But seems currentWindow has the same effect in our case.
+     * See for details:
+     * https://developer.chrome.com/extensions/windows#current-window
+     * https://dev.opera.com/extensions/tab-window/#accessing-the-current-tab
+     * https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/tabs/query
+     */
+    let tabs;
+
+    try {
+      tabs = await browser_polyfill_default().tabs.query({
+        currentWindow: true,
+        active: true
+      });
+    } catch (e) {
+      log/* log.debug */.c.debug(new Error(e.message));
+    }
+
+    if (tabs && tabs.length > 0) {
+      return tabs[0].id;
+    }
+
+    return null;
+  }; // https://developer.chrome.com/extensions/tabs#event-onCreated
+
+
+  const onCreatedChannel = common_utils.channels.newChannel();
+  browser_polyfill_default().tabs.onCreated.addListener(chromeTab => {
+    onCreatedChannel.notify(toTabFromChromeTab(chromeTab));
+  }); // https://developer.chrome.com/extensions/tabs#event-onCreated
+
+  const onRemovedChannel = common_utils.channels.newChannel();
+  browser_polyfill_default().tabs.onRemoved.addListener(tabId => {
+    onRemovedChannel.notify(tabId);
+  });
+  const onUpdatedChannel = common_utils.channels.newChannel(); // https://developer.chrome.com/extensions/tabs#event-onUpdated
+
+  browser_polyfill_default().tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+    onUpdatedChannel.notify(toTabFromChromeTab(tab));
+  }); // https://developer.chrome.com/extensions/tabs#event-onActivated
+
+  const onActivatedChannel = common_utils.channels.newChannel();
+  browser_polyfill_default().tabs.onActivated.addListener(activeInfo => {
+    onActivatedChannel.notify(activeInfo.tabId);
+  }); // https://developer.chrome.com/extensions/windows#event-onFocusChanged
+
+  browser_polyfill_default().windows.onFocusChanged.addListener(async windowId => {
+    if (windowId === (browser_polyfill_default()).windows.WINDOW_ID_NONE) {
+      return;
+    }
+
+    const tabId = await getActive();
+
+    if (tabId) {
+      onActivatedChannel.notify(tabId);
+    }
+  });
+  /**
+   * Give focus to a window
+   * @param tabId Tab identifier
+   * @param windowId Window identifier
+   */
+
+  async function focusWindow(tabId, windowId) {
+    /**
+     * Updating already focused window produces bug in Edge browser
+     * https://github.com/AdguardTeam/AdguardBrowserExtension/issues/675
+     */
+    const activeTabId = await getActive();
+
+    if (activeTabId && tabId !== activeTabId) {
+      // Focus window
+      try {
+        await browser_polyfill_default().windows.update(windowId, {
+          focused: true
+        });
+      } catch (e) {
+        logOperationError(`Update window ${windowId}`, e);
+      }
+    }
+  }
+  /**
+   * Creates new tab
+   * @param createData
+   */
+
+
+  const create = async function (createData) {
+    const {
+      url,
+      inNewWindow,
+      width,
+      height,
+      top,
+      left,
+      isFullscreen
+    } = createData;
+    const active = createData.active === true;
+
+    if (createData.type === 'popup' // Does not work properly in Anniversary builds
+    && !browser_utils_browserUtils.isEdgeBeforeCreatorsUpdate() // Isn't supported by Android WebExt
+    && !prefs.mobile) {
+      // https://developer.chrome.com/extensions/windows#method-create
+      // https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/windows/create
+      const windowState = isFullscreen ? {
+        state: 'fullscreen'
+      } : {
+        width: width || 1000,
+        height: height || 650,
+        top: top || 0,
+        left: left || 0
+      };
+      const {
+        id
+      } = await browser_polyfill_default().windows.create({
+        url,
+        type: 'popup',
+        ...windowState
+      }); // Firefox currently can't .create with top and left due to bug
+      // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/windows/create
+      // https://bugzilla.mozilla.org/show_bug.cgi?id=1271047
+
+      if (browser_utils_browserUtils.isFirefoxBrowser() && typeof windowState.top === 'number') {
+        await browser_polyfill_default().windows.update(id, windowState);
+      }
+
+      return;
+    }
+
+    const isHttp = url.indexOf('http') === 0;
+
+    async function onWindowFound(win) {
+      // https://developer.chrome.com/extensions/tabs#method-create
+      const chromeTab = await browser_polyfill_default().tabs.create({
+        /**
+         * In the Firefox browser for Android there is not concept of windows
+         * There is only one window whole time
+         * That's why if we try to provide windowId, method fails with error.
+         */
+        windowId: !prefs.mobile ? win.id : undefined,
+        url,
+        active
+      });
+
+      if (active) {
+        await focusWindow(chromeTab.id, chromeTab.windowId);
+      }
+
+      return toTabFromChromeTab(chromeTab);
+    }
+
+    const onWindowCreatedWithTab = async win => {
+      const [tab] = win.tabs;
+
+      if (active) {
+        await focusWindow(tab.id, tab.windowId);
+      }
+
+      return toTabFromChromeTab(tab);
+    };
+
+    function isAppropriateWindow(win) {
+      // We can't open not-http (e.g. 'chrome-extension://') urls in incognito mode
+      return win.type === 'normal' && (isHttp || !win.incognito);
+    }
+
+    if (!inNewWindow) {
+      // https://developer.chrome.com/extensions/windows#method-create
+      // https://developer.chrome.com/extensions/windows#method-getLastFocused
+      // https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/windows/create
+      // https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/windows/getLastFocused
+      const win = await browser_polyfill_default().windows.getLastFocused();
+
+      if (isAppropriateWindow(win)) {
+        return onWindowFound(win);
+      } // https://github.com/AdguardTeam/AdguardBrowserExtension/issues/569
+
+
+      const wins = await browser_polyfill_default().windows.getAll({});
+
+      if (wins) {
+        for (let i = 0; i < wins.length; i += 1) {
+          const win = wins[i];
+
+          if (isAppropriateWindow(win)) {
+            return onWindowFound(win);
+          }
+        }
+      } // Create new window
+
+
+      const newWin = await browser_polyfill_default().windows.create();
+      return onWindowFound(newWin);
+    } // if inNewWindow
+    // we open window with "url" to avoid empty new tab creation
+
+
+    const newWin = await browser_polyfill_default().windows.create({
+      url
+    });
+    return onWindowCreatedWithTab(newWin);
+  };
+
+  const remove = async tabId => {
+    // https://developer.chrome.com/extensions/tabs#method-remove
+    // https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/tabs/remove
+    try {
+      await browser_polyfill_default().tabs.remove(tabIdToInt(tabId));
+    } catch (e) {
+      return;
+    }
+
+    return tabId;
+  };
+
+  const activate = async function (tabId) {
+    try {
+      // https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/tabs/update
+      const chromeTab = await browser_polyfill_default().tabs.update(tabIdToInt(tabId), {
+        active: true
+      });
+      await focusWindow(tabId, chromeTab.windowId);
+      return tabId;
+    } catch (e) {
+      logOperationError('Before tab update', e);
+    }
+  };
+  /**
+   * Sends message to tabs
+   * @param tabId
+   * @param message
+   * @param options
+   * @returns {Promise<*>}
+   */
+
+
+  const sendMessage = async (tabId, message, options) => {
+    // https://developer.chrome.com/extensions/tabs#method-sendMessage
+    // https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/tabs/sendMessage
+    const args = [tabIdToInt(tabId), message];
+
+    if (typeof options === 'object') {
+      args.push(options);
+    }
+
+    try {
+      const response = await browser_polyfill_default().tabs.sendMessage(...args);
+      return response;
+    } catch (e) {
+      log/* log.debug */.c.debug(e.message);
+    }
+  };
+
+  const reload = async (tabId, url) => {
+    if (url) {
+      if (browser_utils_browserUtils.isEdgeBrowser()) {
+        /**
+         * For security reasons, in Firefox and Edge, this may not be a privileged URL.
+         * So passing any of the following URLs will fail, with runtime.lastError being set to an error message:
+         * chrome: URLs
+         * javascript: URLs
+         * data: URLs
+         * privileged about: URLs (for example, about:config, about:addons, about:debugging).
+         *
+         * Non-privileged URLs (about:home, about:newtab, about:blank) are allowed.
+         *
+         * So we use a content script instead.
+         */
+
+        /**
+         * Content script may not have been loaded at this point yet.
+         * https://github.com/AdguardTeam/AdguardBrowserExtension/issues/580
+         */
+        setTimeout(() => {
+          sendMessage(tabId, {
+            type: 'update-tab-url',
+            url
+          });
+        }, 100);
+      } else {
+        try {
+          await browser_polyfill_default().tabs.update(tabIdToInt(tabId), {
+            url
+          });
+        } catch (e) {
+          logOperationError('Tab update', e);
+        }
+      } // https://developer.chrome.com/extensions/tabs#method-reload
+      // https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/tabs/reload#Browser_compatibility
+
+    } else if ((browser_polyfill_default()).tabs.reload) {
+      try {
+        await browser_polyfill_default().tabs.reload(tabIdToInt(tabId), {
+          bypassCache: true
+        });
+      } catch (e) {
+        logOperationError('Tab reload', e);
+      }
+    } else {
+      // Reload page without cache via content script
+      sendMessage(tabId, {
+        type: 'no-cache-reload'
+      });
+    }
+  };
+
+  const getAll = async () => {
+    // https://developer.chrome.com/extensions/tabs#method-query
+    // https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/tabs/query
+    const chromeTabs = await browser_polyfill_default().tabs.query({});
+    const result = [];
+
+    for (let i = 0; i < chromeTabs.length; i += 1) {
+      const chromeTab = chromeTabs[i];
+      result.push(toTabFromChromeTab(chromeTab));
+    }
+
+    return result;
+  };
+  /**
+   * Gets tab by id
+   * @param tabId Tab identifier
+   */
+
+
+  const get = async tabId => {
+    try {
+      const chromeTab = await browser_polyfill_default().tabs.get(tabIdToInt(tabId));
+      return toTabFromChromeTab(chromeTab);
+    } catch (e) {
+      logOperationError('Get tab', e);
+    }
+  };
+  /**
+   * Updates tab url
+   * @param {number} tabId
+   * @param {string} url
+   */
+
+
+  const updateUrl = async (tabId, url) => {
+    if (tabId === 0) {
+      return;
+    }
+
+    try {
+      await browser_polyfill_default().tabs.update(tabId, {
+        url
+      });
+    } catch (e) {
+      log/* log.error */.c.error(new Error(e.message));
+    }
+  };
+  /**
+   * True if `browser.tabs.insertCSS` supports `cssOrigin: "user"`.
+   */
+
+
+  let userCSSSupport = true;
+  /**
+   * Inserts CSS using the `browser.tabs.insertCSS` under the hood.
+   * This method always injects CSS using `runAt: document_start`/
+   *
+   * @param {number} tabId Tab id or null if you want to inject into the active tab
+   * @param {number} requestFrameId Target frame id (CSS will be inserted into that frame)
+   * @param {number} code CSS code to insert
+   */
+
+  const insertCssCode = !(browser_polyfill_default()).tabs.insertCSS ? undefined : async (tabId, requestFrameId, code) => {
+    const injectDetails = {
+      code,
+      runAt: 'document_start',
+      frameId: requestFrameId,
+      matchAboutBlank: true
+    };
+
+    if (userCSSSupport) {
+      // If this is set for not supporting browser, it will throw an error.
+      injectDetails.cssOrigin = 'user';
+    }
+
+    try {
+      await browser_polyfill_default().tabs.insertCSS(tabId, injectDetails);
+    } catch (e) {
+      // e.message in edge is undefined
+      const errorMessage = e.message || e; // Some browsers do not support user css origin // TODO which one?
+
+      if (/\bcssOrigin\b/.test(errorMessage)) {
+        userCSSSupport = false;
+      }
+    }
+  };
+  /**
+   * Executes the specified JS code using `browser.tabs.executeScript` under the hood.
+   * This method forces `runAt: document_start`.
+   *
+   * @param {number} tabId Tab id or null if you want to inject into the active tab
+   * @param {requestFrameId} requestFrameId Target frame id (script will be injected into that frame)
+   * @param {requestFrameId} code Javascript code to execute
+   */
+
+  const executeScriptCode = !(browser_polyfill_default()).tabs.executeScript ? undefined : async (tabId, requestFrameId, code) => {
+    try {
+      await browser_polyfill_default().tabs.executeScript(tabId, {
+        code,
+        frameId: requestFrameId,
+        runAt: 'document_start',
+        matchAboutBlank: true
+      });
+    } catch (e) {
+      log/* log.debug */.c.debug(new Error(e.message));
+    }
+  };
+  /**
+   * Executes the specified javascript file in the top frame of the specified tab.
+   * This method forces `runAt: document_start`.
+   *
+   * @param {number} tabId Tab id or null if you want to inject into the active tab
+   * @param {Object} options
+   * @param {string} options.file - Path to the javascript file
+   * @param {number} [options.frameId=0] - id of the frame, default to the 0;
+   * @param {function} callback Called when the script injection is complete
+   */
+
+  const executeScriptFile = !(browser_polyfill_default()).tabs.executeScript ? undefined : async (tabId, options) => {
+    const {
+      file,
+      frameId = 0
+    } = options;
+    const executeScriptOptions = {
+      file,
+      runAt: 'document_start'
+    }; // Chrome 49 throws an exception if browser.tabs.executeScript is called
+    // with a frameId equal to 0
+
+    if (frameId !== 0) {
+      executeScriptOptions.frameId = frameId;
+    }
+
+    try {
+      await browser_polyfill_default().tabs.executeScript(tabId, executeScriptOptions);
+    } catch (e) {
+      log/* log.debug */.c.debug(new Error(e.message));
+    }
+  };
+  return {
+    onCreated: onCreatedChannel,
+    onRemoved: onRemovedChannel,
+    onUpdated: onUpdatedChannel,
+    onActivated: onActivatedChannel,
+    create,
+    remove,
+    activate,
+    reload,
+    sendMessage,
+    getAll,
+    getActive,
+    get,
+    updateUrl,
+    insertCssCode,
+    executeScriptCode,
+    executeScriptFile
+  };
+}();
+;// CONCATENATED MODULE: ./Extension/src/background/tabs/tabs-api.js
+/**
+ * This file is part of Adguard Browser Extension (https://github.com/AdguardTeam/AdguardBrowserExtension).
+ *
+ * Adguard Browser Extension is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Adguard Browser Extension is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+
+
+const tabsApi = (tabsImpl => {
+  const tabs = Object.create(null); // Fired when a tab is created. Note that the tab's URL may not be set at the time
+  // this event fired, but you can listen to onUpdated events to be notified when a URL is set.
+
+  const onCreatedChannel = common_utils.channels.newChannel(); // Fired when a tab is closed.
+
+  const onRemovedChannel = common_utils.channels.newChannel(); // Fired when a tab is updated.
+
+  const onUpdatedChannel = common_utils.channels.newChannel(); // Fires when the active tab in a window changes.
+
+  const onActivatedChannel = common_utils.channels.newChannel();
+  /**
+   * Saves tab to collection and notify listeners
+   * @param aTab
+   */
+
+  function onTabCreated(aTab) {
+    const tab = tabs[aTab.tabId];
+
+    if (tab) {
+      // Tab has been already synchronized
+      return;
+    }
+
+    tabs[aTab.tabId] = aTab;
+    onCreatedChannel.notify(aTab);
+  } // Synchronize opened tabs
+
+
+  (async () => {
+    const aTabs = await tabsImpl.getAll();
+
+    for (let i = 0; i < aTabs.length; i += 1) {
+      const aTab = aTabs[i];
+      tabs[aTab.tabId] = aTab;
+    }
+  })();
+
+  tabsImpl.onCreated.addListener(onTabCreated);
+  tabsImpl.onRemoved.addListener(tabId => {
+    const tab = tabs[tabId];
+
+    if (tab) {
+      onRemovedChannel.notify(tab);
+      delete tabs[tabId];
+    }
+  });
+  tabsImpl.onUpdated.addListener(aTab => {
+    const tab = tabs[aTab.tabId];
+
+    if (tab) {
+      tab.url = aTab.url;
+      tab.title = aTab.title;
+      tab.status = aTab.status; // If the tab was updated it means that it wasn't used to send requests in the background
+
+      tab.synthetic = false;
+      onUpdatedChannel.notify(tab);
+    }
+  });
+  tabsImpl.onActivated.addListener(tabId => {
+    const tab = tabs[tabId];
+
+    if (tab) {
+      onActivatedChannel.notify(tab);
+    }
+  }); // --------- Actions ---------
+  // Creates a new tab.
+
+  const create = async details => {
+    return tabsImpl.create(details);
+  }; // Closes tab.
+
+
+  const remove = async tabId => {
+    return tabsImpl.remove(tabId);
+  }; // Activates tab (Also makes tab's window in focus).
+
+
+  const activate = function (tabId) {
+    return tabsImpl.activate(tabId);
+  }; // Reloads tab.
+
+
+  const reload = async (tabId, url) => {
+    await tabsImpl.reload(tabId, url);
+  }; // Updates tab url
+
+
+  const updateUrl = (tabId, url) => {
+    tabsImpl.updateUrl(tabId, url);
+  }; // Sends message to tab
+
+
+  const sendMessage = function (tabId, message, options) {
+    return tabsImpl.sendMessage(tabId, message, options);
+  };
+  /**
+   * Sometimes chrome does not return url and title on tab update events,
+   * but returns tabs with urls when tabs are requested by tabs api
+   * That is why during getting tabs we sync their urls with actual values
+   */
+
+
+  const syncTabs = (targetTabs, actualTab) => {
+    const {
+      tabId
+    } = actualTab;
+    const tab = targetTabs[tabId];
+
+    if (!tab) {
+      targetTabs[tabId] = actualTab;
+      return actualTab;
+    }
+
+    if (!tab.url && actualTab.url) {
+      tab.url = actualTab.url;
+    }
+
+    if (!tab.title && actualTab.title) {
+      tab.title = actualTab.title;
+    } // update tab state in the target tabs array
+
+
+    targetTabs[tabId] = tab;
+    return tab;
+  }; // Gets all opened tabs
+
+
+  const getAll = async () => {
+    const aTabs = await tabsImpl.getAll();
+    const result = [];
+
+    for (let i = 0; i < aTabs.length; i += 1) {
+      const aTab = aTabs[i];
+      const tab = syncTabs(tabs, aTab);
+      result.push(tab);
+    }
+
+    return result;
+  }; // Calls callback with each tab
+
+
+  const forEach = function (callback) {
+    (async () => {
+      const aTabs = await tabsImpl.getAll();
+
+      for (let i = 0; i < aTabs.length; i += 1) {
+        const aTab = aTabs[i];
+        let tab = tabs[aTab.tabId];
+
+        if (!tab) {
+          // Synchronize state
+          tabs[aTab.tabId] = aTab;
+          tab = aTab;
+        }
+
+        callback(tab);
+      }
+    })();
+  }; // Gets active tab
+
+
+  const getActive = async tabId => {
+    if (!tabId) {
+      tabId = await tabsImpl.getActive();
+    }
+
+    if (!tabId) {
+      return null;
+    }
+
+    let tab = tabs[tabId];
+
+    if (tab) {
+      if (!tab.url || !tab.title) {
+        const aTab = await tabsImpl.get(tabId);
+
+        if (aTab) {
+          syncTabs(tabs, aTab);
+        }
+      }
+
+      return tab;
+    } // Tab not found in the local state, but we are sure that this tab exists. Sync...
+    // TODO[Edge]: Relates to Edge Bug https://github.com/AdguardTeam/AdguardBrowserExtension/issues/481
+
+
+    tab = await tabsImpl.get(tabId);
+    onTabCreated(tab);
+    return tab;
+  };
+
+  const isIncognito = function (tabId) {
+    const tab = tabs[tabId];
+    return tab && tab.incognito === true;
+  }; // Records tab's frame
+
+
+  const recordTabFrame = function (tabId, frameId, url, domainName) {
+    let tab = tabs[tabId];
+
+    if (!tab && frameId === 0) {
+      // Sync tab for that 'onCreated' event was missed.
+      // https://github.com/AdguardTeam/AdguardBrowserExtension/issues/481
+      tab = {
+        tabId,
+        url,
+        status: 'loading',
+        // We mark this tabs as synthetic because actually they may not exists
+        synthetic: true
+      };
+      onTabCreated(tab);
+    }
+
+    if (tab) {
+      if (!tab.frames) {
+        tab.frames = Object.create(null);
+      }
+
+      tab.frames[frameId] = {
+        url,
+        domainName
+      };
+    }
+  };
+
+  const clearTabFrames = function (tabId) {
+    const tab = tabs[tabId];
+
+    if (tab) {
+      tab.frames = null;
+    }
+  }; // Gets tab's frame by id
+
+
+  const getTabFrame = function (tabId, frameId) {
+    const tab = tabs[tabId];
+
+    if (tab && tab.frames) {
+      return tab.frames[frameId || 0];
+    }
+
+    return null;
+  };
+  /**
+   * Checks if the tab is new tab for popup or not
+   * May be false positive for FF at least because new tab url in FF is "about:blank" too
+   * @param tabId
+   * @returns {boolean}
+   */
+
+
+  const isNewPopupTab = tabId => {
+    const tab = tabs[tabId];
+
+    if (!tab) {
+      return false;
+    }
+
+    return !!(tab.url === '' || tab.url === 'about:blank');
+  }; // Update tab metadata
+
+
+  const updateTabMetadata = function (tabId, values) {
+    const tab = tabs[tabId];
+
+    if (tab) {
+      if (!tab.metadata) {
+        tab.metadata = Object.create(null);
+      } // eslint-disable-next-line no-restricted-syntax
+
+
+      for (const key in values) {
+        if (values.hasOwnProperty && values.hasOwnProperty(key)) {
+          tab.metadata[key] = values[key];
+        }
+      }
+    }
+  }; // Gets tab metadata
+
+
+  const getTabMetadata = (tabId, key) => {
+    const tab = tabs[tabId];
+
+    if (tab && tab.metadata) {
+      return tab.metadata[key];
+    }
+
+    return null;
+  };
+
+  const clearTabMetadata = tabId => {
+    const tab = tabs[tabId];
+
+    if (tab) {
+      tab.metadata = null;
+    }
+  }; // Injecting resources to tabs
+
+
+  const {
+    insertCssCode
+  } = tabsImpl;
+  const {
+    executeScriptCode
+  } = tabsImpl;
+  const {
+    executeScriptFile
+  } = tabsImpl;
+  return {
+    // Events
+    onCreated: onCreatedChannel,
+    onRemoved: onRemovedChannel,
+    onUpdated: onUpdatedChannel,
+    onActivated: onActivatedChannel,
+    // Actions
+    create,
+    remove,
+    activate,
+    reload,
+    sendMessage,
+    getAll,
+    forEach,
+    getActive,
+    isIncognito,
+    updateUrl,
+    // Frames
+    recordTabFrame,
+    clearTabFrames,
+    getTabFrame,
+    isNewPopupTab,
+    // Other
+    updateTabMetadata,
+    getTabMetadata,
+    clearTabMetadata,
+    insertCssCode,
+    executeScriptCode,
+    executeScriptFile
+  };
+})(tabsImpl);
+
+
+// EXTERNAL MODULE: ./node_modules/@adguard/tsurlfilter/dist/tsurlfilter.browser.js
+var tsurlfilter_browser = __webpack_require__(4346);
+;// CONCATENATED MODULE: ./node_modules/@adguard/tsurlfilter/dist/es/request-type.js
+/**
+ * RequestType is the request types enumeration
+ */
+var RequestType;
+(function (RequestType) {
+    /** main frame */
+    RequestType[RequestType["Document"] = 1] = "Document";
+    /** (iframe) $subdocument */
+    RequestType[RequestType["Subdocument"] = 2] = "Subdocument";
+    /** (javascript, etc) $script */
+    RequestType[RequestType["Script"] = 4] = "Script";
+    /** (css) $stylesheet */
+    RequestType[RequestType["Stylesheet"] = 8] = "Stylesheet";
+    /** (flash, etc) $object */
+    RequestType[RequestType["Object"] = 16] = "Object";
+    /** (any image) $image */
+    RequestType[RequestType["Image"] = 32] = "Image";
+    /** (ajax/fetch) $xmlhttprequest */
+    RequestType[RequestType["XmlHttpRequest"] = 64] = "XmlHttpRequest";
+    /** (video/music) $media */
+    RequestType[RequestType["Media"] = 128] = "Media";
+    /** (any custom font) $font */
+    RequestType[RequestType["Font"] = 256] = "Font";
+    /** (a websocket connection) $websocket */
+    RequestType[RequestType["Websocket"] = 512] = "Websocket";
+    /** (navigator.sendBeacon()) $ping */
+    RequestType[RequestType["Ping"] = 1024] = "Ping";
+    /** (webrtc, in extension works via wrappers) $webrtc */
+    RequestType[RequestType["Webrtc"] = 2048] = "Webrtc";
+    /** any other request type */
+    RequestType[RequestType["Other"] = 4096] = "Other";
+})(RequestType || (RequestType = {}));
+
+
+
+;// CONCATENATED MODULE: ./Extension/src/background/utils/request-types.js
+
+/**
+ * Request types enumeration
+ */
+
+const RequestTypes = {
+  /**
+   * Document that is loaded for a top-level frame
+   */
+  DOCUMENT: 'DOCUMENT',
+
+  /**
+   * Document that is loaded for an embedded frame (iframe)
+   */
+  SUBDOCUMENT: 'SUBDOCUMENT',
+  SCRIPT: 'SCRIPT',
+  STYLESHEET: 'STYLESHEET',
+  OBJECT: 'OBJECT',
+  IMAGE: 'IMAGE',
+  XMLHTTPREQUEST: 'XMLHTTPREQUEST',
+  MEDIA: 'MEDIA',
+  FONT: 'FONT',
+  WEBSOCKET: 'WEBSOCKET',
+  WEBRTC: 'WEBRTC',
+  OTHER: 'OTHER',
+  CSP: 'CSP',
+  COOKIE: 'COOKIE',
+  PING: 'PING',
+  CSP_REPORT: 'CSP_REPORT',
+
+  /**
+   * Transforms to TSUrlFilter.RequestType
+   *
+   * @param requestType
+   * @return {number}
+   */
+  transformRequestType(requestType) {
+    const contentTypes = RequestTypes;
+
+    switch (requestType) {
+      case contentTypes.DOCUMENT:
+        return RequestType.Document;
+
+      case contentTypes.SUBDOCUMENT:
+        return RequestType.Subdocument;
+
+      case contentTypes.STYLESHEET:
+        return RequestType.Stylesheet;
+
+      case contentTypes.FONT:
+        return RequestType.Font;
+
+      case contentTypes.IMAGE:
+        return RequestType.Image;
+
+      case contentTypes.MEDIA:
+        return RequestType.Media;
+
+      case contentTypes.SCRIPT:
+        return RequestType.Script;
+
+      case contentTypes.XMLHTTPREQUEST:
+        return RequestType.XmlHttpRequest;
+
+      case contentTypes.WEBSOCKET:
+        return RequestType.Websocket;
+
+      case contentTypes.WEBRTC:
+        return RequestType.Webrtc;
+
+      case contentTypes.PING:
+        return RequestType.Ping;
+
+      default:
+        return RequestType.Other;
+    }
+  },
+
+  /**
+   * Transforms from TSUrlFilter.RequestType
+   *
+   * @param requestType
+   * @return {string}
+   */
+  transformRequestTypeFromTs(requestType) {
+    const contentTypes = RequestTypes;
+
+    switch (requestType) {
+      case RequestType.Document:
+        return contentTypes.DOCUMENT;
+
+      case RequestType.Subdocument:
+        return contentTypes.SUBDOCUMENT;
+
+      case RequestType.Stylesheet:
+        return contentTypes.STYLESHEET;
+
+      case RequestType.Font:
+        return contentTypes.FONT;
+
+      case RequestType.Image:
+        return contentTypes.IMAGE;
+
+      case RequestType.Media:
+        return contentTypes.MEDIA;
+
+      case RequestType.Script:
+        return contentTypes.SCRIPT;
+
+      case RequestType.XmlHttpRequest:
+        return contentTypes.XMLHTTPREQUEST;
+
+      case RequestType.Websocket:
+        return contentTypes.WEBSOCKET;
+
+      case RequestType.Ping:
+        return contentTypes.PING;
+
+      default:
+        return contentTypes.OTHER;
+    }
+  }
+
+};
+/**
+ * Parse content type from path
+ * @param path Path
+ * @returns {*} content type (RequestTypes.*) or null
+ */
+
+function parseContentTypeFromUrlPath(path) {
+  const objectContentTypes = '.jar.swf.';
+  const mediaContentTypes = '.mp4.flv.avi.m3u.webm.mpeg.3gp.3gpp.3g2.3gpp2.ogg.mov.qt.';
+  const fontContentTypes = '.ttf.otf.woff.woff2.eot.';
+  const imageContentTypes = '.ico.png.gif.jpg.jpeg.webp.';
+  let ext = path.slice(-6);
+  const pos = ext.lastIndexOf('.'); // Unable to parse extension from url
+
+  if (pos === -1) {
+    return null;
+  }
+
+  ext = `${ext.slice(pos)}.`;
+
+  if (objectContentTypes.indexOf(ext) !== -1) {
+    return RequestTypes.OBJECT;
+  }
+
+  if (mediaContentTypes.indexOf(ext) !== -1) {
+    return RequestTypes.MEDIA;
+  }
+
+  if (fontContentTypes.indexOf(ext) !== -1) {
+    return RequestTypes.FONT;
+  }
+
+  if (imageContentTypes.indexOf(ext) !== -1) {
+    return RequestTypes.IMAGE;
+  }
+
+  return null;
+}
+;// CONCATENATED MODULE: ./Extension/src/common/common-script.js
+/**
+ * This file is part of Adguard Browser Extension (https://github.com/AdguardTeam/AdguardBrowserExtension).
+ *
+ * Adguard Browser Extension is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Adguard Browser Extension is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+const runtimeImpl = (() => {
+  return {
+    onMessage: (browser_polyfill_default()).runtime.onMessage,
+    sendMessage: (browser_polyfill_default()).runtime.sendMessage
+  };
+})(); // eslint-disable-next-line prefer-destructuring
+
+const common_script_i18n = (browser_polyfill_default()).i18n;
+;// CONCATENATED MODULE: ./Extension/src/background/extension-api/background-page.js
+/**
+ * This file is part of Adguard Browser Extension (https://github.com/AdguardTeam/AdguardBrowserExtension).
+ *
+ * Adguard Browser Extension is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Adguard Browser Extension is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/* eslint-disable max-len */
+
+
+
+
+
+
+
+const backgroundPage = (() => {
+  var _browser$webRequest8, _browser$webRequest9, _browser$webNavigatio;
+
+  const runtime = function () {
+    const onMessage = {
+      addListener(callback) {
+        // https://developer.chrome.com/extensions/runtime#event-onMessage
+        runtimeImpl.onMessage.addListener((message, sender) => {
+          const senderOverride = Object.create(null);
+
+          if (sender.tab) {
+            senderOverride.tab = toTabFromChromeTab(sender.tab);
+          }
+
+          if (typeof sender.frameId !== 'undefined') {
+            senderOverride.frameId = sender.frameId;
+          }
+
+          return callback(message, senderOverride);
+        });
+      }
+
+    };
+    return {
+      setUninstallURL: (browser_polyfill_default()).runtime.setUninstallURL,
+      reload: (browser_polyfill_default()).runtime.reload,
+      onMessage,
+      onConnect: (browser_polyfill_default()).runtime.onConnect,
+
+      get lastError() {
+        return (browser_polyfill_default()).runtime.lastError;
+      }
+
+    };
+  }(); // Calculates scheme of this extension (e.g.: chrome-extension:// or moz-extension://)
+
+
+  const extensionScheme = function () {
+    const url = browser_polyfill_default().runtime.getURL('');
+
+    if (!url) {
+      return url;
+    }
+
+    const index = url.indexOf('://');
+
+    if (index > 0) {
+      return url.substring(0, index);
+    }
+
+    return url;
+  }();
+  /**
+   * We are skipping requests to internal resources of extensions
+   * (e.g. chrome-extension:// or moz-extension://... etc.)
+   * @param details Request details
+   * @returns {boolean}
+   */
+
+
+  function shouldSkipRequest(details) {
+    return details.tabId === BACKGROUND_TAB_ID && details.url.indexOf(extensionScheme) === 0;
+  }
+
+  const linkHelper = document.createElement('a');
+  /**
+   * Fixing request type:
+   * https://code.google.com/p/chromium/issues/detail?id=410382
+   *
+   * @param url Request url
+   * @returns String Fixed object type
+   */
+
+  function parseRequestTypeFromUrl(url) {
+    linkHelper.href = url;
+    const path = linkHelper.pathname;
+    let requestType = parseContentTypeFromUrlPath(path);
+
+    if (requestType === null) {
+      // https://code.google.com/p/chromium/issues/detail?id=410382
+      requestType = RequestTypes.OBJECT;
+    }
+
+    return requestType;
+  }
+  /**
+   * An array of HTTP headers.
+   * Each header is represented as a dictionary containing the keys name
+   * and either value or binaryValue.
+   * https://developer.chrome.com/extensions/webRequest#type-HttpHeaders
+   * @typedef HttpHeaders
+   * @type {Array.<{ name: String, value: String, binaryValue }>}
+   */
+
+  /**
+   * @typedef RequestDetails
+   * @type {Object}
+   * @property {String} requestUrl - request url
+   * @property {String} referrerUrl - the origin where the request was initiated
+   * @property {{tabId: Number}} tab - request tab with tabId in property
+   * @property {Number} requestId - the ID of the request
+   * @property {Number} statusCode - standard HTTP status code
+   * @property {String} method - standard HTTP method
+   * @property {Number} frameId - ID of current frame. Frame IDs are unique within a tab.
+   * @property {Number} requestFrameId - ID of frame where request is executed
+   * @property {Number} requestType - request type {@link RequestTypes}
+   * @property {HttpHeaders} [requestHeaders] - the HTTP request headers
+   * @property {HttpHeaders} [responseHeaders] - the HTTP response headers
+   * @property {String} redirectUrl - new URL in onBeforeRedirect event
+   */
+
+  /**
+   * Argument passed to the webRequest event listener.
+   * Every webRequest event listener has its own object with request details.
+   * To learn more see https://developer.chrome.com/extensions/webRequest or
+   * https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/webRequest
+   * @typedef {Object} WebRequestDetails
+   */
+
+  /**
+   * Transforms raw request details from different browsers into unified format
+   * @param {WebRequestDetails} details raw webRequest details
+   * @returns {RequestDetails} prepared request details
+   */
+
+
+  function getRequestDetails(details) {
+    const tab = {
+      tabId: details.tabId
+    };
+    /**
+     * FF sends http instead of ws protocol at the http-listeners layer
+     * Although this is expected, as the Upgrade request is indeed an HTTP request,
+     * we use a chromium based approach in this case.
+     */
+
+    if (details.type === 'websocket' && details.url.indexOf('http') === 0) {
+      details.url = details.url.replace(/^http(s)?:/, 'ws$1:');
+    } // https://developer.chrome.com/extensions/webRequest#event-onBeforeRequest
+
+
+    const requestDetails = {
+      requestUrl: details.url,
+      // request url
+      url: details.url,
+      tab,
+      // request tab,
+      tabId: details.tabId,
+      requestId: details.requestId,
+      statusCode: details.statusCode,
+      method: details.method
+    };
+    let frameId = 0; // id of this frame (only for main_frame and sub_frame types)
+
+    let requestFrameId = 0; // id of frame where request is executed
+
+    let requestType; // request type
+
+    switch (details.type) {
+      case 'main_frame':
+        frameId = 0;
+        requestType = RequestTypes.DOCUMENT;
+        break;
+
+      case 'sub_frame':
+        frameId = details.frameId; // for sub_frame use parentFrameId as id of frame that wraps this frame
+
+        requestFrameId = details.parentFrameId;
+        requestType = RequestTypes.SUBDOCUMENT;
+        break;
+
+      default:
+        requestFrameId = details.frameId;
+        requestType = details.type.toUpperCase();
+        break;
+    } // Relate request to main_frame
+
+
+    if (requestFrameId === -1) {
+      requestFrameId = 0;
+    }
+
+    if (requestType === 'IMAGESET') {
+      requestType = RequestTypes.IMAGE;
+    }
+
+    if (requestType === RequestTypes.OTHER) {
+      requestType = parseRequestTypeFromUrl(details.url);
+    }
+    /**
+     * ping type is 'ping' in Chrome
+     * but Firefox considers it as 'beacon'
+     */
+
+
+    if (requestType === 'BEACON') {
+      requestType = RequestTypes.PING;
+    }
+    /**
+     * Use `OTHER` type as a fallback
+     * https://github.com/AdguardTeam/AdguardBrowserExtension/issues/777
+     */
+
+
+    if (!(requestType in RequestTypes)) {
+      requestType = RequestTypes.OTHER;
+    }
+
+    requestDetails.frameId = frameId;
+    requestDetails.requestFrameId = requestFrameId;
+    requestDetails.requestType = requestType;
+
+    if (details.requestHeaders) {
+      requestDetails.requestHeaders = details.requestHeaders;
+    }
+
+    if (details.responseHeaders) {
+      requestDetails.responseHeaders = details.responseHeaders;
+    }
+
+    if (details.requestBody) {
+      requestDetails.requestBody = details.requestBody;
+    }
+
+    if (details.tabId === BACKGROUND_TAB_ID) {
+      // In case of background request, its details contains referrer url
+      // Chrome uses `initiator`: https://developer.chrome.com/extensions/webRequest#event-onBeforeRequest
+      // FF uses `originUrl`: https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/webRequest/onBeforeRequest#Additional_objects
+      requestDetails.referrerUrl = details.originUrl || details.initiator;
+    }
+
+    requestDetails.originUrl = details.originUrl || details.initiator;
+    requestDetails.thirdParty = tsurlfilter_browser.isThirdPartyRequest(requestDetails.requestUrl, requestDetails.originUrl);
+    return requestDetails;
+  }
+
+  const onBeforeRequest = {
+    /**
+     * Wrapper for webRequest.onBeforeRequest event
+     * It prepares requestDetails and passes them to the callback
+     * @param callback callback function receives {RequestDetails} and handles event
+     * @param {String} urls url match pattern https://developer.chrome.com/extensions/match_patterns
+     * @param {string[]} types
+     * @param {string[]} extraInfoSpecsDirty
+     */
+    addListener(callback, urls, types, extraInfoSpecsDirty) {
+      var _browser$webRequest, _browser$webRequest$o;
+
+      const filters = {};
+
+      if (urls) {
+        filters.urls = urls;
+      }
+
+      if (types) {
+        filters.types = types;
+      }
+
+      const extraInfoSpec = ['blocking'];
+
+      if (extraInfoSpecsDirty && extraInfoSpecsDirty.length > 0) {
+        extraInfoSpecsDirty.forEach(spec => {
+          extraInfoSpec.push(spec);
+        });
+      } // https://developer.chrome.com/extensions/webRequest#event-onBeforeRequest
+
+
+      (_browser$webRequest = (browser_polyfill_default()).webRequest) === null || _browser$webRequest === void 0 ? void 0 : (_browser$webRequest$o = _browser$webRequest.onBeforeRequest) === null || _browser$webRequest$o === void 0 ? void 0 : _browser$webRequest$o.addListener(details => {
+        if (shouldSkipRequest(details)) {
+          return;
+        }
+
+        const requestDetails = getRequestDetails(details);
+        return callback(requestDetails);
+      }, filters, extraInfoSpec);
+    }
+
+  };
+  /**
+   * Apply 'extraHeaders' option for request/response headers access/change. See:
+   * https://groups.google.com/a/chromium.org/forum/#!topic/chromium-extensions/vYIaeezZwfQ
+   * https://chromium-review.googlesource.com/c/chromium/src/+/1338165
+   */
+
+  const onBeforeSendHeadersExtraInfoSpec = ['requestHeaders', 'blocking'];
+  const onHeadersReceivedExtraInfoSpec = ['responseHeaders', 'blocking'];
+
+  if ((browser_polyfill_default()).webRequest && typeof (browser_polyfill_default()).webRequest.OnBeforeSendHeadersOptions !== 'undefined' && browser_polyfill_default().webRequest.OnBeforeSendHeadersOptions.hasOwnProperty('EXTRA_HEADERS')) {
+    onBeforeSendHeadersExtraInfoSpec.push('extraHeaders');
+  }
+
+  if ((browser_polyfill_default()).webRequest && typeof (browser_polyfill_default()).webRequest.OnHeadersReceivedOptions !== 'undefined' && browser_polyfill_default().webRequest.OnHeadersReceivedOptions.hasOwnProperty('EXTRA_HEADERS')) {
+    onHeadersReceivedExtraInfoSpec.push('extraHeaders');
+  }
+
+  const onHeadersReceived = {
+    /**
+     * Wrapper for webRequest.onHeadersReceived event
+     * It prepares requestDetails and passes them to the callback
+     * @param callback callback function receives {RequestDetails} and handles event
+     * @param {Array.<String>} urls url match pattern https://developer.chrome.com/extensions/match_patterns
+     */
+    addListener(callback, urls) {
+      var _browser$webRequest2, _browser$webRequest2$;
+
+      (_browser$webRequest2 = (browser_polyfill_default()).webRequest) === null || _browser$webRequest2 === void 0 ? void 0 : (_browser$webRequest2$ = _browser$webRequest2.onHeadersReceived) === null || _browser$webRequest2$ === void 0 ? void 0 : _browser$webRequest2$.addListener(details => {
+        if (shouldSkipRequest(details)) {
+          return;
+        }
+
+        const requestDetails = getRequestDetails(details);
+        const result = callback(requestDetails);
+
+        if (result) {
+          return 'responseHeaders' in result ? {
+            responseHeaders: result.responseHeaders
+          } : {};
+        }
+      }, urls ? {
+        urls
+      } : {}, onHeadersReceivedExtraInfoSpec);
+    }
+
+  };
+  const onBeforeSendHeaders = {
+    /**
+     * Wrapper for webRequest.onBeforeSendHeaders event
+     * It prepares requestDetails and passes them to the callback
+     * @param callback callback function receives {RequestDetails} and handles event
+     * @param {Array.<String>} urls url match pattern https://developer.chrome.com/extensions/match_patterns
+     */
+    addListener(callback, urls) {
+      var _browser$webRequest3, _browser$webRequest3$;
+
+      let requestFilter = {};
+      /**
+       * Sometimes extraHeaders option of onBeforeSendHeaders handler is blocking network
+       * https://github.com/AdguardTeam/AdguardBrowserExtension/issues/1634
+       * https://github.com/AdguardTeam/AdguardBrowserExtension/issues/1644
+       * https://bugs.chromium.org/p/chromium/issues/detail?id=938560
+       * https://bugs.chromium.org/p/chromium/issues/detail?id=1075905
+       * This issue was fixed in the Canary v85.0.4178.0 and would be fixed
+       * in the Chrome with the same version
+       * Until v85 we have decided to filter requests with types:
+       * 'stylesheet', 'script', 'media'
+       */
+
+      if (prefs.browser === 'Chrome' && prefs.chromeVersion < 85) {
+        const allTypes = ['main_frame', 'sub_frame', 'stylesheet', 'script', 'image', 'font', 'object', 'xmlhttprequest', 'ping', 'csp_report', 'media', 'websocket', 'other']; // this request types block requests, if use them with extraHeaders and blocking options
+
+        const nonExtraHeadersTypes = ['stylesheet', 'script', 'media'];
+        const extraHeadersTypes = allTypes.filter(type => !nonExtraHeadersTypes.includes(type)); // Assign instead of spread used because FF begin to support them from v55
+        // https://caniuse.com/#feat=mdn-javascript_operators_spread_spread_in_object_literals
+
+        requestFilter = Object.assign(requestFilter, {
+          types: extraHeadersTypes
+        });
+      }
+
+      if (urls) {
+        // Assign instead of spread used because FF begin to support them from v55
+        // https://caniuse.com/#feat=mdn-javascript_operators_spread_spread_in_object_literals
+        requestFilter = Object.assign(requestFilter, {
+          urls
+        });
+      }
+
+      (_browser$webRequest3 = (browser_polyfill_default()).webRequest) === null || _browser$webRequest3 === void 0 ? void 0 : (_browser$webRequest3$ = _browser$webRequest3.onBeforeSendHeaders) === null || _browser$webRequest3$ === void 0 ? void 0 : _browser$webRequest3$.addListener(details => {
+        if (shouldSkipRequest(details)) {
+          return;
+        }
+
+        const requestDetails = getRequestDetails(details);
+        const result = callback(requestDetails);
+
+        if (result) {
+          return 'requestHeaders' in result ? {
+            requestHeaders: result.requestHeaders
+          } : {};
+        }
+      }, requestFilter, onBeforeSendHeadersExtraInfoSpec);
+    }
+
+  };
+  const onResponseStarted = {
+    /**
+     * Wrapper for webRequest.onResponseStarted event
+     * It prepares requestDetails and passes them to the callback
+     * @param callback callback function receives {RequestDetails} and handles event
+     * @param {String} urls url match pattern https://developer.chrome.com/extensions/match_patterns
+     */
+    addListener(callback, urls) {
+      var _browser$webRequest4, _browser$webRequest4$;
+
+      (_browser$webRequest4 = (browser_polyfill_default()).webRequest) === null || _browser$webRequest4 === void 0 ? void 0 : (_browser$webRequest4$ = _browser$webRequest4.onResponseStarted) === null || _browser$webRequest4$ === void 0 ? void 0 : _browser$webRequest4$.addListener(details => {
+        if (shouldSkipRequest(details)) {
+          return;
+        }
+
+        const requestDetails = getRequestDetails(details);
+        return callback(requestDetails);
+      }, urls ? {
+        urls
+      } : {}, ['responseHeaders']);
+    }
+
+  };
+  const onErrorOccurred = {
+    /**
+     * Wrapper for webRequest.onErrorOccurred event
+     * It prepares requestDetails and passes them to the callback
+     * @param callback callback function receives {RequestDetails} and handles event
+     * @param {String} urls url match pattern https://developer.chrome.com/extensions/match_patterns
+     */
+    addListener(callback, urls) {
+      var _browser$webRequest5, _browser$webRequest5$;
+
+      (_browser$webRequest5 = (browser_polyfill_default()).webRequest) === null || _browser$webRequest5 === void 0 ? void 0 : (_browser$webRequest5$ = _browser$webRequest5.onErrorOccurred) === null || _browser$webRequest5$ === void 0 ? void 0 : _browser$webRequest5$.addListener(details => {
+        if (shouldSkipRequest(details)) {
+          return;
+        }
+
+        const requestDetails = getRequestDetails(details);
+        return callback(requestDetails);
+      }, urls ? {
+        urls
+      } : {});
+    }
+
+  };
+  const onCompleted = {
+    /**
+     * Wrapper for webRequest.onCompleted event
+     * It prepares requestDetails and passes them to the callback
+     * @param callback callback function receives {RequestDetails} and handles event
+     * @param {String} urls url match pattern https://developer.chrome.com/extensions/match_patterns
+     */
+    addListener(callback, urls) {
+      var _browser$webRequest6, _browser$webRequest6$;
+
+      (_browser$webRequest6 = (browser_polyfill_default()).webRequest) === null || _browser$webRequest6 === void 0 ? void 0 : (_browser$webRequest6$ = _browser$webRequest6.onCompleted) === null || _browser$webRequest6$ === void 0 ? void 0 : _browser$webRequest6$.addListener(details => {
+        if (shouldSkipRequest(details)) {
+          return;
+        }
+
+        const requestDetails = getRequestDetails(details);
+        return callback(requestDetails);
+      }, urls ? {
+        urls
+      } : {}, ['responseHeaders']);
+    }
+
+  };
+  const onBeforeRedirect = {
+    /**
+     * Wrapper for webRequest.onBeforeRedirect event
+     * It prepares requestDetails and passes them to the callback
+     * @param callback callback function receives {RequestDetails} and handles event
+     * @param {Array.<String>} urls url match pattern https://developer.chrome.com/extensions/match_patterns
+     */
+    addListener(callback, urls) {
+      var _browser$webRequest7, _browser$webRequest7$;
+
+      (_browser$webRequest7 = (browser_polyfill_default()).webRequest) === null || _browser$webRequest7 === void 0 ? void 0 : (_browser$webRequest7$ = _browser$webRequest7.onBeforeRedirect) === null || _browser$webRequest7$ === void 0 ? void 0 : _browser$webRequest7$.addListener(details => {
+        if (shouldSkipRequest(details)) {
+          return;
+        }
+
+        const requestDetails = getRequestDetails(details);
+        requestDetails.redirectUrl = details.redirectUrl;
+        return callback(requestDetails);
+      }, urls ? {
+        urls
+      } : {});
+    }
+
+  };
+  /**
+   * Gets URL of a file that belongs to our extension
+   * https://developer.chrome.com/apps/runtime#method-getURL
+   */
+  // eslint-disable-next-line prefer-destructuring
+
+  const getURL = (browser_polyfill_default()).runtime.getURL;
+  const app = {
+    /**
+     * Extension ID
+     */
+    getId() {
+      return (browser_polyfill_default()).runtime.id;
+    },
+
+    /**
+     * Gets extension scheme
+     * @returns "chrome-extension" for Chrome," ms-browser-extension" for Edge
+     */
+    getUrlScheme() {
+      const url = backgroundPage.getURL('test.html');
+      const index = url.indexOf('://');
+      return url.substring(0, index);
+    },
+
+    /**
+     * Extension version
+     */
+    getVersion() {
+      return browser_polyfill_default().runtime.getManifest().version;
+    },
+
+    /**
+     * Extension UI locale
+     */
+    getLocale() {
+      return browser_polyfill_default().i18n.getUILanguage();
+    },
+
+    /**
+     * Returns extension's full url
+     */
+    getExtensionUrl() {
+      const url = getURL('');
+      return url.substring(0, url.length - 1);
+    },
+
+    /**
+     * If referrer of request contains full url of extension,
+     * then this request is considered as extension's own request
+     * (e.g. request for filter downloading)
+     * https://github.com/AdguardTeam/AdguardBrowserExtension/issues/1437
+     * @param referrerUrl
+     * @returns {boolean}
+     */
+    isOwnRequest(referrerUrl) {
+      return referrerUrl && referrerUrl.indexOf(this.getExtensionUrl()) === 0;
+    }
+
+  };
+  const webRequest = {
+    onBeforeRequest,
+    handlerBehaviorChanged: (_browser$webRequest8 = (browser_polyfill_default()).webRequest) === null || _browser$webRequest8 === void 0 ? void 0 : _browser$webRequest8.handlerBehaviorChanged,
+    onCompleted,
+    onErrorOccurred,
+    onHeadersReceived,
+    onBeforeSendHeaders,
+    onResponseStarted,
+    onBeforeRedirect,
+    webSocketSupported: (browser_polyfill_default()).webRequest && typeof (browser_polyfill_default()).webRequest.ResourceType !== 'undefined' && (browser_polyfill_default()).webRequest.ResourceType.WEBSOCKET === 'websocket',
+    filterResponseData: (_browser$webRequest9 = (browser_polyfill_default()).webRequest) === null || _browser$webRequest9 === void 0 ? void 0 : _browser$webRequest9.filterResponseData
+  };
+  const onCreatedNavigationTarget = {
+    addListener(callback) {
+      // https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/webNavigation/onCreatedNavigationTarget#Browser_compatibility
+      if (!(browser_polyfill_default()).webNavigation || typeof (browser_polyfill_default()).webNavigation.onCreatedNavigationTarget === 'undefined') {
+        return;
+      }
+
+      browser_polyfill_default().webNavigation.onCreatedNavigationTarget.addListener(details => {
+        if (details.tabId === BACKGROUND_TAB_ID) {
+          return;
+        }
+
+        callback({
+          tabId: details.tabId,
+          sourceTabId: details.sourceTabId,
+          url: details.url
+        });
+      });
+    }
+
+  };
+  const onCommitted = {
+    /**
+     * Wrapper for webNavigation.onCommitted event
+     * It prepares webNavigation details and passes them to the callback
+     * @param callback callback function receives object similar to {RequestDetails}
+     * and handles event
+     */
+    addListener(callback) {
+      if (!(browser_polyfill_default()).webNavigation) return; // https://developer.chrome.com/extensions/webNavigation#event-onCommitted
+
+      browser_polyfill_default().webNavigation.onCommitted.addListener(details => {
+        // makes webNavigation.onCommitted details similar to webRequestDetails
+        details.requestType = details.frameId === 0 ? RequestTypes.DOCUMENT : RequestTypes.SUBDOCUMENT;
+        details.tab = {
+          tabId: details.tabId
+        };
+        details.requestUrl = details.url;
+        callback(details);
+      }, {
+        url: [{
+          urlPrefix: 'http'
+        }, {
+          urlPrefix: 'https'
+        }]
+      });
+    }
+
+  }; // https://developer.chrome.com/extensions/webNavigation
+
+  const webNavigation = {
+    onCreatedNavigationTarget,
+    onCommitted,
+    onDOMContentLoaded: (_browser$webNavigatio = (browser_polyfill_default()).webNavigation) === null || _browser$webNavigatio === void 0 ? void 0 : _browser$webNavigatio.onDOMContentLoaded
+  };
+  const browserActionSupported = typeof (browser_polyfill_default()).browserAction.setIcon !== 'undefined';
+  const browserAction = {
+    /* eslint-disable-next-line no-unused-vars */
+    async setBrowserAction(tab, icon, badge, badgeColor, title) {
+      if (!browserActionSupported) {
+        return;
+      }
+
+      const {
+        tabId
+      } = tab;
+
+      const onIconReady = async () => {
+        try {
+          await browser_polyfill_default().browserAction.setBadgeText({
+            tabId,
+            text: badge
+          });
+        } catch (e) {
+          log/* log.debug */.c.debug(new Error(e.message));
+          return;
+        }
+
+        if (badge) {
+          try {
+            await browser_polyfill_default().browserAction.setBadgeBackgroundColor({
+              tabId,
+              color: badgeColor
+            });
+          } catch (e) {
+            log/* log.debug */.c.debug(new Error(e.message));
+          }
+        } // title setup via manifest.json file
+        // chrome.browserAction.setTitle({tabId: tabId, title: title});
+
+      };
+      /**
+       * Workaround for MS Edge.
+       * For some reason Edge changes the inner state of the "icon"
+       * object and adds a tabId property inside.
+       */
+
+
+      delete icon.tabId;
+
+      if ((browser_polyfill_default()).runtime.lastError) {
+        return;
+      }
+
+      try {
+        await browser_polyfill_default().browserAction.setIcon({
+          tabId,
+          path: icon
+        });
+      } catch (e) {
+        log/* log.debug */.c.debug(new Error(e.message));
+        return;
+      }
+
+      onIconReady();
+    },
+
+    setPopup() {// Do nothing. Popup is already installed in manifest file
+    },
+
+    resize() {// Do nothing
+    },
+
+    close() {// Do nothing
+    }
+
+  }; // eslint-disable-next-line prefer-destructuring
+  // const contextMenus = browser.contextMenus;
+  // eslint-disable-next-line prefer-destructuring
+
+  const i18n = (browser_polyfill_default()).i18n;
+  return {
+    runtime,
+    getURL,
+    app,
+    webRequest,
+    webNavigation,
+    browserAction,
+    // contextMenus,
+    i18n
+  };
+})();
+;// CONCATENATED MODULE: ./Extension/src/background/utils/browser-utils.js
+/**
+ * This file is part of Adguard Browser Extension (https://github.com/AdguardTeam/AdguardBrowserExtension).
+ *
+ * Adguard Browser Extension is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Adguard Browser Extension is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+
+
+
+
+
+const browser_utils_browserUtils = function () {
+  /**
+   * Extension version (x.x.x)
+   * @param version
+   * @constructor
+   */
+  const Version = function (version) {
+    this.version = Object.create(null);
+    const parts = String(version || '').split('.');
+
+    function parseVersionPart(part) {
+      if (Number.isNaN(part)) {
+        return 0;
+      }
+
+      return Math.max(part - 0, 0);
+    }
+
+    for (let i = 3; i >= 0; i -= 1) {
+      this.version[i] = parseVersionPart(parts[i]);
+    }
+  };
+  /**
+   * Compares with other version
+   * @param o
+   * @returns {number}
+   */
+
+
+  Version.prototype.compare = function (o) {
+    for (let i = 0; i < 4; i += 1) {
+      if (this.version[i] > o.version[i]) {
+        return 1;
+      }
+
+      if (this.version[i] < o.version[i]) {
+        return -1;
+      }
+    }
+
+    return 0;
+  };
+
+  const browserUtils = {
+    /**
+     * Checks if version matches simple (without labels) semantic versioning scheme
+     * https://semver.org/
+     * @param {string} version
+     * @return {boolean}
+     */
+    isSemver(version) {
+      const semverRegex = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/;
+      return semverRegex.test(version);
+    },
+
+    /**
+     * Checks if left version is greater than the right version
+     */
+    isGreaterVersion(leftVersion, rightVersion) {
+      const left = new Version(leftVersion);
+      const right = new Version(rightVersion);
+      return left.compare(right) > 0;
+    },
+
+    isGreaterOrEqualsVersion(leftVersion, rightVersion) {
+      const left = new Version(leftVersion);
+      const right = new Version(rightVersion);
+      return left.compare(right) >= 0;
+    },
+
+    /**
+     * Returns major number of version
+     *
+     * @param version
+     */
+    getMajorVersionNumber(version) {
+      const v = new Version(version);
+      return v.version[0];
+    },
+
+    /**
+     * Returns minor number of version
+     *
+     * @param version
+     */
+    getMinorVersionNumber(version) {
+      const v = new Version(version);
+      return v.version[1];
+    },
+
+    /**
+     * @returns Extension version
+     */
+    getAppVersion() {
+      return storage_localStorage.getItem('app-version');
+    },
+
+    setAppVersion(version) {
+      storage_localStorage.setItem('app-version', version);
+    },
+
+    isYaBrowser() {
+      return prefs.browser === 'YaBrowser';
+    },
+
+    isOperaBrowser() {
+      return prefs.browser === 'Opera';
+    },
+
+    isEdgeBrowser() {
+      return prefs.browser === 'Edge';
+    },
+
+    isEdgeChromiumBrowser() {
+      return prefs.browser === 'EdgeChromium';
+    },
+
+    isFirefoxBrowser() {
+      return prefs.browser === 'Firefox';
+    },
+
+    isChromeBrowser() {
+      return prefs.browser === 'Chrome';
+    },
+
+    isChromium() {
+      return prefs.platform === 'chromium';
+    },
+
+    isWindowsOs() {
+      return navigator.userAgent.toLowerCase().indexOf('win') >= 0;
+    },
+
+    isMacOs() {
+      return navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+    },
+
+    getBrowser() {
+      return prefs.browser;
+    },
+
+    getPlatform() {
+      return prefs.platform;
+    },
+
+    /**
+     * Finds header object by header name (case insensitive)
+     * @param headers Headers collection
+     * @param headerName Header name
+     * @returns {*}
+     */
+    findHeaderByName(headers, headerName) {
+      if (headers) {
+        for (let i = 0; i < headers.length; i += 1) {
+          const header = headers[i];
+
+          if (header.name.toLowerCase() === headerName.toLowerCase()) {
+            return header;
+          }
+        }
+      }
+
+      return null;
+    },
+
+    /**
+     * Finds header value by name (case insensitive)
+     * @param headers Headers collection
+     * @param headerName Header name
+     * @returns {null}
+     */
+    getHeaderValueByName(headers, headerName) {
+      const header = this.findHeaderByName(headers, headerName);
+      return header ? header.value : null;
+    },
+
+    /**
+     * Set header value. Only for Chrome
+     * @param headers
+     * @param headerName
+     * @param headerValue
+     */
+    setHeaderValue(headers, headerName, headerValue) {
+      if (!headers) {
+        headers = [];
+      }
+
+      const header = this.findHeaderByName(headers, headerName);
+
+      if (header) {
+        header.value = headerValue;
+      } else {
+        headers.push({
+          name: headerName,
+          value: headerValue
+        });
+      }
+
+      return headers;
+    },
+
+    /**
+     * Removes header from headers by name
+     *
+     * @param {Array} headers
+     * @param {String} headerName
+     * @return {boolean} True if header were removed
+     */
+    removeHeader(headers, headerName) {
+      let removed = false;
+
+      if (headers) {
+        for (let i = headers.length - 1; i >= 0; i -= 1) {
+          const header = headers[i];
+
+          if (header.name.toLowerCase() === headerName.toLowerCase()) {
+            headers.splice(i, 1);
+            removed = true;
+          }
+        }
+      }
+
+      return removed;
+    },
+
+    getSafebrowsingBackUrl(tab) {
+      // https://code.google.com/p/chromium/issues/detail?id=11854
+      const previousUrl = tabsApi.getTabMetadata(tab.tabId, 'previousUrl');
+
+      if (previousUrl && previousUrl.indexOf('http') === 0) {
+        return previousUrl;
+      }
+
+      const referrerUrl = tabsApi.getTabMetadata(tab.tabId, 'referrerUrl');
+
+      if (referrerUrl && referrerUrl.indexOf('http') === 0) {
+        return referrerUrl;
+      }
+
+      return 'about:newtab';
+    },
+
+    /**
+     * Retrieve languages from navigator
+     * @param {number} [limit] Limit of preferred languages
+     * @returns {Array}
+     */
+    getNavigatorLanguages(limit) {
+      let languages = []; // https://developer.mozilla.org/ru/docs/Web/API/NavigatorLanguage/languages
+
+      if (collections.isArray(navigator.languages)) {
+        // get all languages if 'limit' is not specified
+        const langLimit = limit || navigator.languages.length;
+        languages = navigator.languages.slice(0, langLimit);
+      } else if (navigator.language) {
+        languages.push(navigator.language); // .language is first in .languages
+      }
+
+      return languages;
+    },
+
+    /**
+     * Affected issues:
+     * https://github.com/AdguardTeam/AdguardBrowserExtension/issues/602
+     * https://github.com/AdguardTeam/AdguardBrowserExtension/issues/566
+     * 'Popup' window
+     * Creators update is not yet released, so we use Insider build 15063 instead.
+     */
+    EDGE_CREATORS_UPDATE: 15063,
+
+    isEdgeBeforeCreatorsUpdate() {
+      return this.isEdgeBrowser() && prefs.edgeVersion.build < this.EDGE_CREATORS_UPDATE;
+    },
+
+    /**
+     * Returns extension params: clientId, version and locale
+     */
+    getExtensionParams() {
+      const locale = encodeURIComponent(backgroundPage.app.getLocale());
+      const version = encodeURIComponent(backgroundPage.app.getVersion());
+      const id = encodeURIComponent(backgroundPage.app.getId());
+      const params = [];
+      params.push(`v=${version}`);
+      params.push(`lang=${locale}`);
+      params.push(`id=${id}`);
+      return params;
+    },
+
+    /**
+     * @typedef PermissionsObj
+     * A Permissions object represents a collection of permissions
+     * https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/permissions/Permissions
+     * @property {Array<string>} permissions
+     * @property {Array<string>} [origins]
+     */
+
+    /**
+     * Checks if extension has required permissions
+     * @param {PermissionsObj} permissions
+     * @returns {Promise<boolean>}
+     */
+    containsPermissions: permissions => {
+      return browser_polyfill_default().permissions.contains(permissions);
+    },
+
+    /**
+     * Requests required permissions
+     * @param {PermissionsObj} permissions
+     * @returns {Promise<boolean>}
+     */
+    requestPermissions: permissions => {
+      return browser_polyfill_default().permissions.request(permissions);
+    },
+
+    /**
+     * Removes required permissions
+     * @param {PermissionsObj} permissions
+     * @returns {Promise<boolean>}
+     */
+    removePermission: permissions => {
+      return browser_polyfill_default().permissions.remove(permissions);
+    }
+  };
+  return browserUtils;
+}();
+;// CONCATENATED MODULE: ./Extension/src/background/utils/optional-permissions.js
+
+
+
+const getPermissionsToRequest = () => {
+  const permissions = {
+    origins: [],
+    permissions: []
+  };
+  const {
+    optional_permissions: optionalPermissions
+  } = browser_polyfill_default().runtime.getManifest();
+
+  if (optionalPermissions.includes('<all_urls>')) {
+    permissions.origins.push('<all_urls>');
+    optionalPermissions.splice(optionalPermissions.indexOf('<all_urls>'), 1);
+  }
+
+  permissions.permissions = [...optionalPermissions];
+  return permissions;
+};
+
+const hasAllOptionalPermissions = async () => {
+  const permissions = getPermissionsToRequest();
+  return browser_utils_browserUtils.containsPermissions(permissions);
+};
+const requestOptionalPermissions = async () => {
+  const permissions = getPermissionsToRequest();
+  return browserUtils.requestPermissions(permissions);
+};
+// EXTERNAL MODULE: ./Extension/src/pages/common/components/Button/index.jsx + 1 modules
+var Button = __webpack_require__(6961);
+;// CONCATENATED MODULE: ./Extension/src/pages/popup/components/MainContainer/components/Icons.jsx
+/* eslint-disable max-len */
+
+const ArrowRight = ({
+  className = '',
+  color = '#0C0C0E'
+}) => /*#__PURE__*/react.createElement("svg", {
+  className: className,
+  width: "24",
+  height: "24",
+  xmlns: "http://www.w3.org/2000/svg"
+}, /*#__PURE__*/react.createElement("path", {
+  d: "m15.7 12.7-6 6c-.2.2-.4.3-.7.3-.3 0-.5-.1-.7-.3-.4-.4-.4-1 0-1.4l5.3-5.3-5.3-5.3c-.4-.4-.4-1 0-1.4.4-.4 1-.4 1.4 0l6 6c.4.4.4 1 0 1.4z",
+  fill: color,
+  fillRule: "evenodd"
+}));
+const Globe = ({
+  className = '',
+  fill = '#050506'
+}) => /*#__PURE__*/react.createElement("svg", {
+  className: className,
+  width: "32",
+  height: "32",
+  viewBox: "0 0 32 32",
+  xmlns: "http://www.w3.org/2000/svg"
+}, /*#__PURE__*/react.createElement("g", {
+  fill: "none",
+  fillRule: "evenodd"
+}, /*#__PURE__*/react.createElement("rect", {
+  fill: fill,
+  width: "32",
+  height: "32",
+  rx: "16"
+}), /*#__PURE__*/react.createElement("path", {
+  d: "M4 4h24v24H4z"
+}), /*#__PURE__*/react.createElement("path", {
+  d: "M15.75 6C10.365 6 6 10.365 6 15.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S21.135 6 15.75 6zm-7.94 7.5a8.256 8.256 0 0 0-.31 2.25c0 .78.108 1.535.31 2.25h3.311A20.633 20.633 0 0 1 11 15.75c0-.773.042-1.526.121-2.25h-3.31zM8.4 12h2.948c.211-1.086.513-2.074.888-2.919.163-.366.342-.71.537-1.028A8.28 8.28 0 0 0 8.4 12zm4.231 1.5a19.039 19.039 0 0 0-.131 2.25c0 .782.046 1.536.131 2.25h6.238c.085-.714.131-1.468.131-2.25s-.046-1.536-.131-2.25H12.63zm5.99-1.5H12.88c.186-.87.435-1.65.728-2.31.336-.756.718-1.323 1.103-1.69.382-.363.732-.5 1.04-.5.308 0 .658.137 1.04.5.385.367.767.934 1.103 1.69.293.66.542 1.44.728 2.31zm1.758 1.5c.08.724.121 1.477.121 2.25 0 .773-.042 1.526-.121 2.25h3.31A8.26 8.26 0 0 0 24 15.75a8.26 8.26 0 0 0-.31-2.25h-3.311zM23.1 12h-2.948c-.211-1.086-.513-2.074-.888-2.919a8.706 8.706 0 0 0-.537-1.028A8.28 8.28 0 0 1 23.1 12zM12.773 23.447A8.28 8.28 0 0 1 8.4 19.5h2.948c.211 1.086.513 2.074.888 2.919.163.366.342.71.537 1.028zm.834-1.638c-.293-.66-.542-1.44-.728-2.309h5.742a11.86 11.86 0 0 1-.728 2.31c-.336.756-.718 1.323-1.103 1.69-.382.363-.732.5-1.04.5-.308 0-.658-.137-1.04-.5-.385-.367-.767-.934-1.103-1.69zm5.657.61c.375-.845.677-1.833.888-2.919H23.1a8.28 8.28 0 0 1-4.373 3.947c.195-.317.374-.662.537-1.028z",
+  fill: "#FFF"
+})));
+const Shield = ({
+  className = '',
+  fill = '#050506'
+}) => /*#__PURE__*/react.createElement("svg", {
+  className: className,
+  width: "32",
+  height: "32",
+  viewBox: "0 0 32 32",
+  xmlns: "http://www.w3.org/2000/svg"
+}, /*#__PURE__*/react.createElement("g", {
+  fill: "none",
+  fillRule: "evenodd"
+}, /*#__PURE__*/react.createElement("rect", {
+  fill: fill,
+  width: "32",
+  height: "32",
+  rx: "16"
+}), /*#__PURE__*/react.createElement("path", {
+  d: "M4 4h24v24H4z"
+}), /*#__PURE__*/react.createElement("path", {
+  d: "M15.051 6.154a3 3 0 0 1 1.898 0l6 2A3 3 0 0 1 25 11v5.338c0 5.502-5.56 8.841-7.94 10.019a2.377 2.377 0 0 1-2.12 0C12.56 25.179 7 21.84 7 16.337V11a3 3 0 0 1 2.051-2.846zm.475 1.423-6 2A1.5 1.5 0 0 0 8.5 11v5.338c0 2.207 1.108 4.057 2.633 5.565 1.526 1.51 3.352 2.555 4.472 3.11a.876.876 0 0 0 .79 0c1.12-.555 2.946-1.6 4.472-3.11 1.524-1.508 2.633-3.358 2.633-5.565V11a1.5 1.5 0 0 0-1.026-1.423l-6-2a1.5 1.5 0 0 0-.948 0zm4.004 6.23a.75.75 0 0 1 0 1.061l-3.434 3.434a1.55 1.55 0 0 1-2.192 0l-1.434-1.434a.75.75 0 1 1 1.06-1.06l1.435 1.434c.02.02.05.02.07 0l3.435-3.435a.75.75 0 0 1 1.06 0z",
+  fill: "#FFF"
+})));
+const Clock = ({
+  className = '',
+  fill = '#050506'
+}) => /*#__PURE__*/react.createElement("svg", {
+  className: className,
+  width: "32",
+  height: "32",
+  viewBox: "0 0 32 32",
+  xmlns: "http://www.w3.org/2000/svg"
+}, /*#__PURE__*/react.createElement("g", {
+  fill: "none",
+  fillRule: "evenodd"
+}, /*#__PURE__*/react.createElement("rect", {
+  fill: fill,
+  width: "32",
+  height: "32",
+  rx: "16"
+}), /*#__PURE__*/react.createElement("path", {
+  d: "M4 3h24v24H4z"
+}), /*#__PURE__*/react.createElement("path", {
+  d: "M18.057 6a.75.75 0 0 1 .102 1.493l-.102.007h-1.25v1.285a8 8 0 1 1-1.747.027l.247-.027V7.5h-1.25a.75.75 0 0 1-.101-1.493L14.057 6h4zm-2 4.25a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13zm3.03 3.47a.75.75 0 0 1 .073.976l-.072.084-1.189 1.189a2 2 0 1 1-1.207-1.116l.146.055 1.19-1.188a.75.75 0 0 1 1.06 0zm-3.03 2.53a.5.5 0 1 0 0 1 .5.5 0 0 0 0-1zM9.682 7.786c.337-.24.8-.127 1.017.225.216.353.103.812-.231 1.055a9.501 9.501 0 0 0-1.13.965c-.292.293-.763.333-1.078.064a.711.711 0 0 1-.064-1.04 11 11 0 0 1 1.486-1.27zm12.75-.001a11 11 0 0 1 1.488 1.272.71.71 0 0 1-.065 1.037c-.314.268-.784.229-1.076-.063a9.497 9.497 0 0 0-1.132-.968c-.333-.243-.446-.7-.23-1.053a.71.71 0 0 1 1.014-.225z",
+  fill: "#FFF"
+})));
+const Check = ({
+  className = '',
+  fill = '#050506'
+}) => /*#__PURE__*/react.createElement("svg", {
+  className: className,
+  width: "32",
+  height: "32",
+  viewBox: "0 0 32 32",
+  xmlns: "http://www.w3.org/2000/svg"
+}, /*#__PURE__*/react.createElement("g", {
+  fill: "none",
+  fillRule: "evenodd"
+}, /*#__PURE__*/react.createElement("rect", {
+  fill: fill,
+  width: "32",
+  height: "32",
+  rx: "16"
+}), /*#__PURE__*/react.createElement("path", {
+  d: "M4 4h24v24H4z"
+}), /*#__PURE__*/react.createElement("path", {
+  d: "M24.28 11.22a.75.75 0 0 1 0 1.06l-8.586 8.586a2.75 2.75 0 0 1-3.889 0L8.22 17.28a.75.75 0 1 1 1.06-1.06l3.586 3.585a1.25 1.25 0 0 0 1.768 0l8.586-8.585a.75.75 0 0 1 1.06 0z",
+  fill: "#FFF"
+})));
 // EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js
 var injectStylesIntoStyleTag = __webpack_require__(5491);
 var injectStylesIntoStyleTag_default = /*#__PURE__*/__webpack_require__.n(injectStylesIntoStyleTag);
@@ -2364,9 +13575,9 @@ var insertStyleElement_default = /*#__PURE__*/__webpack_require__.n(insertStyleE
 // EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/styleTagTransform.js
 var styleTagTransform = __webpack_require__(2563);
 var styleTagTransform_default = /*#__PURE__*/__webpack_require__.n(styleTagTransform);
-// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!./node_modules/postcss-loader/dist/cjs.js!./Extension/src/pages/popup/components/MainContainer/Main/components/MainHeader/styles.css
-var styles = __webpack_require__(5041);
-;// CONCATENATED MODULE: ./Extension/src/pages/popup/components/MainContainer/Main/components/MainHeader/styles.css
+// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!./node_modules/postcss-loader/dist/cjs.js!./Extension/src/pages/popup/components/MainContainer/Main/PermissionsMissing/styles.css
+var styles = __webpack_require__(906);
+;// CONCATENATED MODULE: ./Extension/src/pages/popup/components/MainContainer/Main/PermissionsMissing/styles.css
 
       
       
@@ -2393,7 +13604,69 @@ var update = injectStylesIntoStyleTag_default()(styles/* default */.Z, options);
 
 
 
-       /* harmony default export */ const MainHeader_styles = (styles/* default */.Z && styles/* default.locals */.Z.locals ? styles/* default.locals */.Z.locals : undefined);
+       /* harmony default export */ const PermissionsMissing_styles = (styles/* default */.Z && styles/* default.locals */.Z.locals ? styles/* default.locals */.Z.locals : undefined);
+
+;// CONCATENATED MODULE: ./Extension/src/pages/popup/components/MainContainer/Main/PermissionsMissing/index.jsx
+
+
+
+
+
+const PermissionsMissing = ({
+  inlineCTA,
+  onRequestPermissions
+}) => {
+  return /*#__PURE__*/react.createElement("div", null, /*#__PURE__*/react.createElement("div", {
+    className: "section-no-permission section-default-browser"
+  }, /*#__PURE__*/react.createElement("div", null, /*#__PURE__*/react.createElement("div", {
+    className: "permission_missing__title"
+  }, reactTranslator/* reactTranslator.getMessage */._.getMessage('missing_permissions_default_search_engine_title')), /*#__PURE__*/react.createElement("div", null, reactTranslator/* reactTranslator.getMessage */._.getMessage('missing_permissions_default_search_engine_description'))), /*#__PURE__*/react.createElement("div", null, /*#__PURE__*/react.createElement(Check, null))), /*#__PURE__*/react.createElement("div", {
+    className: "section-no-permission section-enable-permissions"
+  }, /*#__PURE__*/react.createElement("div", null, /*#__PURE__*/react.createElement("div", {
+    className: "permission_missing__title"
+  }, reactTranslator/* reactTranslator.getMessage */._.getMessage('missing_permissions_disabled_title')), /*#__PURE__*/react.createElement("div", null, reactTranslator/* reactTranslator.getMessage */._.getMessage('missing_permissions_disabled_description')), !inlineCTA && /*#__PURE__*/react.createElement(Button/* Button */.z, {
+    className: "cta",
+    name: "enable-protection",
+    size: "small",
+    onClick: onRequestPermissions
+  }, reactTranslator/* reactTranslator.getMessage */._.getMessage('missing_permissions_cta_button_popup'))), /*#__PURE__*/react.createElement("div", null, inlineCTA && /*#__PURE__*/react.createElement(Button/* Button */.z, {
+    className: "cta-inline",
+    name: "enable-protection",
+    size: "small",
+    color: "secondary",
+    onClick: onRequestPermissions
+  }, reactTranslator/* reactTranslator.getMessage */._.getMessage('missing_permissions_cta_button_popup')))));
+};
+// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!./node_modules/postcss-loader/dist/cjs.js!./Extension/src/pages/popup/components/MainContainer/Main/components/MainHeader/styles.css
+var MainHeader_styles = __webpack_require__(5041);
+;// CONCATENATED MODULE: ./Extension/src/pages/popup/components/MainContainer/Main/components/MainHeader/styles.css
+
+      
+      
+      
+      
+      
+      
+      
+      
+      
+
+var styles_options = {};
+
+styles_options.styleTagTransform = (styleTagTransform_default());
+styles_options.setAttributes = (setAttributesWithoutAttributes_default());
+
+      styles_options.insert = insertBySelector_default().bind(null, "head");
+    
+styles_options.domAPI = (styleDomAPI_default());
+styles_options.insertStyleElement = (insertStyleElement_default());
+
+var styles_update = injectStylesIntoStyleTag_default()(MainHeader_styles/* default */.Z, styles_options);
+
+
+
+
+       /* harmony default export */ const components_MainHeader_styles = (MainHeader_styles/* default */.Z && MainHeader_styles/* default.locals */.Z.locals ? MainHeader_styles/* default.locals */.Z.locals : undefined);
 
 ;// CONCATENATED MODULE: ./Extension/src/pages/popup/components/MainContainer/Main/components/MainHeader/index.jsx
 
@@ -2430,10 +13703,13 @@ const QwantLogo = () => /*#__PURE__*/react.createElement("svg", {
 
 const MainHeader = () => {
   const openTab = url => {
-    browser/* browser.tabs.create */.X.tabs.create({
+    browser_polyfill_default().tabs.create({
       active: true,
       url
     });
+    setTimeout(() => {
+      window.close();
+    }, 1);
   };
 
   const onClose = () => {
@@ -2472,17 +13748,17 @@ var Check_styles = __webpack_require__(8193);
       
       
 
-var styles_options = {};
+var Check_styles_options = {};
 
-styles_options.styleTagTransform = (styleTagTransform_default());
-styles_options.setAttributes = (setAttributesWithoutAttributes_default());
+Check_styles_options.styleTagTransform = (styleTagTransform_default());
+Check_styles_options.setAttributes = (setAttributesWithoutAttributes_default());
 
-      styles_options.insert = insertBySelector_default().bind(null, "head");
+      Check_styles_options.insert = insertBySelector_default().bind(null, "head");
     
-styles_options.domAPI = (styleDomAPI_default());
-styles_options.insertStyleElement = (insertStyleElement_default());
+Check_styles_options.domAPI = (styleDomAPI_default());
+Check_styles_options.insertStyleElement = (insertStyleElement_default());
 
-var styles_update = injectStylesIntoStyleTag_default()(Check_styles/* default */.Z, styles_options);
+var Check_styles_update = injectStylesIntoStyleTag_default()(Check_styles/* default */.Z, Check_styles_options);
 
 
 
@@ -2530,7 +13806,7 @@ const onColor = '#ffffff';
 const offColor = '#ffffff';
 const onHandleColor = '#85d6ad';
 const offHandleColor = '#e9eaec';
-const Check = ({
+const Check_Check = ({
   className,
   checked,
   onChange
@@ -2567,8 +13843,6 @@ const Check = ({
     }))
   );
 };
-// EXTERNAL MODULE: ./Extension/src/pages/popup/components/MainContainer/components/Icons.jsx
-var Icons = __webpack_require__(6207);
 // EXTERNAL MODULE: ./node_modules/classnames/index.js
 var classnames = __webpack_require__(8356);
 var classnames_default = /*#__PURE__*/__webpack_require__.n(classnames);
@@ -2802,14 +14076,14 @@ const ProtectionStatus = ({
     background: backgroundColor
   }, /*#__PURE__*/react.createElement("div", {
     className: "protection_status__bottom"
-  }, /*#__PURE__*/react.createElement(Check, {
+  }, /*#__PURE__*/react.createElement(Check_Check, {
     onChange: () => switcher.handler(),
     checked: switcher.mode === 'enabled' || protectionEnabledLocal
   }), /*#__PURE__*/react.createElement("div", {
     className: "right-side"
   }, /*#__PURE__*/react.createElement("span", {
     className: "total_blocked_count"
-  }, totalBlockedTab), /*#__PURE__*/react.createElement(Icons/* ArrowRight */.ol, null)))));
+  }, totalBlockedTab), /*#__PURE__*/react.createElement(ArrowRight, null)))));
 };
 // EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!./node_modules/postcss-loader/dist/cjs.js!./Extension/src/pages/popup/components/MainContainer/Main/components/ProtectionLevel/styles.css
 var ProtectionLevel_styles = __webpack_require__(6190);
@@ -2875,7 +14149,7 @@ const ProtectionLevel = ({
     text: level ? reactTranslator/* reactTranslator.getMessage */._.getMessage(`protection_level_${level}_description`) : ''
   }, /*#__PURE__*/react.createElement("div", {
     className: "protection_level__bottom"
-  }, /*#__PURE__*/react.createElement("div", null, /*#__PURE__*/react.createElement(ShieldIcon, null), reactTranslator/* reactTranslator.getMessage */._.getMessage('protection_level')), /*#__PURE__*/react.createElement(Icons/* ArrowRight */.ol, null))));
+  }, /*#__PURE__*/react.createElement("div", null, /*#__PURE__*/react.createElement(ShieldIcon, null), reactTranslator/* reactTranslator.getMessage */._.getMessage('protection_level')), /*#__PURE__*/react.createElement(ArrowRight, null))));
 };
 
 const ShieldIcon = () => /*#__PURE__*/react.createElement("svg", {
@@ -2959,10 +14233,8 @@ const GlobalStats = ({
     className: "right"
   }, /*#__PURE__*/react.createElement("div", null, reactTranslator/* reactTranslator.getMessage */._.getMessage('popup_stats_time_saved')), /*#__PURE__*/react.createElement("div", {
     className: "metric"
-  }, annoyanceTime))), /*#__PURE__*/react.createElement(Icons/* ArrowRight */.ol, null))));
+  }, annoyanceTime))), /*#__PURE__*/react.createElement(ArrowRight, null))));
 };
-// EXTERNAL MODULE: ./Extension/src/common/common-script.js
-var common_script = __webpack_require__(1351);
 ;// CONCATENATED MODULE: ./Extension/src/content-script/content-script.js
 /**
  * This file is part of Adguard Browser Extension (https://github.com/AdguardTeam/AdguardBrowserExtension).
@@ -2982,11 +14254,11 @@ var common_script = __webpack_require__(1351);
  */
 
 const contentPage = {
-  sendMessage: common_script/* runtimeImpl.sendMessage */.V.sendMessage,
-  onMessage: common_script/* runtimeImpl.onMessage */.V.onMessage
+  sendMessage: runtimeImpl.sendMessage,
+  onMessage: runtimeImpl.onMessage
 };
 // EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!./node_modules/postcss-loader/dist/cjs.js!./Extension/src/pages/popup/components/MainContainer/Main/styles.css
-var Main_styles = __webpack_require__(309);
+var Main_styles = __webpack_require__(6458);
 ;// CONCATENATED MODULE: ./Extension/src/pages/popup/components/MainContainer/Main/styles.css
 
       
@@ -3019,8 +14291,6 @@ var Main_styles_update = injectStylesIntoStyleTag_default()(Main_styles/* defaul
 // EXTERNAL MODULE: ./node_modules/react-spinners/BarLoader.js
 var BarLoader = __webpack_require__(9789);
 var BarLoader_default = /*#__PURE__*/__webpack_require__.n(BarLoader);
-// EXTERNAL MODULE: ./Extension/src/pages/common/components/Button/index.jsx + 1 modules
-var Button = __webpack_require__(6961);
 // EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!./node_modules/postcss-loader/dist/cjs.js!./Extension/src/pages/popup/components/MainContainer/Main/LoadingView/styles.css
 var LoadingView_styles = __webpack_require__(1479);
 ;// CONCATENATED MODULE: ./Extension/src/pages/popup/components/MainContainer/Main/LoadingView/styles.css
@@ -3073,7 +14343,7 @@ const LoadingView = () => {
   }, []);
 
   const onReload = () => {
-    browser/* browser.runtime.reload */.X.runtime.reload();
+    browser_polyfill_default().runtime.reload();
   };
 
   return /*#__PURE__*/react.createElement("div", {
@@ -3104,7 +14374,7 @@ const LoadingView = () => {
 
 
 
-const Main = (0,mobxreact_esm/* observer */.Pi)(({
+const Main = mobxreact_esm_observer(({
   store,
   settingsStore
 }) => {
@@ -3131,14 +14401,14 @@ const Main = (0,mobxreact_esm/* observer */.Pi)(({
   react.useEffect(() => {
     (async () => {
       setLoading(true);
-      const isPermissionsGranted = await (0,optional_permissions/* hasAllOptionalPermissions */.R)();
+      const isPermissionsGranted = await hasAllOptionalPermissions();
       setHasPermissions(isPermissionsGranted);
       setLoading(false);
     })();
   }, []);
 
   const onRequestPermissions = () => {
-    browser/* browser.runtime.openOptionsPage */.X.runtime.openOptionsPage();
+    browser_polyfill_default().runtime.openOptionsPage();
   };
 
   if (hasPermissions === false) {
@@ -3146,7 +14416,7 @@ const Main = (0,mobxreact_esm/* observer */.Pi)(({
       className: "main"
     }, /*#__PURE__*/react.createElement(MainHeader, null), /*#__PURE__*/react.createElement("div", {
       className: "main__content"
-    }, /*#__PURE__*/react.createElement(PermissionsMissing/* PermissionsMissing */.I, {
+    }, /*#__PURE__*/react.createElement(PermissionsMissing, {
       onRequestPermissions: onRequestPermissions
     })));
   }
@@ -3281,25 +14551,118 @@ var PopupView_styles_update = injectStylesIntoStyleTag_default()(PopupView_style
 
 
 const PopupView = ({
-  goToMain,
   title,
   subtitle,
   children
 }) => {
   return /*#__PURE__*/react.createElement("div", {
     className: "popup_view_container"
-  }, /*#__PURE__*/react.createElement(Header, {
-    goToMain: goToMain
-  }), /*#__PURE__*/react.createElement("div", {
+  }, /*#__PURE__*/react.createElement(Header, null), /*#__PURE__*/react.createElement("div", {
     className: "title"
   }, title), subtitle && /*#__PURE__*/react.createElement("div", {
     className: "subtitle"
   }, subtitle), children);
 };
-// EXTERNAL MODULE: ./Extension/src/pages/popup/components/MainContainer/components/ProtectionButton/index.jsx + 1 modules
-var ProtectionButton = __webpack_require__(6849);
-// EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/extends.js
-var esm_extends = __webpack_require__(3229);
+// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!./node_modules/postcss-loader/dist/cjs.js!./Extension/src/pages/popup/components/MainContainer/components/ProtectionButton/styles.css
+var ProtectionButton_styles = __webpack_require__(5163);
+;// CONCATENATED MODULE: ./Extension/src/pages/popup/components/MainContainer/components/ProtectionButton/styles.css
+
+      
+      
+      
+      
+      
+      
+      
+      
+      
+
+var ProtectionButton_styles_options = {};
+
+ProtectionButton_styles_options.styleTagTransform = (styleTagTransform_default());
+ProtectionButton_styles_options.setAttributes = (setAttributesWithoutAttributes_default());
+
+      ProtectionButton_styles_options.insert = insertBySelector_default().bind(null, "head");
+    
+ProtectionButton_styles_options.domAPI = (styleDomAPI_default());
+ProtectionButton_styles_options.insertStyleElement = (insertStyleElement_default());
+
+var ProtectionButton_styles_update = injectStylesIntoStyleTag_default()(ProtectionButton_styles/* default */.Z, ProtectionButton_styles_options);
+
+
+
+
+       /* harmony default export */ const components_ProtectionButton_styles = (ProtectionButton_styles/* default */.Z && ProtectionButton_styles/* default.locals */.Z.locals ? ProtectionButton_styles/* default.locals */.Z.locals : undefined);
+
+;// CONCATENATED MODULE: ./Extension/src/pages/popup/components/MainContainer/components/ProtectionButton/index.jsx
+
+
+
+
+
+const ProtectionButton = ({
+  level,
+  onClick: onClickProp,
+  active,
+  inPopup
+}) => {
+  const onClick = () => {
+    var _window, _window$apm;
+
+    const transaction = (_window = window) === null || _window === void 0 ? void 0 : (_window$apm = _window.apm) === null || _window$apm === void 0 ? void 0 : _window$apm.startTransaction(`protection-button-click-${level}`);
+    onClickProp(level);
+
+    if (transaction) {
+      transaction.result = 'success';
+      transaction.end();
+    }
+  };
+
+  return /*#__PURE__*/react.createElement("div", {
+    tabIndex: "0",
+    role: "button",
+    onClick: onClick,
+    onKeyPress: onClick,
+    className: classnames_default()('protection-list__button', {
+      'protection-list__button--active': active,
+      'protection-list__button_in_popup': inPopup
+    })
+  }, /*#__PURE__*/react.createElement("div", {
+    className: classnames_default()('inner-left', {
+      'inner-left__popup': inPopup
+    })
+  }, /*#__PURE__*/react.createElement("span", {
+    className: classnames_default()('inner-left__title', {
+      'inner-left__title__popup': inPopup
+    })
+  }, reactTranslator/* reactTranslator.getMessage */._.getMessage(`protection_level_${level}`)), /*#__PURE__*/react.createElement("span", {
+    className: "inner-left__desc"
+  }, reactTranslator/* reactTranslator.getMessage */._.getMessage(`protection_level_${level}_description`))), /*#__PURE__*/react.createElement("div", {
+    className: "inner-right"
+  }, /*#__PURE__*/react.createElement(Check, {
+    className: classnames_default()('inner-right__active-check', {
+      'inner-right__active-check--visible': active
+    })
+  })));
+};
+;// CONCATENATED MODULE: ./node_modules/@babel/runtime/helpers/esm/extends.js
+function esm_extends_extends() {
+  esm_extends_extends = Object.assign || function (target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i];
+
+      for (var key in source) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+          target[key] = source[key];
+        }
+      }
+    }
+
+    return target;
+  };
+
+  return esm_extends_extends.apply(this, arguments);
+}
 // EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!./node_modules/postcss-loader/dist/cjs.js!./Extension/src/pages/popup/components/MainContainer/SettingsView/HelpSection/styles.css
 var HelpSection_styles = __webpack_require__(9281);
 ;// CONCATENATED MODULE: ./Extension/src/pages/popup/components/MainContainer/SettingsView/HelpSection/styles.css
@@ -3354,17 +14717,20 @@ const HelpLink = ({
   text
 }) => {
   const openTab = () => {
-    browser/* browser.tabs.create */.X.tabs.create({
+    browser_polyfill_default().tabs.create({
       url: reactTranslator/* reactTranslator.getMessage */._.getMessage(url),
       active: true
     });
+    setTimeout(() => {
+      window.close();
+    }, 1);
   };
 
   return /*#__PURE__*/react.createElement("a", {
     onClick: openTab,
     href: reactTranslator/* reactTranslator.getMessage */._.getMessage(url),
     title: reactTranslator/* reactTranslator.getMessage */._.getMessage(text)
-  }, /*#__PURE__*/react.createElement("span", null, reactTranslator/* reactTranslator.getMessage */._.getMessage(text)), /*#__PURE__*/react.createElement(Icons/* ArrowRight */.ol, {
+  }, /*#__PURE__*/react.createElement("span", null, reactTranslator/* reactTranslator.getMessage */._.getMessage(text)), /*#__PURE__*/react.createElement(ArrowRight, {
     className: "chevron"
   }));
 };
@@ -3376,7 +14742,7 @@ const HelpSection = () => {
     className: "title"
   }, reactTranslator/* reactTranslator.getMessage */._.getMessage('popup_settings_help_label')), /*#__PURE__*/react.createElement("div", {
     className: "help-links"
-  }, helpLinks.map(link => /*#__PURE__*/react.createElement(HelpLink, (0,esm_extends/* default */.Z)({}, link, {
+  }, helpLinks.map(link => /*#__PURE__*/react.createElement(HelpLink, esm_extends_extends({}, link, {
     key: link.url
   })))));
 };
@@ -3415,10 +14781,23 @@ var TelemetrySection_styles_update = injectStylesIntoStyleTag_default()(Telemetr
 
 
 
+
 const TelemetrySection = ({
   checked,
   onChange
 }) => {
+  const onLearnMore = e => {
+    e.preventDefault();
+    e.stopPropagation();
+    browser_polyfill_default().tabs.create({
+      active: true,
+      url: reactTranslator/* reactTranslator.getMessage */._.getMessage(reactTranslator/* reactTranslator.getMessage */._.getMessage('popup_settings_telemetry_learn_more_link'))
+    });
+    setTimeout(() => {
+      window.close();
+    }, 1);
+  };
+
   return /*#__PURE__*/react.createElement("div", {
     className: "telemetry-section"
   }, /*#__PURE__*/react.createElement("input", {
@@ -3428,7 +14807,10 @@ const TelemetrySection = ({
     onChange: e => onChange(!e.target.checked)
   }), /*#__PURE__*/react.createElement("label", {
     htmlFor: "telemetry-check"
-  }, reactTranslator/* reactTranslator.getMessage */._.getMessage('popup_settings_telemetry_label')));
+  }, reactTranslator/* reactTranslator.getMessage */._.getMessage('popup_settings_telemetry_label'), /*#__PURE__*/react.createElement("a", {
+    href: reactTranslator/* reactTranslator.getMessage */._.getMessage('popup_settings_telemetry_learn_more_link'),
+    onClick: onLearnMore
+  }, reactTranslator/* reactTranslator.getMessage */._.getMessage('popup_settings_telemetry_learn_more'))));
 };
 // EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!./node_modules/postcss-loader/dist/cjs.js!./Extension/src/pages/popup/components/MainContainer/SettingsView/styles.css
 var SettingsView_styles = __webpack_require__(2747);
@@ -3471,7 +14853,7 @@ var SettingsView_styles_update = injectStylesIntoStyleTag_default()(SettingsView
 
 
 
-const SettingsView = (0,mobxreact_esm/* observer */.Pi)(({
+const SettingsView = mobxreact_esm_observer(({
   store,
   settingsStore
 }) => {
@@ -3517,8 +14899,16 @@ const SettingsView = (0,mobxreact_esm/* observer */.Pi)(({
   };
 
   const onUpdateTelemetry = async value => {
+    var _window, _window$apm;
+
+    const transaction = (_window = window) === null || _window === void 0 ? void 0 : (_window$apm = _window.apm) === null || _window$apm === void 0 ? void 0 : _window$apm.startTransaction(`popup-telemetry-toggle-${value ? 'disabled' : 'enabled'}`);
     await messenger/* messenger.changeUserSetting */.d.changeUserSetting('hits-count-disabled', value);
     await settingsStore.requestOptionsData();
+
+    if (transaction) {
+      transaction.result = 'success';
+      transaction.end();
+    }
   };
 
   const title = reactTranslator/* reactTranslator.getMessage */._.getMessage('protection_level');
@@ -3526,17 +14916,17 @@ const SettingsView = (0,mobxreact_esm/* observer */.Pi)(({
     title: title
   }, /*#__PURE__*/react.createElement("div", null, /*#__PURE__*/react.createElement("div", {
     className: "protection-list"
-  }, /*#__PURE__*/react.createElement(ProtectionButton/* ProtectionButton */.$, {
+  }, /*#__PURE__*/react.createElement(ProtectionButton, {
     inPopup: true,
     level: "standard",
     active: activeLevel === 'standard',
     onClick: onProtectionLevelChange
-  }), /*#__PURE__*/react.createElement(ProtectionButton/* ProtectionButton */.$, {
+  }), /*#__PURE__*/react.createElement(ProtectionButton, {
     inPopup: true,
     level: "strict",
     active: activeLevel === 'strict',
     onClick: onProtectionLevelChange
-  }), /*#__PURE__*/react.createElement(ProtectionButton/* ProtectionButton */.$, {
+  }), /*#__PURE__*/react.createElement(ProtectionButton, {
     inPopup: true,
     level: "disabled",
     active: activeLevel === 'disabled',
@@ -3547,6 +14937,8 @@ const SettingsView = (0,mobxreact_esm/* observer */.Pi)(({
   })));
 });
 /* harmony default export */ const MainContainer_SettingsView = (SettingsView);
+// EXTERNAL MODULE: ./node_modules/core-js/modules/es.array.reduce.js
+var es_array_reduce = __webpack_require__(8736);
 // EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!./node_modules/postcss-loader/dist/cjs.js!./Extension/src/pages/popup/components/MainContainer/components/Table/styles.css
 var Table_styles = __webpack_require__(5276);
 ;// CONCATENATED MODULE: ./Extension/src/pages/popup/components/MainContainer/components/Table/styles.css
@@ -3693,18 +15085,22 @@ var TabStatsView_styles_update = injectStylesIntoStyleTag_default()(TabStatsView
 
 
 
+
 const LIST_SIZE = 8;
-const TabStatsView = (0,mobxreact_esm/* observer */.Pi)(({
+const TabStatsView = mobxreact_esm_observer(({
   store
 }) => {
   const totalBlockedDomains = Object.keys(store.blockedDomainsTab).length;
   const {
-    currentSite
+    currentSite,
+    totalBlockedTab = 0
   } = store || {};
   const list = Object.keys(store.blockedDomainsTab).map(domain => ({
     domain,
     count: store.blockedDomainsTab[domain]
   })).sort((a, b) => b.count - a.count).slice(0, LIST_SIZE);
+  const domainCount = list.reduce((prev, current) => prev + current.count, 0);
+  const count = totalBlockedTab >= domainCount ? totalBlockedTab : domainCount;
   const title = reactTranslator/* reactTranslator.getMessage */._.getMessage('popup_stats_blocked_elements');
   const subtitle = isWebURL(currentSite) ? currentSite : null;
   return /*#__PURE__*/react.createElement(PopupView, {
@@ -3715,12 +15111,12 @@ const TabStatsView = (0,mobxreact_esm/* observer */.Pi)(({
   }, /*#__PURE__*/react.createElement("div", {
     className: "tiles"
   }, /*#__PURE__*/react.createElement(Tile, {
-    icon: /*#__PURE__*/react.createElement(Icons/* Globe */.TH, null),
+    icon: /*#__PURE__*/react.createElement(Globe, null),
     value: formatCounter(totalBlockedDomains),
     label: reactTranslator/* reactTranslator.getMessage */._.getMessage('popup_stats_table_domains_label')
   }), /*#__PURE__*/react.createElement(Tile, {
-    icon: /*#__PURE__*/react.createElement(Icons/* Shield */.WL, null),
-    value: formatCounter(store.totalBlockedTab),
+    icon: /*#__PURE__*/react.createElement(Shield, null),
+    value: formatCounter(count),
     label: reactTranslator/* reactTranslator.getMessage */._.getMessage('popup_stats_trackers')
   })), /*#__PURE__*/react.createElement(Table, {
     list: list
@@ -3806,7 +15202,7 @@ const useKonamiCode = () => {
 
 
 
-const GlobalStatsView = (0,mobxreact_esm/* observer */.Pi)(({
+const GlobalStatsView = mobxreact_esm_observer(({
   store
 }) => {
   var _store$blockedDomains, _store$blockedDomains2;
@@ -3837,12 +15233,12 @@ const GlobalStatsView = (0,mobxreact_esm/* observer */.Pi)(({
   }, /*#__PURE__*/react.createElement("div", {
     className: "tiles"
   }, /*#__PURE__*/react.createElement(Tile, {
-    icon: /*#__PURE__*/react.createElement(Icons/* Shield */.WL, null),
+    icon: /*#__PURE__*/react.createElement(Shield, null),
     label: reactTranslator/* reactTranslator.getMessage */._.getMessage('popup_stats_trackers'),
     value: formatCounter(store.totalBlocked),
     background: "#ded6ff"
   }), /*#__PURE__*/react.createElement(Tile, {
-    icon: /*#__PURE__*/react.createElement(Icons/* Clock */.SU, null),
+    icon: /*#__PURE__*/react.createElement(Clock, null),
     label: reactTranslator/* reactTranslator.getMessage */._.getMessage('popup_stats_time_saved'),
     value: annoyanceTime,
     background: "#ded6ff"
@@ -3895,19 +15291,19 @@ var main_container_update = injectStylesIntoStyleTag_default()(main_container/* 
 
 
 
-const MainContainer = (0,mobxreact_esm/* observer */.Pi)(() => {
+const MainContainer = mobxreact_esm_observer(() => {
   const location = useLocation();
   const store = (0,react.useContext)(popupStore);
   const {
     settingsStore
-  } = react.useContext(RootStore/* rootStore */.U);
+  } = react.useContext(rootStore);
   const {
     protectionLevel
   } = settingsStore;
   react.useEffect(() => {
     (async () => {
       if (protectionLevel) {
-        const isPermissionsGranted = await (0,optional_permissions/* hasAllOptionalPermissions */.R)();
+        const isPermissionsGranted = await hasAllOptionalPermissions();
 
         if (isPermissionsGranted) {
           await messenger/* messenger.applyQwantSettings */.d.applyQwantSettings(protectionLevel);
@@ -3955,113 +15351,6 @@ const MainContainer = (0,mobxreact_esm/* observer */.Pi)(() => {
     })
   }));
 });
-// EXTERNAL MODULE: ./Extension/src/background/apm.js + 42 modules
-var apm = __webpack_require__(6305);
-// EXTERNAL MODULE: ./Extension/src/pages/popup/components/Popup/main.css
-var main = __webpack_require__(4562);
-;// CONCATENATED MODULE: ./Extension/src/pages/popup/components/Popup/index.js
-
-
-
-
-
-
-
-
-
-const Popup = (0,mobxreact_esm/* observer */.Pi)(() => {
-  var _settings$names;
-
-  const {
-    settingsStore
-  } = react.useContext(RootStore/* rootStore */.U);
-  const {
-    ErrorBoundary,
-    didCatch,
-    error
-  } = a();
-  const {
-    getPopupData,
-    updateBlockedStats
-  } = react.useContext(popupStore);
-  const {
-    settings
-  } = settingsStore;
-  const key = settings === null || settings === void 0 ? void 0 : (_settings$names = settings.names) === null || _settings$names === void 0 ? void 0 : _settings$names.DISABLE_COLLECT_HITS;
-  const disableCollectHit = key ? (settings === null || settings === void 0 ? void 0 : settings.values[key]) || false : false;
-  react.useEffect(() => {
-    (async () => {
-      await getPopupData();
-    })();
-  }, [getPopupData]); // subscribe to stats change
-
-  react.useEffect(() => {
-    const messageHandler = message => {
-      switch (message.type) {
-        case 'updateTotalBlocked':
-          {
-            const {
-              tabInfo
-            } = message;
-            updateBlockedStats(tabInfo);
-            break;
-          }
-
-        default:
-          break;
-      }
-    };
-
-    messenger/* messenger.onMessage.addListener */.d.onMessage.addListener(messageHandler);
-    return () => {
-      messenger/* messenger.onMessage.removeListener */.d.onMessage.removeListener(messageHandler);
-    };
-  }, [updateBlockedStats]);
-  react.useEffect(() => {
-    if (!disableCollectHit) {
-      apm/* apm.init */.t.init(true);
-    } else {
-      console.warn('APM disabled'); // eslint-disable-line no-console
-    }
-  }, [disableCollectHit]);
-
-  if (didCatch) {
-    // TODO Handle Error state
-    return /*#__PURE__*/react.createElement("p", null, "Error:", ' ', error.message);
-  }
-
-  return /*#__PURE__*/react.createElement(ErrorBoundary, null, /*#__PURE__*/react.createElement(MainContainer, null));
-});
-;// CONCATENATED MODULE: ./Extension/src/pages/popup/index.jsx
-
-
-
-
-
-const popupPage = {
-  init: () => {
-    document.documentElement.lang = i18n/* i18n.getUILanguage */.a.getUILanguage();
-    react_dom.render( /*#__PURE__*/react.createElement(react.StrictMode, null, /*#__PURE__*/react.createElement(MemoryRouter, {
-      initialEntries: ['/main']
-    }, /*#__PURE__*/react.createElement(Popup, null))), document.getElementById('root'));
-  }
-};
-;// CONCATENATED MODULE: ./Extension/pages/popup/index.js
-
-popupPage.init();
-
-/***/ }),
-
-/***/ 6305:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-
-// EXPORTS
-__webpack_require__.d(__webpack_exports__, {
-  "t": () => (/* binding */ apm)
-});
-
 // EXTERNAL MODULE: ./node_modules/error-stack-parser/error-stack-parser.js
 var error_stack_parser = __webpack_require__(4602);
 var error_stack_parser_default = /*#__PURE__*/__webpack_require__.n(error_stack_parser);
@@ -4291,8 +15580,8 @@ function bind(fn, thisArg) {
  * @constructor
  * @param {Function} fn
  */
-function Promise(fn) {
-  if (!(this instanceof Promise))
+function src_Promise(fn) {
+  if (!(this instanceof src_Promise))
     throw new TypeError('Promises must be constructed via new');
   if (typeof fn !== 'function') throw new TypeError('not a function');
   /** @type {!number} */
@@ -4316,7 +15605,7 @@ function handle(self, deferred) {
     return;
   }
   self._handled = true;
-  Promise._immediateFn(function() {
+  src_Promise._immediateFn(function() {
     var cb = self._state === 1 ? deferred.onFulfilled : deferred.onRejected;
     if (cb === null) {
       (self._state === 1 ? resolve : reject)(deferred.promise, self._value);
@@ -4343,7 +15632,7 @@ function resolve(self, newValue) {
       (typeof newValue === 'object' || typeof newValue === 'function')
     ) {
       var then = newValue.then;
-      if (newValue instanceof Promise) {
+      if (newValue instanceof src_Promise) {
         self._state = 3;
         self._value = newValue;
         finale(self);
@@ -4369,9 +15658,9 @@ function reject(self, newValue) {
 
 function finale(self) {
   if (self._state === 2 && self._deferreds.length === 0) {
-    Promise._immediateFn(function() {
+    src_Promise._immediateFn(function() {
       if (!self._handled) {
-        Promise._unhandledRejectionFn(self._value);
+        src_Promise._unhandledRejectionFn(self._value);
       }
     });
   }
@@ -4419,11 +15708,11 @@ function doResolve(fn, self) {
   }
 }
 
-Promise.prototype['catch'] = function(onRejected) {
+src_Promise.prototype['catch'] = function(onRejected) {
   return this.then(null, onRejected);
 };
 
-Promise.prototype.then = function(onFulfilled, onRejected) {
+src_Promise.prototype.then = function(onFulfilled, onRejected) {
   // @ts-ignore
   var prom = new this.constructor(noop);
 
@@ -4431,10 +15720,10 @@ Promise.prototype.then = function(onFulfilled, onRejected) {
   return prom;
 };
 
-Promise.prototype['finally'] = src_finally;
+src_Promise.prototype['finally'] = src_finally;
 
-Promise.all = function(arr) {
-  return new Promise(function(resolve, reject) {
+src_Promise.all = function(arr) {
+  return new src_Promise(function(resolve, reject) {
     if (!isArray(arr)) {
       return reject(new TypeError('Promise.all accepts an array'));
     }
@@ -4473,38 +15762,38 @@ Promise.all = function(arr) {
   });
 };
 
-Promise.allSettled = src_allSettled;
+src_Promise.allSettled = src_allSettled;
 
-Promise.resolve = function(value) {
-  if (value && typeof value === 'object' && value.constructor === Promise) {
+src_Promise.resolve = function(value) {
+  if (value && typeof value === 'object' && value.constructor === src_Promise) {
     return value;
   }
 
-  return new Promise(function(resolve) {
+  return new src_Promise(function(resolve) {
     resolve(value);
   });
 };
 
-Promise.reject = function(value) {
-  return new Promise(function(resolve, reject) {
+src_Promise.reject = function(value) {
+  return new src_Promise(function(resolve, reject) {
     reject(value);
   });
 };
 
-Promise.race = function(arr) {
-  return new Promise(function(resolve, reject) {
+src_Promise.race = function(arr) {
+  return new src_Promise(function(resolve, reject) {
     if (!isArray(arr)) {
       return reject(new TypeError('Promise.race accepts an array'));
     }
 
     for (var i = 0, len = arr.length; i < len; i++) {
-      Promise.resolve(arr[i]).then(resolve, reject);
+      src_Promise.resolve(arr[i]).then(resolve, reject);
     }
   });
 };
 
 // Use polyfill for setImmediate for performance gains
-Promise._immediateFn =
+src_Promise._immediateFn =
   // @ts-ignore
   (typeof setImmediate === 'function' &&
     function(fn) {
@@ -4515,13 +15804,13 @@ Promise._immediateFn =
     setTimeoutFunc(fn, 0);
   };
 
-Promise._unhandledRejectionFn = function _unhandledRejectionFn(err) {
+src_Promise._unhandledRejectionFn = function _unhandledRejectionFn(err) {
   if (typeof console !== 'undefined' && console) {
     console.warn('Possible Unhandled Promise Rejection:', err); // eslint-disable-line no-console
   }
 };
 
-/* harmony default export */ const src = (Promise);
+/* harmony default export */ const src = (src_Promise);
 
 ;// CONCATENATED MODULE: ./node_modules/@elastic/apm-rum-core/dist/es/common/polyfills.js
 
@@ -4709,14 +15998,14 @@ function isObject(value) {
   return value !== null && typeof value === 'object';
 }
 
-function isFunction(value) {
+function utils_isFunction(value) {
   return typeof value === 'function';
 }
 
 function baseExtend(dst, objs, deep) {
   for (var i = 0, ii = objs.length; i < ii; ++i) {
     var obj = objs[i];
-    if (!isObject(obj) && !isFunction(obj)) continue;
+    if (!isObject(obj) && !utils_isFunction(obj)) continue;
     var keys = Object.keys(obj);
 
     for (var j = 0, jj = keys.length; j < jj; j++) {
@@ -5112,9 +16401,9 @@ var KEYWORD_LIMIT = 1024;
 var SESSION_TIMEOUT = 30 * 60000;
 
 ;// CONCATENATED MODULE: ./node_modules/@elastic/apm-rum-core/dist/es/common/context.js
-var _excluded = ["tags"];
+var context_excluded = ["tags"];
 
-function _objectWithoutPropertiesLoose(source, excluded) { if (source == null) return {}; var target = {}; var sourceKeys = Object.keys(source); var key, i; for (i = 0; i < sourceKeys.length; i++) { key = sourceKeys[i]; if (excluded.indexOf(key) >= 0) continue; target[key] = source[key]; } return target; }
+function context_objectWithoutPropertiesLoose(source, excluded) { if (source == null) return {}; var target = {}; var sourceKeys = Object.keys(source); var key, i; for (i = 0; i < sourceKeys.length; i++) { key = sourceKeys[i]; if (excluded.indexOf(key) >= 0) continue; target[key] = source[key]; } return target; }
 
 
 
@@ -5261,7 +16550,7 @@ function addSpanContext(span, data) {
 function addTransactionContext(transaction, _temp) {
   var _ref = _temp === void 0 ? {} : _temp,
       tags = _ref.tags,
-      configContext = _objectWithoutPropertiesLoose(_ref, _excluded);
+      configContext = context_objectWithoutPropertiesLoose(_ref, context_excluded);
 
   var pageContext = getPageContext();
   var responseContext = {};
@@ -6884,7 +18173,7 @@ var EventHandler = function () {
 
 /* harmony default export */ const event_handler = (EventHandler);
 ;// CONCATENATED MODULE: ./node_modules/@elastic/apm-rum-core/dist/es/common/config-service.js
-function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+function config_service_extends() { config_service_extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return config_service_extends.apply(this, arguments); }
 
 
 
@@ -7122,7 +18411,7 @@ var Config = function () {
     if (config) {
       if (merge) {
         var prevConfig = this.getLocalConfig();
-        config = _extends({}, prevConfig, config);
+        config = config_service_extends({}, prevConfig, config);
       }
 
       var storage = sessionStorage;
@@ -8047,7 +19336,7 @@ var PerformanceMonitoring = function () {
 
 var pageLoadBreakdowns = [['domainLookupStart', 'domainLookupEnd', 'DNS'], ['connectStart', 'connectEnd', 'TCP'], ['requestStart', 'responseStart', 'Request'], ['responseStart', 'responseEnd', 'Response'], ['domLoading', 'domComplete', 'Processing'], ['loadEventStart', 'loadEventEnd', 'Load']];
 
-function getValue(value) {
+function breakdown_getValue(value) {
   return {
     value: value
   };
@@ -8139,8 +19428,8 @@ function getSpanBreakdown(transactionDetails, _ref) {
     transaction: transactionDetails,
     span: details,
     samples: {
-      'span.self_time.count': getValue(count),
-      'span.self_time.sum.us': getValue(duration)
+      'span.self_time.count': breakdown_getValue(count),
+      'span.self_time.sum.us': breakdown_getValue(duration)
     }
   };
 }
@@ -8162,9 +19451,9 @@ function breakdown_captureBreakdown(transaction, timings) {
   breakdowns.push({
     transaction: transactionDetails,
     samples: {
-      'transaction.duration.count': getValue(1),
-      'transaction.duration.sum.us': getValue(trDuration),
-      'transaction.breakdown.count': getValue(sampled ? 1 : 0)
+      'transaction.duration.count': breakdown_getValue(1),
+      'transaction.duration.sum.us': breakdown_getValue(trDuration),
+      'transaction.breakdown.count': breakdown_getValue(sampled ? 1 : 0)
     }
   });
 
@@ -9339,12 +20628,6 @@ var apmBase = getApmBase();
 var es_init = apmBase.init.bind(apmBase);
 /* harmony default export */ const es = ((/* unused pure expression or super */ null && (es_init)));
 
-// EXTERNAL MODULE: ./Extension/src/background/extension-api/background-page.js
-var background_page = __webpack_require__(736);
-// EXTERNAL MODULE: ./Extension/src/background/utils/browser-utils.js
-var browser_utils = __webpack_require__(1654);
-// EXTERNAL MODULE: ./Extension/src/common/log.js
-var log = __webpack_require__(9224);
 ;// CONCATENATED MODULE: ./Extension/src/background/apm.js
 
 
@@ -9359,16 +20642,15 @@ const apm = (() => {
       return;
     }
 
-    const locale = background_page/* backgroundPage.app.getLocale */.$.app.getLocale();
-    const version = background_page/* backgroundPage.app.getVersion */.$.app.getVersion();
-    const browser = browser_utils/* browserUtils.getBrowser */.z.getBrowser();
-    const platform = browser_utils/* browserUtils.getPlatform */.z.getPlatform(); // eslint-disable-next-line max-len
+    const locale = backgroundPage.app.getLocale();
+    const version = backgroundPage.app.getVersion();
+    const browser = browser_utils_browserUtils.getBrowser();
+    const platform = browser_utils_browserUtils.getPlatform(); // eslint-disable-next-line max-len
 
     log/* log.info */.c.info('APM agent starting locale={0}, version={1}, browser={2}, platform={3}', locale, version, browser, platform);
     agent = es_init({
-      // TODO replace with prod URL https://www.qwant.com/apm/
-      serverUrl: 'https://apm.dev-steam.c2.par1.kube.qwant.ninja:443',
-      serviceName: 'qwant-vip-extension',
+      serverUrl: 'https://www.qwant.com/apm/',
+      serviceName: 'qwant-viprivacy-android',
       serviceVersion: version,
       flushInterval: 100,
       active
@@ -9398,4126 +20680,113 @@ const apm = (() => {
     init
   };
 })();
+// EXTERNAL MODULE: ./Extension/src/pages/popup/components/Popup/main.css
+var main = __webpack_require__(4562);
+;// CONCATENATED MODULE: ./Extension/src/pages/popup/components/Popup/index.js
 
-/***/ }),
 
-/***/ 736:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "$": () => (/* binding */ backgroundPage)
-/* harmony export */ });
-/* harmony import */ var _adguard_tsurlfilter__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(4346);
-/* harmony import */ var _adguard_tsurlfilter__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_adguard_tsurlfilter__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _utils_request_types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(3485);
-/* harmony import */ var _utils_common__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(5088);
-/* harmony import */ var _common_common_script__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(1351);
-/* harmony import */ var _browser__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(2273);
-/* harmony import */ var _prefs__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(4847);
-/* harmony import */ var _common_log__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(9224);
-/* harmony import */ var _iconsCache__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(1719);
-/**
- * This file is part of Adguard Browser Extension (https://github.com/AdguardTeam/AdguardBrowserExtension).
- *
- * Adguard Browser Extension is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Adguard Browser Extension is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
- */
 
-/* eslint-disable max-len */
 
 
 
 
 
 
+const Popup = mobxreact_esm_observer(() => {
+  var _settings$names;
 
-
-const backgroundPage = (() => {
-  var _browser$webRequest8, _browser$webRequest9, _browser$webNavigatio;
-
-  const runtime = function () {
-    const onMessage = {
-      addListener(callback) {
-        // https://developer.chrome.com/extensions/runtime#event-onMessage
-        _common_common_script__WEBPACK_IMPORTED_MODULE_3__/* .runtimeImpl.onMessage.addListener */ .V.onMessage.addListener((message, sender) => {
-          const senderOverride = Object.create(null);
-
-          if (sender.tab) {
-            senderOverride.tab = (0,_utils_common__WEBPACK_IMPORTED_MODULE_2__/* .toTabFromChromeTab */ .bw)(sender.tab);
-          }
-
-          if (typeof sender.frameId !== 'undefined') {
-            senderOverride.frameId = sender.frameId;
-          }
-
-          return callback(message, senderOverride);
-        });
-      }
-
-    };
-    return {
-      setUninstallURL: _browser__WEBPACK_IMPORTED_MODULE_4__/* .browser.runtime.setUninstallURL */ .X.runtime.setUninstallURL,
-      reload: _browser__WEBPACK_IMPORTED_MODULE_4__/* .browser.runtime.reload */ .X.runtime.reload,
-      onMessage,
-      onConnect: _browser__WEBPACK_IMPORTED_MODULE_4__/* .browser.runtime.onConnect */ .X.runtime.onConnect,
-
-      get lastError() {
-        return _browser__WEBPACK_IMPORTED_MODULE_4__/* .browser.runtime.lastError */ .X.runtime.lastError;
-      }
-
-    };
-  }(); // Calculates scheme of this extension (e.g.: chrome-extension:// or moz-extension://)
-
-
-  const extensionScheme = function () {
-    const url = _browser__WEBPACK_IMPORTED_MODULE_4__/* .browser.runtime.getURL */ .X.runtime.getURL('');
-
-    if (!url) {
-      return url;
-    }
-
-    const index = url.indexOf('://');
-
-    if (index > 0) {
-      return url.substring(0, index);
-    }
-
-    return url;
-  }();
-  /**
-   * We are skipping requests to internal resources of extensions
-   * (e.g. chrome-extension:// or moz-extension://... etc.)
-   * @param details Request details
-   * @returns {boolean}
-   */
-
-
-  function shouldSkipRequest(details) {
-    return details.tabId === _utils_common__WEBPACK_IMPORTED_MODULE_2__/* .BACKGROUND_TAB_ID */ .HB && details.url.indexOf(extensionScheme) === 0;
-  }
-
-  const linkHelper = document.createElement('a');
-  /**
-   * Fixing request type:
-   * https://code.google.com/p/chromium/issues/detail?id=410382
-   *
-   * @param url Request url
-   * @returns String Fixed object type
-   */
-
-  function parseRequestTypeFromUrl(url) {
-    linkHelper.href = url;
-    const path = linkHelper.pathname;
-    let requestType = (0,_utils_request_types__WEBPACK_IMPORTED_MODULE_1__/* .parseContentTypeFromUrlPath */ .O)(path);
-
-    if (requestType === null) {
-      // https://code.google.com/p/chromium/issues/detail?id=410382
-      requestType = _utils_request_types__WEBPACK_IMPORTED_MODULE_1__/* .RequestTypes.OBJECT */ .l.OBJECT;
-    }
-
-    return requestType;
-  }
-  /**
-   * An array of HTTP headers.
-   * Each header is represented as a dictionary containing the keys name
-   * and either value or binaryValue.
-   * https://developer.chrome.com/extensions/webRequest#type-HttpHeaders
-   * @typedef HttpHeaders
-   * @type {Array.<{ name: String, value: String, binaryValue }>}
-   */
-
-  /**
-   * @typedef RequestDetails
-   * @type {Object}
-   * @property {String} requestUrl - request url
-   * @property {String} referrerUrl - the origin where the request was initiated
-   * @property {{tabId: Number}} tab - request tab with tabId in property
-   * @property {Number} requestId - the ID of the request
-   * @property {Number} statusCode - standard HTTP status code
-   * @property {String} method - standard HTTP method
-   * @property {Number} frameId - ID of current frame. Frame IDs are unique within a tab.
-   * @property {Number} requestFrameId - ID of frame where request is executed
-   * @property {Number} requestType - request type {@link RequestTypes}
-   * @property {HttpHeaders} [requestHeaders] - the HTTP request headers
-   * @property {HttpHeaders} [responseHeaders] - the HTTP response headers
-   * @property {String} redirectUrl - new URL in onBeforeRedirect event
-   */
-
-  /**
-   * Argument passed to the webRequest event listener.
-   * Every webRequest event listener has its own object with request details.
-   * To learn more see https://developer.chrome.com/extensions/webRequest or
-   * https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/webRequest
-   * @typedef {Object} WebRequestDetails
-   */
-
-  /**
-   * Transforms raw request details from different browsers into unified format
-   * @param {WebRequestDetails} details raw webRequest details
-   * @returns {RequestDetails} prepared request details
-   */
-
-
-  function getRequestDetails(details) {
-    const tab = {
-      tabId: details.tabId
-    };
-    /**
-     * FF sends http instead of ws protocol at the http-listeners layer
-     * Although this is expected, as the Upgrade request is indeed an HTTP request,
-     * we use a chromium based approach in this case.
-     */
-
-    if (details.type === 'websocket' && details.url.indexOf('http') === 0) {
-      details.url = details.url.replace(/^http(s)?:/, 'ws$1:');
-    } // https://developer.chrome.com/extensions/webRequest#event-onBeforeRequest
-
-
-    const requestDetails = {
-      requestUrl: details.url,
-      // request url
-      url: details.url,
-      tab,
-      // request tab,
-      tabId: details.tabId,
-      requestId: details.requestId,
-      statusCode: details.statusCode,
-      method: details.method
-    };
-    let frameId = 0; // id of this frame (only for main_frame and sub_frame types)
-
-    let requestFrameId = 0; // id of frame where request is executed
-
-    let requestType; // request type
-
-    switch (details.type) {
-      case 'main_frame':
-        frameId = 0;
-        requestType = _utils_request_types__WEBPACK_IMPORTED_MODULE_1__/* .RequestTypes.DOCUMENT */ .l.DOCUMENT;
-        break;
-
-      case 'sub_frame':
-        frameId = details.frameId; // for sub_frame use parentFrameId as id of frame that wraps this frame
-
-        requestFrameId = details.parentFrameId;
-        requestType = _utils_request_types__WEBPACK_IMPORTED_MODULE_1__/* .RequestTypes.SUBDOCUMENT */ .l.SUBDOCUMENT;
-        break;
-
-      default:
-        requestFrameId = details.frameId;
-        requestType = details.type.toUpperCase();
-        break;
-    } // Relate request to main_frame
-
-
-    if (requestFrameId === -1) {
-      requestFrameId = 0;
-    }
-
-    if (requestType === 'IMAGESET') {
-      requestType = _utils_request_types__WEBPACK_IMPORTED_MODULE_1__/* .RequestTypes.IMAGE */ .l.IMAGE;
-    }
-
-    if (requestType === _utils_request_types__WEBPACK_IMPORTED_MODULE_1__/* .RequestTypes.OTHER */ .l.OTHER) {
-      requestType = parseRequestTypeFromUrl(details.url);
-    }
-    /**
-     * ping type is 'ping' in Chrome
-     * but Firefox considers it as 'beacon'
-     */
-
-
-    if (requestType === 'BEACON') {
-      requestType = _utils_request_types__WEBPACK_IMPORTED_MODULE_1__/* .RequestTypes.PING */ .l.PING;
-    }
-    /**
-     * Use `OTHER` type as a fallback
-     * https://github.com/AdguardTeam/AdguardBrowserExtension/issues/777
-     */
-
-
-    if (!(requestType in _utils_request_types__WEBPACK_IMPORTED_MODULE_1__/* .RequestTypes */ .l)) {
-      requestType = _utils_request_types__WEBPACK_IMPORTED_MODULE_1__/* .RequestTypes.OTHER */ .l.OTHER;
-    }
-
-    requestDetails.frameId = frameId;
-    requestDetails.requestFrameId = requestFrameId;
-    requestDetails.requestType = requestType;
-
-    if (details.requestHeaders) {
-      requestDetails.requestHeaders = details.requestHeaders;
-    }
-
-    if (details.responseHeaders) {
-      requestDetails.responseHeaders = details.responseHeaders;
-    }
-
-    if (details.requestBody) {
-      requestDetails.requestBody = details.requestBody;
-    }
-
-    if (details.tabId === _utils_common__WEBPACK_IMPORTED_MODULE_2__/* .BACKGROUND_TAB_ID */ .HB) {
-      // In case of background request, its details contains referrer url
-      // Chrome uses `initiator`: https://developer.chrome.com/extensions/webRequest#event-onBeforeRequest
-      // FF uses `originUrl`: https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/webRequest/onBeforeRequest#Additional_objects
-      requestDetails.referrerUrl = details.originUrl || details.initiator;
-    }
-
-    requestDetails.originUrl = details.originUrl || details.initiator;
-    requestDetails.thirdParty = _adguard_tsurlfilter__WEBPACK_IMPORTED_MODULE_0__.isThirdPartyRequest(requestDetails.requestUrl, requestDetails.originUrl);
-    return requestDetails;
-  }
-
-  const onBeforeRequest = {
-    /**
-     * Wrapper for webRequest.onBeforeRequest event
-     * It prepares requestDetails and passes them to the callback
-     * @param callback callback function receives {RequestDetails} and handles event
-     * @param {String} urls url match pattern https://developer.chrome.com/extensions/match_patterns
-     * @param {string[]} types
-     * @param {string[]} extraInfoSpecsDirty
-     */
-    addListener(callback, urls, types, extraInfoSpecsDirty) {
-      var _browser$webRequest, _browser$webRequest$o;
-
-      const filters = {};
-
-      if (urls) {
-        filters.urls = urls;
-      }
-
-      if (types) {
-        filters.types = types;
-      }
-
-      const extraInfoSpec = ['blocking'];
-
-      if (extraInfoSpecsDirty && extraInfoSpecsDirty.length > 0) {
-        extraInfoSpecsDirty.forEach(spec => {
-          extraInfoSpec.push(spec);
-        });
-      } // https://developer.chrome.com/extensions/webRequest#event-onBeforeRequest
-
-
-      (_browser$webRequest = _browser__WEBPACK_IMPORTED_MODULE_4__/* .browser.webRequest */ .X.webRequest) === null || _browser$webRequest === void 0 ? void 0 : (_browser$webRequest$o = _browser$webRequest.onBeforeRequest) === null || _browser$webRequest$o === void 0 ? void 0 : _browser$webRequest$o.addListener(details => {
-        if (shouldSkipRequest(details)) {
-          return;
-        }
-
-        const requestDetails = getRequestDetails(details);
-        return callback(requestDetails);
-      }, filters, extraInfoSpec);
-    }
-
-  };
-  /**
-   * Apply 'extraHeaders' option for request/response headers access/change. See:
-   * https://groups.google.com/a/chromium.org/forum/#!topic/chromium-extensions/vYIaeezZwfQ
-   * https://chromium-review.googlesource.com/c/chromium/src/+/1338165
-   */
-
-  const onBeforeSendHeadersExtraInfoSpec = ['requestHeaders', 'blocking'];
-  const onHeadersReceivedExtraInfoSpec = ['responseHeaders', 'blocking'];
-
-  if (_browser__WEBPACK_IMPORTED_MODULE_4__/* .browser.webRequest */ .X.webRequest && typeof _browser__WEBPACK_IMPORTED_MODULE_4__/* .browser.webRequest.OnBeforeSendHeadersOptions */ .X.webRequest.OnBeforeSendHeadersOptions !== 'undefined' && _browser__WEBPACK_IMPORTED_MODULE_4__/* .browser.webRequest.OnBeforeSendHeadersOptions.hasOwnProperty */ .X.webRequest.OnBeforeSendHeadersOptions.hasOwnProperty('EXTRA_HEADERS')) {
-    onBeforeSendHeadersExtraInfoSpec.push('extraHeaders');
-  }
-
-  if (_browser__WEBPACK_IMPORTED_MODULE_4__/* .browser.webRequest */ .X.webRequest && typeof _browser__WEBPACK_IMPORTED_MODULE_4__/* .browser.webRequest.OnHeadersReceivedOptions */ .X.webRequest.OnHeadersReceivedOptions !== 'undefined' && _browser__WEBPACK_IMPORTED_MODULE_4__/* .browser.webRequest.OnHeadersReceivedOptions.hasOwnProperty */ .X.webRequest.OnHeadersReceivedOptions.hasOwnProperty('EXTRA_HEADERS')) {
-    onHeadersReceivedExtraInfoSpec.push('extraHeaders');
-  }
-
-  const onHeadersReceived = {
-    /**
-     * Wrapper for webRequest.onHeadersReceived event
-     * It prepares requestDetails and passes them to the callback
-     * @param callback callback function receives {RequestDetails} and handles event
-     * @param {Array.<String>} urls url match pattern https://developer.chrome.com/extensions/match_patterns
-     */
-    addListener(callback, urls) {
-      var _browser$webRequest2, _browser$webRequest2$;
-
-      (_browser$webRequest2 = _browser__WEBPACK_IMPORTED_MODULE_4__/* .browser.webRequest */ .X.webRequest) === null || _browser$webRequest2 === void 0 ? void 0 : (_browser$webRequest2$ = _browser$webRequest2.onHeadersReceived) === null || _browser$webRequest2$ === void 0 ? void 0 : _browser$webRequest2$.addListener(details => {
-        if (shouldSkipRequest(details)) {
-          return;
-        }
-
-        const requestDetails = getRequestDetails(details);
-        const result = callback(requestDetails);
-
-        if (result) {
-          return 'responseHeaders' in result ? {
-            responseHeaders: result.responseHeaders
-          } : {};
-        }
-      }, urls ? {
-        urls
-      } : {}, onHeadersReceivedExtraInfoSpec);
-    }
-
-  };
-  const onBeforeSendHeaders = {
-    /**
-     * Wrapper for webRequest.onBeforeSendHeaders event
-     * It prepares requestDetails and passes them to the callback
-     * @param callback callback function receives {RequestDetails} and handles event
-     * @param {Array.<String>} urls url match pattern https://developer.chrome.com/extensions/match_patterns
-     */
-    addListener(callback, urls) {
-      var _browser$webRequest3, _browser$webRequest3$;
-
-      let requestFilter = {};
-      /**
-       * Sometimes extraHeaders option of onBeforeSendHeaders handler is blocking network
-       * https://github.com/AdguardTeam/AdguardBrowserExtension/issues/1634
-       * https://github.com/AdguardTeam/AdguardBrowserExtension/issues/1644
-       * https://bugs.chromium.org/p/chromium/issues/detail?id=938560
-       * https://bugs.chromium.org/p/chromium/issues/detail?id=1075905
-       * This issue was fixed in the Canary v85.0.4178.0 and would be fixed
-       * in the Chrome with the same version
-       * Until v85 we have decided to filter requests with types:
-       * 'stylesheet', 'script', 'media'
-       */
-
-      if (_prefs__WEBPACK_IMPORTED_MODULE_5__/* .prefs.browser */ .D.browser === 'Chrome' && _prefs__WEBPACK_IMPORTED_MODULE_5__/* .prefs.chromeVersion */ .D.chromeVersion < 85) {
-        const allTypes = ['main_frame', 'sub_frame', 'stylesheet', 'script', 'image', 'font', 'object', 'xmlhttprequest', 'ping', 'csp_report', 'media', 'websocket', 'other']; // this request types block requests, if use them with extraHeaders and blocking options
-
-        const nonExtraHeadersTypes = ['stylesheet', 'script', 'media'];
-        const extraHeadersTypes = allTypes.filter(type => !nonExtraHeadersTypes.includes(type)); // Assign instead of spread used because FF begin to support them from v55
-        // https://caniuse.com/#feat=mdn-javascript_operators_spread_spread_in_object_literals
-
-        requestFilter = Object.assign(requestFilter, {
-          types: extraHeadersTypes
-        });
-      }
-
-      if (urls) {
-        // Assign instead of spread used because FF begin to support them from v55
-        // https://caniuse.com/#feat=mdn-javascript_operators_spread_spread_in_object_literals
-        requestFilter = Object.assign(requestFilter, {
-          urls
-        });
-      }
-
-      (_browser$webRequest3 = _browser__WEBPACK_IMPORTED_MODULE_4__/* .browser.webRequest */ .X.webRequest) === null || _browser$webRequest3 === void 0 ? void 0 : (_browser$webRequest3$ = _browser$webRequest3.onBeforeSendHeaders) === null || _browser$webRequest3$ === void 0 ? void 0 : _browser$webRequest3$.addListener(details => {
-        if (shouldSkipRequest(details)) {
-          return;
-        }
-
-        const requestDetails = getRequestDetails(details);
-        const result = callback(requestDetails);
-
-        if (result) {
-          return 'requestHeaders' in result ? {
-            requestHeaders: result.requestHeaders
-          } : {};
-        }
-      }, requestFilter, onBeforeSendHeadersExtraInfoSpec);
-    }
-
-  };
-  const onResponseStarted = {
-    /**
-     * Wrapper for webRequest.onResponseStarted event
-     * It prepares requestDetails and passes them to the callback
-     * @param callback callback function receives {RequestDetails} and handles event
-     * @param {String} urls url match pattern https://developer.chrome.com/extensions/match_patterns
-     */
-    addListener(callback, urls) {
-      var _browser$webRequest4, _browser$webRequest4$;
-
-      (_browser$webRequest4 = _browser__WEBPACK_IMPORTED_MODULE_4__/* .browser.webRequest */ .X.webRequest) === null || _browser$webRequest4 === void 0 ? void 0 : (_browser$webRequest4$ = _browser$webRequest4.onResponseStarted) === null || _browser$webRequest4$ === void 0 ? void 0 : _browser$webRequest4$.addListener(details => {
-        if (shouldSkipRequest(details)) {
-          return;
-        }
-
-        const requestDetails = getRequestDetails(details);
-        return callback(requestDetails);
-      }, urls ? {
-        urls
-      } : {}, ['responseHeaders']);
-    }
-
-  };
-  const onErrorOccurred = {
-    /**
-     * Wrapper for webRequest.onErrorOccurred event
-     * It prepares requestDetails and passes them to the callback
-     * @param callback callback function receives {RequestDetails} and handles event
-     * @param {String} urls url match pattern https://developer.chrome.com/extensions/match_patterns
-     */
-    addListener(callback, urls) {
-      var _browser$webRequest5, _browser$webRequest5$;
-
-      (_browser$webRequest5 = _browser__WEBPACK_IMPORTED_MODULE_4__/* .browser.webRequest */ .X.webRequest) === null || _browser$webRequest5 === void 0 ? void 0 : (_browser$webRequest5$ = _browser$webRequest5.onErrorOccurred) === null || _browser$webRequest5$ === void 0 ? void 0 : _browser$webRequest5$.addListener(details => {
-        if (shouldSkipRequest(details)) {
-          return;
-        }
-
-        const requestDetails = getRequestDetails(details);
-        return callback(requestDetails);
-      }, urls ? {
-        urls
-      } : {});
-    }
-
-  };
-  const onCompleted = {
-    /**
-     * Wrapper for webRequest.onCompleted event
-     * It prepares requestDetails and passes them to the callback
-     * @param callback callback function receives {RequestDetails} and handles event
-     * @param {String} urls url match pattern https://developer.chrome.com/extensions/match_patterns
-     */
-    addListener(callback, urls) {
-      var _browser$webRequest6, _browser$webRequest6$;
-
-      (_browser$webRequest6 = _browser__WEBPACK_IMPORTED_MODULE_4__/* .browser.webRequest */ .X.webRequest) === null || _browser$webRequest6 === void 0 ? void 0 : (_browser$webRequest6$ = _browser$webRequest6.onCompleted) === null || _browser$webRequest6$ === void 0 ? void 0 : _browser$webRequest6$.addListener(details => {
-        if (shouldSkipRequest(details)) {
-          return;
-        }
-
-        const requestDetails = getRequestDetails(details);
-        return callback(requestDetails);
-      }, urls ? {
-        urls
-      } : {}, ['responseHeaders']);
-    }
-
-  };
-  const onBeforeRedirect = {
-    /**
-     * Wrapper for webRequest.onBeforeRedirect event
-     * It prepares requestDetails and passes them to the callback
-     * @param callback callback function receives {RequestDetails} and handles event
-     * @param {Array.<String>} urls url match pattern https://developer.chrome.com/extensions/match_patterns
-     */
-    addListener(callback, urls) {
-      var _browser$webRequest7, _browser$webRequest7$;
-
-      (_browser$webRequest7 = _browser__WEBPACK_IMPORTED_MODULE_4__/* .browser.webRequest */ .X.webRequest) === null || _browser$webRequest7 === void 0 ? void 0 : (_browser$webRequest7$ = _browser$webRequest7.onBeforeRedirect) === null || _browser$webRequest7$ === void 0 ? void 0 : _browser$webRequest7$.addListener(details => {
-        if (shouldSkipRequest(details)) {
-          return;
-        }
-
-        const requestDetails = getRequestDetails(details);
-        requestDetails.redirectUrl = details.redirectUrl;
-        return callback(requestDetails);
-      }, urls ? {
-        urls
-      } : {});
-    }
-
-  };
-  /**
-   * Gets URL of a file that belongs to our extension
-   * https://developer.chrome.com/apps/runtime#method-getURL
-   */
-  // eslint-disable-next-line prefer-destructuring
-
-  const getURL = _browser__WEBPACK_IMPORTED_MODULE_4__/* .browser.runtime.getURL */ .X.runtime.getURL;
-  const app = {
-    /**
-     * Extension ID
-     */
-    getId() {
-      return _browser__WEBPACK_IMPORTED_MODULE_4__/* .browser.runtime.id */ .X.runtime.id;
-    },
-
-    /**
-     * Gets extension scheme
-     * @returns "chrome-extension" for Chrome," ms-browser-extension" for Edge
-     */
-    getUrlScheme() {
-      const url = backgroundPage.getURL('test.html');
-      const index = url.indexOf('://');
-      return url.substring(0, index);
-    },
-
-    /**
-     * Extension version
-     */
-    getVersion() {
-      return _browser__WEBPACK_IMPORTED_MODULE_4__/* .browser.runtime.getManifest */ .X.runtime.getManifest().version;
-    },
-
-    /**
-     * Extension UI locale
-     */
-    getLocale() {
-      return _browser__WEBPACK_IMPORTED_MODULE_4__/* .browser.i18n.getUILanguage */ .X.i18n.getUILanguage();
-    },
-
-    /**
-     * Returns extension's full url
-     */
-    getExtensionUrl() {
-      const url = getURL('');
-      return url.substring(0, url.length - 1);
-    },
-
-    /**
-     * If referrer of request contains full url of extension,
-     * then this request is considered as extension's own request
-     * (e.g. request for filter downloading)
-     * https://github.com/AdguardTeam/AdguardBrowserExtension/issues/1437
-     * @param referrerUrl
-     * @returns {boolean}
-     */
-    isOwnRequest(referrerUrl) {
-      return referrerUrl && referrerUrl.indexOf(this.getExtensionUrl()) === 0;
-    }
-
-  };
-  const webRequest = {
-    onBeforeRequest,
-    handlerBehaviorChanged: (_browser$webRequest8 = _browser__WEBPACK_IMPORTED_MODULE_4__/* .browser.webRequest */ .X.webRequest) === null || _browser$webRequest8 === void 0 ? void 0 : _browser$webRequest8.handlerBehaviorChanged,
-    onCompleted,
-    onErrorOccurred,
-    onHeadersReceived,
-    onBeforeSendHeaders,
-    onResponseStarted,
-    onBeforeRedirect,
-    webSocketSupported: _browser__WEBPACK_IMPORTED_MODULE_4__/* .browser.webRequest */ .X.webRequest && typeof _browser__WEBPACK_IMPORTED_MODULE_4__/* .browser.webRequest.ResourceType */ .X.webRequest.ResourceType !== 'undefined' && _browser__WEBPACK_IMPORTED_MODULE_4__/* .browser.webRequest.ResourceType.WEBSOCKET */ .X.webRequest.ResourceType.WEBSOCKET === 'websocket',
-    filterResponseData: (_browser$webRequest9 = _browser__WEBPACK_IMPORTED_MODULE_4__/* .browser.webRequest */ .X.webRequest) === null || _browser$webRequest9 === void 0 ? void 0 : _browser$webRequest9.filterResponseData
-  };
-  const onCreatedNavigationTarget = {
-    addListener(callback) {
-      // https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/webNavigation/onCreatedNavigationTarget#Browser_compatibility
-      if (!_browser__WEBPACK_IMPORTED_MODULE_4__/* .browser.webNavigation */ .X.webNavigation || typeof _browser__WEBPACK_IMPORTED_MODULE_4__/* .browser.webNavigation.onCreatedNavigationTarget */ .X.webNavigation.onCreatedNavigationTarget === 'undefined') {
-        return;
-      }
-
-      _browser__WEBPACK_IMPORTED_MODULE_4__/* .browser.webNavigation.onCreatedNavigationTarget.addListener */ .X.webNavigation.onCreatedNavigationTarget.addListener(details => {
-        if (details.tabId === _utils_common__WEBPACK_IMPORTED_MODULE_2__/* .BACKGROUND_TAB_ID */ .HB) {
-          return;
-        }
-
-        callback({
-          tabId: details.tabId,
-          sourceTabId: details.sourceTabId,
-          url: details.url
-        });
-      });
-    }
-
-  };
-  const onCommitted = {
-    /**
-     * Wrapper for webNavigation.onCommitted event
-     * It prepares webNavigation details and passes them to the callback
-     * @param callback callback function receives object similar to {RequestDetails}
-     * and handles event
-     */
-    addListener(callback) {
-      if (!_browser__WEBPACK_IMPORTED_MODULE_4__/* .browser.webNavigation */ .X.webNavigation) return; // https://developer.chrome.com/extensions/webNavigation#event-onCommitted
-
-      _browser__WEBPACK_IMPORTED_MODULE_4__/* .browser.webNavigation.onCommitted.addListener */ .X.webNavigation.onCommitted.addListener(details => {
-        // makes webNavigation.onCommitted details similar to webRequestDetails
-        details.requestType = details.frameId === 0 ? _utils_request_types__WEBPACK_IMPORTED_MODULE_1__/* .RequestTypes.DOCUMENT */ .l.DOCUMENT : _utils_request_types__WEBPACK_IMPORTED_MODULE_1__/* .RequestTypes.SUBDOCUMENT */ .l.SUBDOCUMENT;
-        details.tab = {
-          tabId: details.tabId
-        };
-        details.requestUrl = details.url;
-        callback(details);
-      }, {
-        url: [{
-          urlPrefix: 'http'
-        }, {
-          urlPrefix: 'https'
-        }]
-      });
-    }
-
-  }; // https://developer.chrome.com/extensions/webNavigation
-
-  const webNavigation = {
-    onCreatedNavigationTarget,
-    onCommitted,
-    onDOMContentLoaded: (_browser$webNavigatio = _browser__WEBPACK_IMPORTED_MODULE_4__/* .browser.webNavigation */ .X.webNavigation) === null || _browser$webNavigatio === void 0 ? void 0 : _browser$webNavigatio.onDOMContentLoaded
-  };
-  const browserActionSupported = typeof _browser__WEBPACK_IMPORTED_MODULE_4__/* .browser.browserAction.setIcon */ .X.browserAction.setIcon !== 'undefined';
-  const browserAction = {
-    /* eslint-disable-next-line no-unused-vars */
-    async setBrowserAction(tab, icon, badge, badgeColor, title) {
-      if (!browserActionSupported) {
-        return;
-      }
-
-      const {
-        tabId
-      } = tab;
-
-      const onIconReady = async () => {
-        try {
-          await _browser__WEBPACK_IMPORTED_MODULE_4__/* .browser.browserAction.setBadgeText */ .X.browserAction.setBadgeText({
-            tabId,
-            text: badge
-          });
-        } catch (e) {
-          _common_log__WEBPACK_IMPORTED_MODULE_6__/* .log.debug */ .c.debug(new Error(e.message));
-          return;
-        }
-
-        if (badge) {
-          try {
-            await _browser__WEBPACK_IMPORTED_MODULE_4__/* .browser.browserAction.setBadgeBackgroundColor */ .X.browserAction.setBadgeBackgroundColor({
-              tabId,
-              color: badgeColor
-            });
-          } catch (e) {
-            _common_log__WEBPACK_IMPORTED_MODULE_6__/* .log.debug */ .c.debug(new Error(e.message));
-          }
-        } // title setup via manifest.json file
-        // chrome.browserAction.setTitle({tabId: tabId, title: title});
-
-      };
-      /**
-       * Workaround for MS Edge.
-       * For some reason Edge changes the inner state of the "icon"
-       * object and adds a tabId property inside.
-       */
-
-
-      delete icon.tabId;
-
-      if (_browser__WEBPACK_IMPORTED_MODULE_4__/* .browser.runtime.lastError */ .X.runtime.lastError) {
-        return;
-      }
-
-      try {
-        await _browser__WEBPACK_IMPORTED_MODULE_4__/* .browser.browserAction.setIcon */ .X.browserAction.setIcon({
-          tabId,
-          imageData: await (0,_iconsCache__WEBPACK_IMPORTED_MODULE_7__/* .getIconImageData */ .O)(icon)
-        });
-      } catch (e) {
-        _common_log__WEBPACK_IMPORTED_MODULE_6__/* .log.debug */ .c.debug(new Error(e.message));
-        return;
-      }
-
-      onIconReady();
-    },
-
-    setPopup() {// Do nothing. Popup is already installed in manifest file
-    },
-
-    resize() {// Do nothing
-    },
-
-    close() {// Do nothing
-    }
-
-  }; // eslint-disable-next-line prefer-destructuring
-  // const contextMenus = browser.contextMenus;
-  // eslint-disable-next-line prefer-destructuring
-
-  const i18n = _browser__WEBPACK_IMPORTED_MODULE_4__/* .browser.i18n */ .X.i18n;
-  return {
-    runtime,
-    getURL,
-    app,
-    webRequest,
-    webNavigation,
-    browserAction,
-    // contextMenus,
-    i18n
-  };
-})();
-
-/***/ }),
-
-/***/ 2273:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "X": () => (/* reexport default from dynamic */ webextension_polyfill__WEBPACK_IMPORTED_MODULE_0___default.a)
-/* harmony export */ });
-/* harmony import */ var webextension_polyfill__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3679);
-/* harmony import */ var webextension_polyfill__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(webextension_polyfill__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _windows__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(5802);
-
-
-(0,_windows__WEBPACK_IMPORTED_MODULE_1__/* .patchWindows */ .x)((webextension_polyfill__WEBPACK_IMPORTED_MODULE_0___default()));
-
-
-/***/ }),
-
-/***/ 1719:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "O": () => (/* binding */ getIconImageData)
-/* harmony export */ });
-/* harmony import */ var core_js_modules_esnext_map_delete_all_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3929);
-/* harmony import */ var core_js_modules_esnext_map_delete_all_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_esnext_map_delete_all_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var core_js_modules_esnext_map_every_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(7851);
-/* harmony import */ var core_js_modules_esnext_map_every_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_esnext_map_every_js__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var core_js_modules_esnext_map_filter_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(3633);
-/* harmony import */ var core_js_modules_esnext_map_filter_js__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_esnext_map_filter_js__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var core_js_modules_esnext_map_find_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(1192);
-/* harmony import */ var core_js_modules_esnext_map_find_js__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_esnext_map_find_js__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var core_js_modules_esnext_map_find_key_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(7515);
-/* harmony import */ var core_js_modules_esnext_map_find_key_js__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_esnext_map_find_key_js__WEBPACK_IMPORTED_MODULE_4__);
-/* harmony import */ var core_js_modules_esnext_map_includes_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(8034);
-/* harmony import */ var core_js_modules_esnext_map_includes_js__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_esnext_map_includes_js__WEBPACK_IMPORTED_MODULE_5__);
-/* harmony import */ var core_js_modules_esnext_map_key_of_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(1480);
-/* harmony import */ var core_js_modules_esnext_map_key_of_js__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_esnext_map_key_of_js__WEBPACK_IMPORTED_MODULE_6__);
-/* harmony import */ var core_js_modules_esnext_map_map_keys_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(9027);
-/* harmony import */ var core_js_modules_esnext_map_map_keys_js__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_esnext_map_map_keys_js__WEBPACK_IMPORTED_MODULE_7__);
-/* harmony import */ var core_js_modules_esnext_map_map_values_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(5739);
-/* harmony import */ var core_js_modules_esnext_map_map_values_js__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_esnext_map_map_values_js__WEBPACK_IMPORTED_MODULE_8__);
-/* harmony import */ var core_js_modules_esnext_map_merge_js__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(9283);
-/* harmony import */ var core_js_modules_esnext_map_merge_js__WEBPACK_IMPORTED_MODULE_9___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_esnext_map_merge_js__WEBPACK_IMPORTED_MODULE_9__);
-/* harmony import */ var core_js_modules_esnext_map_reduce_js__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(4473);
-/* harmony import */ var core_js_modules_esnext_map_reduce_js__WEBPACK_IMPORTED_MODULE_10___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_esnext_map_reduce_js__WEBPACK_IMPORTED_MODULE_10__);
-/* harmony import */ var core_js_modules_esnext_map_some_js__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(989);
-/* harmony import */ var core_js_modules_esnext_map_some_js__WEBPACK_IMPORTED_MODULE_11___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_esnext_map_some_js__WEBPACK_IMPORTED_MODULE_11__);
-/* harmony import */ var core_js_modules_esnext_map_update_js__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(7194);
-/* harmony import */ var core_js_modules_esnext_map_update_js__WEBPACK_IMPORTED_MODULE_12___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_esnext_map_update_js__WEBPACK_IMPORTED_MODULE_12__);
-
-
-
-
-
-
-
-
-
-
-
-
-
-const cache = new Map();
-/**
- * Download image and convert it to ImageData
- *
- * @param {Number} size - icon size in px
- * @param {String} url - icon url
- * @returns {ImageData}
- */
-
-const loadImageData = (size, url) => {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.src = url;
-
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      document.documentElement.appendChild(canvas);
-      canvas.width = size;
-      canvas.height = size;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0);
-      const data = ctx.getImageData(0, 0, size, size);
-      canvas.remove();
-      resolve(data);
-    };
-
-    img.onerror = reject;
-  });
-};
-/**
- * Get ImageData for specific url
- *
- * @param {Number} size - icon size in px
- * @param {String} url - icon url
- * @returns {[size: Number, imageData: ImageData]} - key-value entry for browserAction.setIcon 'imageData' property
- */
-
-
-const getImageData = async (size, url) => {
-  const imageData = cache.get(url);
-
-  if (!imageData) {
-    const data = await loadImageData(size, url);
-    cache.set(url, data);
-    return [size, data];
-  }
-
-  return [size, imageData];
-};
-/**
- * Match urls from browserAction.setIcon 'path' property with cached ImageData values
- * and return 'imageData' object for this action.
- *
- * see: https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/browserAction/setIcon
- *
- * @param {Object} path - browserAction.setIcon details 'path' property
- * @returns {Object} - browserAction.setIcon details 'imageData' property
- */
-
-
-const getIconImageData = async path => {
-  const imageDataEntriesPromises = Object.entries(path).map(([size, url]) => getImageData(size, url));
-  const imageDataEntries = await Promise.all(imageDataEntriesPromises);
-  const imageData = Object.fromEntries(imageDataEntries);
-  return imageData;
-};
-
-/***/ }),
-
-/***/ 4879:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "W": () => (/* binding */ tabsImpl)
-/* harmony export */ });
-/* harmony import */ var _browser__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2273);
-/* harmony import */ var _utils_common__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(5088);
-/* harmony import */ var _prefs__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(4847);
-/* harmony import */ var _utils_browser_utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(1654);
-/* harmony import */ var _common_log__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(9224);
-/**
- * This file is part of Adguard Browser Extension (https://github.com/AdguardTeam/AdguardBrowserExtension).
- *
- * Adguard Browser Extension is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Adguard Browser Extension is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
- */
-
-/* eslint-disable max-len */
-
-
-
-
-
-/**
- * Chromium tabs implementation
- * @type {{onCreated, onRemoved, onUpdated, onActivated, create, remove, activate, reload, sendMessage, getAll, getActive, fromChromeTab}}
- */
-
-const tabsImpl = function () {
-  /**
-   * tabId parameter must be integer
-   * @param tabId
-   */
-  function tabIdToInt(tabId) {
-    return Number.parseInt(tabId, 10);
-  }
-
-  function logOperationError(operation, e) {
-    _common_log__WEBPACK_IMPORTED_MODULE_4__/* .log.error */ .c.error('Error while executing operation{1}: {0}', e, operation ? ` '${operation}'` : '');
-  }
-  /**
-   * Returns id of active tab
-   * @returns {Promise<number|null>}
-   */
-
-
-  const getActive = async function () {
-    /**
-     * lastFocusedWindow parameter isn't supported by Opera
-     * But seems currentWindow has the same effect in our case.
-     * See for details:
-     * https://developer.chrome.com/extensions/windows#current-window
-     * https://dev.opera.com/extensions/tab-window/#accessing-the-current-tab
-     * https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/tabs/query
-     */
-    let tabs;
-
-    try {
-      tabs = await _browser__WEBPACK_IMPORTED_MODULE_0__/* .browser.tabs.query */ .X.tabs.query({
-        currentWindow: true,
-        active: true
-      });
-    } catch (e) {
-      _common_log__WEBPACK_IMPORTED_MODULE_4__/* .log.debug */ .c.debug(new Error(e.message));
-    }
-
-    if (tabs && tabs.length > 0) {
-      return tabs[0].id;
-    }
-
-    return null;
-  }; // https://developer.chrome.com/extensions/tabs#event-onCreated
-
-
-  const onCreatedChannel = _utils_common__WEBPACK_IMPORTED_MODULE_1__/* .utils.channels.newChannel */ .P6.channels.newChannel();
-  _browser__WEBPACK_IMPORTED_MODULE_0__/* .browser.tabs.onCreated.addListener */ .X.tabs.onCreated.addListener(chromeTab => {
-    onCreatedChannel.notify((0,_utils_common__WEBPACK_IMPORTED_MODULE_1__/* .toTabFromChromeTab */ .bw)(chromeTab));
-  }); // https://developer.chrome.com/extensions/tabs#event-onCreated
-
-  const onRemovedChannel = _utils_common__WEBPACK_IMPORTED_MODULE_1__/* .utils.channels.newChannel */ .P6.channels.newChannel();
-  _browser__WEBPACK_IMPORTED_MODULE_0__/* .browser.tabs.onRemoved.addListener */ .X.tabs.onRemoved.addListener(tabId => {
-    onRemovedChannel.notify(tabId);
-  });
-  const onUpdatedChannel = _utils_common__WEBPACK_IMPORTED_MODULE_1__/* .utils.channels.newChannel */ .P6.channels.newChannel(); // https://developer.chrome.com/extensions/tabs#event-onUpdated
-
-  _browser__WEBPACK_IMPORTED_MODULE_0__/* .browser.tabs.onUpdated.addListener */ .X.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-    onUpdatedChannel.notify((0,_utils_common__WEBPACK_IMPORTED_MODULE_1__/* .toTabFromChromeTab */ .bw)(tab));
-  }); // https://developer.chrome.com/extensions/tabs#event-onActivated
-
-  const onActivatedChannel = _utils_common__WEBPACK_IMPORTED_MODULE_1__/* .utils.channels.newChannel */ .P6.channels.newChannel();
-  _browser__WEBPACK_IMPORTED_MODULE_0__/* .browser.tabs.onActivated.addListener */ .X.tabs.onActivated.addListener(activeInfo => {
-    onActivatedChannel.notify(activeInfo.tabId);
-  }); // https://developer.chrome.com/extensions/windows#event-onFocusChanged
-
-  _browser__WEBPACK_IMPORTED_MODULE_0__/* .browser.windows.onFocusChanged.addListener */ .X.windows.onFocusChanged.addListener(async windowId => {
-    if (windowId === _browser__WEBPACK_IMPORTED_MODULE_0__/* .browser.windows.WINDOW_ID_NONE */ .X.windows.WINDOW_ID_NONE) {
-      return;
-    }
-
-    const tabId = await getActive();
-
-    if (tabId) {
-      onActivatedChannel.notify(tabId);
-    }
-  });
-  /**
-   * Give focus to a window
-   * @param tabId Tab identifier
-   * @param windowId Window identifier
-   */
-
-  async function focusWindow(tabId, windowId) {
-    /**
-     * Updating already focused window produces bug in Edge browser
-     * https://github.com/AdguardTeam/AdguardBrowserExtension/issues/675
-     */
-    const activeTabId = await getActive();
-
-    if (activeTabId && tabId !== activeTabId) {
-      // Focus window
-      try {
-        await _browser__WEBPACK_IMPORTED_MODULE_0__/* .browser.windows.update */ .X.windows.update(windowId, {
-          focused: true
-        });
-      } catch (e) {
-        logOperationError(`Update window ${windowId}`, e);
-      }
-    }
-  }
-  /**
-   * Creates new tab
-   * @param createData
-   */
-
-
-  const create = async function (createData) {
-    const {
-      url,
-      inNewWindow,
-      width,
-      height,
-      top,
-      left,
-      isFullscreen
-    } = createData;
-    const active = createData.active === true;
-
-    if (createData.type === 'popup' // Does not work properly in Anniversary builds
-    && !_utils_browser_utils__WEBPACK_IMPORTED_MODULE_3__/* .browserUtils.isEdgeBeforeCreatorsUpdate */ .z.isEdgeBeforeCreatorsUpdate() // Isn't supported by Android WebExt
-    && !_prefs__WEBPACK_IMPORTED_MODULE_2__/* .prefs.mobile */ .D.mobile) {
-      // https://developer.chrome.com/extensions/windows#method-create
-      // https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/windows/create
-      const windowState = isFullscreen ? {
-        state: 'fullscreen'
-      } : {
-        width: width || 1000,
-        height: height || 650,
-        top: top || 0,
-        left: left || 0
-      };
-      const {
-        id
-      } = await _browser__WEBPACK_IMPORTED_MODULE_0__/* .browser.windows.create */ .X.windows.create({
-        url,
-        type: 'popup',
-        ...windowState
-      }); // Firefox currently can't .create with top and left due to bug
-      // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/windows/create
-      // https://bugzilla.mozilla.org/show_bug.cgi?id=1271047
-
-      if (_utils_browser_utils__WEBPACK_IMPORTED_MODULE_3__/* .browserUtils.isFirefoxBrowser */ .z.isFirefoxBrowser() && typeof windowState.top === 'number') {
-        await _browser__WEBPACK_IMPORTED_MODULE_0__/* .browser.windows.update */ .X.windows.update(id, windowState);
-      }
-
-      return;
-    }
-
-    const isHttp = url.indexOf('http') === 0;
-
-    async function onWindowFound(win) {
-      // https://developer.chrome.com/extensions/tabs#method-create
-      const chromeTab = await _browser__WEBPACK_IMPORTED_MODULE_0__/* .browser.tabs.create */ .X.tabs.create({
-        /**
-         * In the Firefox browser for Android there is not concept of windows
-         * There is only one window whole time
-         * That's why if we try to provide windowId, method fails with error.
-         */
-        windowId: !_prefs__WEBPACK_IMPORTED_MODULE_2__/* .prefs.mobile */ .D.mobile ? win.id : undefined,
-        url,
-        active
-      });
-
-      if (active) {
-        await focusWindow(chromeTab.id, chromeTab.windowId);
-      }
-
-      return (0,_utils_common__WEBPACK_IMPORTED_MODULE_1__/* .toTabFromChromeTab */ .bw)(chromeTab);
-    }
-
-    const onWindowCreatedWithTab = async win => {
-      const [tab] = win.tabs;
-
-      if (active) {
-        await focusWindow(tab.id, tab.windowId);
-      }
-
-      return (0,_utils_common__WEBPACK_IMPORTED_MODULE_1__/* .toTabFromChromeTab */ .bw)(tab);
-    };
-
-    function isAppropriateWindow(win) {
-      // We can't open not-http (e.g. 'chrome-extension://') urls in incognito mode
-      return win.type === 'normal' && (isHttp || !win.incognito);
-    }
-
-    if (!inNewWindow) {
-      // https://developer.chrome.com/extensions/windows#method-create
-      // https://developer.chrome.com/extensions/windows#method-getLastFocused
-      // https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/windows/create
-      // https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/windows/getLastFocused
-      const win = await _browser__WEBPACK_IMPORTED_MODULE_0__/* .browser.windows.getLastFocused */ .X.windows.getLastFocused();
-
-      if (isAppropriateWindow(win)) {
-        return onWindowFound(win);
-      } // https://github.com/AdguardTeam/AdguardBrowserExtension/issues/569
-
-
-      const wins = await _browser__WEBPACK_IMPORTED_MODULE_0__/* .browser.windows.getAll */ .X.windows.getAll({});
-
-      if (wins) {
-        for (let i = 0; i < wins.length; i += 1) {
-          const win = wins[i];
-
-          if (isAppropriateWindow(win)) {
-            return onWindowFound(win);
-          }
-        }
-      } // Create new window
-
-
-      const newWin = await _browser__WEBPACK_IMPORTED_MODULE_0__/* .browser.windows.create */ .X.windows.create();
-      return onWindowFound(newWin);
-    } // if inNewWindow
-    // we open window with "url" to avoid empty new tab creation
-
-
-    const newWin = await _browser__WEBPACK_IMPORTED_MODULE_0__/* .browser.windows.create */ .X.windows.create({
-      url
-    });
-    return onWindowCreatedWithTab(newWin);
-  };
-
-  const remove = async tabId => {
-    // https://developer.chrome.com/extensions/tabs#method-remove
-    // https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/tabs/remove
-    try {
-      await _browser__WEBPACK_IMPORTED_MODULE_0__/* .browser.tabs.remove */ .X.tabs.remove(tabIdToInt(tabId));
-    } catch (e) {
-      return;
-    }
-
-    return tabId;
-  };
-
-  const activate = async function (tabId) {
-    try {
-      // https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/tabs/update
-      const chromeTab = await _browser__WEBPACK_IMPORTED_MODULE_0__/* .browser.tabs.update */ .X.tabs.update(tabIdToInt(tabId), {
-        active: true
-      });
-      await focusWindow(tabId, chromeTab.windowId);
-      return tabId;
-    } catch (e) {
-      logOperationError('Before tab update', e);
-    }
-  };
-  /**
-   * Sends message to tabs
-   * @param tabId
-   * @param message
-   * @param options
-   * @returns {Promise<*>}
-   */
-
-
-  const sendMessage = async (tabId, message, options) => {
-    // https://developer.chrome.com/extensions/tabs#method-sendMessage
-    // https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/tabs/sendMessage
-    const args = [tabIdToInt(tabId), message];
-
-    if (typeof options === 'object') {
-      args.push(options);
-    }
-
-    try {
-      const response = await _browser__WEBPACK_IMPORTED_MODULE_0__/* .browser.tabs.sendMessage */ .X.tabs.sendMessage(...args);
-      return response;
-    } catch (e) {
-      _common_log__WEBPACK_IMPORTED_MODULE_4__/* .log.debug */ .c.debug(e.message);
-    }
-  };
-
-  const reload = async (tabId, url) => {
-    if (url) {
-      if (_utils_browser_utils__WEBPACK_IMPORTED_MODULE_3__/* .browserUtils.isEdgeBrowser */ .z.isEdgeBrowser()) {
-        /**
-         * For security reasons, in Firefox and Edge, this may not be a privileged URL.
-         * So passing any of the following URLs will fail, with runtime.lastError being set to an error message:
-         * chrome: URLs
-         * javascript: URLs
-         * data: URLs
-         * privileged about: URLs (for example, about:config, about:addons, about:debugging).
-         *
-         * Non-privileged URLs (about:home, about:newtab, about:blank) are allowed.
-         *
-         * So we use a content script instead.
-         */
-
-        /**
-         * Content script may not have been loaded at this point yet.
-         * https://github.com/AdguardTeam/AdguardBrowserExtension/issues/580
-         */
-        setTimeout(() => {
-          sendMessage(tabId, {
-            type: 'update-tab-url',
-            url
-          });
-        }, 100);
-      } else {
-        try {
-          await _browser__WEBPACK_IMPORTED_MODULE_0__/* .browser.tabs.update */ .X.tabs.update(tabIdToInt(tabId), {
-            url
-          });
-        } catch (e) {
-          logOperationError('Tab update', e);
-        }
-      } // https://developer.chrome.com/extensions/tabs#method-reload
-      // https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/tabs/reload#Browser_compatibility
-
-    } else if (_browser__WEBPACK_IMPORTED_MODULE_0__/* .browser.tabs.reload */ .X.tabs.reload) {
-      try {
-        await _browser__WEBPACK_IMPORTED_MODULE_0__/* .browser.tabs.reload */ .X.tabs.reload(tabIdToInt(tabId), {
-          bypassCache: true
-        });
-      } catch (e) {
-        logOperationError('Tab reload', e);
-      }
-    } else {
-      // Reload page without cache via content script
-      sendMessage(tabId, {
-        type: 'no-cache-reload'
-      });
-    }
-  };
-
-  const getAll = async () => {
-    // https://developer.chrome.com/extensions/tabs#method-query
-    // https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/tabs/query
-    const chromeTabs = await _browser__WEBPACK_IMPORTED_MODULE_0__/* .browser.tabs.query */ .X.tabs.query({});
-    const result = [];
-
-    for (let i = 0; i < chromeTabs.length; i += 1) {
-      const chromeTab = chromeTabs[i];
-      result.push((0,_utils_common__WEBPACK_IMPORTED_MODULE_1__/* .toTabFromChromeTab */ .bw)(chromeTab));
-    }
-
-    return result;
-  };
-  /**
-   * Gets tab by id
-   * @param tabId Tab identifier
-   */
-
-
-  const get = async tabId => {
-    try {
-      const chromeTab = await _browser__WEBPACK_IMPORTED_MODULE_0__/* .browser.tabs.get */ .X.tabs.get(tabIdToInt(tabId));
-      return (0,_utils_common__WEBPACK_IMPORTED_MODULE_1__/* .toTabFromChromeTab */ .bw)(chromeTab);
-    } catch (e) {
-      logOperationError('Get tab', e);
-    }
-  };
-  /**
-   * Updates tab url
-   * @param {number} tabId
-   * @param {string} url
-   */
-
-
-  const updateUrl = async (tabId, url) => {
-    if (tabId === 0) {
-      return;
-    }
-
-    try {
-      await _browser__WEBPACK_IMPORTED_MODULE_0__/* .browser.tabs.update */ .X.tabs.update(tabId, {
-        url
-      });
-    } catch (e) {
-      _common_log__WEBPACK_IMPORTED_MODULE_4__/* .log.error */ .c.error(new Error(e.message));
-    }
-  };
-  /**
-   * True if `browser.tabs.insertCSS` supports `cssOrigin: "user"`.
-   */
-
-
-  let userCSSSupport = true;
-  /**
-   * Inserts CSS using the `browser.tabs.insertCSS` under the hood.
-   * This method always injects CSS using `runAt: document_start`/
-   *
-   * @param {number} tabId Tab id or null if you want to inject into the active tab
-   * @param {number} requestFrameId Target frame id (CSS will be inserted into that frame)
-   * @param {number} code CSS code to insert
-   */
-
-  const insertCssCode = !_browser__WEBPACK_IMPORTED_MODULE_0__/* .browser.tabs.insertCSS */ .X.tabs.insertCSS ? undefined : async (tabId, requestFrameId, code) => {
-    const injectDetails = {
-      code,
-      runAt: 'document_start',
-      frameId: requestFrameId,
-      matchAboutBlank: true
-    };
-
-    if (userCSSSupport) {
-      // If this is set for not supporting browser, it will throw an error.
-      injectDetails.cssOrigin = 'user';
-    }
-
-    try {
-      await _browser__WEBPACK_IMPORTED_MODULE_0__/* .browser.tabs.insertCSS */ .X.tabs.insertCSS(tabId, injectDetails);
-    } catch (e) {
-      // e.message in edge is undefined
-      const errorMessage = e.message || e; // Some browsers do not support user css origin // TODO which one?
-
-      if (/\bcssOrigin\b/.test(errorMessage)) {
-        userCSSSupport = false;
-      }
-    }
-  };
-  /**
-   * Executes the specified JS code using `browser.tabs.executeScript` under the hood.
-   * This method forces `runAt: document_start`.
-   *
-   * @param {number} tabId Tab id or null if you want to inject into the active tab
-   * @param {requestFrameId} requestFrameId Target frame id (script will be injected into that frame)
-   * @param {requestFrameId} code Javascript code to execute
-   */
-
-  const executeScriptCode = !_browser__WEBPACK_IMPORTED_MODULE_0__/* .browser.tabs.executeScript */ .X.tabs.executeScript ? undefined : async (tabId, requestFrameId, code) => {
-    try {
-      await _browser__WEBPACK_IMPORTED_MODULE_0__/* .browser.tabs.executeScript */ .X.tabs.executeScript(tabId, {
-        code,
-        frameId: requestFrameId,
-        runAt: 'document_start',
-        matchAboutBlank: true
-      });
-    } catch (e) {
-      _common_log__WEBPACK_IMPORTED_MODULE_4__/* .log.debug */ .c.debug(new Error(e.message));
-    }
-  };
-  /**
-   * Executes the specified javascript file in the top frame of the specified tab.
-   * This method forces `runAt: document_start`.
-   *
-   * @param {number} tabId Tab id or null if you want to inject into the active tab
-   * @param {Object} options
-   * @param {string} options.file - Path to the javascript file
-   * @param {number} [options.frameId=0] - id of the frame, default to the 0;
-   * @param {function} callback Called when the script injection is complete
-   */
-
-  const executeScriptFile = !_browser__WEBPACK_IMPORTED_MODULE_0__/* .browser.tabs.executeScript */ .X.tabs.executeScript ? undefined : async (tabId, options) => {
-    const {
-      file,
-      frameId = 0
-    } = options;
-    const executeScriptOptions = {
-      file,
-      runAt: 'document_start'
-    }; // Chrome 49 throws an exception if browser.tabs.executeScript is called
-    // with a frameId equal to 0
-
-    if (frameId !== 0) {
-      executeScriptOptions.frameId = frameId;
-    }
-
-    try {
-      await _browser__WEBPACK_IMPORTED_MODULE_0__/* .browser.tabs.executeScript */ .X.tabs.executeScript(tabId, executeScriptOptions);
-    } catch (e) {
-      _common_log__WEBPACK_IMPORTED_MODULE_4__/* .log.debug */ .c.debug(new Error(e.message));
-    }
-  };
-  return {
-    onCreated: onCreatedChannel,
-    onRemoved: onRemovedChannel,
-    onUpdated: onUpdatedChannel,
-    onActivated: onActivatedChannel,
-    create,
-    remove,
-    activate,
-    reload,
-    sendMessage,
-    getAll,
-    getActive,
-    get,
-    updateUrl,
-    insertCssCode,
-    executeScriptCode,
-    executeScriptFile
-  };
-}();
-
-/***/ }),
-
-/***/ 5802:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "x": () => (/* binding */ patchWindows)
-/* harmony export */ });
-/* eslint-disable no-unused-vars */
-
-/**
- * This function patches if necessary browser.windows implementation for Firefox for Android
- */
-const patchWindows = function (browser) {
-  // Make compatible with Android WebExt
-  if (typeof browser.windows === 'undefined') {
-    browser.windows = function () {
-      const defaultWindow = {
-        id: 1,
-        type: 'normal'
-      };
-      const emptyListener = {
-        addListener() {// Doing nothing
-        }
-
-      };
-
-      const create = function (createData) {
-        return Promise.resolve(defaultWindow);
-      };
-
-      const update = function (windowId, data) {
-        return Promise.resolve();
-      };
-
-      const getAll = function (query) {
-        return Promise.resolve(defaultWindow);
-      };
-
-      const getLastFocused = function () {
-        return Promise.resolve(defaultWindow);
-      };
-
-      return {
-        onCreated: emptyListener,
-        onRemoved: emptyListener,
-        onFocusChanged: emptyListener,
-        create,
-        update,
-        getAll,
-        getLastFocused
-      };
-    }();
-  }
-};
-
-/***/ }),
-
-/***/ 4847:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "D": () => (/* binding */ prefs)
-/* harmony export */ });
-/* harmony import */ var _extension_api_browser__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2273);
-/* harmony import */ var _utils_lazy__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(1255);
-/**
- * This file is part of Adguard Browser Extension (https://github.com/AdguardTeam/AdguardBrowserExtension).
- *
- * Adguard Browser Extension is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Adguard Browser Extension is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
- */
-
-
-/**
- * Extension global preferences.
- */
-
-const prefs = (() => {
-  const Prefs = {
-    get mobile() {
-      return (0,_utils_lazy__WEBPACK_IMPORTED_MODULE_1__/* .lazyGet */ .$)(Prefs, 'mobile', () => navigator.userAgent.indexOf('Android') >= 0);
-    },
-
-    get platform() {
-      return (0,_utils_lazy__WEBPACK_IMPORTED_MODULE_1__/* .lazyGet */ .$)(Prefs, 'platform', () => window.browser ? 'firefox' : 'chromium');
-    },
-
-    get browser() {
-      return (0,_utils_lazy__WEBPACK_IMPORTED_MODULE_1__/* .lazyGet */ .$)(Prefs, 'browser', () => {
-        let browser;
-        let {
-          userAgent
-        } = navigator;
-        userAgent = userAgent.toLowerCase();
-
-        if (userAgent.indexOf('yabrowser') >= 0) {
-          browser = 'YaBrowser';
-        } else if (userAgent.indexOf('edge') >= 0) {
-          browser = 'Edge';
-        } else if (userAgent.indexOf('edg') >= 0) {
-          browser = 'EdgeChromium';
-        } else if (userAgent.indexOf('opera') >= 0 || userAgent.indexOf('opr') >= 0) {
-          browser = 'Opera';
-        } else if (userAgent.indexOf('firefox') >= 0) {
-          browser = 'Firefox';
-        } else {
-          browser = 'Chrome';
-        }
-
-        return browser;
-      });
-    },
-
-    get chromeVersion() {
-      return (0,_utils_lazy__WEBPACK_IMPORTED_MODULE_1__/* .lazyGet */ .$)(Prefs, 'chromeVersion', () => {
-        const match = /\sChrome\/(\d+)\./.exec(navigator.userAgent);
-        return match === null ? null : Number.parseInt(match[1], 10);
-      });
-    },
-
-    get firefoxVersion() {
-      return (0,_utils_lazy__WEBPACK_IMPORTED_MODULE_1__/* .lazyGet */ .$)(Prefs, 'firefoxVersion', () => {
-        const match = /\sFirefox\/(\d+)\./.exec(navigator.userAgent);
-        return match === null ? null : Number.parseInt(match[1], 10);
-      });
-    },
-
-    /**
-     * https://msdn.microsoft.com/ru-ru/library/hh869301(v=vs.85).aspx
-     * @returns {*}
-     */
-    get edgeVersion() {
-      return (0,_utils_lazy__WEBPACK_IMPORTED_MODULE_1__/* .lazyGet */ .$)(Prefs, 'edgeVersion', function () {
-        if (this.browser === 'Edge') {
-          const {
-            userAgent
-          } = navigator;
-          const i = userAgent.indexOf('Edge/');
-
-          if (i < 0) {
-            return {
-              rev: 0,
-              build: 0
-            };
-          }
-
-          const version = userAgent.substring(i + 'Edge/'.length);
-          const parts = version.split('.');
-          return {
-            rev: Number.parseInt(parts[0], 10),
-            build: Number.parseInt(parts[1], 10)
-          };
-        }
-      });
-    },
-
-    /**
-     * Makes sense in case of FF add-on only
-     */
-    speedupStartup() {
-      return false;
-    },
-
-    get ICONS() {
-      return (0,_utils_lazy__WEBPACK_IMPORTED_MODULE_1__/* .lazyGet */ .$)(Prefs, 'ICONS', () => ({
-        ICON_GREEN: {
-          '19': _extension_api_browser__WEBPACK_IMPORTED_MODULE_0__/* .browser.runtime.getURL */ .X.runtime.getURL('assets/icons/green-19.png'),
-          '38': _extension_api_browser__WEBPACK_IMPORTED_MODULE_0__/* .browser.runtime.getURL */ .X.runtime.getURL('assets/icons/green-38.png')
-        },
-        ICON_GRAY: {
-          '19': _extension_api_browser__WEBPACK_IMPORTED_MODULE_0__/* .browser.runtime.getURL */ .X.runtime.getURL('assets/icons/gray-19.png'),
-          '38': _extension_api_browser__WEBPACK_IMPORTED_MODULE_0__/* .browser.runtime.getURL */ .X.runtime.getURL('assets/icons/gray-38.png')
-        }
-      }));
-    },
-
-    // interval 60 seconds in Firefox is set so big due to excessive IO operations on every storage save
-    // https://github.com/AdguardTeam/AdguardBrowserExtension/issues/1006
-    get statsSaveInterval() {
-      return this.browser === 'Firefox' ? 1000 * 60 : 1000;
-    }
-
-  };
-  /**
-   * Collect browser specific features here
-   */
-
-  Prefs.features = function () {
-    // Get the global extension object (browser for FF, chrome for Chromium)
-    const browser = window.browser || window.chrome;
-    const responseContentFilteringSupported = typeof browser !== 'undefined' && typeof browser.webRequest !== 'undefined' && typeof browser.webRequest.filterResponseData !== 'undefined';
-    const canUseInsertCSSAndExecuteScript = // Blink engine based browsers
-    (Prefs.browser === 'Chrome' || Prefs.browser === 'Opera' || Prefs.browser === 'YaBrowser' || Prefs.browser === 'EdgeChromium' // Support for tabs.insertCSS and tabs.executeScript on chrome
-    // requires chrome version above or equal to 39,
-    // as per documentation: https://developers.chrome.com/extensions/tabs
-    // But due to a bug, it requires version >= 50
-    // https://bugs.chromium.org/p/chromium/issues/detail?id=63979
-    ) && Prefs.chromeVersion >= 50 || Prefs.browser === 'Firefox' && typeof browser !== 'undefined' && typeof browser.tabs !== 'undefined' && typeof browser.tabs.insertCSS !== 'undefined'; // Edge browser does not support `runAt` in options of tabs.insertCSS
-    // and tabs.executeScript
-
-    return {
-      responseContentFilteringSupported,
-      canUseInsertCSSAndExecuteScript,
-      hasBackgroundTab: typeof browser !== 'undefined' // Background requests have sense only in case of webext
-
-    };
-  }();
-
-  return Prefs;
-})();
-
-/***/ }),
-
-/***/ 1315:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "t": () => (/* reexport safe */ _rules_storage_ABSTRACT_BROWSERS___WEBPACK_IMPORTED_MODULE_0__.Z)
-/* harmony export */ });
-/* harmony import */ var _rules_storage_ABSTRACT_BROWSERS___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(7088);
-// !IMPORTANT!
-// './rules-storage.__ABSTRACT_BROWSER__' is replaced during webpack compilation
-// with NormalModuleReplacementPlugin to proper browser implementation
-// './rules-storage.chrome' or ./rules-storage.firefox
-
-
-
-/***/ }),
-
-/***/ 9869:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Z": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var _extension_api_browser__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2273);
-/**
- * This file is part of Adguard Browser Extension (https://github.com/AdguardTeam/AdguardBrowserExtension).
- *
- * Adguard Browser Extension is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Adguard Browser Extension is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
- */
-
-/**
- * Filter rules storage implementation
- */
-
-const chromeRulesStorageImpl = (() => {
-  const read = async path => {
-    const results = await _extension_api_browser__WEBPACK_IMPORTED_MODULE_0__/* .browser.storage.local.get */ .X.storage.local.get(path);
-    let lines = [];
-
-    if (results && results[path] instanceof Array) {
-      lines = results[path];
-    }
-
-    return lines;
-  };
-
-  const write = async (path, data) => {
-    const item = {};
-    item[path] = data;
-    await _extension_api_browser__WEBPACK_IMPORTED_MODULE_0__/* .browser.storage.local.set */ .X.storage.local.set(item);
-  };
-
-  const remove = async path => {
-    await _extension_api_browser__WEBPACK_IMPORTED_MODULE_0__/* .browser.storage.local.remove */ .X.storage.local.remove(path);
-  };
-
-  return {
-    read,
-    write,
-    remove
-  };
-})();
-
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (chromeRulesStorageImpl);
-
-/***/ }),
-
-/***/ 7088:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Z": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var _rules_storage_chrome__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9869);
-/* harmony import */ var _common_log__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(9224);
-/**
- * This file is part of Adguard Browser Extension (https://github.com/AdguardTeam/AdguardBrowserExtension).
- *
- * Adguard Browser Extension is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Adguard Browser Extension is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
- */
-// We use chrome rules storage implementation as fallback as it based on storage.local
-
-
-/**
- * Filter rules storage implementation. Based on the indexedDB
- *
- * We have to use indexedDB instead of browser.storage.local due to some problems with the latest one.
- * browser.storage.local has high memory and disk utilization.
- *
- * https://bugzilla.mozilla.org/show_bug.cgi?id=1371255
- * https://github.com/AdguardTeam/AdguardBrowserExtension/issues/892
- */
-
-const firefoxRulesStorageImpl = function (initialAPI) {
-  const STORAGE_NAME = 'AdguardRulesStorage';
-  let database;
-
-  function onError(error) {
-    _common_log__WEBPACK_IMPORTED_MODULE_1__/* .log.error */ .c.error('Adguard rulesStorage error: {0}', error.error || error);
-  }
-  /**
-   * Gets value from the database by key
-   */
-
-
-  function getFromDatabase(key) {
-    return new Promise((resolve, reject) => {
-      const transaction = database.transaction(STORAGE_NAME);
-      const table = transaction.objectStore(STORAGE_NAME);
-      const request = table.get(key);
-
-      const eventHandler = event => {
-        const request = event.target;
-
-        if (request.error) {
-          reject(request.error);
-          return;
-        }
-
-        let lines = [];
-        const {
-          result
-        } = request;
-
-        if (result && result.value) {
-          lines = result.value.split(/\r?\n/);
-        }
-
-        resolve(lines);
-      };
-
-      request.onsuccess = eventHandler;
-      request.onerror = eventHandler;
-    });
-  }
-  /**
-   * Puts key and value to the database
-   */
-
-
-  function putToDatabase(key, value) {
-    return new Promise((resolve, reject) => {
-      const transaction = database.transaction(STORAGE_NAME, 'readwrite');
-      const table = transaction.objectStore(STORAGE_NAME);
-      const request = table.put({
-        key,
-        value: value.join('\n')
-      });
-
-      const eventHandler = event => {
-        const request = event.target;
-
-        if (request.error) {
-          reject(request.error);
-        } else {
-          resolve();
-        }
-      };
-
-      request.onsuccess = eventHandler;
-      request.onerror = eventHandler;
-    });
-  }
-  /**
-   * Deletes value from the database
-   */
-
-
-  function deleteFromDatabase(key) {
-    return new Promise((resolve, reject) => {
-      const transaction = database.transaction(STORAGE_NAME, 'readwrite');
-      const table = transaction.objectStore(STORAGE_NAME);
-      const request = table.delete(key);
-
-      const eventHandler = event => {
-        const request = event.target;
-
-        if (request.error) {
-          reject(request.error);
-        } else {
-          resolve();
-        }
-      };
-
-      request.onsuccess = eventHandler;
-      request.onerror = eventHandler;
-    });
-  }
-  /**
-   * Read rules
-   * @param path Path to rules
-   */
-
-
-  const read = async path => {
-    const result = await getFromDatabase(path);
-    return result;
-  };
-  /**
-   * Writes rules
-   * @param path Path to rules
-   * @param data Data to write (Array)
-   */
-
-
-  const write = async (path, data) => {
-    await putToDatabase(path, data);
-  };
-  /**
-   * Removes rules
-   * @param path Path to rules
-   */
-
-
-  const remove = async path => {
-    await deleteFromDatabase(path);
-  };
-  /**
-   * We can detect whether IndexedDB was initialized or not only in an async way
-   */
-
-
-  const init = () => new Promise(resolve => {
-    // Failed in private browsing mode.
-    const request = indexedDB.open(STORAGE_NAME, 1);
-
-    request.onupgradeneeded = function (ev) {
-      database = ev.target.result;
-      database.onerror = onError;
-      database.onabort = onError; // DB doesn't exist => creates new storage
-
-      const table = database.createObjectStore(STORAGE_NAME, {
-        keyPath: 'key'
-      });
-      table.createIndex('value', 'value', {
-        unique: false
-      });
-    };
-
-    request.onsuccess = function (ev) {
-      database = ev.target.result;
-      database.onerror = onError;
-      database.onabort = onError;
-      resolve(api);
-    };
-
-    const onRequestError = function () {
-      onError(this.error); // Fallback to the browser.storage API
-
-      resolve(initialAPI);
-    };
-
-    request.onerror = onRequestError;
-    request.onblocked = onRequestError;
-  });
-
-  const api = {
-    read,
-    write,
-    remove,
-    init,
-
-    /**
-     * IndexedDB isn't initialized in the private mode.
-     * In this case we should switch implementation to the browser.storage (see init method)
-     * This flag helps us to understand which implementation is used now (see update-service.js for example)
-     */
-    isIndexedDB: true
-  };
-  return api;
-}(_rules_storage_chrome__WEBPACK_IMPORTED_MODULE_0__/* ["default"] */ .Z);
-
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (firefoxRulesStorageImpl);
-
-/***/ }),
-
-/***/ 7789:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "X": () => (/* binding */ localStorage)
-/* harmony export */ });
-/* unused harmony export rulesStorage */
-/* harmony import */ var _common_log__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9224);
-/* harmony import */ var _utils_local_storage__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(5131);
-/* harmony import */ var _rules_storage__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(1315);
-/**
- * This file is part of Adguard Browser Extension (https://github.com/AdguardTeam/AdguardBrowserExtension).
- *
- * Adguard Browser Extension is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Adguard Browser Extension is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
- */
-
-
-
-/**
- * This class manages local storage
- */
-
-const localStorage = function (localStorageImpl) {
-  const getItem = function (key) {
-    return localStorageImpl.getItem(key);
-  };
-
-  const setItem = function (key, value) {
-    try {
-      localStorageImpl.setItem(key, value);
-    } catch (ex) {
-      _common_log__WEBPACK_IMPORTED_MODULE_0__/* .log.error */ .c.error(`Error while saving item ${key} to the localStorage: ${ex}`);
-    }
-  };
-
-  const removeItem = function (key) {
-    localStorageImpl.removeItem(key);
-  };
-
-  const hasItem = function (key) {
-    return localStorageImpl.hasItem(key);
-  };
-
-  const init = async function () {
-    if (typeof localStorageImpl.init === 'function') {
-      await localStorageImpl.init();
-    }
-  };
-
-  const isInitialized = function () {
-    // WebExtension storage has async initialization
-    if (typeof localStorageImpl.isInitialized === 'function') {
-      return localStorageImpl.isInitialized();
-    }
-
-    return true;
-  };
-
-  return {
-    getItem,
-    setItem,
-    removeItem,
-    hasItem,
-    init,
-    isInitialized
-  };
-}(_utils_local_storage__WEBPACK_IMPORTED_MODULE_1__/* .localStorageImpl */ .i);
-/**
- * This class manages storage for filters.
- */
-
-const rulesStorage = (rulesStorageImpl => {
-  function getFilePath(filterId) {
-    return `filterrules_${filterId}.txt`;
-  }
-  /**
-   * Loads filter from the storage
-   *
-   * @param filterId  Filter identifier
-   */
-
-
-  const read = async filterId => {
-    const filePath = getFilePath(filterId);
-    let rules;
-
-    try {
-      rules = await rulesStorageImpl.read(filePath);
-    } catch (e) {
-      _common_log__WEBPACK_IMPORTED_MODULE_0__/* .log.error */ .c.error(`Error while reading rules from file ${filePath} cause: ${e}`);
-    }
-
-    return rules;
-  };
-  /**
-   * Saves filter rules to storage
-   *
-   * @param filterId      Filter identifier
-   * @param filterRules   Filter rules
-   */
-
-
-  const write = async (filterId, filterRules) => {
-    const filePath = getFilePath(filterId);
-
-    try {
-      await rulesStorageImpl.write(filePath, filterRules);
-    } catch (e) {
-      _common_log__WEBPACK_IMPORTED_MODULE_0__/* .log.error */ .c.error(`Error writing filters to file ${filePath}. Cause: ${e}`);
-    }
-  };
-  /**
-   * Removes filter from storage
-   * @param filterId
-   */
-
-
-  const remove = async filterId => {
-    const filePath = getFilePath(filterId);
-
-    try {
-      await rulesStorageImpl.remove(filePath);
-    } catch (e) {
-      _common_log__WEBPACK_IMPORTED_MODULE_0__/* .log.error */ .c.error(`Error removing filter ${filePath}. Cause: ${e}`);
-    }
-  };
-  /**
-   * IndexedDB implementation of the rules storage requires async initialization.
-   * Also in some cases IndexedDB isn't supported, so we have to replace implementation
-   * with the browser.storage
-   */
-
-
-  const init = async () => {
-    if (typeof rulesStorageImpl.init === 'function') {
-      const api = await rulesStorageImpl.init();
-      rulesStorageImpl = api;
-    }
-  };
-
-  return {
-    read,
-    write,
-    remove,
-    init
-  };
-})(_rules_storage__WEBPACK_IMPORTED_MODULE_2__/* .rulesStorageImpl */ .t);
-
-/***/ }),
-
-/***/ 6458:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "n": () => (/* binding */ tabsApi)
-/* harmony export */ });
-/* harmony import */ var _utils_common__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5088);
-/* harmony import */ var _extension_api_tabs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(4879);
-/**
- * This file is part of Adguard Browser Extension (https://github.com/AdguardTeam/AdguardBrowserExtension).
- *
- * Adguard Browser Extension is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Adguard Browser Extension is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
- */
-
-
-
-const tabsApi = (tabsImpl => {
-  const tabs = Object.create(null); // Fired when a tab is created. Note that the tab's URL may not be set at the time
-  // this event fired, but you can listen to onUpdated events to be notified when a URL is set.
-
-  const onCreatedChannel = _utils_common__WEBPACK_IMPORTED_MODULE_0__/* .utils.channels.newChannel */ .P6.channels.newChannel(); // Fired when a tab is closed.
-
-  const onRemovedChannel = _utils_common__WEBPACK_IMPORTED_MODULE_0__/* .utils.channels.newChannel */ .P6.channels.newChannel(); // Fired when a tab is updated.
-
-  const onUpdatedChannel = _utils_common__WEBPACK_IMPORTED_MODULE_0__/* .utils.channels.newChannel */ .P6.channels.newChannel(); // Fires when the active tab in a window changes.
-
-  const onActivatedChannel = _utils_common__WEBPACK_IMPORTED_MODULE_0__/* .utils.channels.newChannel */ .P6.channels.newChannel();
-  /**
-   * Saves tab to collection and notify listeners
-   * @param aTab
-   */
-
-  function onTabCreated(aTab) {
-    const tab = tabs[aTab.tabId];
-
-    if (tab) {
-      // Tab has been already synchronized
-      return;
-    }
-
-    tabs[aTab.tabId] = aTab;
-    onCreatedChannel.notify(aTab);
-  } // Synchronize opened tabs
-
-
-  (async () => {
-    const aTabs = await tabsImpl.getAll();
-
-    for (let i = 0; i < aTabs.length; i += 1) {
-      const aTab = aTabs[i];
-      tabs[aTab.tabId] = aTab;
-    }
-  })();
-
-  tabsImpl.onCreated.addListener(onTabCreated);
-  tabsImpl.onRemoved.addListener(tabId => {
-    const tab = tabs[tabId];
-
-    if (tab) {
-      onRemovedChannel.notify(tab);
-      delete tabs[tabId];
-    }
-  });
-  tabsImpl.onUpdated.addListener(aTab => {
-    const tab = tabs[aTab.tabId];
-
-    if (tab) {
-      tab.url = aTab.url;
-      tab.title = aTab.title;
-      tab.status = aTab.status; // If the tab was updated it means that it wasn't used to send requests in the background
-
-      tab.synthetic = false;
-      onUpdatedChannel.notify(tab);
-    }
-  });
-  tabsImpl.onActivated.addListener(tabId => {
-    const tab = tabs[tabId];
-
-    if (tab) {
-      onActivatedChannel.notify(tab);
-    }
-  }); // --------- Actions ---------
-  // Creates a new tab.
-
-  const create = async details => {
-    return tabsImpl.create(details);
-  }; // Closes tab.
-
-
-  const remove = async tabId => {
-    return tabsImpl.remove(tabId);
-  }; // Activates tab (Also makes tab's window in focus).
-
-
-  const activate = function (tabId) {
-    return tabsImpl.activate(tabId);
-  }; // Reloads tab.
-
-
-  const reload = async (tabId, url) => {
-    await tabsImpl.reload(tabId, url);
-  }; // Updates tab url
-
-
-  const updateUrl = (tabId, url) => {
-    tabsImpl.updateUrl(tabId, url);
-  }; // Sends message to tab
-
-
-  const sendMessage = function (tabId, message, options) {
-    return tabsImpl.sendMessage(tabId, message, options);
-  };
-  /**
-   * Sometimes chrome does not return url and title on tab update events,
-   * but returns tabs with urls when tabs are requested by tabs api
-   * That is why during getting tabs we sync their urls with actual values
-   */
-
-
-  const syncTabs = (targetTabs, actualTab) => {
-    const {
-      tabId
-    } = actualTab;
-    const tab = targetTabs[tabId];
-
-    if (!tab) {
-      targetTabs[tabId] = actualTab;
-      return actualTab;
-    }
-
-    if (!tab.url && actualTab.url) {
-      tab.url = actualTab.url;
-    }
-
-    if (!tab.title && actualTab.title) {
-      tab.title = actualTab.title;
-    } // update tab state in the target tabs array
-
-
-    targetTabs[tabId] = tab;
-    return tab;
-  }; // Gets all opened tabs
-
-
-  const getAll = async () => {
-    const aTabs = await tabsImpl.getAll();
-    const result = [];
-
-    for (let i = 0; i < aTabs.length; i += 1) {
-      const aTab = aTabs[i];
-      const tab = syncTabs(tabs, aTab);
-      result.push(tab);
-    }
-
-    return result;
-  }; // Calls callback with each tab
-
-
-  const forEach = function (callback) {
+  const {
+    pathname
+  } = useLocation();
+  const {
+    settingsStore
+  } = react.useContext(rootStore);
+  const {
+    ErrorBoundary,
+    didCatch,
+    error
+  } = a();
+  const {
+    getPopupData,
+    updateBlockedStats
+  } = react.useContext(popupStore);
+  const {
+    settings
+  } = settingsStore;
+  const key = settings === null || settings === void 0 ? void 0 : (_settings$names = settings.names) === null || _settings$names === void 0 ? void 0 : _settings$names.DISABLE_COLLECT_HITS;
+  const disableCollectHit = key ? (settings === null || settings === void 0 ? void 0 : settings.values[key]) || false : false;
+  react.useEffect(() => {
     (async () => {
-      const aTabs = await tabsImpl.getAll();
-
-      for (let i = 0; i < aTabs.length; i += 1) {
-        const aTab = aTabs[i];
-        let tab = tabs[aTab.tabId];
-
-        if (!tab) {
-          // Synchronize state
-          tabs[aTab.tabId] = aTab;
-          tab = aTab;
-        }
-
-        callback(tab);
-      }
+      await getPopupData();
     })();
-  }; // Gets active tab
+  }, [getPopupData]);
+  react.useEffect(() => {
+    var _window, _window$apm;
 
+    if (!pathname) return;
+    const transaction = (_window = window) === null || _window === void 0 ? void 0 : (_window$apm = _window.apm) === null || _window$apm === void 0 ? void 0 : _window$apm.startTransaction(`popup-navigate-${pathname.replace('/', '')}`);
 
-  const getActive = async tabId => {
-    if (!tabId) {
-      tabId = await tabsImpl.getActive();
+    if (transaction) {
+      transaction.result = 'success';
+      transaction.end();
     }
-
-    if (!tabId) {
-      return null;
-    }
-
-    let tab = tabs[tabId];
-
-    if (tab) {
-      if (!tab.url || !tab.title) {
-        const aTab = await tabsImpl.get(tabId);
-
-        if (aTab) {
-          syncTabs(tabs, aTab);
-        }
-      }
-
-      return tab;
-    } // Tab not found in the local state, but we are sure that this tab exists. Sync...
-    // TODO[Edge]: Relates to Edge Bug https://github.com/AdguardTeam/AdguardBrowserExtension/issues/481
-
-
-    tab = await tabsImpl.get(tabId);
-    onTabCreated(tab);
-    return tab;
-  };
-
-  const isIncognito = function (tabId) {
-    const tab = tabs[tabId];
-    return tab && tab.incognito === true;
-  }; // Records tab's frame
-
-
-  const recordTabFrame = function (tabId, frameId, url, domainName) {
-    let tab = tabs[tabId];
-
-    if (!tab && frameId === 0) {
-      // Sync tab for that 'onCreated' event was missed.
-      // https://github.com/AdguardTeam/AdguardBrowserExtension/issues/481
-      tab = {
-        tabId,
-        url,
-        status: 'loading',
-        // We mark this tabs as synthetic because actually they may not exists
-        synthetic: true
-      };
-      onTabCreated(tab);
-    }
-
-    if (tab) {
-      if (!tab.frames) {
-        tab.frames = Object.create(null);
-      }
-
-      tab.frames[frameId] = {
-        url,
-        domainName
-      };
-    }
-  };
-
-  const clearTabFrames = function (tabId) {
-    const tab = tabs[tabId];
-
-    if (tab) {
-      tab.frames = null;
-    }
-  }; // Gets tab's frame by id
-
-
-  const getTabFrame = function (tabId, frameId) {
-    const tab = tabs[tabId];
-
-    if (tab && tab.frames) {
-      return tab.frames[frameId || 0];
-    }
-
-    return null;
-  };
-  /**
-   * Checks if the tab is new tab for popup or not
-   * May be false positive for FF at least because new tab url in FF is "about:blank" too
-   * @param tabId
-   * @returns {boolean}
-   */
-
-
-  const isNewPopupTab = tabId => {
-    const tab = tabs[tabId];
-
-    if (!tab) {
-      return false;
-    }
-
-    return !!(tab.url === '' || tab.url === 'about:blank');
-  }; // Update tab metadata
-
-
-  const updateTabMetadata = function (tabId, values) {
-    const tab = tabs[tabId];
-
-    if (tab) {
-      if (!tab.metadata) {
-        tab.metadata = Object.create(null);
-      } // eslint-disable-next-line no-restricted-syntax
-
-
-      for (const key in values) {
-        if (values.hasOwnProperty && values.hasOwnProperty(key)) {
-          tab.metadata[key] = values[key];
-        }
-      }
-    }
-  }; // Gets tab metadata
-
-
-  const getTabMetadata = (tabId, key) => {
-    const tab = tabs[tabId];
-
-    if (tab && tab.metadata) {
-      return tab.metadata[key];
-    }
-
-    return null;
-  };
-
-  const clearTabMetadata = tabId => {
-    const tab = tabs[tabId];
-
-    if (tab) {
-      tab.metadata = null;
-    }
-  }; // Injecting resources to tabs
-
-
-  const {
-    insertCssCode
-  } = tabsImpl;
-  const {
-    executeScriptCode
-  } = tabsImpl;
-  const {
-    executeScriptFile
-  } = tabsImpl;
-  return {
-    // Events
-    onCreated: onCreatedChannel,
-    onRemoved: onRemovedChannel,
-    onUpdated: onUpdatedChannel,
-    onActivated: onActivatedChannel,
-    // Actions
-    create,
-    remove,
-    activate,
-    reload,
-    sendMessage,
-    getAll,
-    forEach,
-    getActive,
-    isIncognito,
-    updateUrl,
-    // Frames
-    recordTabFrame,
-    clearTabFrames,
-    getTabFrame,
-    isNewPopupTab,
-    // Other
-    updateTabMetadata,
-    getTabMetadata,
-    clearTabMetadata,
-    insertCssCode,
-    executeScriptCode,
-    executeScriptFile
-  };
-})(_extension_api_tabs__WEBPACK_IMPORTED_MODULE_1__/* .tabsImpl */ .W);
-
-
-
-/***/ }),
-
-/***/ 1654:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "z": () => (/* binding */ browserUtils)
-/* harmony export */ });
-/* harmony import */ var _prefs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(4847);
-/* harmony import */ var _storage__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(7789);
-/* harmony import */ var _collections__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(4118);
-/* harmony import */ var _tabs_tabs_api__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(6458);
-/* harmony import */ var _extension_api_background_page__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(736);
-/* harmony import */ var _extension_api_browser__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(2273);
-/**
- * This file is part of Adguard Browser Extension (https://github.com/AdguardTeam/AdguardBrowserExtension).
- *
- * Adguard Browser Extension is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Adguard Browser Extension is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
- */
-
-
-
-
-
-
-const browserUtils = function () {
-  /**
-   * Extension version (x.x.x)
-   * @param version
-   * @constructor
-   */
-  const Version = function (version) {
-    this.version = Object.create(null);
-    const parts = String(version || '').split('.');
-
-    function parseVersionPart(part) {
-      if (Number.isNaN(part)) {
-        return 0;
-      }
-
-      return Math.max(part - 0, 0);
-    }
-
-    for (let i = 3; i >= 0; i -= 1) {
-      this.version[i] = parseVersionPart(parts[i]);
-    }
-  };
-  /**
-   * Compares with other version
-   * @param o
-   * @returns {number}
-   */
-
-
-  Version.prototype.compare = function (o) {
-    for (let i = 0; i < 4; i += 1) {
-      if (this.version[i] > o.version[i]) {
-        return 1;
-      }
-
-      if (this.version[i] < o.version[i]) {
-        return -1;
-      }
-    }
-
-    return 0;
-  };
-
-  const browserUtils = {
-    /**
-     * Checks if version matches simple (without labels) semantic versioning scheme
-     * https://semver.org/
-     * @param {string} version
-     * @return {boolean}
-     */
-    isSemver(version) {
-      const semverRegex = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/;
-      return semverRegex.test(version);
-    },
-
-    /**
-     * Checks if left version is greater than the right version
-     */
-    isGreaterVersion(leftVersion, rightVersion) {
-      const left = new Version(leftVersion);
-      const right = new Version(rightVersion);
-      return left.compare(right) > 0;
-    },
-
-    isGreaterOrEqualsVersion(leftVersion, rightVersion) {
-      const left = new Version(leftVersion);
-      const right = new Version(rightVersion);
-      return left.compare(right) >= 0;
-    },
-
-    /**
-     * Returns major number of version
-     *
-     * @param version
-     */
-    getMajorVersionNumber(version) {
-      const v = new Version(version);
-      return v.version[0];
-    },
-
-    /**
-     * Returns minor number of version
-     *
-     * @param version
-     */
-    getMinorVersionNumber(version) {
-      const v = new Version(version);
-      return v.version[1];
-    },
-
-    /**
-     * @returns Extension version
-     */
-    getAppVersion() {
-      return _storage__WEBPACK_IMPORTED_MODULE_1__/* .localStorage.getItem */ .X.getItem('app-version');
-    },
-
-    setAppVersion(version) {
-      _storage__WEBPACK_IMPORTED_MODULE_1__/* .localStorage.setItem */ .X.setItem('app-version', version);
-    },
-
-    isYaBrowser() {
-      return _prefs__WEBPACK_IMPORTED_MODULE_0__/* .prefs.browser */ .D.browser === 'YaBrowser';
-    },
-
-    isOperaBrowser() {
-      return _prefs__WEBPACK_IMPORTED_MODULE_0__/* .prefs.browser */ .D.browser === 'Opera';
-    },
-
-    isEdgeBrowser() {
-      return _prefs__WEBPACK_IMPORTED_MODULE_0__/* .prefs.browser */ .D.browser === 'Edge';
-    },
-
-    isEdgeChromiumBrowser() {
-      return _prefs__WEBPACK_IMPORTED_MODULE_0__/* .prefs.browser */ .D.browser === 'EdgeChromium';
-    },
-
-    isFirefoxBrowser() {
-      return _prefs__WEBPACK_IMPORTED_MODULE_0__/* .prefs.browser */ .D.browser === 'Firefox';
-    },
-
-    isChromeBrowser() {
-      return _prefs__WEBPACK_IMPORTED_MODULE_0__/* .prefs.browser */ .D.browser === 'Chrome';
-    },
-
-    isChromium() {
-      return _prefs__WEBPACK_IMPORTED_MODULE_0__/* .prefs.platform */ .D.platform === 'chromium';
-    },
-
-    isWindowsOs() {
-      return navigator.userAgent.toLowerCase().indexOf('win') >= 0;
-    },
-
-    isMacOs() {
-      return navigator.platform.toUpperCase().indexOf('MAC') >= 0;
-    },
-
-    getBrowser() {
-      return _prefs__WEBPACK_IMPORTED_MODULE_0__/* .prefs.browser */ .D.browser;
-    },
-
-    getPlatform() {
-      return _prefs__WEBPACK_IMPORTED_MODULE_0__/* .prefs.platform */ .D.platform;
-    },
-
-    /**
-     * Finds header object by header name (case insensitive)
-     * @param headers Headers collection
-     * @param headerName Header name
-     * @returns {*}
-     */
-    findHeaderByName(headers, headerName) {
-      if (headers) {
-        for (let i = 0; i < headers.length; i += 1) {
-          const header = headers[i];
-
-          if (header.name.toLowerCase() === headerName.toLowerCase()) {
-            return header;
+  }, [pathname]); // subscribe to stats change
+
+  react.useEffect(() => {
+    const messageHandler = message => {
+      switch (message.type) {
+        case 'updateTotalBlocked':
+          {
+            const {
+              tabInfo
+            } = message;
+            updateBlockedStats(tabInfo);
+            break;
           }
-        }
+
+        default:
+          break;
       }
-
-      return null;
-    },
-
-    /**
-     * Finds header value by name (case insensitive)
-     * @param headers Headers collection
-     * @param headerName Header name
-     * @returns {null}
-     */
-    getHeaderValueByName(headers, headerName) {
-      const header = this.findHeaderByName(headers, headerName);
-      return header ? header.value : null;
-    },
-
-    /**
-     * Set header value. Only for Chrome
-     * @param headers
-     * @param headerName
-     * @param headerValue
-     */
-    setHeaderValue(headers, headerName, headerValue) {
-      if (!headers) {
-        headers = [];
-      }
-
-      const header = this.findHeaderByName(headers, headerName);
-
-      if (header) {
-        header.value = headerValue;
-      } else {
-        headers.push({
-          name: headerName,
-          value: headerValue
-        });
-      }
-
-      return headers;
-    },
-
-    /**
-     * Removes header from headers by name
-     *
-     * @param {Array} headers
-     * @param {String} headerName
-     * @return {boolean} True if header were removed
-     */
-    removeHeader(headers, headerName) {
-      let removed = false;
-
-      if (headers) {
-        for (let i = headers.length - 1; i >= 0; i -= 1) {
-          const header = headers[i];
-
-          if (header.name.toLowerCase() === headerName.toLowerCase()) {
-            headers.splice(i, 1);
-            removed = true;
-          }
-        }
-      }
-
-      return removed;
-    },
-
-    getSafebrowsingBackUrl(tab) {
-      // https://code.google.com/p/chromium/issues/detail?id=11854
-      const previousUrl = _tabs_tabs_api__WEBPACK_IMPORTED_MODULE_3__/* .tabsApi.getTabMetadata */ .n.getTabMetadata(tab.tabId, 'previousUrl');
-
-      if (previousUrl && previousUrl.indexOf('http') === 0) {
-        return previousUrl;
-      }
-
-      const referrerUrl = _tabs_tabs_api__WEBPACK_IMPORTED_MODULE_3__/* .tabsApi.getTabMetadata */ .n.getTabMetadata(tab.tabId, 'referrerUrl');
-
-      if (referrerUrl && referrerUrl.indexOf('http') === 0) {
-        return referrerUrl;
-      }
-
-      return 'about:newtab';
-    },
-
-    /**
-     * Retrieve languages from navigator
-     * @param {number} [limit] Limit of preferred languages
-     * @returns {Array}
-     */
-    getNavigatorLanguages(limit) {
-      let languages = []; // https://developer.mozilla.org/ru/docs/Web/API/NavigatorLanguage/languages
-
-      if (_collections__WEBPACK_IMPORTED_MODULE_2__/* .collections.isArray */ .s.isArray(navigator.languages)) {
-        // get all languages if 'limit' is not specified
-        const langLimit = limit || navigator.languages.length;
-        languages = navigator.languages.slice(0, langLimit);
-      } else if (navigator.language) {
-        languages.push(navigator.language); // .language is first in .languages
-      }
-
-      return languages;
-    },
-
-    /**
-     * Affected issues:
-     * https://github.com/AdguardTeam/AdguardBrowserExtension/issues/602
-     * https://github.com/AdguardTeam/AdguardBrowserExtension/issues/566
-     * 'Popup' window
-     * Creators update is not yet released, so we use Insider build 15063 instead.
-     */
-    EDGE_CREATORS_UPDATE: 15063,
-
-    isEdgeBeforeCreatorsUpdate() {
-      return this.isEdgeBrowser() && _prefs__WEBPACK_IMPORTED_MODULE_0__/* .prefs.edgeVersion.build */ .D.edgeVersion.build < this.EDGE_CREATORS_UPDATE;
-    },
-
-    /**
-     * Returns extension params: clientId, version and locale
-     */
-    getExtensionParams() {
-      const locale = encodeURIComponent(_extension_api_background_page__WEBPACK_IMPORTED_MODULE_4__/* .backgroundPage.app.getLocale */ .$.app.getLocale());
-      const version = encodeURIComponent(_extension_api_background_page__WEBPACK_IMPORTED_MODULE_4__/* .backgroundPage.app.getVersion */ .$.app.getVersion());
-      const id = encodeURIComponent(_extension_api_background_page__WEBPACK_IMPORTED_MODULE_4__/* .backgroundPage.app.getId */ .$.app.getId());
-      const params = [];
-      params.push(`v=${version}`);
-      params.push(`lang=${locale}`);
-      params.push(`id=${id}`);
-      return params;
-    },
-
-    /**
-     * @typedef PermissionsObj
-     * A Permissions object represents a collection of permissions
-     * https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/permissions/Permissions
-     * @property {Array<string>} permissions
-     * @property {Array<string>} [origins]
-     */
-
-    /**
-     * Checks if extension has required permissions
-     * @param {PermissionsObj} permissions
-     * @returns {Promise<boolean>}
-     */
-    containsPermissions: permissions => {
-      return _extension_api_browser__WEBPACK_IMPORTED_MODULE_5__/* .browser.permissions.contains */ .X.permissions.contains(permissions);
-    },
-
-    /**
-     * Requests required permissions
-     * @param {PermissionsObj} permissions
-     * @returns {Promise<boolean>}
-     */
-    requestPermissions: permissions => {
-      return _extension_api_browser__WEBPACK_IMPORTED_MODULE_5__/* .browser.permissions.request */ .X.permissions.request(permissions);
-    },
-
-    /**
-     * Removes required permissions
-     * @param {PermissionsObj} permissions
-     * @returns {Promise<boolean>}
-     */
-    removePermission: permissions => {
-      return _extension_api_browser__WEBPACK_IMPORTED_MODULE_5__/* .browser.permissions.remove */ .X.permissions.remove(permissions);
-    }
-  };
-  return browserUtils;
-}();
-
-/***/ }),
-
-/***/ 8098:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Z": () => (/* binding */ channels)
-/* harmony export */ });
-/* eslint-disable prefer-rest-params */
-
-/**
- * Simple publish-subscribe implementation
- */
-const channels = (() => {
-  const EventChannels = (() => {
-    const EventChannel = function () {
-      let listeners = null;
-      let listenerCallback = null;
-
-      const addListener = function (callback) {
-        if (typeof callback !== 'function') {
-          throw new Error('Illegal callback');
-        }
-
-        if (listeners !== null) {
-          listeners.push(callback);
-          return;
-        }
-
-        if (listenerCallback !== null) {
-          listeners = [];
-          listeners.push(listenerCallback);
-          listeners.push(callback);
-          listenerCallback = null;
-        } else {
-          listenerCallback = callback;
-        }
-      };
-
-      const removeListener = function (callback) {
-        if (listenerCallback !== null) {
-          listenerCallback = null;
-        } else {
-          const index = listeners.indexOf(callback);
-
-          if (index >= 0) {
-            listeners.splice(index, 1);
-          }
-        }
-      };
-
-      const notify = function () {
-        if (listenerCallback !== null) {
-          return listenerCallback.apply(listenerCallback, arguments);
-        }
-
-        if (listeners !== null) {
-          for (let i = 0; i < listeners.length; i += 1) {
-            const listener = listeners[i];
-            listener.apply(listener, arguments);
-          }
-        }
-      };
-
-      const notifyInReverseOrder = function () {
-        if (listenerCallback !== null) {
-          return listenerCallback.apply(listenerCallback, arguments);
-        }
-
-        if (listeners !== null) {
-          for (let i = listeners.length - 1; i >= 0; i -= 1) {
-            const listener = listeners[i];
-            listener.apply(listener, arguments);
-          }
-        }
-      };
-
-      return {
-        addListener,
-        removeListener,
-        notify,
-        notifyInReverseOrder
-      };
     };
 
-    const namedChannels = Object.create(null);
-
-    const newChannel = function () {
-      return new EventChannel();
+    messenger/* messenger.onMessage.addListener */.d.onMessage.addListener(messageHandler);
+    return () => {
+      messenger/* messenger.onMessage.removeListener */.d.onMessage.removeListener(messageHandler);
     };
-
-    const newNamedChannel = function (name) {
-      const channel = newChannel();
-      namedChannels[name] = channel;
-      return channel;
-    };
-
-    const getNamedChannel = function (name) {
-      return namedChannels[name];
-    };
-
-    return {
-      newChannel,
-      newNamedChannel,
-      getNamedChannel
-    };
-  })();
-
-  return EventChannels;
-})();
-
-/***/ }),
-
-/***/ 4118:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "s": () => (/* binding */ collections)
-/* harmony export */ });
-/**
- * Util class for work with collections
- */
-const collections = (() => {
-  const CollectionUtils = {
-    remove(collection, element) {
-      if (!element || !collection) {
-        return;
-      }
-
-      const index = collection.indexOf(element);
-
-      if (index >= 0) {
-        collection.splice(index, 1);
-      }
-    },
-
-    removeAll(collection, element) {
-      if (!element || !collection) {
-        return;
-      }
-
-      for (let i = collection.length - 1; i >= 0; i -= 1) {
-        if (collection[i] === element) {
-          collection.splice(i, 1);
-        }
-      }
-    },
-
-    /**
-     * Removes elements from collection if predicate returns true
-     * @param collection
-     * @param predicate
-     */
-    removeBy(collection, predicate) {
-      if (!predicate || !collection) {
-        return;
-      }
-
-      for (let i = collection.length - 1; i >= 0; i -= 1) {
-        if (predicate(collection[i])) {
-          collection.splice(i, 1);
-        }
-      }
-    },
-
-    removeRule(collection, rule) {
-      if (!rule || !collection) {
-        return;
-      }
-
-      for (let i = collection.length - 1; i >= 0; i -= 1) {
-        if (rule.getText() === collection[i].getText()) {
-          collection.splice(i, 1);
-        }
-      }
-    },
-
-    removeDuplicates(arr) {
-      if (!arr || arr.length === 1) {
-        return arr;
-      }
-
-      return arr.filter((elem, pos) => arr.indexOf(elem) === pos);
-    },
-
-    getRulesText(collection) {
-      const text = [];
-
-      if (!collection) {
-        return text;
-      }
-
-      for (let i = 0; i < collection.length; i += 1) {
-        text.push(collection[i].getText());
-      }
-
-      return text;
-    },
-
-    /**
-     * Find element in array by property
-     * @param array
-     * @param property
-     * @param value
-     * @returns {*}
-     */
-    find(array, property, value) {
-      if (typeof array.find === 'function') {
-        return array.find(a => a[property] === value);
-      }
-
-      for (let i = 0; i < array.length; i += 1) {
-        const elem = array[i];
-
-        if (elem[property] === value) {
-          return elem;
-        }
-      }
-
-      return null;
-    },
-
-    /**
-     * Checks if specified object is array
-     * We don't use instanceof because it is too slow: http://jsperf.com/instanceof-performance/2
-     * @param obj Object
-     */
-    isArray: Array.isArray || function (obj) {
-      return `${obj}` === '[object Array]';
-    },
-
-    /**
-     * Returns array elements of a, which is not included in b
-     *
-     * @param a
-     * @param b
-     */
-    getArraySubtraction(a, b) {
-      return a.filter(i => b.indexOf(i) < 0);
+  }, [updateBlockedStats]);
+  react.useEffect(() => {
+    if (!disableCollectHit) {
+      apm.init(true);
+    } else {
+      console.warn('APM disabled'); // eslint-disable-line no-console
     }
+  }, [disableCollectHit]);
 
-  };
-  return CollectionUtils;
-})();
+  if (didCatch) {
+    // TODO Handle Error state
+    return /*#__PURE__*/react.createElement("p", null, "Error:", ' ', error.message);
+  }
 
-/***/ }),
-
-/***/ 5088:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "HB": () => (/* binding */ BACKGROUND_TAB_ID),
-/* harmony export */   "P6": () => (/* binding */ utils),
-/* harmony export */   "bw": () => (/* binding */ toTabFromChromeTab)
-/* harmony export */ });
-/* unused harmony exports MAIN_FRAME_ID, unload */
-/* harmony import */ var _common_log__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9224);
-/* harmony import */ var _common_strings__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(9100);
-/* harmony import */ var _dates__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(1572);
-/* harmony import */ var _collections__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(4118);
-/* harmony import */ var _concurrent__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(4225);
-/* harmony import */ var _channels__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(8098);
-/* harmony import */ var _workaround__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(284);
-/* harmony import */ var _i18n__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(2721);
-/* harmony import */ var _filters__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(9272);
-/* harmony import */ var _url__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(2818);
-/**
- * This file is part of Adguard Browser Extension (https://github.com/AdguardTeam/AdguardBrowserExtension).
- *
- * Adguard Browser Extension is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Adguard Browser Extension is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
- */
+  return /*#__PURE__*/react.createElement(ErrorBoundary, null, /*#__PURE__*/react.createElement(MainContainer, null));
+});
+;// CONCATENATED MODULE: ./Extension/src/pages/popup/index.jsx
 
 
 
 
 
-
-
-
-
-
-/**
- * Background tab id in browsers is defined as -1
- */
-
-const BACKGROUND_TAB_ID = -1;
-/**
- * Main frame id is equal to 0
- */
-
-const MAIN_FRAME_ID = 0;
-/**
- * Utilities namespace
- */
-
-const utils = {
-  strings: _common_strings__WEBPACK_IMPORTED_MODULE_1__/* .strings */ .j,
-  dates: _dates__WEBPACK_IMPORTED_MODULE_2__/* .dates */ .p,
-  collections: _collections__WEBPACK_IMPORTED_MODULE_3__/* .collections */ .s,
-  concurrent: _concurrent__WEBPACK_IMPORTED_MODULE_4__/* .concurrent */ .d,
-  channels: _channels__WEBPACK_IMPORTED_MODULE_5__/* .channels */ .Z,
-  workaround: _workaround__WEBPACK_IMPORTED_MODULE_6__/* .workaround */ .c,
-  i18n: _i18n__WEBPACK_IMPORTED_MODULE_7__/* .i18n */ .a,
-  filters: _filters__WEBPACK_IMPORTED_MODULE_8__/* .filters */ .u,
-  url: _url__WEBPACK_IMPORTED_MODULE_9__/* .url */ .H
+const popupPage = {
+  init: () => {
+    document.documentElement.lang = i18n/* i18n.getUILanguage */.a.getUILanguage();
+    react_dom.render( /*#__PURE__*/react.createElement(react.StrictMode, null, /*#__PURE__*/react.createElement(MemoryRouter, {
+      initialEntries: ['/main']
+    }, /*#__PURE__*/react.createElement(Popup, null))), document.getElementById('root'));
+  }
 };
-/**
- * Converts chrome tabs into tabs
- * https://developer.chrome.com/extensions/tabs#type-Tab
- * @param chromeTab
- * @returns tab
- */
+;// CONCATENATED MODULE: ./Extension/pages/popup/index.js
 
-function toTabFromChromeTab(chromeTab) {
-  return {
-    tabId: chromeTab.id,
-    url: chromeTab.url,
-    title: chromeTab.title,
-    incognito: chromeTab.incognito,
-    status: chromeTab.status
-  };
-}
-/**
- * Unload handler. When extension is unload then 'fireUnload' is invoked.
- * You can add own handler with method 'when'
- * @type {{when, fireUnload}}
- */
-
-const unload = function () {
-  const unloadChannel = utils.channels.newChannel();
-
-  const when = function (callback) {
-    if (typeof callback !== 'function') {
-      return;
-    }
-
-    unloadChannel.addListener(() => {
-      try {
-        callback();
-      } catch (ex) {
-        _common_log__WEBPACK_IMPORTED_MODULE_0__/* .log.error */ .c.error('Error while invoke unload method');
-        _common_log__WEBPACK_IMPORTED_MODULE_0__/* .log.error */ .c.error(ex);
-      }
-    });
-  };
-
-  const fireUnload = function (reason) {
-    _common_log__WEBPACK_IMPORTED_MODULE_0__/* .log.info */ .c.info(`Unload is fired: ${reason}`);
-    unloadChannel.notifyInReverseOrder(reason);
-  };
-
-  return {
-    when,
-    fireUnload
-  };
-}();
-
-/***/ }),
-
-/***/ 4225:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "d": () => (/* binding */ concurrent)
-/* harmony export */ });
-/* eslint-disable prefer-rest-params */
-
-/**
- * Util class for support timeout, retry operations, debounce
- */
-const concurrent = function () {
-  const ConcurrentUtils = {
-    runAsync(callback, context) {
-      const params = Array.prototype.slice.call(arguments, 2);
-      setTimeout(() => {
-        callback.apply(context, params);
-      }, 0);
-    },
-
-    retryUntil(predicate, main, details) {
-      if (typeof details !== 'object') {
-        details = {};
-      }
-
-      let now = 0;
-      const next = details.next || 200;
-      const until = details.until || 2000;
-
-      const check = function () {
-        if (predicate() === true || now >= until) {
-          main();
-          return;
-        }
-
-        now += next;
-        setTimeout(check, next);
-      };
-
-      setTimeout(check, 1);
-    },
-
-    debounce(func, wait) {
-      let timeout;
-      return function () {
-        const context = this;
-        const args = arguments;
-
-        const later = function () {
-          timeout = null;
-          func.apply(context, args);
-        };
-
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-      };
-    },
-
-    /**
-     * Returns a new function that, when invoked, invokes `func` at most once per `wait` milliseconds.
-     * https://github.com/component/throttle
-     *
-     * @param {Function} func Function to wrap.
-     * @param {Number} wait Number of milliseconds that must elapse between `func` invocations.
-     * @return {Function} A new function that wraps the `func` function passed in.
-     */
-    throttle(func, wait) {
-      let ctx;
-      let args;
-      let rtn;
-      let timeoutID; // caching
-
-      let last = 0;
-
-      function call() {
-        timeoutID = 0;
-        last = +new Date();
-        rtn = func.apply(ctx, args);
-        ctx = null;
-        args = null;
-      }
-
-      return function throttled() {
-        ctx = this;
-        args = arguments;
-        const delta = new Date() - last;
-
-        if (!timeoutID) {
-          if (delta >= wait) {
-            call();
-          } else {
-            timeoutID = setTimeout(call, wait - delta);
-          }
-        }
-
-        return rtn;
-      };
-    }
-
-  };
-  return ConcurrentUtils;
-}();
-
-/***/ }),
-
-/***/ 1572:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "p": () => (/* binding */ dates)
-/* harmony export */ });
-/**
- * Util class for dates
- */
-const dates = function () {
-  const DateUtils = {
-    isSameHour(a, b) {
-      return this.isSameDay(a, b) && a.getHours() === b.getHours();
-    },
-
-    isSameDay(a, b) {
-      return this.isSameMonth(a, b) && a.getDate() === b.getDate();
-    },
-
-    isSameMonth(a, b) {
-      if (!a || !b) {
-        return false;
-      }
-
-      return a.getYear() === b.getYear() && a.getMonth() === b.getMonth();
-    },
-
-    getDifferenceInHours(a, b) {
-      return (a.getTime() - b.getTime()) / 1000 / 60 / 60;
-    },
-
-    getDifferenceInDays(a, b) {
-      return this.getDifferenceInHours(a, b) / 24;
-    },
-
-    getDifferenceInMonths(a, b) {
-      return this.getDifferenceInDays(a, b) / 30;
-    }
-
-  };
-  return DateUtils;
-}();
-
-/***/ }),
-
-/***/ 9272:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "u": () => (/* binding */ filters)
-/* harmony export */ });
-/* harmony import */ var _common_constants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(4568);
-
-/**
- * Util class for detect filter type. Includes various filter identifiers
- */
-
-const filters = (() => {
-  const FilterUtils = {
-    isUserFilterRule(rule) {
-      return rule.getFilterListId() === _common_constants__WEBPACK_IMPORTED_MODULE_0__/* .ANTIBANNER_FILTERS_ID.USER_FILTER_ID */ .gu.USER_FILTER_ID;
-    },
-
-    isAllowlistFilterRule(rule) {
-      return rule.getFilterListId() === _common_constants__WEBPACK_IMPORTED_MODULE_0__/* .ANTIBANNER_FILTERS_ID.ALLOWLIST_FILTER_ID */ .gu.ALLOWLIST_FILTER_ID;
-    }
-
-  }; // Make accessible only constants without functions. They will be passed to content-page
-
-  FilterUtils.ids = _common_constants__WEBPACK_IMPORTED_MODULE_0__/* .ANTIBANNER_FILTERS_ID */ .gu; // Copy filter ids to api
-
-  Object.keys(_common_constants__WEBPACK_IMPORTED_MODULE_0__/* .ANTIBANNER_FILTERS_ID */ .gu).forEach(key => {
-    FilterUtils[key] = _common_constants__WEBPACK_IMPORTED_MODULE_0__/* .ANTIBANNER_FILTERS_ID */ .gu[key];
-  });
-  return FilterUtils;
-})();
-
-/***/ }),
-
-/***/ 2721:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "a": () => (/* binding */ i18n)
-/* harmony export */ });
-/* harmony import */ var _collections__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(4118);
-
-/**
- * Simple i18n utils
- */
-
-const i18n = function () {
-  function isArrayElement(array, elem) {
-    return array.indexOf(elem) >= 0;
-  }
-
-  function isObjectKey(object, key) {
-    return key in object;
-  }
-
-  return {
-    /**
-     * Tries to find locale in the given collection of locales
-     * @param locales Collection of locales (array or object)
-     * @param locale Locale (e.g. en, en_GB, pt_BR)
-     * @returns matched locale from the locales collection or null
-     */
-    normalize(locales, locale) {
-      if (!locale) {
-        return null;
-      } // Transform Language-Country => Language_Country
-
-
-      locale = locale.replace('-', '_');
-      let search;
-
-      if (_collections__WEBPACK_IMPORTED_MODULE_0__/* .collections.isArray */ .s.isArray(locales)) {
-        search = isArrayElement;
-      } else {
-        search = isObjectKey;
-      }
-
-      if (search(locales, locale)) {
-        return locale;
-      } // Try to search by the language
-
-
-      const parts = locale.split('_');
-      const language = parts[0];
-
-      if (search(locales, language)) {
-        return language;
-      }
-
-      return null;
-    }
-
-  };
-}();
-
-/***/ }),
-
-/***/ 1255:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "$": () => (/* binding */ lazyGet)
-/* harmony export */ });
-/* unused harmony export lazyGetClear */
-/**
- * This function allows cache property in object. Use with javascript getter.
- *
- * var Object = {
- *
- *      get someProperty(){
- *          return lazyGet(Object, 'someProperty', function() {
- *              return calculateSomeProperty();
- *          });
- *      }
- * }
- *
- * @param object Object
- * @param prop Original property name
- * @param calculateFunc Calculation function
- * @returns {*}
- */
-const lazyGet = function (object, prop, calculateFunc) {
-  const cachedProp = `_${prop}`;
-
-  if (cachedProp in object) {
-    return object[cachedProp];
-  }
-
-  const value = calculateFunc.apply(object);
-  object[cachedProp] = value;
-  return value;
-};
-/**
- * Clear cached property
- * @param object Object
- * @param prop Original property name
- */
-
-const lazyGetClear = function (object, prop) {
-  delete object[`_${prop}`];
-};
-
-/***/ }),
-
-/***/ 5131:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "i": () => (/* binding */ localStorageImpl)
-/* harmony export */ });
-/* harmony import */ var _extension_api_browser__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2273);
-/* harmony import */ var _common_log__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(9224);
-/**
- * This file is part of Adguard Browser Extension (https://github.com/AdguardTeam/AdguardBrowserExtension).
- *
- * Adguard Browser Extension is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Adguard Browser Extension is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
- */
-
-
-/**
- * Local storage implementation for chromium-based browsers
- */
-
-const localStorageImpl = function () {
-  const ADGUARD_SETTINGS_PROP = 'adguard-settings';
-  let values = null;
-  /**
-   * Reads data from storage.local
-   * @param path Path
-   */
-
-  async function read(path) {
-    const results = await _extension_api_browser__WEBPACK_IMPORTED_MODULE_0__/* .browser.storage.local.get */ .X.storage.local.get(path);
-    return results ? results[path] : null;
-  }
-  /**
-   * Writes data to storage.local
-   * @param path Path
-   * @param data Data to write
-   */
-
-
-  async function write(path, data) {
-    const item = {};
-    item[path] = data;
-    await _extension_api_browser__WEBPACK_IMPORTED_MODULE_0__/* .browser.storage.local.set */ .X.storage.local.set(item);
-  }
-  /**
-   * Due to async initialization of storage, we have to check it before accessing values object
-   * @returns {boolean}
-   */
-
-
-  function isInitialized() {
-    return values !== null;
-  }
-  /**
-   * Retrieves value by key from cached values
-   * @param key
-   * @returns {*}
-   */
-
-
-  function getItem(key) {
-    if (!isInitialized()) {
-      return null;
-    }
-
-    return values[key];
-  }
-
-  function setItem(key, value) {
-    if (!isInitialized()) {
-      return;
-    }
-
-    values[key] = value;
-    write(ADGUARD_SETTINGS_PROP, values);
-  }
-
-  function removeItem(key) {
-    if (!isInitialized()) {
-      return;
-    }
-
-    delete values[key];
-    write(ADGUARD_SETTINGS_PROP, values);
-  }
-
-  function hasItem(key) {
-    if (!isInitialized()) {
-      return false;
-    }
-
-    return key in values;
-  }
-  /**
-   * We can't use localStorage object anymore and we've decided to store all data into storage.local
-   * localStorage is affected by cleaning tools: https://github.com/AdguardTeam/AdguardBrowserExtension/issues/681
-   * storage.local has async nature and we have to preload all key-values pairs into memory on extension startup
-   */
-
-
-  async function init() {
-    if (isInitialized()) {
-      // Already initialized
-      return;
-    }
-
-    let items;
-
-    try {
-      items = await read(ADGUARD_SETTINGS_PROP);
-    } catch (e) {
-      _common_log__WEBPACK_IMPORTED_MODULE_1__/* .log.error */ .c.error(e);
-    }
-
-    values = items || Object.create(null);
-  }
-
-  return {
-    getItem,
-    setItem,
-    removeItem,
-    hasItem,
-    init,
-    isInitialized
-  };
-}();
-
-/***/ }),
-
-/***/ 5753:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "R": () => (/* binding */ hasAllOptionalPermissions),
-/* harmony export */   "f": () => (/* binding */ requestOptionalPermissions)
-/* harmony export */ });
-/* harmony import */ var _extension_api_browser__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2273);
-/* harmony import */ var _browser_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(1654);
-
-
-
-const getPermissionsToRequest = () => {
-  const permissions = {
-    origins: [],
-    permissions: []
-  };
-  const {
-    optional_permissions: optionalPermissions
-  } = _extension_api_browser__WEBPACK_IMPORTED_MODULE_0__/* .browser.runtime.getManifest */ .X.runtime.getManifest();
-
-  if (optionalPermissions.includes('<all_urls>')) {
-    permissions.origins.push('<all_urls>');
-    optionalPermissions.splice(optionalPermissions.indexOf('<all_urls>'), 1);
-  }
-
-  permissions.permissions = [...optionalPermissions];
-  return permissions;
-};
-
-const hasAllOptionalPermissions = async () => {
-  const permissions = getPermissionsToRequest();
-  return _browser_utils__WEBPACK_IMPORTED_MODULE_1__/* .browserUtils.containsPermissions */ .z.containsPermissions(permissions);
-};
-const requestOptionalPermissions = async () => {
-  const permissions = getPermissionsToRequest();
-  return _browser_utils__WEBPACK_IMPORTED_MODULE_1__/* .browserUtils.requestPermissions */ .z.requestPermissions(permissions);
-};
-
-/***/ }),
-
-/***/ 3485:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "O": () => (/* binding */ parseContentTypeFromUrlPath),
-/* harmony export */   "l": () => (/* binding */ RequestTypes)
-/* harmony export */ });
-/* harmony import */ var _adguard_tsurlfilter_dist_es_request_type__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(8261);
-
-/**
- * Request types enumeration
- */
-
-const RequestTypes = {
-  /**
-   * Document that is loaded for a top-level frame
-   */
-  DOCUMENT: 'DOCUMENT',
-
-  /**
-   * Document that is loaded for an embedded frame (iframe)
-   */
-  SUBDOCUMENT: 'SUBDOCUMENT',
-  SCRIPT: 'SCRIPT',
-  STYLESHEET: 'STYLESHEET',
-  OBJECT: 'OBJECT',
-  IMAGE: 'IMAGE',
-  XMLHTTPREQUEST: 'XMLHTTPREQUEST',
-  MEDIA: 'MEDIA',
-  FONT: 'FONT',
-  WEBSOCKET: 'WEBSOCKET',
-  WEBRTC: 'WEBRTC',
-  OTHER: 'OTHER',
-  CSP: 'CSP',
-  COOKIE: 'COOKIE',
-  PING: 'PING',
-  CSP_REPORT: 'CSP_REPORT',
-
-  /**
-   * Transforms to TSUrlFilter.RequestType
-   *
-   * @param requestType
-   * @return {number}
-   */
-  transformRequestType(requestType) {
-    const contentTypes = RequestTypes;
-
-    switch (requestType) {
-      case contentTypes.DOCUMENT:
-        return _adguard_tsurlfilter_dist_es_request_type__WEBPACK_IMPORTED_MODULE_0__/* .RequestType.Document */ .x.Document;
-
-      case contentTypes.SUBDOCUMENT:
-        return _adguard_tsurlfilter_dist_es_request_type__WEBPACK_IMPORTED_MODULE_0__/* .RequestType.Subdocument */ .x.Subdocument;
-
-      case contentTypes.STYLESHEET:
-        return _adguard_tsurlfilter_dist_es_request_type__WEBPACK_IMPORTED_MODULE_0__/* .RequestType.Stylesheet */ .x.Stylesheet;
-
-      case contentTypes.FONT:
-        return _adguard_tsurlfilter_dist_es_request_type__WEBPACK_IMPORTED_MODULE_0__/* .RequestType.Font */ .x.Font;
-
-      case contentTypes.IMAGE:
-        return _adguard_tsurlfilter_dist_es_request_type__WEBPACK_IMPORTED_MODULE_0__/* .RequestType.Image */ .x.Image;
-
-      case contentTypes.MEDIA:
-        return _adguard_tsurlfilter_dist_es_request_type__WEBPACK_IMPORTED_MODULE_0__/* .RequestType.Media */ .x.Media;
-
-      case contentTypes.SCRIPT:
-        return _adguard_tsurlfilter_dist_es_request_type__WEBPACK_IMPORTED_MODULE_0__/* .RequestType.Script */ .x.Script;
-
-      case contentTypes.XMLHTTPREQUEST:
-        return _adguard_tsurlfilter_dist_es_request_type__WEBPACK_IMPORTED_MODULE_0__/* .RequestType.XmlHttpRequest */ .x.XmlHttpRequest;
-
-      case contentTypes.WEBSOCKET:
-        return _adguard_tsurlfilter_dist_es_request_type__WEBPACK_IMPORTED_MODULE_0__/* .RequestType.Websocket */ .x.Websocket;
-
-      case contentTypes.WEBRTC:
-        return _adguard_tsurlfilter_dist_es_request_type__WEBPACK_IMPORTED_MODULE_0__/* .RequestType.Webrtc */ .x.Webrtc;
-
-      case contentTypes.PING:
-        return _adguard_tsurlfilter_dist_es_request_type__WEBPACK_IMPORTED_MODULE_0__/* .RequestType.Ping */ .x.Ping;
-
-      default:
-        return _adguard_tsurlfilter_dist_es_request_type__WEBPACK_IMPORTED_MODULE_0__/* .RequestType.Other */ .x.Other;
-    }
-  },
-
-  /**
-   * Transforms from TSUrlFilter.RequestType
-   *
-   * @param requestType
-   * @return {string}
-   */
-  transformRequestTypeFromTs(requestType) {
-    const contentTypes = RequestTypes;
-
-    switch (requestType) {
-      case _adguard_tsurlfilter_dist_es_request_type__WEBPACK_IMPORTED_MODULE_0__/* .RequestType.Document */ .x.Document:
-        return contentTypes.DOCUMENT;
-
-      case _adguard_tsurlfilter_dist_es_request_type__WEBPACK_IMPORTED_MODULE_0__/* .RequestType.Subdocument */ .x.Subdocument:
-        return contentTypes.SUBDOCUMENT;
-
-      case _adguard_tsurlfilter_dist_es_request_type__WEBPACK_IMPORTED_MODULE_0__/* .RequestType.Stylesheet */ .x.Stylesheet:
-        return contentTypes.STYLESHEET;
-
-      case _adguard_tsurlfilter_dist_es_request_type__WEBPACK_IMPORTED_MODULE_0__/* .RequestType.Font */ .x.Font:
-        return contentTypes.FONT;
-
-      case _adguard_tsurlfilter_dist_es_request_type__WEBPACK_IMPORTED_MODULE_0__/* .RequestType.Image */ .x.Image:
-        return contentTypes.IMAGE;
-
-      case _adguard_tsurlfilter_dist_es_request_type__WEBPACK_IMPORTED_MODULE_0__/* .RequestType.Media */ .x.Media:
-        return contentTypes.MEDIA;
-
-      case _adguard_tsurlfilter_dist_es_request_type__WEBPACK_IMPORTED_MODULE_0__/* .RequestType.Script */ .x.Script:
-        return contentTypes.SCRIPT;
-
-      case _adguard_tsurlfilter_dist_es_request_type__WEBPACK_IMPORTED_MODULE_0__/* .RequestType.XmlHttpRequest */ .x.XmlHttpRequest:
-        return contentTypes.XMLHTTPREQUEST;
-
-      case _adguard_tsurlfilter_dist_es_request_type__WEBPACK_IMPORTED_MODULE_0__/* .RequestType.Websocket */ .x.Websocket:
-        return contentTypes.WEBSOCKET;
-
-      case _adguard_tsurlfilter_dist_es_request_type__WEBPACK_IMPORTED_MODULE_0__/* .RequestType.Ping */ .x.Ping:
-        return contentTypes.PING;
-
-      default:
-        return contentTypes.OTHER;
-    }
-  }
-
-};
-/**
- * Parse content type from path
- * @param path Path
- * @returns {*} content type (RequestTypes.*) or null
- */
-
-function parseContentTypeFromUrlPath(path) {
-  const objectContentTypes = '.jar.swf.';
-  const mediaContentTypes = '.mp4.flv.avi.m3u.webm.mpeg.3gp.3gpp.3g2.3gpp2.ogg.mov.qt.';
-  const fontContentTypes = '.ttf.otf.woff.woff2.eot.';
-  const imageContentTypes = '.ico.png.gif.jpg.jpeg.webp.';
-  let ext = path.slice(-6);
-  const pos = ext.lastIndexOf('.'); // Unable to parse extension from url
-
-  if (pos === -1) {
-    return null;
-  }
-
-  ext = `${ext.slice(pos)}.`;
-
-  if (objectContentTypes.indexOf(ext) !== -1) {
-    return RequestTypes.OBJECT;
-  }
-
-  if (mediaContentTypes.indexOf(ext) !== -1) {
-    return RequestTypes.MEDIA;
-  }
-
-  if (fontContentTypes.indexOf(ext) !== -1) {
-    return RequestTypes.FONT;
-  }
-
-  if (imageContentTypes.indexOf(ext) !== -1) {
-    return RequestTypes.IMAGE;
-  }
-
-  return null;
-}
-
-/***/ }),
-
-/***/ 2818:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "H": () => (/* binding */ url)
-/* harmony export */ });
-/* harmony import */ var punycode__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2860);
-/* harmony import */ var _common_strings__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(9100);
-/**
- * This file is part of Adguard Browser Extension (https://github.com/AdguardTeam/AdguardBrowserExtension).
- *
- * Adguard Browser Extension is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Adguard Browser Extension is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
- */
-
-/* eslint-disable camelcase, no-control-regex, max-len */
-
-
-const url = function () {
-  const RE_V4 = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|0x[0-9a-f][0-9a-f]?|0[0-7]{3})\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|0x[0-9a-f][0-9a-f]?|0[0-7]{3})$/i;
-  const RE_V4_HEX = /^0x([0-9a-f]{8})$/i;
-  const RE_V4_NUMERIC = /^[0-9]+$/;
-  const RE_V4inV6 = /(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
-  const RE_BAD_CHARACTERS = /([^0-9a-f:])/i;
-  const RE_BAD_ADDRESS = /([0-9a-f]{5,}|:{3,}|[^:]:$|^:[^:]$)/i;
-  /**
-   * Helper methods to work with URLs
-   */
-
-  const UrlUtils = {
-    isHttpRequest(url) {
-      return url && url.indexOf('http') === 0;
-    },
-
-    isHttpOrWsRequest(url) {
-      return url && (url.indexOf('http') === 0 || url.indexOf('ws') === 0);
-    },
-
-    toPunyCode(domain) {
-      if (!domain) {
-        return '';
-      }
-
-      if (/^[\x00-\x7F]+$/.test(domain)) {
-        return domain;
-      }
-
-      return punycode__WEBPACK_IMPORTED_MODULE_0__/* ["default"].toASCII */ .ZP.toASCII(domain);
-    },
-
-    /**
-     * Retrieves hostname from URL
-     */
-    getHost(url) {
-      if (!url) {
-        return null;
-      }
-
-      let firstIdx = url.indexOf('//');
-
-      if (firstIdx === -1) {
-        /**
-         * It's non hierarchical structured URL (e.g. stun: or turn:)
-         * https://tools.ietf.org/html/rfc4395#section-2.2
-         * https://tools.ietf.org/html/draft-nandakumar-rtcweb-stun-uri-08#appendix-B
-         */
-        firstIdx = url.indexOf(':');
-
-        if (firstIdx === -1) {
-          return null;
-        }
-
-        firstIdx -= 1;
-      }
-
-      const nextSlashIdx = url.indexOf('/', firstIdx + 2);
-      const startParamsIdx = url.indexOf('?', firstIdx + 2);
-      let lastIdx = nextSlashIdx;
-
-      if (startParamsIdx > 0 && (startParamsIdx < nextSlashIdx || nextSlashIdx < 0)) {
-        lastIdx = startParamsIdx;
-      }
-
-      let host = lastIdx === -1 ? url.substring(firstIdx + 2) : url.substring(firstIdx + 2, lastIdx);
-      const portIndex = host.indexOf(':');
-      host = portIndex === -1 ? host : host.substring(0, portIndex); // https://github.com/AdguardTeam/AdguardBrowserExtension/issues/1586
-
-      const lastChar = host.charAt(host.length - 1);
-
-      if (lastChar === '.') {
-        host = host.slice(0, -1);
-      }
-
-      return host;
-    },
-
-    getDomainName(url) {
-      const host = this.getHost(url);
-      return this.getCroppedDomainName(host);
-    },
-
-    getDomainFromURL(url) {
-      if (!url) return null;
-      const parsed = new URL(url);
-      const urlParts = parsed.hostname.replace('www.', '').split('.');
-      return urlParts.slice(0).slice(-(urlParts.length === 4 ? 3 : 2)).join('.');
-    },
-
-    getCroppedDomainName(host) {
-      return _common_strings__WEBPACK_IMPORTED_MODULE_1__/* .strings.startWith */ .j.startWith(host, 'www.') ? host.substring(4) : host;
-    },
-
-    isIpv4(address) {
-      if (RE_V4.test(address)) {
-        return true;
-      }
-
-      if (RE_V4_HEX.test(address)) {
-        return true;
-      }
-
-      if (RE_V4_NUMERIC.test(address)) {
-        return true;
-      }
-
-      return false;
-    },
-
-    isIpv6(address) {
-      let a4addon = 0;
-      const address4 = address.match(RE_V4inV6);
-
-      if (address4) {
-        const temp4 = address4[0].split('.');
-
-        for (let i = 0; i < 4; i += 1) {
-          if (/^0[0-9]+/.test(temp4[i])) {
-            return false;
-          }
-        }
-
-        address = address.replace(RE_V4inV6, '');
-
-        if (/[0-9]$/.test(address)) {
-          return false;
-        }
-
-        address += temp4.join(':');
-        a4addon = 2;
-      }
-
-      if (RE_BAD_CHARACTERS.test(address)) {
-        return false;
-      }
-
-      if (RE_BAD_ADDRESS.test(address)) {
-        return false;
-      }
-
-      function count(string, substring) {
-        return (string.length - string.replace(new RegExp(substring, 'g'), '').length) / substring.length;
-      }
-
-      const halves = count(address, '::');
-
-      if (halves === 1 && count(address, ':') <= 6 + 2 + a4addon) {
-        return true;
-      }
-
-      if (halves === 0 && count(address, ':') === 7 + a4addon) {
-        return true;
-      }
-
-      return false;
-    },
-
-    urlEquals(u1, u2) {
-      if (!u1 || !u2) {
-        return false;
-      } // eslint-disable-next-line prefer-destructuring
-
-
-      u1 = u1.split(/[#?]/)[0]; // eslint-disable-next-line prefer-destructuring
-
-      u2 = u2.split(/[#?]/)[0];
-      return u1 === u2;
-    }
-
-  };
-  return UrlUtils;
-}();
-
-/***/ }),
-
-/***/ 284:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "c": () => (/* binding */ workaround)
-/* harmony export */ });
-/**
- * We collect here all workarounds and ugly hacks:)
- */
-const workaround = function () {
-  const WorkaroundUtils = {
-    /**
-     * Converts blocked counter to the badge text.
-     * Workaround for FF - make 99 max.
-     *
-     * @param blocked Blocked requests count
-     */
-    getBlockedCountText(blocked, isFirefoxBrowser) {
-      const MAX = isFirefoxBrowser ? 99 : 999;
-      let blockedText = blocked === '0' ? '' : blocked;
-
-      if (blocked - 0 > MAX) {
-        blockedText = '\u221E';
-      }
-
-      return blockedText;
-    }
-
-  };
-  return WorkaroundUtils;
-}();
-
-/***/ }),
-
-/***/ 1351:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "V": () => (/* binding */ runtimeImpl)
-/* harmony export */ });
-/* unused harmony export i18n */
-/* harmony import */ var _background_extension_api_browser__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2273);
-/**
- * This file is part of Adguard Browser Extension (https://github.com/AdguardTeam/AdguardBrowserExtension).
- *
- * Adguard Browser Extension is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Adguard Browser Extension is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
- */
-
-const runtimeImpl = (() => {
-  return {
-    onMessage: _background_extension_api_browser__WEBPACK_IMPORTED_MODULE_0__/* .browser.runtime.onMessage */ .X.runtime.onMessage,
-    sendMessage: _background_extension_api_browser__WEBPACK_IMPORTED_MODULE_0__/* .browser.runtime.sendMessage */ .X.runtime.sendMessage
-  };
-})(); // eslint-disable-next-line prefer-destructuring
-
-const i18n = _background_extension_api_browser__WEBPACK_IMPORTED_MODULE_0__/* .browser.i18n */ .X.i18n;
+popupPage.init();
 
 /***/ }),
 
@@ -13527,13 +20796,12 @@ const i18n = _background_extension_api_browser__WEBPACK_IMPORTED_MODULE_0__/* .b
 "use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "CI": () => (/* binding */ ANTIBANNER_GROUPS_ID),
-/* harmony export */   "Qp": () => (/* binding */ NOTIFIER_TYPES),
 /* harmony export */   "XR": () => (/* binding */ TRUSTED_TAG),
 /* harmony export */   "XS": () => (/* binding */ WASTE_CHARACTERS),
 /* harmony export */   "gu": () => (/* binding */ ANTIBANNER_FILTERS_ID),
 /* harmony export */   "oK": () => (/* binding */ MESSAGE_TYPES)
 /* harmony export */ });
-/* unused harmony exports STEALTH_ACTIONS, FULLSCREEN_USER_RULES_EDITOR, FILTERING_LOG, NAVIGATION_TAGS, CUSTOM_FILTERS_GROUP_DISPLAY_NUMBER, CUSTOM_FILTERS_START_ID, SCROLLBAR_WIDTH */
+/* unused harmony exports STEALTH_ACTIONS, NOTIFIER_TYPES, FULLSCREEN_USER_RULES_EDITOR, FILTERING_LOG, NAVIGATION_TAGS, CUSTOM_FILTERS_GROUP_DISPLAY_NUMBER, CUSTOM_FILTERS_START_ID, SCROLLBAR_WIDTH */
 /**
  * Filter ids used in the code on the background page and filtering log page
  */
@@ -13847,253 +21115,6 @@ const log = (() => {
 
 /***/ }),
 
-/***/ 9100:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "j": () => (/* binding */ strings)
-/* harmony export */ });
-/**
- * Util class for work with strings
- */
-const strings = (() => {
-  const StringUtils = {
-    isEmpty(str) {
-      return !str || str.trim().length === 0;
-    },
-
-    startWith(str, prefix) {
-      return str && str.indexOf(prefix) === 0;
-    },
-
-    endsWith(str, postfix) {
-      return str.endsWith(postfix);
-    },
-
-    substringAfter(str, separator) {
-      if (!str) {
-        return str;
-      }
-
-      const index = str.indexOf(separator);
-      return index < 0 ? '' : str.substring(index + separator.length);
-    },
-
-    substringBefore(str, separator) {
-      if (!str || !separator) {
-        return str;
-      }
-
-      const index = str.indexOf(separator);
-      return index < 0 ? str : str.substring(0, index);
-    },
-
-    contains(str, searchString) {
-      return str && str.indexOf(searchString) >= 0;
-    },
-
-    containsIgnoreCase(str, searchString) {
-      return str && searchString && str.toUpperCase().indexOf(searchString.toUpperCase()) >= 0;
-    },
-
-    replaceAll(str, find, replace) {
-      if (!str) {
-        return str;
-      }
-
-      return str.split(find).join(replace);
-    },
-
-    join(array, separator, startIndex, endIndex) {
-      if (!array) {
-        return null;
-      }
-
-      if (!startIndex) {
-        startIndex = 0;
-      }
-
-      if (!endIndex) {
-        endIndex = array.length;
-      }
-
-      if (startIndex >= endIndex) {
-        return '';
-      }
-
-      const buf = [];
-
-      for (let i = startIndex; i < endIndex; i += 1) {
-        buf.push(array[i]);
-      }
-
-      return buf.join(separator);
-    },
-
-    /**
-     * Get string before regexp first match
-     * @param {string} str
-     * @param {RegExp} rx
-     */
-    getBeforeRegExp(str, rx) {
-      const index = str.search(rx);
-      return str.substring(0, index);
-    },
-
-    /**
-     * Look for any symbol from "chars" array starting at "start" index or from the start of the string
-     *
-     * @param str   String to search
-     * @param chars Chars to search for
-     * @param start Start index (optional, inclusive)
-     * @return int Index of the element found or null
-     */
-    indexOfAny(str, chars, start) {
-      start = start || 0;
-
-      if (typeof str === 'string' && str.length <= start) {
-        return -1;
-      }
-
-      for (let i = start; i < str.length; i += 1) {
-        const c = str.charAt(i);
-
-        if (chars.indexOf(c) > -1) {
-          return i;
-        }
-      }
-
-      return -1;
-    },
-
-    /**
-     * Splits string by a delimiter, ignoring escaped delimiters
-     * @param str               String to split
-     * @param delimiter         Delimiter
-     * @param escapeCharacter   Escape character
-     * @param preserveAllTokens If true - preserve empty entries.
-     */
-    splitByDelimiterWithEscapeCharacter(str, delimiter, escapeCharacter, preserveAllTokens) {
-      const parts = [];
-
-      if (this.isEmpty(str)) {
-        return parts;
-      }
-
-      let sb = [];
-
-      for (let i = 0; i < str.length; i += 1) {
-        const c = str.charAt(i);
-
-        if (c === delimiter) {
-          if (i === 0) {// Ignore
-          } else if (str.charAt(i - 1) === escapeCharacter) {
-            sb.splice(sb.length - 1, 1);
-            sb.push(c);
-          } else if (preserveAllTokens || sb.length > 0) {
-            const part = sb.join('');
-            parts.push(part);
-            sb = [];
-          }
-        } else {
-          sb.push(c);
-        }
-      }
-
-      if (preserveAllTokens || sb.length > 0) {
-        parts.push(sb.join(''));
-      }
-
-      return parts;
-    },
-
-    /**
-     * Serialize HTML element
-     * @param element
-     */
-    elementToString(element) {
-      const s = [];
-      s.push('<');
-      s.push(element.localName);
-      const {
-        attributes
-      } = element;
-
-      for (let i = 0; i < attributes.length; i += 1) {
-        const attr = attributes[i];
-        s.push(' ');
-        s.push(attr.name);
-        s.push('="');
-        const value = attr.value === null ? '' : attr.value.replace(/"/g, '\\"');
-        s.push(value);
-        s.push('"');
-      }
-
-      s.push('>');
-      return s.join('');
-    },
-
-    /**
-     * Checks if the specified string starts with a substr at the specified index.
-     * @param str - String to check
-     * @param startIndex - Index to start checking from
-     * @param substr - Substring to check
-     * @return boolean true if it does start
-     */
-    startsAtIndexWith(str, startIndex, substr) {
-      if (str.length - startIndex < substr.length) {
-        return false;
-      }
-
-      for (let i = 0; i < substr.length; i += 1) {
-        if (str.charAt(startIndex + i) !== substr.charAt(i)) {
-          return false;
-        }
-      }
-
-      return true;
-    },
-
-    /**
-     * Checks if str has unquoted substr
-     * @param str
-     * @param substr
-     */
-    hasUnquotedSubstring(str, substr) {
-      const quotes = ['"', "'", '/'];
-      const stack = [];
-
-      for (let i = 0; i < str.length; i += 1) {
-        const cursor = str[i];
-
-        if (stack.length === 0) {
-          if (this.startsAtIndexWith(str, i, substr)) {
-            return true;
-          }
-        }
-
-        if (quotes.indexOf(cursor) >= 0 && (i === 0 || str[i - 1] !== '\\')) {
-          const last = stack.pop();
-
-          if (!last) {
-            stack.push(cursor);
-          } else if (last !== cursor) {
-            stack.push(last);
-            stack.push(cursor);
-          }
-        }
-      }
-
-      return false;
-    }
-
-  };
-  return StringUtils;
-})();
-
-/***/ }),
-
 /***/ 7122:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
@@ -14262,1729 +21283,6 @@ const Button = ({
       hidden
     })
   }, showLoading ? /*#__PURE__*/react.createElement(Loading, null) : children);
-};
-
-/***/ }),
-
-/***/ 1442:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-
-// EXPORTS
-__webpack_require__.d(__webpack_exports__, {
-  "U": () => (/* binding */ rootStore)
-});
-
-// EXTERNAL MODULE: ./node_modules/react/index.js
-var react = __webpack_require__(846);
-// EXTERNAL MODULE: ./node_modules/mobx/dist/mobx.esm.js
-var mobx_esm = __webpack_require__(1056);
-// EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/initializerDefineProperty.js
-var initializerDefineProperty = __webpack_require__(5497);
-// EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/applyDecoratedDescriptor.js
-var applyDecoratedDescriptor = __webpack_require__(6813);
-// EXTERNAL MODULE: ./Extension/src/common/log.js
-var log = __webpack_require__(9224);
-// EXTERNAL MODULE: ./node_modules/xstate/es/interpreter.js + 4 modules
-var interpreter = __webpack_require__(9989);
-// EXTERNAL MODULE: ./node_modules/xstate/es/Machine.js + 2 modules
-var Machine = __webpack_require__(5697);
-;// CONCATENATED MODULE: ./Extension/src/pages/common/components/Editor/savingFSM.js
-
-
-const STATES = {
-  IDLE: 'idle',
-  SAVING: 'saving',
-  SAVED: 'saved'
-};
-const EVENTS = {
-  SAVE: 'save',
-  SUCCESS: 'success',
-  ERROR: 'error',
-  TIMEOUT: 'timeout'
-};
-const SAVED_DISPLAY_TIMEOUT_MS = 1000;
-const savingStateMachine = {
-  initial: 'idle',
-  states: {
-    [STATES.IDLE]: {
-      on: {
-        [EVENTS.SAVE]: STATES.SAVING
-      }
-    },
-    [STATES.SAVING]: {
-      invoke: {
-        src: 'saveData',
-        onDone: {
-          target: STATES.SAVED
-        },
-        onError: {
-          target: STATES.SAVED,
-          actions: (context, event) => {
-            const {
-              data: error
-            } = event;
-            log/* log.error */.c.error(error.message);
-          }
-        }
-      }
-    },
-    [STATES.SAVED]: {
-      after: [{
-        delay: SAVED_DISPLAY_TIMEOUT_MS,
-        target: STATES.IDLE
-      }]
-    }
-  }
-};
-const createSavingService = ({
-  id,
-  services
-}) => {
-  return (0,interpreter/* interpret */.kJ)((0,Machine/* Machine */.J)({ ...savingStateMachine,
-    id
-  }, {
-    services
-  })).start().onEvent(event => {
-    log/* log.debug */.c.debug(id, event);
-  }).onTransition(state => {
-    log/* log.debug */.c.debug(id, {
-      currentState: state.value
-    });
-  });
-};
-// EXTERNAL MODULE: ./node_modules/@adguard/translate/dist/index.esm.js
-var index_esm = __webpack_require__(8396);
-// EXTERNAL MODULE: ./Extension/src/common/translators/i18n.js
-var i18n = __webpack_require__(7122);
-;// CONCATENATED MODULE: ./Extension/src/common/translators/translator.js
-
-
-/**
- * Retrieves localised message by key, formats it and converts into string
- */
-
-const translator_translator = index_esm/* translate.createTranslator */.Iu.createTranslator(i18n/* i18n */.a);
-;// CONCATENATED MODULE: ./Extension/src/pages/helpers.js
-/* eslint-disable max-len */
-
-const isMacOs = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
-const getFilenameExtension = filename => {
-  if (!filename) {
-    return undefined;
-  }
-
-  const parts = filename.split('.');
-
-  if (parts.length < 2) {
-    return undefined;
-  }
-
-  return parts[parts.length - 1];
-};
-/**
- * Handles file upload
- * @param file
- * @param requiredExtension
- * @returns {Promise<string>}
- */
-
-const handleFileUpload = (file, requiredExtension) => new Promise((resolve, reject) => {
-  if (getFilenameExtension(file.name) !== requiredExtension) {
-    reject(new Error(translator.getMessage('options_popup_import_settings_wrong_file_ext', {
-      extension: requiredExtension
-    })));
-  }
-
-  const reader = new FileReader();
-  reader.readAsText(file, 'UTF-8');
-
-  reader.onload = evt => {
-    resolve(evt.target.result);
-  };
-
-  reader.onerror = () => {
-    reject(new Error(translator.getMessage('options_popup_import_error_file_description')));
-  };
-});
-const hoursToMs = hours => {
-  const MS_IN_HOUR = 1000 * 60 * 60;
-  return hours * MS_IN_HOUR;
-};
-/**
- * Awaits required period of time
- * @param timeoutMs
- * @returns {Promise<unknown>}
- */
-
-const sleep = timeoutMs => {
-  return new Promise(resolve => {
-    setTimeout(resolve, timeoutMs);
-  });
-};
-const indexOfIgnoreCase = (str, searchString) => {
-  return str.toLowerCase().indexOf(searchString.toLowerCase());
-};
-const containsIgnoreCase = (str, searchString) => {
-  return !!(str && searchString && indexOfIgnoreCase(str, searchString) >= 0);
-};
-const findChunks = (str, searchString, chunks = []) => {
-  const ind = indexOfIgnoreCase(str, searchString);
-
-  if (ind > -1) {
-    chunks.push(str.slice(0, ind));
-    chunks.push(str.slice(ind, ind + searchString.length));
-    const restStr = str.slice(ind + searchString.length);
-
-    if (containsIgnoreCase(restStr, searchString)) {
-      findChunks(restStr, searchString, chunks);
-    } else {
-      chunks.push(restStr);
-    }
-  }
-
-  return chunks.filter(i => !!i);
-};
-const passiveEventSupported = (() => {
-  let passiveSupported = null;
-  return () => {
-    // memoize support to avoid adding multiple test events
-    if (typeof passiveSupported === 'boolean') {
-      return passiveSupported;
-    }
-
-    let supported = false;
-
-    try {
-      const options = {
-        get passive() {
-          supported = true;
-          return false;
-        }
-
-      };
-      window.addEventListener('test', null, options);
-      window.removeEventListener('test', null, options);
-    } catch (err) {
-      supported = false;
-    }
-
-    passiveSupported = supported;
-    return passiveSupported;
-  };
-})();
-const copyToClipboard = text => {
-  const textarea = document.createElement('textarea');
-  textarea.innerText = text;
-  textarea.style = `
-        position: absolute;
-        display: hidden;
-        width: 0;
-        height: 0;
-    `;
-  document.body.appendChild(textarea);
-  textarea.select();
-  document.execCommand('copy');
-  textarea.remove();
-};
-const measureTextWidth = text => {
-  const el = document.createElement('p');
-  el.innerText = text;
-  el.style = `
-        position: absolute;
-        display: hidden;
-        height: 0;
-        white-space: nowrap;
-        font-family: Roboto, "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Ubuntu, Arial, sans-serif;
-        font-size: 14px;
-    `;
-  document.body.appendChild(el);
-  const pxLength = el.clientWidth;
-  el.remove();
-  return pxLength;
-};
-/**
- * Сalculate the angle of radius vector of the scroll motion
- * and detect whether scroll is vertical
- *
- * @param {number} deltaY - wheel event deltaY value
- * @param {number} deltaX - wheel event deltaX value
- * @returns {boolean}
- */
-
-const isVerticalScroll = (() => {
-  const degToRad = deg => deg * (Math.PI / 180);
-
-  const deg60ToRad = degToRad(60);
-  const deg90ToRad = degToRad(90);
-  const deg120ToRad = degToRad(120);
-  const deg240ToRad = degToRad(240);
-  const deg270ToRad = degToRad(270);
-  const deg300ToRad = degToRad(300);
-  return (deltaY, deltaX) => {
-    if (deltaY === 0) {
-      return false;
-    }
-
-    let angle = Math.atan(deltaX / deltaY);
-    angle = deltaY > 0 ? angle + deg90ToRad : angle + deg270ToRad;
-    return angle > deg60ToRad && angle < deg120ToRad || angle > deg240ToRad && angle < deg300ToRad;
-  };
-})();
-// EXTERNAL MODULE: ./Extension/src/pages/services/messenger.js
-var messenger = __webpack_require__(7916);
-;// CONCATENATED MODULE: ./Extension/src/pages/options/components/Filters/Search/constants.js
-const SEARCH_FILTERS = {
-  ALL: 'all',
-  ENABLED: 'enabled',
-  DISABLED: 'disabled'
-};
-// EXTERNAL MODULE: ./node_modules/lodash/sortBy.js
-var sortBy = __webpack_require__(9219);
-var sortBy_default = /*#__PURE__*/__webpack_require__.n(sortBy);
-;// CONCATENATED MODULE: ./Extension/src/pages/options/components/Filters/helpers.js
-
-/**
- * Sorts filters by enabled status and displayNumber
- * @param filters
- */
-
-const sortFilters = filters => {
-  const sorted = [...filters].sort((a, b) => {
-    // sort by enabled
-    const enabledA = !!a.enabled;
-    const enabledB = !!b.enabled;
-
-    if (enabledA !== enabledB) {
-      return enabledB - enabledA;
-    } // sort by groupId
-
-
-    if (a.groupId !== b.groupId) {
-      return a.groupId - b.groupId;
-    } // sort by display number
-
-
-    if (a.displayNumber && b.displayNumber) {
-      return a.displayNumber - b.displayNumber;
-    }
-
-    if (a.displayNumber) {
-      return 1;
-    }
-
-    if (b.displayNumber) {
-      return -1;
-    }
-
-    return 0;
-  });
-  return sorted;
-};
-/**
- * Updates filters state without changing order
- * @param currentFilters
- * @param newFilters
- */
-
-const updateFilters = (currentFilters, newFilters) => {
-  const updatedFilters = [...currentFilters];
-  newFilters.forEach(newFilter => {
-    const currentFilterIdx = currentFilters.findIndex(currentFilter => {
-      return currentFilter.filterId === newFilter.filterId;
-    });
-
-    if (currentFilterIdx < 0) {
-      updatedFilters.push(newFilter);
-    } else {
-      updatedFilters[currentFilterIdx] = newFilter;
-    }
-  });
-  return updatedFilters;
-};
-/**
- * Updates groups state without changing order
- * @param currentGroups
- * @param newGroups
- */
-
-const updateGroups = (currentGroups, newGroups) => {
-  const updatedGroups = [...currentGroups];
-  newGroups.forEach(newGroup => {
-    const currentGroupIdx = currentGroups.findIndex(currentGroup => {
-      return currentGroup.groupId === newGroup.groupId;
-    });
-
-    if (currentGroupIdx < 0) {
-      updatedGroups.push(newGroup);
-    } else {
-      updatedGroups[currentGroupIdx] = newGroup;
-    }
-  });
-  return updatedGroups;
-};
-const sortGroupsOnSearch = groups => {
-  const sortedGroups = sortBy_default()(groups, 'displayNumber').sort((a, b) => {
-    // enabled first
-    if (a.enabled && !b.enabled) {
-      return -1;
-    }
-
-    if (!a.enabled && b.enabled) {
-      return 1;
-    }
-
-    return 0;
-  });
-  return sortedGroups;
-};
-;// CONCATENATED MODULE: ./Extension/src/pages/options/options-storage/OptionsStorage.js
-
-/**
- * Module used to keep options page settings, which do not need extension level persistence
- */
-
-class OptionsStorage {
-  constructor() {
-    this.KEYS = {
-      /* allowlist editor wrap setting */
-      ALLOWLIST_EDITOR_WRAP: 'allowlist-editor-wrap',
-
-      /**
-       * Filtering log columns widths
-       */
-      COLUMNS_WIDTHS_PX: 'columns-widths-px',
-
-      /**
-       * Filtering log columns widths
-       */
-      COLUMNS_DATA: 'columns-data',
-
-      /**
-       * Request modal width
-       */
-      REQUEST_INFO_MODAL_WIDTH: 'request-info-modal-width'
-    };
-    this.DEFAULTS = {
-      [this.KEYS.ALLOWLIST_EDITOR_WRAP]: false,
-      [this.KEYS.REQUEST_INFO_MODAL_WIDTH]: null,
-      [this.KEYS.COLUMNS_DATA]: {
-        status: {
-          width: 260
-        },
-        url: {
-          width: 260
-        },
-        type: {
-          width: 100
-        },
-        rule: {
-          width: 260
-        },
-        filter: {
-          width: 260
-        },
-        source: {
-          width: 200
-        }
-      }
-    };
-    this.storage = localStorage;
-  }
-
-  setItem(key, value) {
-    try {
-      this.storage.setItem(key, JSON.stringify(value));
-    } catch (e) {
-      log/* log.debug */.c.debug(e);
-    }
-  }
-
-  getItem(key) {
-    let storedValue;
-
-    try {
-      storedValue = JSON.parse(this.storage.getItem(key));
-    } catch (e) {
-      log/* log.debug */.c.debug(e);
-      storedValue = null;
-    }
-
-    return storedValue === null ? this.DEFAULTS[key] : storedValue;
-  }
-
-}
-;// CONCATENATED MODULE: ./Extension/src/pages/options/options-storage/index.js
-
-const optionsStorage = new OptionsStorage();
-// EXTERNAL MODULE: ./Extension/src/common/constants.js
-var constants = __webpack_require__(4568);
-;// CONCATENATED MODULE: ./Extension/src/pages/options/stores/SettingsStore.js
-
-
-
-
-var _class, _descriptor, _descriptor2, _descriptor3, _descriptor4, _descriptor5, _descriptor6, _descriptor7, _descriptor8, _descriptor9, _descriptor10, _descriptor11, _descriptor12, _descriptor13, _descriptor14, _descriptor15, _descriptor16, _descriptor17, _descriptor18, _descriptor19, _descriptor20, _descriptor21, _descriptor22, _descriptor23, _descriptor24, _descriptor25, _descriptor26, _descriptor27, _descriptor28, _descriptor29, _descriptor30, _descriptor31, _descriptor32, _descriptor33, _descriptor34, _descriptor35;
-
-
-
-
-
-
-
-
-
-
-const savingAllowlistService = createSavingService({
-  id: 'allowlist',
-  services: {
-    saveData: async (_, e) => {
-      /**
-       * If saveAllowlist executes faster than MIN_EXECUTION_TIME_REQUIRED_MS we increase
-       * execution time for smoother user experience
-       */
-      const MIN_EXECUTION_TIME_REQUIRED_MS = 500;
-      const start = Date.now();
-      await messenger/* messenger.saveAllowlist */.d.saveAllowlist(e.value);
-      const end = Date.now();
-      const timePassed = end - start;
-
-      if (timePassed < MIN_EXECUTION_TIME_REQUIRED_MS) {
-        await sleep(MIN_EXECUTION_TIME_REQUIRED_MS - timePassed);
-      }
-    }
-  }
-});
-let SettingsStore = (_class = class SettingsStore {
-  constructor(rootStore) {
-    this.KEYS = {
-      ALLOW_ACCEPTABLE_ADS: 'allowAcceptableAds',
-      BLOCK_KNOWN_TRACKERS: 'blockKnownTrackers',
-      STRIP_TRACKING_PARAMETERS: 'stripTrackingParameters'
-    };
-
-    (0,initializerDefineProperty/* default */.Z)(this, "settings", _descriptor, this);
-
-    (0,initializerDefineProperty/* default */.Z)(this, "optionsReadyToRender", _descriptor2, this);
-
-    (0,initializerDefineProperty/* default */.Z)(this, "version", _descriptor3, this);
-
-    (0,initializerDefineProperty/* default */.Z)(this, "filters", _descriptor4, this);
-
-    (0,initializerDefineProperty/* default */.Z)(this, "categories", _descriptor5, this);
-
-    (0,initializerDefineProperty/* default */.Z)(this, "visibleFilters", _descriptor6, this);
-
-    (0,initializerDefineProperty/* default */.Z)(this, "rulesCount", _descriptor7, this);
-
-    (0,initializerDefineProperty/* default */.Z)(this, "allowAcceptableAds", _descriptor8, this);
-
-    (0,initializerDefineProperty/* default */.Z)(this, "blockKnownTrackers", _descriptor9, this);
-
-    (0,initializerDefineProperty/* default */.Z)(this, "stripTrackingParameters", _descriptor10, this);
-
-    (0,initializerDefineProperty/* default */.Z)(this, "allowlist", _descriptor11, this);
-
-    (0,initializerDefineProperty/* default */.Z)(this, "savingAllowlistState", _descriptor12, this);
-
-    (0,initializerDefineProperty/* default */.Z)(this, "filtersUpdating", _descriptor13, this);
-
-    (0,initializerDefineProperty/* default */.Z)(this, "selectedGroupId", _descriptor14, this);
-
-    (0,initializerDefineProperty/* default */.Z)(this, "isChrome", _descriptor15, this);
-
-    (0,initializerDefineProperty/* default */.Z)(this, "searchInput", _descriptor16, this);
-
-    (0,initializerDefineProperty/* default */.Z)(this, "searchSelect", _descriptor17, this);
-
-    (0,initializerDefineProperty/* default */.Z)(this, "allowlistEditorContentChanged", _descriptor18, this);
-
-    (0,initializerDefineProperty/* default */.Z)(this, "allowlistEditorWrap", _descriptor19, this);
-
-    (0,initializerDefineProperty/* default */.Z)(this, "fullscreenUserRulesEditorIsOpen", _descriptor20, this);
-
-    (0,initializerDefineProperty/* default */.Z)(this, "allowlistSizeReset", _descriptor21, this);
-
-    (0,initializerDefineProperty/* default */.Z)(this, "setFilterEnabledState", _descriptor22, this);
-
-    (0,initializerDefineProperty/* default */.Z)(this, "setAllowlist", _descriptor23, this);
-
-    (0,initializerDefineProperty/* default */.Z)(this, "getAllowlist", _descriptor24, this);
-
-    (0,initializerDefineProperty/* default */.Z)(this, "appendAllowlist", _descriptor25, this);
-
-    (0,initializerDefineProperty/* default */.Z)(this, "saveAllowlist", _descriptor26, this);
-
-    (0,initializerDefineProperty/* default */.Z)(this, "setAllowlistEditorContentChangedState", _descriptor27, this);
-
-    (0,initializerDefineProperty/* default */.Z)(this, "setSearchInput", _descriptor28, this);
-
-    (0,initializerDefineProperty/* default */.Z)(this, "setSearchSelect", _descriptor29, this);
-
-    (0,initializerDefineProperty/* default */.Z)(this, "sortFilters", _descriptor30, this);
-
-    (0,initializerDefineProperty/* default */.Z)(this, "setFilters", _descriptor31, this);
-
-    (0,initializerDefineProperty/* default */.Z)(this, "setVisibleFilters", _descriptor32, this);
-
-    (0,initializerDefineProperty/* default */.Z)(this, "sortSearchGroups", _descriptor33, this);
-
-    (0,initializerDefineProperty/* default */.Z)(this, "setGroups", _descriptor34, this);
-
-    (0,initializerDefineProperty/* default */.Z)(this, "selectVisibleFilters", _descriptor35, this);
-
-    (0,mobx_esm/* makeObservable */.rC)(this);
-    this.rootStore = rootStore;
-    savingAllowlistService.onTransition(state => {
-      (0,mobx_esm/* runInAction */.z)(() => {
-        this.savingAllowlistState = state.value;
-
-        if (state.value === STATES.SAVING) {
-          this.allowlistEditorContentChanged = false;
-        }
-      });
-    });
-  }
-
-  async requestOptionsData(firstRender) {
-    const data = await messenger/* messenger.getOptionsData */.d.getOptionsData();
-
-    if (!data) {
-      log/* log.error */.c.error('requestOptionsData: messenger.getOptionsData empty response. firstRender={0}', firstRender);
-      return;
-    }
-
-    (0,mobx_esm/* runInAction */.z)(() => {
-      this.settings = data.settings; // on first render we sort filters to show enabled on the top
-      // filter should remain on the same place event after being enabled or disabled
-
-      if (firstRender) {
-        this.setFilters(sortFilters(data.filtersMetadata.filters));
-      } else {
-        // on the next filters updates, we update filters keeping order
-        this.setFilters(updateFilters(this.filters, data.filtersMetadata.filters));
-      } // do not rerender groups on its turning on/off while searching
-
-
-      if (this.isSearching) {
-        this.setGroups(updateGroups(this.categories, data.filtersMetadata.categories));
-      } else {
-        this.setGroups(data.filtersMetadata.categories);
-      }
-
-      this.rulesCount = data.filtersInfo.rulesCount;
-      this.version = data.appVersion;
-      this.constants = data.constants;
-      this.setAllowAcceptableAds(data.filtersMetadata.filters);
-      this.setBlockKnownTrackers(data.filtersMetadata.filters);
-      this.setStripTrackingParameters(data.filtersMetadata.filters);
-      this.isChrome = data.environmentOptions.isChrome;
-      this.optionsReadyToRender = true;
-      this.fullscreenUserRulesEditorIsOpen = data.fullscreenUserRulesEditorIsOpen;
-    });
-  }
-
-  updateRulesCount(rulesCount) {
-    this.rulesCount = rulesCount;
-  }
-
-  setSelectedGroupId(dirtyGroupId) {
-    const groupId = Number.parseInt(dirtyGroupId, 10);
-
-    if (Number.isNaN(groupId)) {
-      this.selectedGroupId = null;
-    } else {
-      const groupExists = this.categories.find(category => category.groupId === groupId);
-
-      if (groupExists) {
-        this.selectedGroupId = groupId;
-      } else {
-        this.selectedGroupId = null;
-      }
-    }
-  }
-
-  updateSetting(settingId, value) {
-    this.settings.values[settingId] = value;
-    messenger/* messenger.changeUserSetting */.d.changeUserSetting(settingId, value);
-  }
-
-  async setFilterRelatedSettingState(filterId, optionKey, enabled) {
-    const prevValue = this[optionKey];
-    this[optionKey] = enabled;
-
-    try {
-      const relatedFilter = this.filters.find(f => f.filterId === filterId);
-
-      if (enabled) {
-        await messenger/* messenger.enableFilter */.d.enableFilter(filterId);
-        await this.updateGroupSetting(relatedFilter.groupId, enabled);
-      } else {
-        await messenger/* messenger.disableFilter */.d.disableFilter(filterId);
-      }
-
-      relatedFilter.enabled = enabled;
-      this.refreshFilter(relatedFilter);
-    } catch (e) {
-      (0,mobx_esm/* runInAction */.z)(() => {
-        this[optionKey] = prevValue;
-      });
-    }
-  }
-
-  async setAllowAcceptableAdsState(enabled) {
-    const {
-      SEARCH_AND_SELF_PROMO_FILTER_ID
-    } = this.constants.AntiBannerFiltersId;
-    await this.setFilterRelatedSettingState(SEARCH_AND_SELF_PROMO_FILTER_ID, this.KEYS.ALLOW_ACCEPTABLE_ADS, !enabled);
-  }
-
-  async setBlockKnownTrackersState(enabled) {
-    const {
-      TRACKING_FILTER_ID
-    } = this.constants.AntiBannerFiltersId;
-    await this.setFilterRelatedSettingState(TRACKING_FILTER_ID, this.KEYS.BLOCK_KNOWN_TRACKERS, enabled);
-  }
-
-  async setStripTrackingParametersState(enabled) {
-    const {
-      URL_TRACKING_FILTER_ID
-    } = this.constants.AntiBannerFiltersId;
-    await this.setFilterRelatedSettingState(URL_TRACKING_FILTER_ID, this.KEYS.STRIP_TRACKING_PARAMETERS, enabled);
-  }
-
-  setSetting(filtersId, settingKey, filters) {
-    const relatedFilter = filters.find(f => f.filterId === filtersId);
-    this[settingKey] = !!(relatedFilter !== null && relatedFilter !== void 0 && relatedFilter.enabled) || false;
-  }
-
-  setAllowAcceptableAds(filters) {
-    const {
-      SEARCH_AND_SELF_PROMO_FILTER_ID
-    } = this.constants.AntiBannerFiltersId;
-    this.setSetting(SEARCH_AND_SELF_PROMO_FILTER_ID, this.KEYS.ALLOW_ACCEPTABLE_ADS, filters);
-  }
-
-  setBlockKnownTrackers(filters) {
-    const {
-      TRACKING_FILTER_ID
-    } = this.constants.AntiBannerFiltersId;
-    this.setSetting(TRACKING_FILTER_ID, this.KEYS.BLOCK_KNOWN_TRACKERS, filters);
-  }
-
-  setStripTrackingParameters(filters) {
-    const {
-      URL_TRACKING_FILTER_ID
-    } = this.constants.AntiBannerFiltersId;
-    this.setSetting(URL_TRACKING_FILTER_ID, this.KEYS.STRIP_TRACKING_PARAMETERS, filters);
-  }
-
-  isFilterEnabled(filterId) {
-    const filter = this.filters.find(f => f.filterId === filterId);
-    return filter.enabled;
-  }
-
-  isAllowAcceptableAdsFilterEnabled() {
-    const {
-      SEARCH_AND_SELF_PROMO_FILTER_ID
-    } = this.constants.AntiBannerFiltersId;
-    this.isFilterEnabled(SEARCH_AND_SELF_PROMO_FILTER_ID);
-  }
-
-  isBlockKnownTrackersFilterEnabled() {
-    const {
-      TRACKING_FILTER_ID
-    } = this.constants.AntiBannerFiltersId;
-    this.isFilterEnabled(TRACKING_FILTER_ID);
-  }
-
-  isStripTrackingParametersFilterEnabled() {
-    const {
-      URL_TRACKING_FILTER_ID
-    } = this.constants.AntiBannerFiltersId;
-    this.isFilterEnabled(URL_TRACKING_FILTER_ID);
-  }
-
-  get lastUpdateTime() {
-    return Math.max(...this.filters.map(filter => filter.lastCheckTime || 0));
-  }
-
-  async updateGroupSetting(id, enabled) {
-    await messenger/* messenger.updateGroupStatus */.d.updateGroupStatus(id, enabled);
-    (0,mobx_esm/* runInAction */.z)(() => {
-      const groupId = parseInt(id, 10);
-
-      if (groupId === constants/* ANTIBANNER_GROUPS_ID.OTHER_FILTERS_GROUP_ID */.CI.OTHER_FILTERS_GROUP_ID && this.isAllowAcceptableAdsFilterEnabled()) {
-        this.allowAcceptableAds = enabled;
-      } else if (groupId === constants/* ANTIBANNER_GROUPS_ID.PRIVACY_FILTERS_GROUP_ID */.CI.PRIVACY_FILTERS_GROUP_ID) {// if (this.isBlockKnownTrackersFilterEnabled()) {
-        //     this.blockKnownTrackers = enabled;
-        // }
-        // if (this.isStripTrackingParametersFilterEnabled()) {
-        //     this.stripTrackingParameters = enabled;
-        // }
-      }
-
-      this.categories.forEach(group => {
-        if (group.groupId === groupId) {
-          if (enabled) {
-            // eslint-disable-next-line no-param-reassign
-            group.enabled = true;
-          } else {
-            // eslint-disable-next-line no-param-reassign
-            delete group.enabled;
-          }
-        }
-      });
-    });
-  }
-
-  refreshFilters(updatedFilters) {
-    if (updatedFilters && updatedFilters.length) {
-      updatedFilters.forEach(filter => this.refreshFilter(filter));
-    }
-  }
-
-  refreshFilter(filter) {
-    if (!filter) {
-      return;
-    }
-
-    const idx = this.filters.findIndex(f => f.filterId === filter.filterId);
-
-    if (idx !== -1) {
-      Object.keys(filter).forEach(key => {
-        this.filters[idx][key] = filter[key];
-      });
-    }
-  }
-
-  async updateFilterSetting(rawFilterId, enabled) {
-    const filterId = Number.parseInt(rawFilterId, 10);
-    this.setFilterEnabledState(filterId, enabled);
-
-    try {
-      const filters = await messenger/* messenger.updateFilterStatus */.d.updateFilterStatus(filterId, enabled);
-      this.refreshFilters(filters); // update allow acceptable ads setting
-
-      if (filterId === this.constants.AntiBannerFiltersId.SEARCH_AND_SELF_PROMO_FILTER_ID) {
-        this.allowAcceptableAds = enabled;
-      } else if (filterId === this.constants.AntiBannerFiltersId.TRACKING_FILTER_ID) {
-        this.blockKnownTrackers = enabled;
-      } else if (filterId === this.constants.AntiBannerFiltersId.URL_TRACKING_FILTER_ID) {
-        this.stripTrackingParameters = enabled;
-      }
-    } catch (e) {
-      log/* log.error */.c.error(e);
-      this.setFilterEnabledState(filterId, !enabled);
-    }
-  }
-
-  setFiltersUpdating(value) {
-    this.filtersUpdating = value;
-  }
-
-  async updateFilters() {
-    this.setFiltersUpdating(true);
-
-    try {
-      const filtersUpdates = await messenger/* messenger.updateFilters */.d.updateFilters();
-      this.refreshFilters(filtersUpdates);
-      setTimeout(() => {
-        this.setFiltersUpdating(false);
-      }, 2000);
-      return filtersUpdates;
-    } catch (error) {
-      this.setFiltersUpdating(false);
-      throw error;
-    }
-  }
-
-  async addCustomFilter(filter) {
-    const newFilter = await messenger/* messenger.addCustomFilter */.d.addCustomFilter(filter);
-
-    if (!newFilter) {
-      return;
-    }
-
-    (0,mobx_esm/* runInAction */.z)(() => {
-      this.filters.push(newFilter);
-
-      if (this.searchSelect !== SEARCH_FILTERS.ALL) {
-        this.setSearchSelect(SEARCH_FILTERS.ALL);
-      }
-    });
-  }
-
-  async removeCustomFilter(filterId) {
-    await messenger/* messenger.removeCustomFilter */.d.removeCustomFilter(filterId);
-    (0,mobx_esm/* runInAction */.z)(() => {
-      this.setFilters(this.filters.filter(filter => filter.filterId !== filterId));
-      this.setVisibleFilters(this.visibleFilters.filter(filter => {
-        return filter.filterId !== filterId;
-      }));
-    });
-  }
-
-  get isSearching() {
-    return this.searchSelect !== SEARCH_FILTERS.ALL || this.searchInput;
-  }
-  /**
-   * We do not sort filters on every filters data update for better UI experience
-   * Filters sort happens when user exits from filters group, or changes search filters
-   */
-
-
-  get filtersToRender() {
-    const searchInputString = this.searchInput.replace(constants/* WASTE_CHARACTERS */.XS, '\\$&');
-    const searchQuery = new RegExp(searchInputString, 'ig');
-    let selectedFilters;
-
-    if (this.isSearching) {
-      selectedFilters = this.visibleFilters;
-    } else {
-      selectedFilters = this.filters;
-    }
-
-    return selectedFilters.filter(filter => {
-      if (Number.isInteger(this.selectedGroupId)) {
-        return filter.groupId === this.selectedGroupId;
-      }
-
-      return true;
-    }).filter(filter => {
-      const nameIsMatching = filter.name.match(searchQuery);
-
-      if (nameIsMatching) {
-        return true;
-      }
-
-      if (filter.tagsDetails) {
-        // eslint-disable-next-line max-len
-        const tagKeywordIsMatching = filter.tagsDetails.some(tag => `#${tag.keyword}`.match(searchQuery));
-
-        if (tagKeywordIsMatching) {
-          return true;
-        }
-      } // AG-10491
-
-
-      if (filter.trusted && filter.trusted === true) {
-        const trustedTagMatching = `#${constants/* TRUSTED_TAG */.XR}`.match(searchQuery);
-
-        if (trustedTagMatching) {
-          return true;
-        }
-      }
-
-      return false;
-    });
-  }
-
-  get appearanceTheme() {
-    if (!this.settings) {
-      return null;
-    }
-
-    return this.settings.values[this.settings.names.APPEARANCE_THEME];
-  }
-
-  get showAdguardPromoInfo() {
-    if (!this.settings) {
-      return null;
-    }
-
-    return !this.settings.values[this.settings.names.DISABLE_SHOW_ADGUARD_PROMO_INFO];
-  }
-
-  async hideAdguardPromoInfo() {
-    await this.updateSetting(this.settings.names.DISABLE_SHOW_ADGUARD_PROMO_INFO, true);
-  }
-
-  get allowlistEditorWrapState() {
-    if (this.allowlistEditorWrap === null) {
-      this.allowlistEditorWrap = optionsStorage.getItem(optionsStorage.KEYS.ALLOWLIST_EDITOR_WRAP);
-    }
-
-    return this.allowlistEditorWrap;
-  }
-
-  toggleAllowlistEditorWrap() {
-    this.allowlistEditorWrap = !this.allowlistEditorWrap;
-    optionsStorage.setItem(optionsStorage.KEYS.ALLOWLIST_EDITOR_WRAP, this.allowlistEditorWrap);
-  }
-
-  get footerRateShowState() {
-    return !this.settings.values[this.settings.names.HIDE_RATE_BLOCK];
-  }
-
-  async hideFooterRateShow() {
-    await this.updateSetting(this.settings.names.HIDE_RATE_BLOCK, true);
-  }
-
-  setFullscreenUserRulesEditorState(isOpen) {
-    this.fullscreenUserRulesEditorIsOpen = isOpen;
-  }
-
-  get isFullscreenUserRulesEditorOpen() {
-    return this.fullscreenUserRulesEditorIsOpen;
-  }
-
-  get userFilterEnabledSettingId() {
-    return this.settings.names.USER_FILTER_ENABLED;
-  }
-
-  get userFilterEnabled() {
-    return this.settings.values[this.userFilterEnabledSettingId];
-  }
-
-  setAllowlistSizeReset(value) {
-    this.allowlistSizeReset = value;
-  }
-
-  get protectionLevel() {
-    var _this$settings, _this$settings$values;
-
-    return this === null || this === void 0 ? void 0 : (_this$settings = this.settings) === null || _this$settings === void 0 ? void 0 : (_this$settings$values = _this$settings.values) === null || _this$settings$values === void 0 ? void 0 : _this$settings$values['protection-level'];
-  }
-
-  get arePermissionsRejected() {
-    var _this$settings2, _this$settings2$value;
-
-    return !!(this !== null && this !== void 0 && (_this$settings2 = this.settings) !== null && _this$settings2 !== void 0 && (_this$settings2$value = _this$settings2.values) !== null && _this$settings2$value !== void 0 && _this$settings2$value['permissions-rejected']);
-  }
-
-  async setProtectionLevel(value) {
-    this.updateSetting('protection-level', value);
-  }
-
-}, (_descriptor = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "settings", [mobx_esm/* observable */.LO], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function () {
-    return null;
-  }
-}), _descriptor2 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "optionsReadyToRender", [mobx_esm/* observable */.LO], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function () {
-    return false;
-  }
-}), _descriptor3 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "version", [mobx_esm/* observable */.LO], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function () {
-    return null;
-  }
-}), _descriptor4 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "filters", [mobx_esm/* observable */.LO], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function () {
-    return [];
-  }
-}), _descriptor5 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "categories", [mobx_esm/* observable */.LO], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function () {
-    return [];
-  }
-}), _descriptor6 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "visibleFilters", [mobx_esm/* observable */.LO], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function () {
-    return [];
-  }
-}), _descriptor7 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "rulesCount", [mobx_esm/* observable */.LO], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function () {
-    return 0;
-  }
-}), _descriptor8 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "allowAcceptableAds", [mobx_esm/* observable */.LO], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function () {
-    return null;
-  }
-}), _descriptor9 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "blockKnownTrackers", [mobx_esm/* observable */.LO], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function () {
-    return null;
-  }
-}), _descriptor10 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "stripTrackingParameters", [mobx_esm/* observable */.LO], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function () {
-    return null;
-  }
-}), _descriptor11 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "allowlist", [mobx_esm/* observable */.LO], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function () {
-    return '';
-  }
-}), _descriptor12 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "savingAllowlistState", [mobx_esm/* observable */.LO], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function () {
-    return savingAllowlistService.initialState.value;
-  }
-}), _descriptor13 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "filtersUpdating", [mobx_esm/* observable */.LO], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function () {
-    return false;
-  }
-}), _descriptor14 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "selectedGroupId", [mobx_esm/* observable */.LO], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function () {
-    return null;
-  }
-}), _descriptor15 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "isChrome", [mobx_esm/* observable */.LO], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function () {
-    return null;
-  }
-}), _descriptor16 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "searchInput", [mobx_esm/* observable */.LO], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function () {
-    return '';
-  }
-}), _descriptor17 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "searchSelect", [mobx_esm/* observable */.LO], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function () {
-    return SEARCH_FILTERS.ALL;
-  }
-}), _descriptor18 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "allowlistEditorContentChanged", [mobx_esm/* observable */.LO], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function () {
-    return false;
-  }
-}), _descriptor19 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "allowlistEditorWrap", [mobx_esm/* observable */.LO], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function () {
-    return null;
-  }
-}), _descriptor20 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "fullscreenUserRulesEditorIsOpen", [mobx_esm/* observable */.LO], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function () {
-    return false;
-  }
-}), _descriptor21 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "allowlistSizeReset", [mobx_esm/* observable */.LO], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function () {
-    return false;
-  }
-}), (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "requestOptionsData", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(_class.prototype, "requestOptionsData"), _class.prototype), (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "updateRulesCount", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(_class.prototype, "updateRulesCount"), _class.prototype), (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "setSelectedGroupId", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(_class.prototype, "setSelectedGroupId"), _class.prototype), (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "updateSetting", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(_class.prototype, "updateSetting"), _class.prototype), (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "setAllowAcceptableAdsState", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(_class.prototype, "setAllowAcceptableAdsState"), _class.prototype), (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "setBlockKnownTrackersState", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(_class.prototype, "setBlockKnownTrackersState"), _class.prototype), (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "setStripTrackingParametersState", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(_class.prototype, "setStripTrackingParametersState"), _class.prototype), (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "setAllowAcceptableAds", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(_class.prototype, "setAllowAcceptableAds"), _class.prototype), (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "setBlockKnownTrackers", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(_class.prototype, "setBlockKnownTrackers"), _class.prototype), (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "setStripTrackingParameters", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(_class.prototype, "setStripTrackingParameters"), _class.prototype), (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "lastUpdateTime", [mobx_esm/* computed */.Fl], Object.getOwnPropertyDescriptor(_class.prototype, "lastUpdateTime"), _class.prototype), (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "updateGroupSetting", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(_class.prototype, "updateGroupSetting"), _class.prototype), (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "refreshFilters", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(_class.prototype, "refreshFilters"), _class.prototype), (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "refreshFilter", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(_class.prototype, "refreshFilter"), _class.prototype), _descriptor22 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "setFilterEnabledState", [mobx_esm/* action */.aD], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function () {
-    return (rawFilterId, enabled) => {
-      const filterId = parseInt(rawFilterId, 10);
-      this.filters.forEach(filter => {
-        if (filter.filterId === filterId) {
-          // eslint-disable-next-line no-param-reassign
-          filter.enabled = !!enabled;
-        }
-      });
-      this.visibleFilters.forEach(filter => {
-        if (filter.filterId === filterId) {
-          // eslint-disable-next-line no-param-reassign
-          filter.enabled = !!enabled;
-        }
-      });
-    };
-  }
-}), (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "updateFilterSetting", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(_class.prototype, "updateFilterSetting"), _class.prototype), (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "setFiltersUpdating", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(_class.prototype, "setFiltersUpdating"), _class.prototype), (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "updateFilters", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(_class.prototype, "updateFilters"), _class.prototype), (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "addCustomFilter", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(_class.prototype, "addCustomFilter"), _class.prototype), (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "removeCustomFilter", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(_class.prototype, "removeCustomFilter"), _class.prototype), _descriptor23 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "setAllowlist", [mobx_esm/* action */.aD], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function () {
-    return allowlist => {
-      this.allowlist = allowlist;
-    };
-  }
-}), _descriptor24 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "getAllowlist", [mobx_esm/* action */.aD], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function () {
-    return async () => {
-      try {
-        const {
-          content
-        } = await messenger/* messenger.getAllowlist */.d.getAllowlist();
-        this.setAllowlist(content);
-      } catch (e) {
-        log/* log.debug */.c.debug(e);
-      }
-    };
-  }
-}), _descriptor25 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "appendAllowlist", [mobx_esm/* action */.aD], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function () {
-    return async allowlist => {
-      await this.saveAllowlist(this.allowlist.concat('\n', allowlist));
-    };
-  }
-}), _descriptor26 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "saveAllowlist", [mobx_esm/* action */.aD], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function () {
-    return async allowlist => {
-      await savingAllowlistService.send(EVENTS.SAVE, {
-        value: allowlist
-      });
-    };
-  }
-}), _descriptor27 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "setAllowlistEditorContentChangedState", [mobx_esm/* action */.aD], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function () {
-    return state => {
-      this.allowlistEditorContentChanged = state;
-    };
-  }
-}), _descriptor28 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "setSearchInput", [mobx_esm/* action */.aD], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function () {
-    return value => {
-      this.searchInput = value;
-      this.sortFilters();
-      this.sortSearchGroups();
-      this.selectVisibleFilters();
-    };
-  }
-}), _descriptor29 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "setSearchSelect", [mobx_esm/* action */.aD], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function () {
-    return value => {
-      this.searchSelect = value;
-      this.sortFilters();
-      this.sortSearchGroups();
-      this.selectVisibleFilters();
-    };
-  }
-}), (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "isSearching", [mobx_esm/* computed */.Fl], Object.getOwnPropertyDescriptor(_class.prototype, "isSearching"), _class.prototype), _descriptor30 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "sortFilters", [mobx_esm/* action */.aD], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function () {
-    return () => {
-      this.setFilters(sortFilters(this.filters));
-    };
-  }
-}), _descriptor31 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "setFilters", [mobx_esm/* action */.aD], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function () {
-    return filters => {
-      this.filters = filters;
-    };
-  }
-}), _descriptor32 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "setVisibleFilters", [mobx_esm/* action */.aD], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function () {
-    return visibleFilters => {
-      this.visibleFilters = visibleFilters;
-    };
-  }
-}), _descriptor33 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "sortSearchGroups", [mobx_esm/* action */.aD], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function () {
-    return () => {
-      this.setGroups(sortGroupsOnSearch(this.categories));
-    };
-  }
-}), _descriptor34 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "setGroups", [mobx_esm/* action */.aD], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function () {
-    return categories => {
-      this.categories = categories;
-    };
-  }
-}), _descriptor35 = (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "selectVisibleFilters", [mobx_esm/* action */.aD], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function () {
-    return () => {
-      this.visibleFilters = this.filters.filter(filter => {
-        let searchMod;
-
-        switch (this.searchSelect) {
-          case SEARCH_FILTERS.ENABLED:
-            searchMod = filter.enabled;
-            break;
-
-          case SEARCH_FILTERS.DISABLED:
-            searchMod = !filter.enabled;
-            break;
-
-          default:
-            searchMod = true;
-        }
-
-        return searchMod;
-      });
-    };
-  }
-}), (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "filtersToRender", [mobx_esm/* computed */.Fl], Object.getOwnPropertyDescriptor(_class.prototype, "filtersToRender"), _class.prototype), (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "appearanceTheme", [mobx_esm/* computed */.Fl], Object.getOwnPropertyDescriptor(_class.prototype, "appearanceTheme"), _class.prototype), (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "showAdguardPromoInfo", [mobx_esm/* computed */.Fl], Object.getOwnPropertyDescriptor(_class.prototype, "showAdguardPromoInfo"), _class.prototype), (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "hideAdguardPromoInfo", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(_class.prototype, "hideAdguardPromoInfo"), _class.prototype), (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "allowlistEditorWrapState", [mobx_esm/* computed */.Fl], Object.getOwnPropertyDescriptor(_class.prototype, "allowlistEditorWrapState"), _class.prototype), (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "toggleAllowlistEditorWrap", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(_class.prototype, "toggleAllowlistEditorWrap"), _class.prototype), (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "footerRateShowState", [mobx_esm/* computed */.Fl], Object.getOwnPropertyDescriptor(_class.prototype, "footerRateShowState"), _class.prototype), (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "hideFooterRateShow", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(_class.prototype, "hideFooterRateShow"), _class.prototype), (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "setFullscreenUserRulesEditorState", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(_class.prototype, "setFullscreenUserRulesEditorState"), _class.prototype), (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "isFullscreenUserRulesEditorOpen", [mobx_esm/* computed */.Fl], Object.getOwnPropertyDescriptor(_class.prototype, "isFullscreenUserRulesEditorOpen"), _class.prototype), (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "userFilterEnabledSettingId", [mobx_esm/* computed */.Fl], Object.getOwnPropertyDescriptor(_class.prototype, "userFilterEnabledSettingId"), _class.prototype), (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "userFilterEnabled", [mobx_esm/* computed */.Fl], Object.getOwnPropertyDescriptor(_class.prototype, "userFilterEnabled"), _class.prototype), (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "setAllowlistSizeReset", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(_class.prototype, "setAllowlistSizeReset"), _class.prototype), (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "protectionLevel", [mobx_esm/* computed */.Fl], Object.getOwnPropertyDescriptor(_class.prototype, "protectionLevel"), _class.prototype), (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "arePermissionsRejected", [mobx_esm/* computed */.Fl], Object.getOwnPropertyDescriptor(_class.prototype, "arePermissionsRejected"), _class.prototype), (0,applyDecoratedDescriptor/* default */.Z)(_class.prototype, "setProtectionLevel", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(_class.prototype, "setProtectionLevel"), _class.prototype)), _class);
-/* harmony default export */ const stores_SettingsStore = (SettingsStore);
-// EXTERNAL MODULE: ./node_modules/nanoid/index.browser.js
-var index_browser = __webpack_require__(2380);
-;// CONCATENATED MODULE: ./Extension/src/pages/options/stores/UiStore.js
-
-
-
-
-var UiStore_class, UiStore_descriptor;
-
-
-
-let UiStore = (UiStore_class = class UiStore {
-  constructor(rootStore) {
-    (0,initializerDefineProperty/* default */.Z)(this, "notifications", UiStore_descriptor, this);
-
-    this.rootStore = rootStore;
-    (0,mobx_esm/* makeObservable */.rC)(this);
-  }
-
-  addNotification({
-    title = '',
-    description
-  }) {
-    const id = (0,index_browser/* nanoid */.x0)();
-    this.notifications.push({
-      id,
-      title,
-      description
-    });
-    return id;
-  }
-
-  removeNotification(id) {
-    this.notifications = this.notifications.filter(notification => notification.id !== id);
-  }
-
-}, (UiStore_descriptor = (0,applyDecoratedDescriptor/* default */.Z)(UiStore_class.prototype, "notifications", [mobx_esm/* observable */.LO], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function () {
-    return [];
-  }
-}), (0,applyDecoratedDescriptor/* default */.Z)(UiStore_class.prototype, "addNotification", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(UiStore_class.prototype, "addNotification"), UiStore_class.prototype), (0,applyDecoratedDescriptor/* default */.Z)(UiStore_class.prototype, "removeNotification", [mobx_esm/* action */.aD], Object.getOwnPropertyDescriptor(UiStore_class.prototype, "removeNotification"), UiStore_class.prototype)), UiStore_class);
-/* harmony default export */ const stores_UiStore = (UiStore);
-;// CONCATENATED MODULE: ./Extension/src/pages/options/stores/RootStore.js
-
-
-
- // Do not allow property change outside of store actions
-
-(0,mobx_esm/* configure */.jQ)({
-  enforceActions: 'observed'
-});
-
-class RootStore {
-  constructor() {
-    this.settingsStore = new stores_SettingsStore(this);
-    this.uiStore = new stores_UiStore(this);
-  }
-
-}
-
-const rootStore = /*#__PURE__*/(0,react.createContext)(new RootStore());
-
-/***/ }),
-
-/***/ 9234:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-
-// EXPORTS
-__webpack_require__.d(__webpack_exports__, {
-  "I": () => (/* binding */ PermissionsMissing)
-});
-
-// EXTERNAL MODULE: ./node_modules/react/index.js
-var react = __webpack_require__(846);
-// EXTERNAL MODULE: ./Extension/src/pages/common/components/Button/index.jsx + 1 modules
-var Button = __webpack_require__(6961);
-// EXTERNAL MODULE: ./Extension/src/pages/popup/components/MainContainer/components/Icons.jsx
-var Icons = __webpack_require__(6207);
-// EXTERNAL MODULE: ./Extension/src/common/translators/reactTranslator.js
-var reactTranslator = __webpack_require__(8647);
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js
-var injectStylesIntoStyleTag = __webpack_require__(5491);
-var injectStylesIntoStyleTag_default = /*#__PURE__*/__webpack_require__.n(injectStylesIntoStyleTag);
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/styleDomAPI.js
-var styleDomAPI = __webpack_require__(9532);
-var styleDomAPI_default = /*#__PURE__*/__webpack_require__.n(styleDomAPI);
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/insertBySelector.js
-var insertBySelector = __webpack_require__(8190);
-var insertBySelector_default = /*#__PURE__*/__webpack_require__.n(insertBySelector);
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js
-var setAttributesWithoutAttributes = __webpack_require__(7630);
-var setAttributesWithoutAttributes_default = /*#__PURE__*/__webpack_require__.n(setAttributesWithoutAttributes);
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/insertStyleElement.js
-var insertStyleElement = __webpack_require__(664);
-var insertStyleElement_default = /*#__PURE__*/__webpack_require__.n(insertStyleElement);
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/styleTagTransform.js
-var styleTagTransform = __webpack_require__(2563);
-var styleTagTransform_default = /*#__PURE__*/__webpack_require__.n(styleTagTransform);
-// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!./node_modules/postcss-loader/dist/cjs.js!./Extension/src/pages/popup/components/MainContainer/Main/PermissionsMissing/styles.css
-var styles = __webpack_require__(906);
-;// CONCATENATED MODULE: ./Extension/src/pages/popup/components/MainContainer/Main/PermissionsMissing/styles.css
-
-      
-      
-      
-      
-      
-      
-      
-      
-      
-
-var options = {};
-
-options.styleTagTransform = (styleTagTransform_default());
-options.setAttributes = (setAttributesWithoutAttributes_default());
-
-      options.insert = insertBySelector_default().bind(null, "head");
-    
-options.domAPI = (styleDomAPI_default());
-options.insertStyleElement = (insertStyleElement_default());
-
-var update = injectStylesIntoStyleTag_default()(styles/* default */.Z, options);
-
-
-
-
-       /* harmony default export */ const PermissionsMissing_styles = (styles/* default */.Z && styles/* default.locals */.Z.locals ? styles/* default.locals */.Z.locals : undefined);
-
-;// CONCATENATED MODULE: ./Extension/src/pages/popup/components/MainContainer/Main/PermissionsMissing/index.jsx
-
-
-
-
-
-const PermissionsMissing = ({
-  inlineCTA,
-  onRequestPermissions
-}) => {
-  return /*#__PURE__*/react.createElement("div", null, /*#__PURE__*/react.createElement("div", {
-    className: "section-no-permission section-default-browser"
-  }, /*#__PURE__*/react.createElement("div", null, /*#__PURE__*/react.createElement("div", {
-    className: "permission_missing__title"
-  }, reactTranslator/* reactTranslator.getMessage */._.getMessage('missing_permissions_default_search_engine_title')), /*#__PURE__*/react.createElement("div", null, reactTranslator/* reactTranslator.getMessage */._.getMessage('missing_permissions_default_search_engine_description'))), /*#__PURE__*/react.createElement("div", null, /*#__PURE__*/react.createElement(Icons/* Check */.Jr, null))), /*#__PURE__*/react.createElement("div", {
-    className: "section-no-permission section-enable-permissions"
-  }, /*#__PURE__*/react.createElement("div", null, /*#__PURE__*/react.createElement("div", {
-    className: "permission_missing__title"
-  }, reactTranslator/* reactTranslator.getMessage */._.getMessage('missing_permissions_disabled_title')), /*#__PURE__*/react.createElement("div", null, reactTranslator/* reactTranslator.getMessage */._.getMessage('missing_permissions_disabled_description')), !inlineCTA && /*#__PURE__*/react.createElement(Button/* Button */.z, {
-    className: "cta",
-    name: "enable-protection",
-    size: "small",
-    onClick: onRequestPermissions
-  }, reactTranslator/* reactTranslator.getMessage */._.getMessage('missing_permissions_cta_button_popup'))), /*#__PURE__*/react.createElement("div", null, inlineCTA && /*#__PURE__*/react.createElement(Button/* Button */.z, {
-    className: "cta-inline",
-    name: "enable-protection",
-    size: "small",
-    color: "secondary",
-    onClick: onRequestPermissions
-  }, reactTranslator/* reactTranslator.getMessage */._.getMessage('missing_permissions_cta_button_popup')))));
-};
-
-/***/ }),
-
-/***/ 6207:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Jr": () => (/* binding */ Check),
-/* harmony export */   "SU": () => (/* binding */ Clock),
-/* harmony export */   "TH": () => (/* binding */ Globe),
-/* harmony export */   "WL": () => (/* binding */ Shield),
-/* harmony export */   "ol": () => (/* binding */ ArrowRight)
-/* harmony export */ });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(846);
-/* eslint-disable max-len */
-
-const ArrowRight = ({
-  className = '',
-  color = '#0C0C0E'
-}) => /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("svg", {
-  className: className,
-  width: "24",
-  height: "24",
-  xmlns: "http://www.w3.org/2000/svg"
-}, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("path", {
-  d: "m15.7 12.7-6 6c-.2.2-.4.3-.7.3-.3 0-.5-.1-.7-.3-.4-.4-.4-1 0-1.4l5.3-5.3-5.3-5.3c-.4-.4-.4-1 0-1.4.4-.4 1-.4 1.4 0l6 6c.4.4.4 1 0 1.4z",
-  fill: color,
-  fillRule: "evenodd"
-}));
-const Globe = ({
-  className = '',
-  fill = '#050506'
-}) => /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("svg", {
-  className: className,
-  width: "32",
-  height: "32",
-  viewBox: "0 0 32 32",
-  xmlns: "http://www.w3.org/2000/svg"
-}, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", {
-  fill: "none",
-  fillRule: "evenodd"
-}, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("rect", {
-  fill: fill,
-  width: "32",
-  height: "32",
-  rx: "16"
-}), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("path", {
-  d: "M4 4h24v24H4z"
-}), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("path", {
-  d: "M15.75 6C10.365 6 6 10.365 6 15.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S21.135 6 15.75 6zm-7.94 7.5a8.256 8.256 0 0 0-.31 2.25c0 .78.108 1.535.31 2.25h3.311A20.633 20.633 0 0 1 11 15.75c0-.773.042-1.526.121-2.25h-3.31zM8.4 12h2.948c.211-1.086.513-2.074.888-2.919.163-.366.342-.71.537-1.028A8.28 8.28 0 0 0 8.4 12zm4.231 1.5a19.039 19.039 0 0 0-.131 2.25c0 .782.046 1.536.131 2.25h6.238c.085-.714.131-1.468.131-2.25s-.046-1.536-.131-2.25H12.63zm5.99-1.5H12.88c.186-.87.435-1.65.728-2.31.336-.756.718-1.323 1.103-1.69.382-.363.732-.5 1.04-.5.308 0 .658.137 1.04.5.385.367.767.934 1.103 1.69.293.66.542 1.44.728 2.31zm1.758 1.5c.08.724.121 1.477.121 2.25 0 .773-.042 1.526-.121 2.25h3.31A8.26 8.26 0 0 0 24 15.75a8.26 8.26 0 0 0-.31-2.25h-3.311zM23.1 12h-2.948c-.211-1.086-.513-2.074-.888-2.919a8.706 8.706 0 0 0-.537-1.028A8.28 8.28 0 0 1 23.1 12zM12.773 23.447A8.28 8.28 0 0 1 8.4 19.5h2.948c.211 1.086.513 2.074.888 2.919.163.366.342.71.537 1.028zm.834-1.638c-.293-.66-.542-1.44-.728-2.309h5.742a11.86 11.86 0 0 1-.728 2.31c-.336.756-.718 1.323-1.103 1.69-.382.363-.732.5-1.04.5-.308 0-.658-.137-1.04-.5-.385-.367-.767-.934-1.103-1.69zm5.657.61c.375-.845.677-1.833.888-2.919H23.1a8.28 8.28 0 0 1-4.373 3.947c.195-.317.374-.662.537-1.028z",
-  fill: "#FFF"
-})));
-const Shield = ({
-  className = '',
-  fill = '#050506'
-}) => /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("svg", {
-  className: className,
-  width: "32",
-  height: "32",
-  viewBox: "0 0 32 32",
-  xmlns: "http://www.w3.org/2000/svg"
-}, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", {
-  fill: "none",
-  fillRule: "evenodd"
-}, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("rect", {
-  fill: fill,
-  width: "32",
-  height: "32",
-  rx: "16"
-}), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("path", {
-  d: "M4 4h24v24H4z"
-}), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("path", {
-  d: "M15.051 6.154a3 3 0 0 1 1.898 0l6 2A3 3 0 0 1 25 11v5.338c0 5.502-5.56 8.841-7.94 10.019a2.377 2.377 0 0 1-2.12 0C12.56 25.179 7 21.84 7 16.337V11a3 3 0 0 1 2.051-2.846zm.475 1.423-6 2A1.5 1.5 0 0 0 8.5 11v5.338c0 2.207 1.108 4.057 2.633 5.565 1.526 1.51 3.352 2.555 4.472 3.11a.876.876 0 0 0 .79 0c1.12-.555 2.946-1.6 4.472-3.11 1.524-1.508 2.633-3.358 2.633-5.565V11a1.5 1.5 0 0 0-1.026-1.423l-6-2a1.5 1.5 0 0 0-.948 0zm4.004 6.23a.75.75 0 0 1 0 1.061l-3.434 3.434a1.55 1.55 0 0 1-2.192 0l-1.434-1.434a.75.75 0 1 1 1.06-1.06l1.435 1.434c.02.02.05.02.07 0l3.435-3.435a.75.75 0 0 1 1.06 0z",
-  fill: "#FFF"
-})));
-const Clock = ({
-  className = '',
-  fill = '#050506'
-}) => /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("svg", {
-  className: className,
-  width: "32",
-  height: "32",
-  viewBox: "0 0 32 32",
-  xmlns: "http://www.w3.org/2000/svg"
-}, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", {
-  fill: "none",
-  fillRule: "evenodd"
-}, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("rect", {
-  fill: fill,
-  width: "32",
-  height: "32",
-  rx: "16"
-}), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("path", {
-  d: "M4 3h24v24H4z"
-}), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("path", {
-  d: "M18.057 6a.75.75 0 0 1 .102 1.493l-.102.007h-1.25v1.285a8 8 0 1 1-1.747.027l.247-.027V7.5h-1.25a.75.75 0 0 1-.101-1.493L14.057 6h4zm-2 4.25a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13zm3.03 3.47a.75.75 0 0 1 .073.976l-.072.084-1.189 1.189a2 2 0 1 1-1.207-1.116l.146.055 1.19-1.188a.75.75 0 0 1 1.06 0zm-3.03 2.53a.5.5 0 1 0 0 1 .5.5 0 0 0 0-1zM9.682 7.786c.337-.24.8-.127 1.017.225.216.353.103.812-.231 1.055a9.501 9.501 0 0 0-1.13.965c-.292.293-.763.333-1.078.064a.711.711 0 0 1-.064-1.04 11 11 0 0 1 1.486-1.27zm12.75-.001a11 11 0 0 1 1.488 1.272.71.71 0 0 1-.065 1.037c-.314.268-.784.229-1.076-.063a9.497 9.497 0 0 0-1.132-.968c-.333-.243-.446-.7-.23-1.053a.71.71 0 0 1 1.014-.225z",
-  fill: "#FFF"
-})));
-const Check = ({
-  className = '',
-  fill = '#050506'
-}) => /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("svg", {
-  className: className,
-  width: "32",
-  height: "32",
-  viewBox: "0 0 32 32",
-  xmlns: "http://www.w3.org/2000/svg"
-}, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", {
-  fill: "none",
-  fillRule: "evenodd"
-}, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("rect", {
-  fill: fill,
-  width: "32",
-  height: "32",
-  rx: "16"
-}), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("path", {
-  d: "M4 4h24v24H4z"
-}), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("path", {
-  d: "M24.28 11.22a.75.75 0 0 1 0 1.06l-8.586 8.586a2.75 2.75 0 0 1-3.889 0L8.22 17.28a.75.75 0 1 1 1.06-1.06l3.586 3.585a1.25 1.25 0 0 0 1.768 0l8.586-8.585a.75.75 0 0 1 1.06 0z",
-  fill: "#FFF"
-})));
-
-/***/ }),
-
-/***/ 6849:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-
-// EXPORTS
-__webpack_require__.d(__webpack_exports__, {
-  "$": () => (/* binding */ ProtectionButton)
-});
-
-// EXTERNAL MODULE: ./node_modules/react/index.js
-var react = __webpack_require__(846);
-// EXTERNAL MODULE: ./node_modules/classnames/index.js
-var classnames = __webpack_require__(8356);
-var classnames_default = /*#__PURE__*/__webpack_require__.n(classnames);
-// EXTERNAL MODULE: ./Extension/src/common/translators/reactTranslator.js
-var reactTranslator = __webpack_require__(8647);
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js
-var injectStylesIntoStyleTag = __webpack_require__(5491);
-var injectStylesIntoStyleTag_default = /*#__PURE__*/__webpack_require__.n(injectStylesIntoStyleTag);
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/styleDomAPI.js
-var styleDomAPI = __webpack_require__(9532);
-var styleDomAPI_default = /*#__PURE__*/__webpack_require__.n(styleDomAPI);
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/insertBySelector.js
-var insertBySelector = __webpack_require__(8190);
-var insertBySelector_default = /*#__PURE__*/__webpack_require__.n(insertBySelector);
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js
-var setAttributesWithoutAttributes = __webpack_require__(7630);
-var setAttributesWithoutAttributes_default = /*#__PURE__*/__webpack_require__.n(setAttributesWithoutAttributes);
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/insertStyleElement.js
-var insertStyleElement = __webpack_require__(664);
-var insertStyleElement_default = /*#__PURE__*/__webpack_require__.n(insertStyleElement);
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/styleTagTransform.js
-var styleTagTransform = __webpack_require__(2563);
-var styleTagTransform_default = /*#__PURE__*/__webpack_require__.n(styleTagTransform);
-// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!./node_modules/postcss-loader/dist/cjs.js!./Extension/src/pages/popup/components/MainContainer/components/ProtectionButton/styles.css
-var styles = __webpack_require__(5163);
-;// CONCATENATED MODULE: ./Extension/src/pages/popup/components/MainContainer/components/ProtectionButton/styles.css
-
-      
-      
-      
-      
-      
-      
-      
-      
-      
-
-var options = {};
-
-options.styleTagTransform = (styleTagTransform_default());
-options.setAttributes = (setAttributesWithoutAttributes_default());
-
-      options.insert = insertBySelector_default().bind(null, "head");
-    
-options.domAPI = (styleDomAPI_default());
-options.insertStyleElement = (insertStyleElement_default());
-
-var update = injectStylesIntoStyleTag_default()(styles/* default */.Z, options);
-
-
-
-
-       /* harmony default export */ const ProtectionButton_styles = (styles/* default */.Z && styles/* default.locals */.Z.locals ? styles/* default.locals */.Z.locals : undefined);
-
-// EXTERNAL MODULE: ./Extension/src/pages/popup/components/MainContainer/components/Icons.jsx
-var Icons = __webpack_require__(6207);
-;// CONCATENATED MODULE: ./Extension/src/pages/popup/components/MainContainer/components/ProtectionButton/index.jsx
-
-
-
-
-
-const ProtectionButton = ({
-  level,
-  onClick: onClickProp,
-  active,
-  inPopup
-}) => {
-  const onClick = () => {
-    var _window, _window$apm;
-
-    const transaction = (_window = window) === null || _window === void 0 ? void 0 : (_window$apm = _window.apm) === null || _window$apm === void 0 ? void 0 : _window$apm.startTransaction(`protection-button-click-${level}`);
-    onClickProp(level);
-
-    if (transaction) {
-      transaction.result = 'success';
-      transaction.end();
-    }
-  };
-
-  return /*#__PURE__*/react.createElement("div", {
-    tabIndex: "0",
-    role: "button",
-    onClick: onClick,
-    onKeyPress: onClick,
-    className: classnames_default()('protection-list__button', {
-      'protection-list__button--active': active,
-      'protection-list__button_in_popup': inPopup
-    })
-  }, /*#__PURE__*/react.createElement("div", {
-    className: classnames_default()('inner-left', {
-      'inner-left__popup': inPopup
-    })
-  }, /*#__PURE__*/react.createElement("span", {
-    className: classnames_default()('inner-left__title', {
-      'inner-left__title__popup': inPopup
-    })
-  }, reactTranslator/* reactTranslator.getMessage */._.getMessage(`protection_level_${level}`)), /*#__PURE__*/react.createElement("span", {
-    className: "inner-left__desc"
-  }, reactTranslator/* reactTranslator.getMessage */._.getMessage(`protection_level_${level}_description`))), /*#__PURE__*/react.createElement("div", {
-    className: "inner-right"
-  }, /*#__PURE__*/react.createElement(Icons/* Check */.Jr, {
-    className: classnames_default()('inner-right__active-check', {
-      'inner-right__active-check--visible': active
-    })
-  })));
 };
 
 /***/ }),
@@ -16425,7 +21723,7 @@ const messenger = new Messenger();
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, ".btn_button {\n    position: relative;\n    border-radius: 8px;\n    border: none;\n    cursor: pointer;\n    overflow: hidden;\n    height: 50px;\n    padding-left: 24px;\n    padding-right: 24px;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    align-content: center;\n    transition: background 0.15s ease-in-out;\n}\n\n.btn_button:disabled {\n    cursor: progress;\n}\n\n.btn_button__loading {\n    width: var(--btn_width_loading);\n}\n\n.btn_loader {\n    width: 32px;\n    height: 32px;\n    border: 4px solid #FFF;\n    border-bottom-color: var(--blue);\n    border-radius: 50%;\n    display: inline-block;\n    box-sizing: border-box;\n    -webkit-animation: rotation 1s linear infinite;\n            animation: rotation 1s linear infinite;\n}\n\n@-webkit-keyframes rotation {\n    0% {\n        transform: rotate(0deg);\n    }\n\n    100% {\n        transform: rotate(360deg);\n    }\n}\n\n@keyframes rotation {\n    0% {\n        transform: rotate(0deg);\n    }\n\n    100% {\n        transform: rotate(360deg);\n    }\n}\n\n.default {\n    font-size: 16px;\n    line-height: 22px;\n    letter-spacing: -0.2px;\n    font-weight: bold;\n}\n\n.small {\n    font-size: 14px;\n    line-height: 1.29;\n    width: 155px;\n    height: 36px;\n    padding-left: 4px !important;\n    padding-right: 4px !important;\n}\n\n.hidden {\n    visibility: hidden;\n}\n\n.primary {\n    background-color: var(--grey-black);\n    color: var(--grey-bright);\n}\n\n.primary:hover {\n    background-color: #4B5058;\n}\n\n.secondary {\n    background: none;\n    border-radius: 8px;\n    border: solid 1px #050506;\n    color: var(--grey-black);\n}\n\n.secondary:hover {\n    background-color: #C8CBD0;\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, ".btn_button {\n    position: relative;\n    border-radius: 8px;\n    border: none;\n    cursor: pointer;\n    overflow: hidden;\n    height: 50px;\n    padding-left: 24px;\n    padding-right: 24px;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    align-content: center;\n    transition: background 0.15s ease-in-out;\n}\n\n.btn_button:disabled {\n    cursor: progress;\n}\n\n.btn_button__loading {\n    width: var(--btn_width_loading);\n}\n\n.btn_loader {\n    width: 32px;\n    height: 32px;\n    border: 4px solid #FFF;\n    border-bottom-color: var(--blue);\n    border-radius: 50%;\n    display: inline-block;\n    box-sizing: border-box;\n    -webkit-animation: rotation 1s linear infinite;\n            animation: rotation 1s linear infinite;\n}\n\n@-webkit-keyframes rotation {\n    0% {\n        transform: rotate(0deg);\n    }\n\n    100% {\n        transform: rotate(360deg);\n    }\n}\n\n@keyframes rotation {\n    0% {\n        transform: rotate(0deg);\n    }\n\n    100% {\n        transform: rotate(360deg);\n    }\n}\n\n.default {\n    font-size: 16px;\n    line-height: 22px;\n    letter-spacing: -0.2px;\n    font-weight: bold;\n}\n\n.small {\n    font-size: 14px;\n    line-height: 1.29;\n    width: 155px;\n    height: 36px;\n    padding-left: 4px !important;\n    padding-right: 4px !important;\n}\n\n.hidden {\n    visibility: hidden;\n}\n\n.primary {\n    background-color: var(--grey-black);\n    color: var(--grey-bright);\n}\n\n.primary:hover {\n    background-color: var(--grey-darker);\n}\n\n.secondary {\n    background: none;\n    border-radius: 8px;\n    border: solid 1px #050506;\n    color: var(--grey-black);\n}\n\n.secondary:hover {\n    background-color: #C8CBD0;\n}", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -16639,7 +21937,7 @@ ___CSS_LOADER_EXPORT___.push([module.id, ".main_section__wrapper {\n    width: 1
 
 /***/ }),
 
-/***/ 309:
+/***/ 6458:
 /***/ ((module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -16701,7 +21999,7 @@ ___CSS_LOADER_EXPORT___.push([module.id, ".help-section .title {\n    font-size:
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, ".telemetry-section {\n    display: flex;\n    margin-top: 12px;\n    margin-bottom: -16px;\n}\n\n.telemetry-section label {\n    margin-left: 4px;\n    font-size: 12px;\n    line-height: 1.33;\n    color: #4b5058;\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, ".telemetry-section {\n    display: flex;\n    margin-top: 12px;\n    margin-bottom: -16px;\n}\n\n.telemetry-section label {\n    font-size: 12px;\n    margin-left: 4px;\n    line-height: 1.33;\n    color: var(--grey-darker);\n}\n\n.telemetry-section a {\n    margin-left: 4px;\n    text-decoration: none;\n    color: var(--grey-darker);\n}\n\n.telemetry-section a:visited {\n    text-decoration: none;\n    color: var(--grey-darker);\n}\n\n.telemetry-section a:hover {\n    text-decoration: underline;\n}", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -16908,7 +22206,7 @@ ___CSS_LOADER_EXPORT___.push([module.id, "body {\n    font-family: Helvetica, sa
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, ":root {\n    --white: #ffffff;\n    --green: #85d6ad;\n    --grey-black: #0c0c0e;\n    --black: #000000;\n    --grey: #e9eaec;\n    --grey-base: #898991;\n    --grey-bright: #f5f5f7;\n    --grey-semi-darkness: #59595f;\n    --blue: #5c97ff;\n    --blue-light: #99beff;\n    --purple-light: #ded6ff;\n    --border: #676e79;\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, ":root {\n    --white: #ffffff;\n    --green: #85d6ad;\n    --grey-black: #0c0c0e;\n    --black: #000000;\n    --grey: #e9eaec;\n    --grey-base: #898991;\n    --grey-bright: #f5f5f7;\n    --grey-semi-darkness: #59595f;\n    --grey-darker: #4b5058;\n    --blue: #5c97ff;\n    --blue-light: #99beff;\n    --purple-light: #ded6ff;\n    --border: #676e79;\n}", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -18107,51 +23405,6 @@ var validator = {
   isTranslationValid: isTranslationValid,
   isPluralFormValid: isPluralFormValid
 };
-
-
-
-
-/***/ }),
-
-/***/ 8261:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "x": () => (/* binding */ RequestType)
-/* harmony export */ });
-/**
- * RequestType is the request types enumeration
- */
-var RequestType;
-(function (RequestType) {
-    /** main frame */
-    RequestType[RequestType["Document"] = 1] = "Document";
-    /** (iframe) $subdocument */
-    RequestType[RequestType["Subdocument"] = 2] = "Subdocument";
-    /** (javascript, etc) $script */
-    RequestType[RequestType["Script"] = 4] = "Script";
-    /** (css) $stylesheet */
-    RequestType[RequestType["Stylesheet"] = 8] = "Stylesheet";
-    /** (flash, etc) $object */
-    RequestType[RequestType["Object"] = 16] = "Object";
-    /** (any image) $image */
-    RequestType[RequestType["Image"] = 32] = "Image";
-    /** (ajax/fetch) $xmlhttprequest */
-    RequestType[RequestType["XmlHttpRequest"] = 64] = "XmlHttpRequest";
-    /** (video/music) $media */
-    RequestType[RequestType["Media"] = 128] = "Media";
-    /** (any custom font) $font */
-    RequestType[RequestType["Font"] = 256] = "Font";
-    /** (a websocket connection) $websocket */
-    RequestType[RequestType["Websocket"] = 512] = "Websocket";
-    /** (navigator.sendBeacon()) $ping */
-    RequestType[RequestType["Ping"] = 1024] = "Ping";
-    /** (webrtc, in extension works via wrappers) $webrtc */
-    RequestType[RequestType["Webrtc"] = 2048] = "Webrtc";
-    /** any other request type */
-    RequestType[RequestType["Other"] = 4096] = "Other";
-})(RequestType || (RequestType = {}));
 
 
 
@@ -51620,24 +56873,6 @@ module.exports = function (argument) {
 
 /***/ }),
 
-/***/ 7321:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-var global = __webpack_require__(3406);
-var isConstructor = __webpack_require__(7558);
-var tryToString = __webpack_require__(368);
-
-var TypeError = global.TypeError;
-
-// `Assert: IsConstructor(argument) is true`
-module.exports = function (argument) {
-  if (isConstructor(argument)) return argument;
-  throw TypeError(tryToString(argument) + ' is not a constructor');
-};
-
-
-/***/ }),
-
 /***/ 8514:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
@@ -51695,6 +56930,74 @@ module.exports = {
 
 /***/ }),
 
+/***/ 592:
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+"use strict";
+
+var fails = __webpack_require__(7931);
+
+module.exports = function (METHOD_NAME, argument) {
+  var method = [][METHOD_NAME];
+  return !!method && fails(function () {
+    // eslint-disable-next-line no-useless-call -- required for testing
+    method.call(null, argument || function () { return 1; }, 1);
+  });
+};
+
+
+/***/ }),
+
+/***/ 939:
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+var global = __webpack_require__(3406);
+var aCallable = __webpack_require__(8146);
+var toObject = __webpack_require__(7410);
+var IndexedObject = __webpack_require__(2170);
+var lengthOfArrayLike = __webpack_require__(5474);
+
+var TypeError = global.TypeError;
+
+// `Array.prototype.{ reduce, reduceRight }` methods implementation
+var createMethod = function (IS_RIGHT) {
+  return function (that, callbackfn, argumentsLength, memo) {
+    aCallable(callbackfn);
+    var O = toObject(that);
+    var self = IndexedObject(O);
+    var length = lengthOfArrayLike(O);
+    var index = IS_RIGHT ? length - 1 : 0;
+    var i = IS_RIGHT ? -1 : 1;
+    if (argumentsLength < 2) while (true) {
+      if (index in self) {
+        memo = self[index];
+        index += i;
+        break;
+      }
+      index += i;
+      if (IS_RIGHT ? index < 0 : length <= index) {
+        throw TypeError('Reduce of empty array with no initial value');
+      }
+    }
+    for (;IS_RIGHT ? index >= 0 : length > index; index += i) if (index in self) {
+      memo = callbackfn(memo, self[index], index, O);
+    }
+    return memo;
+  };
+};
+
+module.exports = {
+  // `Array.prototype.reduce` method
+  // https://tc39.es/ecma262/#sec-array.prototype.reduce
+  left: createMethod(false),
+  // `Array.prototype.reduceRight` method
+  // https://tc39.es/ecma262/#sec-array.prototype.reduceright
+  right: createMethod(true)
+};
+
+
+/***/ }),
+
 /***/ 4021:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
@@ -51705,68 +57008,6 @@ var stringSlice = uncurryThis(''.slice);
 
 module.exports = function (it) {
   return stringSlice(toString(it), 8, -1);
-};
-
-
-/***/ }),
-
-/***/ 7298:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-var global = __webpack_require__(3406);
-var TO_STRING_TAG_SUPPORT = __webpack_require__(8216);
-var isCallable = __webpack_require__(2163);
-var classofRaw = __webpack_require__(4021);
-var wellKnownSymbol = __webpack_require__(4259);
-
-var TO_STRING_TAG = wellKnownSymbol('toStringTag');
-var Object = global.Object;
-
-// ES3 wrong here
-var CORRECT_ARGUMENTS = classofRaw(function () { return arguments; }()) == 'Arguments';
-
-// fallback for IE11 Script Access Denied error
-var tryGet = function (it, key) {
-  try {
-    return it[key];
-  } catch (error) { /* empty */ }
-};
-
-// getting tag from ES6+ `Object.prototype.toString`
-module.exports = TO_STRING_TAG_SUPPORT ? classofRaw : function (it) {
-  var O, tag, result;
-  return it === undefined ? 'Undefined' : it === null ? 'Null'
-    // @@toStringTag case
-    : typeof (tag = tryGet(O = Object(it), TO_STRING_TAG)) == 'string' ? tag
-    // builtinTag case
-    : CORRECT_ARGUMENTS ? classofRaw(O)
-    // ES3 arguments fallback
-    : (result = classofRaw(O)) == 'Object' && isCallable(O.callee) ? 'Arguments' : result;
-};
-
-
-/***/ }),
-
-/***/ 11:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-var call = __webpack_require__(8624);
-var aCallable = __webpack_require__(8146);
-var anObject = __webpack_require__(8514);
-
-// https://github.com/tc39/collection-methods
-module.exports = function deleteAll(/* ...elements */) {
-  var collection = anObject(this);
-  var remover = aCallable(collection['delete']);
-  var allDeleted = true;
-  var wasDeleted;
-  for (var k = 0, len = arguments.length; k < len; k++) {
-    wasDeleted = call(remover, collection, arguments[k]);
-    allDeleted = allDeleted && wasDeleted;
-  }
-  return !!allDeleted;
 };
 
 
@@ -51854,6 +57095,17 @@ var EXISTS = isObject(document) && isObject(document.createElement);
 module.exports = function (it) {
   return EXISTS ? document.createElement(it) : {};
 };
+
+
+/***/ }),
+
+/***/ 3584:
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+var classof = __webpack_require__(4021);
+var global = __webpack_require__(3406);
+
+module.exports = classof(global.process) == 'process';
 
 
 /***/ }),
@@ -51995,26 +57247,6 @@ module.exports = function (exec) {
 
 /***/ }),
 
-/***/ 8626:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-var uncurryThis = __webpack_require__(3074);
-var aCallable = __webpack_require__(8146);
-var NATIVE_BIND = __webpack_require__(2637);
-
-var bind = uncurryThis(uncurryThis.bind);
-
-// optional / simple context binding
-module.exports = function (fn, that) {
-  aCallable(fn);
-  return that === undefined ? fn : NATIVE_BIND ? bind(fn, that) : function (/* ...args */) {
-    return fn.apply(that, arguments);
-  };
-};
-
-
-/***/ }),
-
 /***/ 2637:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
@@ -52100,59 +57332,6 @@ var aFunction = function (argument) {
 
 module.exports = function (namespace, method) {
   return arguments.length < 2 ? aFunction(global[namespace]) : global[namespace] && global[namespace][method];
-};
-
-
-/***/ }),
-
-/***/ 610:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-var classof = __webpack_require__(7298);
-var getMethod = __webpack_require__(4462);
-var Iterators = __webpack_require__(6133);
-var wellKnownSymbol = __webpack_require__(4259);
-
-var ITERATOR = wellKnownSymbol('iterator');
-
-module.exports = function (it) {
-  if (it != undefined) return getMethod(it, ITERATOR)
-    || getMethod(it, '@@iterator')
-    || Iterators[classof(it)];
-};
-
-
-/***/ }),
-
-/***/ 1570:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-var global = __webpack_require__(3406);
-var call = __webpack_require__(8624);
-var aCallable = __webpack_require__(8146);
-var anObject = __webpack_require__(8514);
-var tryToString = __webpack_require__(368);
-var getIteratorMethod = __webpack_require__(610);
-
-var TypeError = global.TypeError;
-
-module.exports = function (argument, usingIterator) {
-  var iteratorMethod = arguments.length < 2 ? getIteratorMethod(argument) : usingIterator;
-  if (aCallable(iteratorMethod)) return anObject(call(iteratorMethod, argument));
-  throw TypeError(tryToString(argument) + ' is not iterable');
-};
-
-
-/***/ }),
-
-/***/ 1285:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-var call = __webpack_require__(8624);
-
-module.exports = function (it) {
-  // eslint-disable-next-line es/no-map -- safe
-  return call(Map.prototype.entries, it);
 };
 
 
@@ -52357,23 +57536,6 @@ module.exports = {
 
 /***/ }),
 
-/***/ 8335:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-var wellKnownSymbol = __webpack_require__(4259);
-var Iterators = __webpack_require__(6133);
-
-var ITERATOR = wellKnownSymbol('iterator');
-var ArrayPrototype = Array.prototype;
-
-// check on default Array iterator
-module.exports = function (it) {
-  return it !== undefined && (Iterators.Array === it || ArrayPrototype[ITERATOR] === it);
-};
-
-
-/***/ }),
-
 /***/ 2163:
 /***/ ((module) => {
 
@@ -52382,65 +57544,6 @@ module.exports = function (it) {
 module.exports = function (argument) {
   return typeof argument == 'function';
 };
-
-
-/***/ }),
-
-/***/ 7558:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-var uncurryThis = __webpack_require__(3074);
-var fails = __webpack_require__(7931);
-var isCallable = __webpack_require__(2163);
-var classof = __webpack_require__(7298);
-var getBuiltIn = __webpack_require__(9997);
-var inspectSource = __webpack_require__(2089);
-
-var noop = function () { /* empty */ };
-var empty = [];
-var construct = getBuiltIn('Reflect', 'construct');
-var constructorRegExp = /^\s*(?:class|function)\b/;
-var exec = uncurryThis(constructorRegExp.exec);
-var INCORRECT_TO_STRING = !constructorRegExp.exec(noop);
-
-var isConstructorModern = function isConstructor(argument) {
-  if (!isCallable(argument)) return false;
-  try {
-    construct(noop, empty, argument);
-    return true;
-  } catch (error) {
-    return false;
-  }
-};
-
-var isConstructorLegacy = function isConstructor(argument) {
-  if (!isCallable(argument)) return false;
-  switch (classof(argument)) {
-    case 'AsyncFunction':
-    case 'GeneratorFunction':
-    case 'AsyncGeneratorFunction': return false;
-  }
-  try {
-    // we can't check .prototype since constructors produced by .bind haven't it
-    // `Function#toString` throws on some built-it function in some legacy engines
-    // (for example, `DOMQuad` and similar in FF41-)
-    return INCORRECT_TO_STRING || !!exec(constructorRegExp, inspectSource(argument));
-  } catch (error) {
-    return true;
-  }
-};
-
-isConstructorLegacy.sham = true;
-
-// `IsConstructor` abstract operation
-// https://tc39.es/ecma262/#sec-isconstructor
-module.exports = !construct || fails(function () {
-  var called;
-  return isConstructorModern(isConstructorModern.call)
-    || !isConstructorModern(Object)
-    || !isConstructorModern(function () { called = true; })
-    || called;
-}) ? isConstructorLegacy : isConstructorModern;
 
 
 /***/ }),
@@ -52511,117 +57614,6 @@ module.exports = USE_SYMBOL_AS_UID ? function (it) {
   var $Symbol = getBuiltIn('Symbol');
   return isCallable($Symbol) && isPrototypeOf($Symbol.prototype, Object(it));
 };
-
-
-/***/ }),
-
-/***/ 7523:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-var global = __webpack_require__(3406);
-var bind = __webpack_require__(8626);
-var call = __webpack_require__(8624);
-var anObject = __webpack_require__(8514);
-var tryToString = __webpack_require__(368);
-var isArrayIteratorMethod = __webpack_require__(8335);
-var lengthOfArrayLike = __webpack_require__(5474);
-var isPrototypeOf = __webpack_require__(3071);
-var getIterator = __webpack_require__(1570);
-var getIteratorMethod = __webpack_require__(610);
-var iteratorClose = __webpack_require__(1652);
-
-var TypeError = global.TypeError;
-
-var Result = function (stopped, result) {
-  this.stopped = stopped;
-  this.result = result;
-};
-
-var ResultPrototype = Result.prototype;
-
-module.exports = function (iterable, unboundFunction, options) {
-  var that = options && options.that;
-  var AS_ENTRIES = !!(options && options.AS_ENTRIES);
-  var IS_ITERATOR = !!(options && options.IS_ITERATOR);
-  var INTERRUPTED = !!(options && options.INTERRUPTED);
-  var fn = bind(unboundFunction, that);
-  var iterator, iterFn, index, length, result, next, step;
-
-  var stop = function (condition) {
-    if (iterator) iteratorClose(iterator, 'normal', condition);
-    return new Result(true, condition);
-  };
-
-  var callFn = function (value) {
-    if (AS_ENTRIES) {
-      anObject(value);
-      return INTERRUPTED ? fn(value[0], value[1], stop) : fn(value[0], value[1]);
-    } return INTERRUPTED ? fn(value, stop) : fn(value);
-  };
-
-  if (IS_ITERATOR) {
-    iterator = iterable;
-  } else {
-    iterFn = getIteratorMethod(iterable);
-    if (!iterFn) throw TypeError(tryToString(iterable) + ' is not iterable');
-    // optimisation for array iterators
-    if (isArrayIteratorMethod(iterFn)) {
-      for (index = 0, length = lengthOfArrayLike(iterable); length > index; index++) {
-        result = callFn(iterable[index]);
-        if (result && isPrototypeOf(ResultPrototype, result)) return result;
-      } return new Result(false);
-    }
-    iterator = getIterator(iterable, iterFn);
-  }
-
-  next = iterator.next;
-  while (!(step = call(next, iterator)).done) {
-    try {
-      result = callFn(step.value);
-    } catch (error) {
-      iteratorClose(iterator, 'throw', error);
-    }
-    if (typeof result == 'object' && result && isPrototypeOf(ResultPrototype, result)) return result;
-  } return new Result(false);
-};
-
-
-/***/ }),
-
-/***/ 1652:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-var call = __webpack_require__(8624);
-var anObject = __webpack_require__(8514);
-var getMethod = __webpack_require__(4462);
-
-module.exports = function (iterator, kind, value) {
-  var innerResult, innerError;
-  anObject(iterator);
-  try {
-    innerResult = getMethod(iterator, 'return');
-    if (!innerResult) {
-      if (kind === 'throw') throw value;
-      return value;
-    }
-    innerResult = call(innerResult, iterator);
-  } catch (error) {
-    innerError = true;
-    innerResult = error;
-  }
-  if (kind === 'throw') throw value;
-  if (innerError) throw innerResult;
-  anObject(innerResult);
-  return value;
-};
-
-
-/***/ }),
-
-/***/ 6133:
-/***/ ((module) => {
-
-module.exports = {};
 
 
 /***/ }),
@@ -52954,19 +57946,6 @@ module.exports = function (it) {
 
 /***/ }),
 
-/***/ 2209:
-/***/ ((module) => {
-
-// `SameValueZero` abstract operation
-// https://tc39.es/ecma262/#sec-samevaluezero
-module.exports = function (x, y) {
-  // eslint-disable-next-line no-self-compare -- NaN check
-  return x === y || x != x && y != y;
-};
-
-
-/***/ }),
-
 /***/ 6421:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
@@ -53030,26 +58009,6 @@ var store = __webpack_require__(2846);
   license: 'https://github.com/zloirock/core-js/blob/v3.21.1/LICENSE',
   source: 'https://github.com/zloirock/core-js'
 });
-
-
-/***/ }),
-
-/***/ 4499:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-var anObject = __webpack_require__(8514);
-var aConstructor = __webpack_require__(7321);
-var wellKnownSymbol = __webpack_require__(4259);
-
-var SPECIES = wellKnownSymbol('species');
-
-// `SpeciesConstructor` abstract operation
-// https://tc39.es/ecma262/#sec-speciesconstructor
-module.exports = function (O, defaultConstructor) {
-  var C = anObject(O).constructor;
-  var S;
-  return C === undefined || (S = anObject(C)[SPECIES]) == undefined ? defaultConstructor : aConstructor(S);
-};
 
 
 /***/ }),
@@ -53186,21 +58145,6 @@ module.exports = function (argument) {
 
 /***/ }),
 
-/***/ 8216:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-var wellKnownSymbol = __webpack_require__(4259);
-
-var TO_STRING_TAG = wellKnownSymbol('toStringTag');
-var test = {};
-
-test[TO_STRING_TAG] = 'z';
-
-module.exports = String(test) === '[object z]';
-
-
-/***/ }),
-
 /***/ 368:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
@@ -53298,378 +58242,28 @@ module.exports = function (name) {
 
 /***/ }),
 
-/***/ 3929:
+/***/ 8736:
 /***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
 
 "use strict";
 
 var $ = __webpack_require__(5942);
-var deleteAll = __webpack_require__(11);
+var $reduce = (__webpack_require__(939).left);
+var arrayMethodIsStrict = __webpack_require__(592);
+var CHROME_VERSION = __webpack_require__(5111);
+var IS_NODE = __webpack_require__(3584);
 
-// `Map.prototype.deleteAll` method
-// https://github.com/tc39/proposal-collection-methods
-$({ target: 'Map', proto: true, real: true, forced: true }, {
-  deleteAll: deleteAll
-});
+var STRICT_METHOD = arrayMethodIsStrict('reduce');
+// Chrome 80-82 has a critical bug
+// https://bugs.chromium.org/p/chromium/issues/detail?id=1049982
+var CHROME_BUG = !IS_NODE && CHROME_VERSION > 79 && CHROME_VERSION < 83;
 
-
-/***/ }),
-
-/***/ 7851:
-/***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-var $ = __webpack_require__(5942);
-var anObject = __webpack_require__(8514);
-var bind = __webpack_require__(8626);
-var getMapIterator = __webpack_require__(1285);
-var iterate = __webpack_require__(7523);
-
-// `Map.prototype.every` method
-// https://github.com/tc39/proposal-collection-methods
-$({ target: 'Map', proto: true, real: true, forced: true }, {
-  every: function every(callbackfn /* , thisArg */) {
-    var map = anObject(this);
-    var iterator = getMapIterator(map);
-    var boundFunction = bind(callbackfn, arguments.length > 1 ? arguments[1] : undefined);
-    return !iterate(iterator, function (key, value, stop) {
-      if (!boundFunction(value, key, map)) return stop();
-    }, { AS_ENTRIES: true, IS_ITERATOR: true, INTERRUPTED: true }).stopped;
-  }
-});
-
-
-/***/ }),
-
-/***/ 3633:
-/***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-var $ = __webpack_require__(5942);
-var getBuiltIn = __webpack_require__(9997);
-var bind = __webpack_require__(8626);
-var call = __webpack_require__(8624);
-var aCallable = __webpack_require__(8146);
-var anObject = __webpack_require__(8514);
-var speciesConstructor = __webpack_require__(4499);
-var getMapIterator = __webpack_require__(1285);
-var iterate = __webpack_require__(7523);
-
-// `Map.prototype.filter` method
-// https://github.com/tc39/proposal-collection-methods
-$({ target: 'Map', proto: true, real: true, forced: true }, {
-  filter: function filter(callbackfn /* , thisArg */) {
-    var map = anObject(this);
-    var iterator = getMapIterator(map);
-    var boundFunction = bind(callbackfn, arguments.length > 1 ? arguments[1] : undefined);
-    var newMap = new (speciesConstructor(map, getBuiltIn('Map')))();
-    var setter = aCallable(newMap.set);
-    iterate(iterator, function (key, value) {
-      if (boundFunction(value, key, map)) call(setter, newMap, key, value);
-    }, { AS_ENTRIES: true, IS_ITERATOR: true });
-    return newMap;
-  }
-});
-
-
-/***/ }),
-
-/***/ 7515:
-/***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-var $ = __webpack_require__(5942);
-var anObject = __webpack_require__(8514);
-var bind = __webpack_require__(8626);
-var getMapIterator = __webpack_require__(1285);
-var iterate = __webpack_require__(7523);
-
-// `Map.prototype.findKey` method
-// https://github.com/tc39/proposal-collection-methods
-$({ target: 'Map', proto: true, real: true, forced: true }, {
-  findKey: function findKey(callbackfn /* , thisArg */) {
-    var map = anObject(this);
-    var iterator = getMapIterator(map);
-    var boundFunction = bind(callbackfn, arguments.length > 1 ? arguments[1] : undefined);
-    return iterate(iterator, function (key, value, stop) {
-      if (boundFunction(value, key, map)) return stop(key);
-    }, { AS_ENTRIES: true, IS_ITERATOR: true, INTERRUPTED: true }).result;
-  }
-});
-
-
-/***/ }),
-
-/***/ 1192:
-/***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-var $ = __webpack_require__(5942);
-var anObject = __webpack_require__(8514);
-var bind = __webpack_require__(8626);
-var getMapIterator = __webpack_require__(1285);
-var iterate = __webpack_require__(7523);
-
-// `Map.prototype.find` method
-// https://github.com/tc39/proposal-collection-methods
-$({ target: 'Map', proto: true, real: true, forced: true }, {
-  find: function find(callbackfn /* , thisArg */) {
-    var map = anObject(this);
-    var iterator = getMapIterator(map);
-    var boundFunction = bind(callbackfn, arguments.length > 1 ? arguments[1] : undefined);
-    return iterate(iterator, function (key, value, stop) {
-      if (boundFunction(value, key, map)) return stop(value);
-    }, { AS_ENTRIES: true, IS_ITERATOR: true, INTERRUPTED: true }).result;
-  }
-});
-
-
-/***/ }),
-
-/***/ 8034:
-/***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-var $ = __webpack_require__(5942);
-var anObject = __webpack_require__(8514);
-var getMapIterator = __webpack_require__(1285);
-var sameValueZero = __webpack_require__(2209);
-var iterate = __webpack_require__(7523);
-
-// `Map.prototype.includes` method
-// https://github.com/tc39/proposal-collection-methods
-$({ target: 'Map', proto: true, real: true, forced: true }, {
-  includes: function includes(searchElement) {
-    return iterate(getMapIterator(anObject(this)), function (key, value, stop) {
-      if (sameValueZero(value, searchElement)) return stop();
-    }, { AS_ENTRIES: true, IS_ITERATOR: true, INTERRUPTED: true }).stopped;
-  }
-});
-
-
-/***/ }),
-
-/***/ 1480:
-/***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-var $ = __webpack_require__(5942);
-var anObject = __webpack_require__(8514);
-var getMapIterator = __webpack_require__(1285);
-var iterate = __webpack_require__(7523);
-
-// `Map.prototype.keyOf` method
-// https://github.com/tc39/proposal-collection-methods
-$({ target: 'Map', proto: true, real: true, forced: true }, {
-  keyOf: function keyOf(searchElement) {
-    return iterate(getMapIterator(anObject(this)), function (key, value, stop) {
-      if (value === searchElement) return stop(key);
-    }, { AS_ENTRIES: true, IS_ITERATOR: true, INTERRUPTED: true }).result;
-  }
-});
-
-
-/***/ }),
-
-/***/ 9027:
-/***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-var $ = __webpack_require__(5942);
-var getBuiltIn = __webpack_require__(9997);
-var bind = __webpack_require__(8626);
-var call = __webpack_require__(8624);
-var aCallable = __webpack_require__(8146);
-var anObject = __webpack_require__(8514);
-var speciesConstructor = __webpack_require__(4499);
-var getMapIterator = __webpack_require__(1285);
-var iterate = __webpack_require__(7523);
-
-// `Map.prototype.mapKeys` method
-// https://github.com/tc39/proposal-collection-methods
-$({ target: 'Map', proto: true, real: true, forced: true }, {
-  mapKeys: function mapKeys(callbackfn /* , thisArg */) {
-    var map = anObject(this);
-    var iterator = getMapIterator(map);
-    var boundFunction = bind(callbackfn, arguments.length > 1 ? arguments[1] : undefined);
-    var newMap = new (speciesConstructor(map, getBuiltIn('Map')))();
-    var setter = aCallable(newMap.set);
-    iterate(iterator, function (key, value) {
-      call(setter, newMap, boundFunction(value, key, map), value);
-    }, { AS_ENTRIES: true, IS_ITERATOR: true });
-    return newMap;
-  }
-});
-
-
-/***/ }),
-
-/***/ 5739:
-/***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-var $ = __webpack_require__(5942);
-var getBuiltIn = __webpack_require__(9997);
-var bind = __webpack_require__(8626);
-var call = __webpack_require__(8624);
-var aCallable = __webpack_require__(8146);
-var anObject = __webpack_require__(8514);
-var speciesConstructor = __webpack_require__(4499);
-var getMapIterator = __webpack_require__(1285);
-var iterate = __webpack_require__(7523);
-
-// `Map.prototype.mapValues` method
-// https://github.com/tc39/proposal-collection-methods
-$({ target: 'Map', proto: true, real: true, forced: true }, {
-  mapValues: function mapValues(callbackfn /* , thisArg */) {
-    var map = anObject(this);
-    var iterator = getMapIterator(map);
-    var boundFunction = bind(callbackfn, arguments.length > 1 ? arguments[1] : undefined);
-    var newMap = new (speciesConstructor(map, getBuiltIn('Map')))();
-    var setter = aCallable(newMap.set);
-    iterate(iterator, function (key, value) {
-      call(setter, newMap, key, boundFunction(value, key, map));
-    }, { AS_ENTRIES: true, IS_ITERATOR: true });
-    return newMap;
-  }
-});
-
-
-/***/ }),
-
-/***/ 9283:
-/***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-var $ = __webpack_require__(5942);
-var aCallable = __webpack_require__(8146);
-var anObject = __webpack_require__(8514);
-var iterate = __webpack_require__(7523);
-
-// `Map.prototype.merge` method
-// https://github.com/tc39/proposal-collection-methods
-$({ target: 'Map', proto: true, real: true, forced: true }, {
-  // eslint-disable-next-line no-unused-vars -- required for `.length`
-  merge: function merge(iterable /* ...iterables */) {
-    var map = anObject(this);
-    var setter = aCallable(map.set);
-    var argumentsLength = arguments.length;
-    var i = 0;
-    while (i < argumentsLength) {
-      iterate(arguments[i++], setter, { that: map, AS_ENTRIES: true });
-    }
-    return map;
-  }
-});
-
-
-/***/ }),
-
-/***/ 4473:
-/***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-var $ = __webpack_require__(5942);
-var global = __webpack_require__(3406);
-var anObject = __webpack_require__(8514);
-var aCallable = __webpack_require__(8146);
-var getMapIterator = __webpack_require__(1285);
-var iterate = __webpack_require__(7523);
-
-var TypeError = global.TypeError;
-
-// `Map.prototype.reduce` method
-// https://github.com/tc39/proposal-collection-methods
-$({ target: 'Map', proto: true, real: true, forced: true }, {
+// `Array.prototype.reduce` method
+// https://tc39.es/ecma262/#sec-array.prototype.reduce
+$({ target: 'Array', proto: true, forced: !STRICT_METHOD || CHROME_BUG }, {
   reduce: function reduce(callbackfn /* , initialValue */) {
-    var map = anObject(this);
-    var iterator = getMapIterator(map);
-    var noInitial = arguments.length < 2;
-    var accumulator = noInitial ? undefined : arguments[1];
-    aCallable(callbackfn);
-    iterate(iterator, function (key, value) {
-      if (noInitial) {
-        noInitial = false;
-        accumulator = value;
-      } else {
-        accumulator = callbackfn(accumulator, value, key, map);
-      }
-    }, { AS_ENTRIES: true, IS_ITERATOR: true });
-    if (noInitial) throw TypeError('Reduce of empty map with no initial value');
-    return accumulator;
-  }
-});
-
-
-/***/ }),
-
-/***/ 989:
-/***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-var $ = __webpack_require__(5942);
-var anObject = __webpack_require__(8514);
-var bind = __webpack_require__(8626);
-var getMapIterator = __webpack_require__(1285);
-var iterate = __webpack_require__(7523);
-
-// `Set.prototype.some` method
-// https://github.com/tc39/proposal-collection-methods
-$({ target: 'Map', proto: true, real: true, forced: true }, {
-  some: function some(callbackfn /* , thisArg */) {
-    var map = anObject(this);
-    var iterator = getMapIterator(map);
-    var boundFunction = bind(callbackfn, arguments.length > 1 ? arguments[1] : undefined);
-    return iterate(iterator, function (key, value, stop) {
-      if (boundFunction(value, key, map)) return stop();
-    }, { AS_ENTRIES: true, IS_ITERATOR: true, INTERRUPTED: true }).stopped;
-  }
-});
-
-
-/***/ }),
-
-/***/ 7194:
-/***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-var $ = __webpack_require__(5942);
-var global = __webpack_require__(3406);
-var call = __webpack_require__(8624);
-var anObject = __webpack_require__(8514);
-var aCallable = __webpack_require__(8146);
-
-var TypeError = global.TypeError;
-
-// `Set.prototype.update` method
-// https://github.com/tc39/proposal-collection-methods
-$({ target: 'Map', proto: true, real: true, forced: true }, {
-  update: function update(key, callback /* , thunk */) {
-    var map = anObject(this);
-    var get = aCallable(map.get);
-    var has = aCallable(map.has);
-    var set = aCallable(map.set);
     var length = arguments.length;
-    aCallable(callback);
-    var isPresentInMap = call(has, map, key);
-    if (!isPresentInMap && length < 3) {
-      throw TypeError('Updating absent value');
-    }
-    var value = isPresentInMap ? call(get, map, key) : aCallable(length > 2 ? arguments[2] : undefined)(key, map);
-    call(set, map, key, callback(value, key, map));
-    return map;
+    return $reduce(this, callbackfn, length, length > 1 ? arguments[1] : undefined);
   }
 });
 
@@ -58806,1796 +63400,6 @@ module.exports = toString;
 
 /***/ }),
 
-/***/ 2497:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-
-// EXPORTS
-__webpack_require__.d(__webpack_exports__, {
-  "Pi": () => (/* binding */ mobxreact_esm_observer)
-});
-
-// UNUSED EXPORTS: MobXProviderContext, Observer, PropTypes, Provider, disposeOnUnmount, enableStaticRendering, inject, isUsingStaticRendering, observerBatching, useAsObservableSource, useLocalObservable, useLocalStore, useObserver, useStaticRendering
-
-// EXTERNAL MODULE: ./node_modules/mobx/dist/mobx.esm.js
-var mobx_esm = __webpack_require__(1056);
-// EXTERNAL MODULE: ./node_modules/react/index.js
-var react = __webpack_require__(846);
-;// CONCATENATED MODULE: ./node_modules/mobx-react-lite/es/utils/assertEnvironment.js
-
-
-if (!react.useState) {
-    throw new Error("mobx-react-lite requires React with Hooks support");
-}
-if (!mobx_esm/* makeObservable */.rC) {
-    throw new Error("mobx-react-lite@3 requires mobx at least version 6 to be available");
-}
-
-// EXTERNAL MODULE: ./node_modules/react-dom/index.js
-var react_dom = __webpack_require__(6644);
-;// CONCATENATED MODULE: ./node_modules/mobx-react-lite/es/utils/reactBatchedUpdates.js
-
-
-;// CONCATENATED MODULE: ./node_modules/mobx-react-lite/es/utils/observerBatching.js
-
-function defaultNoopBatch(callback) {
-    callback();
-}
-function observerBatching(reactionScheduler) {
-    if (!reactionScheduler) {
-        reactionScheduler = defaultNoopBatch;
-        if (false) {}
-    }
-    (0,mobx_esm/* configure */.jQ)({ reactionScheduler: reactionScheduler });
-}
-var isObserverBatched = function () {
-    if (false) {}
-    return true;
-};
-
-;// CONCATENATED MODULE: ./node_modules/mobx-react-lite/es/utils/printDebugValue.js
-
-function printDebugValue(v) {
-    return (0,mobx_esm/* getDependencyTree */.Gf)(v);
-}
-
-;// CONCATENATED MODULE: ./node_modules/mobx-react-lite/es/utils/FinalizationRegistryWrapper.js
-var FinalizationRegistryLocal = typeof FinalizationRegistry === "undefined" ? undefined : FinalizationRegistry;
-
-
-;// CONCATENATED MODULE: ./node_modules/mobx-react-lite/es/utils/reactionCleanupTrackingCommon.js
-function createTrackingData(reaction) {
-    var trackingData = {
-        reaction: reaction,
-        mounted: false,
-        changedBeforeMount: false,
-        cleanAt: Date.now() + CLEANUP_LEAKED_REACTIONS_AFTER_MILLIS
-    };
-    return trackingData;
-}
-/**
- * The minimum time before we'll clean up a Reaction created in a render
- * for a component that hasn't managed to run its effects. This needs to
- * be big enough to ensure that a component won't turn up and have its
- * effects run without being re-rendered.
- */
-var CLEANUP_LEAKED_REACTIONS_AFTER_MILLIS = 10000;
-/**
- * The frequency with which we'll check for leaked reactions.
- */
-var CLEANUP_TIMER_LOOP_MILLIS = 10000;
-
-;// CONCATENATED MODULE: ./node_modules/mobx-react-lite/es/utils/createReactionCleanupTrackingUsingFinalizationRegister.js
-
-/**
- * FinalizationRegistry-based uncommitted reaction cleanup
- */
-function createReactionCleanupTrackingUsingFinalizationRegister(FinalizationRegistry) {
-    var cleanupTokenToReactionTrackingMap = new Map();
-    var globalCleanupTokensCounter = 1;
-    var registry = new FinalizationRegistry(function cleanupFunction(token) {
-        var trackedReaction = cleanupTokenToReactionTrackingMap.get(token);
-        if (trackedReaction) {
-            trackedReaction.reaction.dispose();
-            cleanupTokenToReactionTrackingMap.delete(token);
-        }
-    });
-    return {
-        addReactionToTrack: function (reactionTrackingRef, reaction, objectRetainedByReact) {
-            var token = globalCleanupTokensCounter++;
-            registry.register(objectRetainedByReact, token, reactionTrackingRef);
-            reactionTrackingRef.current = createTrackingData(reaction);
-            reactionTrackingRef.current.finalizationRegistryCleanupToken = token;
-            cleanupTokenToReactionTrackingMap.set(token, reactionTrackingRef.current);
-            return reactionTrackingRef.current;
-        },
-        recordReactionAsCommitted: function (reactionRef) {
-            registry.unregister(reactionRef);
-            if (reactionRef.current && reactionRef.current.finalizationRegistryCleanupToken) {
-                cleanupTokenToReactionTrackingMap.delete(reactionRef.current.finalizationRegistryCleanupToken);
-            }
-        },
-        forceCleanupTimerToRunNowForTests: function () {
-            // When FinalizationRegistry in use, this this is no-op
-        },
-        resetCleanupScheduleForTests: function () {
-            // When FinalizationRegistry in use, this this is no-op
-        }
-    };
-}
-
-;// CONCATENATED MODULE: ./node_modules/mobx-react-lite/es/utils/createTimerBasedReactionCleanupTracking.js
-var __values = (undefined && undefined.__values) || function(o) {
-    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
-    if (m) return m.call(o);
-    if (o && typeof o.length === "number") return {
-        next: function () {
-            if (o && i >= o.length) o = void 0;
-            return { value: o && o[i++], done: !o };
-        }
-    };
-    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
-};
-
-/**
- * timers, gc-style, uncommitted reaction cleanup
- */
-function createTimerBasedReactionCleanupTracking() {
-    /**
-     * Reactions created by components that have yet to be fully mounted.
-     */
-    var uncommittedReactionRefs = new Set();
-    /**
-     * Latest 'uncommitted reactions' cleanup timer handle.
-     */
-    var reactionCleanupHandle;
-    /* istanbul ignore next */
-    /**
-     * Only to be used by test functions; do not export outside of mobx-react-lite
-     */
-    function forceCleanupTimerToRunNowForTests() {
-        // This allows us to control the execution of the cleanup timer
-        // to force it to run at awkward times in unit tests.
-        if (reactionCleanupHandle) {
-            clearTimeout(reactionCleanupHandle);
-            cleanUncommittedReactions();
-        }
-    }
-    /* istanbul ignore next */
-    function resetCleanupScheduleForTests() {
-        var e_1, _a;
-        if (uncommittedReactionRefs.size > 0) {
-            try {
-                for (var uncommittedReactionRefs_1 = __values(uncommittedReactionRefs), uncommittedReactionRefs_1_1 = uncommittedReactionRefs_1.next(); !uncommittedReactionRefs_1_1.done; uncommittedReactionRefs_1_1 = uncommittedReactionRefs_1.next()) {
-                    var ref = uncommittedReactionRefs_1_1.value;
-                    var tracking = ref.current;
-                    if (tracking) {
-                        tracking.reaction.dispose();
-                        ref.current = null;
-                    }
-                }
-            }
-            catch (e_1_1) { e_1 = { error: e_1_1 }; }
-            finally {
-                try {
-                    if (uncommittedReactionRefs_1_1 && !uncommittedReactionRefs_1_1.done && (_a = uncommittedReactionRefs_1.return)) _a.call(uncommittedReactionRefs_1);
-                }
-                finally { if (e_1) throw e_1.error; }
-            }
-            uncommittedReactionRefs.clear();
-        }
-        if (reactionCleanupHandle) {
-            clearTimeout(reactionCleanupHandle);
-            reactionCleanupHandle = undefined;
-        }
-    }
-    function ensureCleanupTimerRunning() {
-        if (reactionCleanupHandle === undefined) {
-            reactionCleanupHandle = setTimeout(cleanUncommittedReactions, CLEANUP_TIMER_LOOP_MILLIS);
-        }
-    }
-    function scheduleCleanupOfReactionIfLeaked(ref) {
-        uncommittedReactionRefs.add(ref);
-        ensureCleanupTimerRunning();
-    }
-    function recordReactionAsCommitted(reactionRef) {
-        uncommittedReactionRefs.delete(reactionRef);
-    }
-    /**
-     * Run by the cleanup timer to dispose any outstanding reactions
-     */
-    function cleanUncommittedReactions() {
-        reactionCleanupHandle = undefined;
-        // Loop through all the candidate leaked reactions; those older
-        // than CLEANUP_LEAKED_REACTIONS_AFTER_MILLIS get tidied.
-        var now = Date.now();
-        uncommittedReactionRefs.forEach(function (ref) {
-            var tracking = ref.current;
-            if (tracking) {
-                if (now >= tracking.cleanAt) {
-                    // It's time to tidy up this leaked reaction.
-                    tracking.reaction.dispose();
-                    ref.current = null;
-                    uncommittedReactionRefs.delete(ref);
-                }
-            }
-        });
-        if (uncommittedReactionRefs.size > 0) {
-            // We've just finished a round of cleanups but there are still
-            // some leak candidates outstanding.
-            ensureCleanupTimerRunning();
-        }
-    }
-    return {
-        addReactionToTrack: function (reactionTrackingRef, reaction, 
-        /**
-         * On timer based implementation we don't really need this object,
-         * but we keep the same api
-         */
-        objectRetainedByReact) {
-            reactionTrackingRef.current = createTrackingData(reaction);
-            scheduleCleanupOfReactionIfLeaked(reactionTrackingRef);
-            return reactionTrackingRef.current;
-        },
-        recordReactionAsCommitted: recordReactionAsCommitted,
-        forceCleanupTimerToRunNowForTests: forceCleanupTimerToRunNowForTests,
-        resetCleanupScheduleForTests: resetCleanupScheduleForTests
-    };
-}
-
-;// CONCATENATED MODULE: ./node_modules/mobx-react-lite/es/utils/reactionCleanupTracking.js
-
-
-
-var _a = FinalizationRegistryLocal
-    ? createReactionCleanupTrackingUsingFinalizationRegister(FinalizationRegistryLocal)
-    : createTimerBasedReactionCleanupTracking(), addReactionToTrack = _a.addReactionToTrack, recordReactionAsCommitted = _a.recordReactionAsCommitted, resetCleanupScheduleForTests = _a.resetCleanupScheduleForTests, forceCleanupTimerToRunNowForTests = _a.forceCleanupTimerToRunNowForTests;
-
-
-;// CONCATENATED MODULE: ./node_modules/mobx-react-lite/es/staticRendering.js
-var globalIsUsingStaticRendering = false;
-function staticRendering_enableStaticRendering(enable) {
-    globalIsUsingStaticRendering = enable;
-}
-function isUsingStaticRendering() {
-    return globalIsUsingStaticRendering;
-}
-
-;// CONCATENATED MODULE: ./node_modules/mobx-react-lite/es/useObserver.js
-var __read = (undefined && undefined.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
-
-
-
-
-
-function observerComponentNameFor(baseComponentName) {
-    return "observer".concat(baseComponentName);
-}
-/**
- * We use class to make it easier to detect in heap snapshots by name
- */
-var ObjectToBeRetainedByReact = /** @class */ (function () {
-    function ObjectToBeRetainedByReact() {
-    }
-    return ObjectToBeRetainedByReact;
-}());
-function objectToBeRetainedByReactFactory() {
-    return new ObjectToBeRetainedByReact();
-}
-function useObserver(fn, baseComponentName) {
-    if (baseComponentName === void 0) { baseComponentName = "observed"; }
-    if (isUsingStaticRendering()) {
-        return fn();
-    }
-    var _a = __read(react.useState(objectToBeRetainedByReactFactory), 1), objectRetainedByReact = _a[0];
-    // Force update, see #2982
-    var _b = __read(react.useState(), 2), setState = _b[1];
-    var forceUpdate = function () { return setState([]); };
-    // StrictMode/ConcurrentMode/Suspense may mean that our component is
-    // rendered and abandoned multiple times, so we need to track leaked
-    // Reactions.
-    var reactionTrackingRef = react.useRef(null);
-    if (!reactionTrackingRef.current) {
-        // First render for this component (or first time since a previous
-        // reaction from an abandoned render was disposed).
-        var newReaction = new mobx_esm/* Reaction */.le(observerComponentNameFor(baseComponentName), function () {
-            // Observable has changed, meaning we want to re-render
-            // BUT if we're a component that hasn't yet got to the useEffect()
-            // stage, we might be a component that _started_ to render, but
-            // got dropped, and we don't want to make state changes then.
-            // (It triggers warnings in StrictMode, for a start.)
-            if (trackingData_1.mounted) {
-                // We have reached useEffect(), so we're mounted, and can trigger an update
-                forceUpdate();
-            }
-            else {
-                // We haven't yet reached useEffect(), so we'll need to trigger a re-render
-                // when (and if) useEffect() arrives.
-                trackingData_1.changedBeforeMount = true;
-            }
-        });
-        var trackingData_1 = addReactionToTrack(reactionTrackingRef, newReaction, objectRetainedByReact);
-    }
-    var reaction = reactionTrackingRef.current.reaction;
-    react.useDebugValue(reaction, printDebugValue);
-    react.useEffect(function () {
-        // Called on first mount only
-        recordReactionAsCommitted(reactionTrackingRef);
-        if (reactionTrackingRef.current) {
-            // Great. We've already got our reaction from our render;
-            // all we need to do is to record that it's now mounted,
-            // to allow future observable changes to trigger re-renders
-            reactionTrackingRef.current.mounted = true;
-            // Got a change before first mount, force an update
-            if (reactionTrackingRef.current.changedBeforeMount) {
-                reactionTrackingRef.current.changedBeforeMount = false;
-                forceUpdate();
-            }
-        }
-        else {
-            // The reaction we set up in our render has been disposed.
-            // This can be due to bad timings of renderings, e.g. our
-            // component was paused for a _very_ long time, and our
-            // reaction got cleaned up
-            // Re-create the reaction
-            reactionTrackingRef.current = {
-                reaction: new mobx_esm/* Reaction */.le(observerComponentNameFor(baseComponentName), function () {
-                    // We've definitely already been mounted at this point
-                    forceUpdate();
-                }),
-                mounted: true,
-                changedBeforeMount: false,
-                cleanAt: Infinity
-            };
-            forceUpdate();
-        }
-        return function () {
-            reactionTrackingRef.current.reaction.dispose();
-            reactionTrackingRef.current = null;
-        };
-    }, []);
-    // render the original component, but have the
-    // reaction track the observables, so that rendering
-    // can be invalidated (see above) once a dependency changes
-    var rendering;
-    var exception;
-    reaction.track(function () {
-        try {
-            rendering = fn();
-        }
-        catch (e) {
-            exception = e;
-        }
-    });
-    if (exception) {
-        throw exception; // re-throw any exceptions caught during rendering
-    }
-    return rendering;
-}
-
-;// CONCATENATED MODULE: ./node_modules/mobx-react-lite/es/observer.js
-
-
-
-var warnObserverOptionsDeprecated = true;
-var hasSymbol = typeof Symbol === "function" && Symbol.for;
-// Using react-is had some issues (and operates on elements, not on types), see #608 / #609
-var ReactForwardRefSymbol = hasSymbol
-    ? Symbol.for("react.forward_ref")
-    : typeof react.forwardRef === "function" && (0,react.forwardRef)(function (props) { return null; })["$$typeof"];
-var ReactMemoSymbol = hasSymbol
-    ? Symbol.for("react.memo")
-    : typeof react.memo === "function" && (0,react.memo)(function (props) { return null; })["$$typeof"];
-// n.b. base case is not used for actual typings or exported in the typing files
-function observer(baseComponent, 
-// TODO remove in next major
-options) {
-    var _a;
-    if (false) {}
-    if (ReactMemoSymbol && baseComponent["$$typeof"] === ReactMemoSymbol) {
-        throw new Error("[mobx-react-lite] You are trying to use `observer` on a function component wrapped in either another `observer` or `React.memo`. The observer already applies 'React.memo' for you.");
-    }
-    // The working of observer is explained step by step in this talk: https://www.youtube.com/watch?v=cPF4iBedoF0&feature=youtu.be&t=1307
-    if (isUsingStaticRendering()) {
-        return baseComponent;
-    }
-    var useForwardRef = (_a = options === null || options === void 0 ? void 0 : options.forwardRef) !== null && _a !== void 0 ? _a : false;
-    var render = baseComponent;
-    var baseComponentName = baseComponent.displayName || baseComponent.name;
-    // If already wrapped with forwardRef, unwrap,
-    // so we can patch render and apply memo
-    if (ReactForwardRefSymbol && baseComponent["$$typeof"] === ReactForwardRefSymbol) {
-        useForwardRef = true;
-        render = baseComponent["render"];
-        if (typeof render !== "function") {
-            throw new Error("[mobx-react-lite] `render` property of ForwardRef was not a function");
-        }
-    }
-    var observerComponent = function (props, ref) {
-        return useObserver(function () { return render(props, ref); }, baseComponentName);
-    };
-    // Don't set `displayName` for anonymous components,
-    // so the `displayName` can be customized by user, see #3192.
-    if (baseComponentName !== "") {
-        ;
-        observerComponent.displayName = baseComponentName;
-    }
-    // Support legacy context: `contextTypes` must be applied before `memo`
-    if (baseComponent.contextTypes) {
-        ;
-        observerComponent.contextTypes = baseComponent.contextTypes;
-    }
-    if (useForwardRef) {
-        // `forwardRef` must be applied prior `memo`
-        // `forwardRef(observer(cmp))` throws:
-        // "forwardRef requires a render function but received a `memo` component. Instead of forwardRef(memo(...)), use memo(forwardRef(...))"
-        observerComponent = (0,react.forwardRef)(observerComponent);
-    }
-    // memo; we are not interested in deep updates
-    // in props; we assume that if deep objects are changed,
-    // this is in observables, which would have been tracked anyway
-    observerComponent = (0,react.memo)(observerComponent);
-    copyStaticProperties(baseComponent, observerComponent);
-    if (false) {}
-    return observerComponent;
-}
-// based on https://github.com/mridgway/hoist-non-react-statics/blob/master/src/index.js
-var hoistBlackList = {
-    $$typeof: true,
-    render: true,
-    compare: true,
-    type: true,
-    // Don't redefine `displayName`,
-    // it's defined as getter-setter pair on `memo` (see #3192).
-    displayName: true
-};
-function copyStaticProperties(base, target) {
-    Object.keys(base).forEach(function (key) {
-        if (!hoistBlackList[key]) {
-            Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(base, key));
-        }
-    });
-}
-
-;// CONCATENATED MODULE: ./node_modules/mobx-react-lite/es/ObserverComponent.js
-
-function ObserverComponent(_a) {
-    var children = _a.children, render = _a.render;
-    var component = children || render;
-    if (typeof component !== "function") {
-        return null;
-    }
-    return useObserver(component);
-}
-if (false) {}
-ObserverComponent.displayName = "Observer";
-
-function ObserverPropsCheck(props, key, componentName, location, propFullName) {
-    var extraKey = key === "children" ? "render" : "children";
-    var hasProp = typeof props[key] === "function";
-    var hasExtraProp = typeof props[extraKey] === "function";
-    if (hasProp && hasExtraProp) {
-        return new Error("MobX Observer: Do not use children and render in the same time in`" + componentName);
-    }
-    if (hasProp || hasExtraProp) {
-        return null;
-    }
-    return new Error("Invalid prop `" +
-        propFullName +
-        "` of type `" +
-        typeof props[key] +
-        "` supplied to" +
-        " `" +
-        componentName +
-        "`, expected `function`.");
-}
-
-;// CONCATENATED MODULE: ./node_modules/mobx-react-lite/es/useLocalObservable.js
-
-
-function useLocalObservable(initializer, annotations) {
-    return useState(function () { return observable(initializer(), annotations, { autoBind: true }); })[0];
-}
-
-;// CONCATENATED MODULE: ./node_modules/mobx-react-lite/es/useAsObservableSource.js
-var useAsObservableSource_read = (undefined && undefined.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
-
-
-
-function useAsObservableSource_useAsObservableSource(current) {
-    if (false)
-        {}
-    var _a = useAsObservableSource_read(useState(function () { return observable(current, {}, { deep: false }); }), 1), res = _a[0];
-    runInAction(function () {
-        Object.assign(res, current);
-    });
-    return res;
-}
-
-;// CONCATENATED MODULE: ./node_modules/mobx-react-lite/es/useLocalStore.js
-
-
-
-
-function useLocalStore(initializer, current) {
-    if (false)
-        {}
-    var source = current && useAsObservableSource(current);
-    return useState(function () { return observable(initializer(source), undefined, { autoBind: true }); })[0];
-}
-
-;// CONCATENATED MODULE: ./node_modules/mobx-react-lite/es/index.js
-
-
-
-
-
-
-observerBatching(react_dom.unstable_batchedUpdates);
-
-
-
-
-
-
-
-function es_useObserver(fn, baseComponentName) {
-    if (baseComponentName === void 0) { baseComponentName = "observed"; }
-    if (false) {}
-    return useObserverOriginal(fn, baseComponentName);
-}
-
-function useStaticRendering(enable) {
-    if (false) {}
-    enableStaticRendering(enable);
-}
-
-;// CONCATENATED MODULE: ./node_modules/mobx-react/dist/mobxreact.esm.js
-
-
-
-
-
-var symbolId = 0;
-
-function createSymbol(name) {
-  if (typeof Symbol === "function") {
-    return Symbol(name);
-  }
-
-  var symbol = "__$mobx-react " + name + " (" + symbolId + ")";
-  symbolId++;
-  return symbol;
-}
-
-var createdSymbols = {};
-function newSymbol(name) {
-  if (!createdSymbols[name]) {
-    createdSymbols[name] = createSymbol(name);
-  }
-
-  return createdSymbols[name];
-}
-function shallowEqual(objA, objB) {
-  //From: https://github.com/facebook/fbjs/blob/c69904a511b900266935168223063dd8772dfc40/packages/fbjs/src/core/shallowEqual.js
-  if (is(objA, objB)) {
-    return true;
-  }
-
-  if (typeof objA !== "object" || objA === null || typeof objB !== "object" || objB === null) {
-    return false;
-  }
-
-  var keysA = Object.keys(objA);
-  var keysB = Object.keys(objB);
-
-  if (keysA.length !== keysB.length) {
-    return false;
-  }
-
-  for (var i = 0; i < keysA.length; i++) {
-    if (!Object.hasOwnProperty.call(objB, keysA[i]) || !is(objA[keysA[i]], objB[keysA[i]])) {
-      return false;
-    }
-  }
-
-  return true;
-}
-
-function is(x, y) {
-  // From: https://github.com/facebook/fbjs/blob/c69904a511b900266935168223063dd8772dfc40/packages/fbjs/src/core/shallowEqual.js
-  if (x === y) {
-    return x !== 0 || 1 / x === 1 / y;
-  } else {
-    return x !== x && y !== y;
-  }
-} // based on https://github.com/mridgway/hoist-non-react-statics/blob/master/src/index.js
-
-
-var mobxreact_esm_hoistBlackList = {
-  $$typeof: 1,
-  render: 1,
-  compare: 1,
-  type: 1,
-  childContextTypes: 1,
-  contextType: 1,
-  contextTypes: 1,
-  defaultProps: 1,
-  getDefaultProps: 1,
-  getDerivedStateFromError: 1,
-  getDerivedStateFromProps: 1,
-  mixins: 1,
-  displayName: 1,
-  propTypes: 1
-};
-function mobxreact_esm_copyStaticProperties(base, target) {
-  var protoProps = Object.getOwnPropertyNames(Object.getPrototypeOf(base));
-  Object.getOwnPropertyNames(base).forEach(function (key) {
-    if (!mobxreact_esm_hoistBlackList[key] && protoProps.indexOf(key) === -1) {
-      Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(base, key));
-    }
-  });
-}
-/**
- * Helper to set `prop` to `this` as non-enumerable (hidden prop)
- * @param target
- * @param prop
- * @param value
- */
-
-function setHiddenProp(target, prop, value) {
-  if (!Object.hasOwnProperty.call(target, prop)) {
-    Object.defineProperty(target, prop, {
-      enumerable: false,
-      configurable: true,
-      writable: true,
-      value: value
-    });
-  } else {
-    target[prop] = value;
-  }
-}
-/**
- * Utilities for patching componentWillUnmount, to make sure @disposeOnUnmount works correctly icm with user defined hooks
- * and the handler provided by mobx-react
- */
-
-var mobxMixins = /*#__PURE__*/newSymbol("patchMixins");
-var mobxPatchedDefinition = /*#__PURE__*/newSymbol("patchedDefinition");
-
-function getMixins(target, methodName) {
-  var mixins = target[mobxMixins] = target[mobxMixins] || {};
-  var methodMixins = mixins[methodName] = mixins[methodName] || {};
-  methodMixins.locks = methodMixins.locks || 0;
-  methodMixins.methods = methodMixins.methods || [];
-  return methodMixins;
-}
-
-function wrapper(realMethod, mixins) {
-  var _this = this;
-
-  for (var _len = arguments.length, args = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
-    args[_key - 2] = arguments[_key];
-  }
-
-  // locks are used to ensure that mixins are invoked only once per invocation, even on recursive calls
-  mixins.locks++;
-
-  try {
-    var retVal;
-
-    if (realMethod !== undefined && realMethod !== null) {
-      retVal = realMethod.apply(this, args);
-    }
-
-    return retVal;
-  } finally {
-    mixins.locks--;
-
-    if (mixins.locks === 0) {
-      mixins.methods.forEach(function (mx) {
-        mx.apply(_this, args);
-      });
-    }
-  }
-}
-
-function wrapFunction(realMethod, mixins) {
-  var fn = function fn() {
-    for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-      args[_key2] = arguments[_key2];
-    }
-
-    wrapper.call.apply(wrapper, [this, realMethod, mixins].concat(args));
-  };
-
-  return fn;
-}
-
-function patch(target, methodName, mixinMethod) {
-  var mixins = getMixins(target, methodName);
-
-  if (mixins.methods.indexOf(mixinMethod) < 0) {
-    mixins.methods.push(mixinMethod);
-  }
-
-  var oldDefinition = Object.getOwnPropertyDescriptor(target, methodName);
-
-  if (oldDefinition && oldDefinition[mobxPatchedDefinition]) {
-    // already patched definition, do not repatch
-    return;
-  }
-
-  var originalMethod = target[methodName];
-  var newDefinition = createDefinition(target, methodName, oldDefinition ? oldDefinition.enumerable : undefined, mixins, originalMethod);
-  Object.defineProperty(target, methodName, newDefinition);
-}
-
-function createDefinition(target, methodName, enumerable, mixins, originalMethod) {
-  var _ref;
-
-  var wrappedFunc = wrapFunction(originalMethod, mixins);
-  return _ref = {}, _ref[mobxPatchedDefinition] = true, _ref.get = function get() {
-    return wrappedFunc;
-  }, _ref.set = function set(value) {
-    if (this === target) {
-      wrappedFunc = wrapFunction(value, mixins);
-    } else {
-      // when it is an instance of the prototype/a child prototype patch that particular case again separately
-      // since we need to store separate values depending on wether it is the actual instance, the prototype, etc
-      // e.g. the method for super might not be the same as the method for the prototype which might be not the same
-      // as the method for the instance
-      var newDefinition = createDefinition(this, methodName, enumerable, mixins, value);
-      Object.defineProperty(this, methodName, newDefinition);
-    }
-  }, _ref.configurable = true, _ref.enumerable = enumerable, _ref;
-}
-
-var mobxAdminProperty = mobx_esm/* $mobx */.so || "$mobx";
-var mobxObserverProperty = /*#__PURE__*/newSymbol("isMobXReactObserver");
-var mobxIsUnmounted = /*#__PURE__*/newSymbol("isUnmounted");
-var skipRenderKey = /*#__PURE__*/newSymbol("skipRender");
-var isForcingUpdateKey = /*#__PURE__*/newSymbol("isForcingUpdate");
-function makeClassComponentObserver(componentClass) {
-  var target = componentClass.prototype;
-
-  if (componentClass[mobxObserverProperty]) {
-    var displayName = getDisplayName(target);
-    console.warn("The provided component class (" + displayName + ") \n                has already been declared as an observer component.");
-  } else {
-    componentClass[mobxObserverProperty] = true;
-  }
-
-  if (target.componentWillReact) throw new Error("The componentWillReact life-cycle event is no longer supported");
-
-  if (componentClass["__proto__"] !== react.PureComponent) {
-    if (!target.shouldComponentUpdate) target.shouldComponentUpdate = observerSCU;else if (target.shouldComponentUpdate !== observerSCU) // n.b. unequal check, instead of existence check, as @observer might be on superclass as well
-      throw new Error("It is not allowed to use shouldComponentUpdate in observer based components.");
-  } // this.props and this.state are made observable, just to make sure @computed fields that
-  // are defined inside the component, and which rely on state or props, re-compute if state or props change
-  // (otherwise the computed wouldn't update and become stale on props change, since props are not observable)
-  // However, this solution is not without it's own problems: https://github.com/mobxjs/mobx-react/issues?utf8=%E2%9C%93&q=is%3Aissue+label%3Aobservable-props-or-not+
-
-
-  makeObservableProp(target, "props");
-  makeObservableProp(target, "state");
-  var baseRender = target.render;
-
-  if (typeof baseRender !== "function") {
-    var _displayName = getDisplayName(target);
-
-    throw new Error("[mobx-react] class component (" + _displayName + ") is missing `render` method." + "\n`observer` requires `render` being a function defined on prototype." + "\n`render = () => {}` or `render = function() {}` is not supported.");
-  }
-
-  target.render = function () {
-    return makeComponentReactive.call(this, baseRender);
-  };
-
-  patch(target, "componentWillUnmount", function () {
-    var _this$render$mobxAdmi;
-
-    if (isUsingStaticRendering() === true) return;
-    (_this$render$mobxAdmi = this.render[mobxAdminProperty]) == null ? void 0 : _this$render$mobxAdmi.dispose();
-    this[mobxIsUnmounted] = true;
-
-    if (!this.render[mobxAdminProperty]) {
-      // Render may have been hot-swapped and/or overriden by a subclass.
-      var _displayName2 = getDisplayName(this);
-
-      console.warn("The reactive render of an observer class component (" + _displayName2 + ") \n                was overriden after MobX attached. This may result in a memory leak if the \n                overriden reactive render was not properly disposed.");
-    }
-  });
-  return componentClass;
-} // Generates a friendly name for debugging
-
-function getDisplayName(comp) {
-  return comp.displayName || comp.name || comp.constructor && (comp.constructor.displayName || comp.constructor.name) || "<component>";
-}
-
-function makeComponentReactive(render) {
-  var _this = this;
-
-  if (isUsingStaticRendering() === true) return render.call(this);
-  /**
-   * If props are shallowly modified, react will render anyway,
-   * so atom.reportChanged() should not result in yet another re-render
-   */
-
-  setHiddenProp(this, skipRenderKey, false);
-  /**
-   * forceUpdate will re-assign this.props. We don't want that to cause a loop,
-   * so detect these changes
-   */
-
-  setHiddenProp(this, isForcingUpdateKey, false);
-  var initialName = getDisplayName(this);
-  var baseRender = render.bind(this);
-  var isRenderingPending = false;
-  var reaction = new mobx_esm/* Reaction */.le(initialName + ".render()", function () {
-    if (!isRenderingPending) {
-      // N.B. Getting here *before mounting* means that a component constructor has side effects (see the relevant test in misc.js)
-      // This unidiomatic React usage but React will correctly warn about this so we continue as usual
-      // See #85 / Pull #44
-      isRenderingPending = true;
-
-      if (_this[mobxIsUnmounted] !== true) {
-        var hasError = true;
-
-        try {
-          setHiddenProp(_this, isForcingUpdateKey, true);
-          if (!_this[skipRenderKey]) react.Component.prototype.forceUpdate.call(_this);
-          hasError = false;
-        } finally {
-          setHiddenProp(_this, isForcingUpdateKey, false);
-          if (hasError) reaction.dispose();
-        }
-      }
-    }
-  });
-  reaction["reactComponent"] = this;
-  reactiveRender[mobxAdminProperty] = reaction;
-  this.render = reactiveRender;
-
-  function reactiveRender() {
-    isRenderingPending = false;
-    var exception = undefined;
-    var rendering = undefined;
-    reaction.track(function () {
-      try {
-        rendering = (0,mobx_esm/* _allowStateChanges */.$$)(false, baseRender);
-      } catch (e) {
-        exception = e;
-      }
-    });
-
-    if (exception) {
-      throw exception;
-    }
-
-    return rendering;
-  }
-
-  return reactiveRender.call(this);
-}
-
-function observerSCU(nextProps, nextState) {
-  if (isUsingStaticRendering()) {
-    console.warn("[mobx-react] It seems that a re-rendering of a React component is triggered while in static (server-side) mode. Please make sure components are rendered only once server-side.");
-  } // update on any state changes (as is the default)
-
-
-  if (this.state !== nextState) {
-    return true;
-  } // update if props are shallowly not equal, inspired by PureRenderMixin
-  // we could return just 'false' here, and avoid the `skipRender` checks etc
-  // however, it is nicer if lifecycle events are triggered like usually,
-  // so we return true here if props are shallowly modified.
-
-
-  return !shallowEqual(this.props, nextProps);
-}
-
-function makeObservableProp(target, propName) {
-  var valueHolderKey = newSymbol("reactProp_" + propName + "_valueHolder");
-  var atomHolderKey = newSymbol("reactProp_" + propName + "_atomHolder");
-
-  function getAtom() {
-    if (!this[atomHolderKey]) {
-      setHiddenProp(this, atomHolderKey, (0,mobx_esm/* createAtom */.cp)("reactive " + propName));
-    }
-
-    return this[atomHolderKey];
-  }
-
-  Object.defineProperty(target, propName, {
-    configurable: true,
-    enumerable: true,
-    get: function get() {
-      var prevReadState = false; // Why this check? BC?
-      // @ts-expect-error
-
-      if (mobx_esm/* _allowStateReadsStart */.wM && mobx_esm/* _allowStateReadsEnd */.mJ) {
-        prevReadState = (0,mobx_esm/* _allowStateReadsStart */.wM)(true);
-      }
-
-      getAtom.call(this).reportObserved(); // Why this check? BC?
-      // @ts-expect-error
-
-      if (mobx_esm/* _allowStateReadsStart */.wM && mobx_esm/* _allowStateReadsEnd */.mJ) {
-        (0,mobx_esm/* _allowStateReadsEnd */.mJ)(prevReadState);
-      }
-
-      return this[valueHolderKey];
-    },
-    set: function set(v) {
-      if (!this[isForcingUpdateKey] && !shallowEqual(this[valueHolderKey], v)) {
-        setHiddenProp(this, valueHolderKey, v);
-        setHiddenProp(this, skipRenderKey, true);
-        getAtom.call(this).reportChanged();
-        setHiddenProp(this, skipRenderKey, false);
-      } else {
-        setHiddenProp(this, valueHolderKey, v);
-      }
-    }
-  });
-}
-
-/**
- * Observer function / decorator
- */
-
-function mobxreact_esm_observer(component) {
-  if (component["isMobxInjector"] === true) {
-    console.warn("Mobx observer: You are trying to use `observer` on a component that already has `inject`. Please apply `observer` before applying `inject`");
-  }
-
-  if (Object.prototype.isPrototypeOf.call(react.Component, component) || Object.prototype.isPrototypeOf.call(react.PureComponent, component)) {
-    // Class component
-    return makeClassComponentObserver(component);
-  } else {
-    // Function component
-    return observer(component);
-  }
-}
-
-function _extends() {
-  _extends = Object.assign || function (target) {
-    for (var i = 1; i < arguments.length; i++) {
-      var source = arguments[i];
-
-      for (var key in source) {
-        if (Object.prototype.hasOwnProperty.call(source, key)) {
-          target[key] = source[key];
-        }
-      }
-    }
-
-    return target;
-  };
-
-  return _extends.apply(this, arguments);
-}
-
-function _objectWithoutPropertiesLoose(source, excluded) {
-  if (source == null) return {};
-  var target = {};
-  var sourceKeys = Object.keys(source);
-  var key, i;
-
-  for (i = 0; i < sourceKeys.length; i++) {
-    key = sourceKeys[i];
-    if (excluded.indexOf(key) >= 0) continue;
-    target[key] = source[key];
-  }
-
-  return target;
-}
-
-var _excluded = ["children"];
-var MobXProviderContext = /*#__PURE__*/react.createContext({});
-function Provider(props) {
-  var children = props.children,
-      stores = _objectWithoutPropertiesLoose(props, _excluded);
-
-  var parentValue = react.useContext(MobXProviderContext);
-  var mutableProviderRef = react.useRef(_extends({}, parentValue, stores));
-  var value = mutableProviderRef.current;
-
-  if (false) { var newValue; }
-
-  return react.createElement(MobXProviderContext.Provider, {
-    value: value
-  }, children);
-}
-Provider.displayName = "MobXProvider";
-
-/**
- * Store Injection
- */
-
-function createStoreInjector(grabStoresFn, component, injectNames, makeReactive) {
-  // Support forward refs
-  var Injector = React__default.forwardRef(function (props, ref) {
-    var newProps = _extends({}, props);
-
-    var context = React__default.useContext(MobXProviderContext);
-    Object.assign(newProps, grabStoresFn(context || {}, newProps) || {});
-
-    if (ref) {
-      newProps.ref = ref;
-    }
-
-    return React__default.createElement(component, newProps);
-  });
-  if (makeReactive) Injector = mobxreact_esm_observer(Injector);
-  Injector["isMobxInjector"] = true; // assigned late to suppress observer warning
-  // Static fields from component should be visible on the generated Injector
-
-  mobxreact_esm_copyStaticProperties(component, Injector);
-  Injector["wrappedComponent"] = component;
-  Injector.displayName = getInjectName(component, injectNames);
-  return Injector;
-}
-
-function getInjectName(component, injectNames) {
-  var displayName;
-  var componentName = component.displayName || component.name || component.constructor && component.constructor.name || "Component";
-  if (injectNames) displayName = "inject-with-" + injectNames + "(" + componentName + ")";else displayName = "inject(" + componentName + ")";
-  return displayName;
-}
-
-function grabStoresByName(storeNames) {
-  return function (baseStores, nextProps) {
-    storeNames.forEach(function (storeName) {
-      if (storeName in nextProps // prefer props over stores
-      ) return;
-      if (!(storeName in baseStores)) throw new Error("MobX injector: Store '" + storeName + "' is not available! Make sure it is provided by some Provider");
-      nextProps[storeName] = baseStores[storeName];
-    });
-    return nextProps;
-  };
-}
-/**
- * higher order component that injects stores to a child.
- * takes either a varargs list of strings, which are stores read from the context,
- * or a function that manually maps the available stores from the context to props:
- * storesToProps(mobxStores, props, context) => newProps
- */
-
-
-function inject() {
-  for (var _len = arguments.length, storeNames = new Array(_len), _key = 0; _key < _len; _key++) {
-    storeNames[_key] = arguments[_key];
-  }
-
-  if (typeof arguments[0] === "function") {
-    var grabStoresFn = arguments[0];
-    return function (componentClass) {
-      return createStoreInjector(grabStoresFn, componentClass, grabStoresFn.name, true);
-    };
-  } else {
-    return function (componentClass) {
-      return createStoreInjector(grabStoresByName(storeNames), componentClass, storeNames.join("-"), false);
-    };
-  }
-}
-
-var protoStoreKey = /*#__PURE__*/(/* unused pure expression or super */ null && (newSymbol("disposeOnUnmountProto")));
-var instStoreKey = /*#__PURE__*/(/* unused pure expression or super */ null && (newSymbol("disposeOnUnmountInst")));
-
-function runDisposersOnWillUnmount() {
-  var _this = this;
-  [].concat(this[protoStoreKey] || [], this[instStoreKey] || []).forEach(function (propKeyOrFunction) {
-    var prop = typeof propKeyOrFunction === "string" ? _this[propKeyOrFunction] : propKeyOrFunction;
-
-    if (prop !== undefined && prop !== null) {
-      if (Array.isArray(prop)) prop.map(function (f) {
-        return f();
-      });else prop();
-    }
-  });
-}
-
-function disposeOnUnmount(target, propertyKeyOrFunction) {
-  if (Array.isArray(propertyKeyOrFunction)) {
-    return propertyKeyOrFunction.map(function (fn) {
-      return disposeOnUnmount(target, fn);
-    });
-  }
-
-  var c = Object.getPrototypeOf(target).constructor;
-  var c2 = Object.getPrototypeOf(target.constructor); // Special case for react-hot-loader
-
-  var c3 = Object.getPrototypeOf(Object.getPrototypeOf(target));
-
-  if (!(c === React__default.Component || c === React__default.PureComponent || c2 === React__default.Component || c2 === React__default.PureComponent || c3 === React__default.Component || c3 === React__default.PureComponent)) {
-    throw new Error("[mobx-react] disposeOnUnmount only supports direct subclasses of React.Component or React.PureComponent.");
-  }
-
-  if (typeof propertyKeyOrFunction !== "string" && typeof propertyKeyOrFunction !== "function" && !Array.isArray(propertyKeyOrFunction)) {
-    throw new Error("[mobx-react] disposeOnUnmount only works if the parameter is either a property key or a function.");
-  } // decorator's target is the prototype, so it doesn't have any instance properties like props
-
-
-  var isDecorator = typeof propertyKeyOrFunction === "string"; // add property key / function we want run (disposed) to the store
-
-  var componentWasAlreadyModified = !!target[protoStoreKey] || !!target[instStoreKey];
-  var store = isDecorator ? // decorators are added to the prototype store
-  target[protoStoreKey] || (target[protoStoreKey] = []) : // functions are added to the instance store
-  target[instStoreKey] || (target[instStoreKey] = []);
-  store.push(propertyKeyOrFunction); // tweak the component class componentWillUnmount if not done already
-
-  if (!componentWasAlreadyModified) {
-    patch(target, "componentWillUnmount", runDisposersOnWillUnmount);
-  } // return the disposer as is if invoked as a non decorator
-
-
-  if (typeof propertyKeyOrFunction !== "string") {
-    return propertyKeyOrFunction;
-  }
-}
-
-function createChainableTypeChecker(validator) {
-  function checkType(isRequired, props, propName, componentName, location, propFullName) {
-    for (var _len = arguments.length, rest = new Array(_len > 6 ? _len - 6 : 0), _key = 6; _key < _len; _key++) {
-      rest[_key - 6] = arguments[_key];
-    }
-
-    return (0,mobx_esm/* untracked */.rg)(function () {
-      componentName = componentName || "<<anonymous>>";
-      propFullName = propFullName || propName;
-
-      if (props[propName] == null) {
-        if (isRequired) {
-          var actual = props[propName] === null ? "null" : "undefined";
-          return new Error("The " + location + " `" + propFullName + "` is marked as required " + "in `" + componentName + "`, but its value is `" + actual + "`.");
-        }
-
-        return null;
-      } else {
-        // @ts-ignore rest arg is necessary for some React internals - fails tests otherwise
-        return validator.apply(void 0, [props, propName, componentName, location, propFullName].concat(rest));
-      }
-    });
-  }
-
-  var chainedCheckType = checkType.bind(null, false); // Add isRequired to satisfy Requirable
-
-  chainedCheckType.isRequired = checkType.bind(null, true);
-  return chainedCheckType;
-} // Copied from React.PropTypes
-
-
-function isSymbol(propType, propValue) {
-  // Native Symbol.
-  if (propType === "symbol") {
-    return true;
-  } // 19.4.3.5 Symbol.prototype[@@toStringTag] === 'Symbol'
-
-
-  if (propValue["@@toStringTag"] === "Symbol") {
-    return true;
-  } // Fallback for non-spec compliant Symbols which are polyfilled.
-
-
-  if (typeof Symbol === "function" && propValue instanceof Symbol) {
-    return true;
-  }
-
-  return false;
-} // Copied from React.PropTypes
-
-
-function getPropType(propValue) {
-  var propType = typeof propValue;
-
-  if (Array.isArray(propValue)) {
-    return "array";
-  }
-
-  if (propValue instanceof RegExp) {
-    // Old webkits (at least until Android 4.0) return 'function' rather than
-    // 'object' for typeof a RegExp. We'll normalize this here so that /bla/
-    // passes PropTypes.object.
-    return "object";
-  }
-
-  if (isSymbol(propType, propValue)) {
-    return "symbol";
-  }
-
-  return propType;
-} // This handles more types than `getPropType`. Only used for error messages.
-// Copied from React.PropTypes
-
-
-function getPreciseType(propValue) {
-  var propType = getPropType(propValue);
-
-  if (propType === "object") {
-    if (propValue instanceof Date) {
-      return "date";
-    } else if (propValue instanceof RegExp) {
-      return "regexp";
-    }
-  }
-
-  return propType;
-}
-
-function createObservableTypeCheckerCreator(allowNativeType, mobxType) {
-  return createChainableTypeChecker(function (props, propName, componentName, location, propFullName) {
-    return (0,mobx_esm/* untracked */.rg)(function () {
-      if (allowNativeType) {
-        if (getPropType(props[propName]) === mobxType.toLowerCase()) return null;
-      }
-
-      var mobxChecker;
-
-      switch (mobxType) {
-        case "Array":
-          mobxChecker = mobx_esm/* isObservableArray */.Ei;
-          break;
-
-        case "Object":
-          mobxChecker = mobx_esm/* isObservableObject */.Pb;
-          break;
-
-        case "Map":
-          mobxChecker = mobx_esm/* isObservableMap */.LJ;
-          break;
-
-        default:
-          throw new Error("Unexpected mobxType: " + mobxType);
-      }
-
-      var propValue = props[propName];
-
-      if (!mobxChecker(propValue)) {
-        var preciseType = getPreciseType(propValue);
-        var nativeTypeExpectationMessage = allowNativeType ? " or javascript `" + mobxType.toLowerCase() + "`" : "";
-        return new Error("Invalid prop `" + propFullName + "` of type `" + preciseType + "` supplied to" + " `" + componentName + "`, expected `mobx.Observable" + mobxType + "`" + nativeTypeExpectationMessage + ".");
-      }
-
-      return null;
-    });
-  });
-}
-
-function createObservableArrayOfTypeChecker(allowNativeType, typeChecker) {
-  return createChainableTypeChecker(function (props, propName, componentName, location, propFullName) {
-    for (var _len2 = arguments.length, rest = new Array(_len2 > 5 ? _len2 - 5 : 0), _key2 = 5; _key2 < _len2; _key2++) {
-      rest[_key2 - 5] = arguments[_key2];
-    }
-
-    return (0,mobx_esm/* untracked */.rg)(function () {
-      if (typeof typeChecker !== "function") {
-        return new Error("Property `" + propFullName + "` of component `" + componentName + "` has " + "invalid PropType notation.");
-      } else {
-        var error = createObservableTypeCheckerCreator(allowNativeType, "Array")(props, propName, componentName, location, propFullName);
-        if (error instanceof Error) return error;
-        var propValue = props[propName];
-
-        for (var i = 0; i < propValue.length; i++) {
-          error = typeChecker.apply(void 0, [propValue, i, componentName, location, propFullName + "[" + i + "]"].concat(rest));
-          if (error instanceof Error) return error;
-        }
-
-        return null;
-      }
-    });
-  });
-}
-
-var observableArray = /*#__PURE__*/createObservableTypeCheckerCreator(false, "Array");
-var observableArrayOf = /*#__PURE__*/createObservableArrayOfTypeChecker.bind(null, false);
-var observableMap = /*#__PURE__*/createObservableTypeCheckerCreator(false, "Map");
-var observableObject = /*#__PURE__*/createObservableTypeCheckerCreator(false, "Object");
-var arrayOrObservableArray = /*#__PURE__*/createObservableTypeCheckerCreator(true, "Array");
-var arrayOrObservableArrayOf = /*#__PURE__*/createObservableArrayOfTypeChecker.bind(null, true);
-var objectOrObservableObject = /*#__PURE__*/createObservableTypeCheckerCreator(true, "Object");
-var PropTypes = {
-  observableArray: observableArray,
-  observableArrayOf: observableArrayOf,
-  observableMap: observableMap,
-  observableObject: observableObject,
-  arrayOrObservableArray: arrayOrObservableArray,
-  arrayOrObservableArrayOf: arrayOrObservableArrayOf,
-  objectOrObservableObject: objectOrObservableObject
-};
-
-if (!react.Component) throw new Error("mobx-react requires React to be available");
-if (!mobx_esm/* observable */.LO) throw new Error("mobx-react requires mobx to be available");
-
-
-
-
-/***/ }),
-
-/***/ 2860:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "ZP": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* unused harmony exports ucs2decode, ucs2encode, decode, encode, toASCII, toUnicode */
-
-
-/** Highest positive signed 32-bit float value */
-const maxInt = 2147483647; // aka. 0x7FFFFFFF or 2^31-1
-
-/** Bootstring parameters */
-const base = 36;
-const tMin = 1;
-const tMax = 26;
-const skew = 38;
-const damp = 700;
-const initialBias = 72;
-const initialN = 128; // 0x80
-const delimiter = '-'; // '\x2D'
-
-/** Regular expressions */
-const regexPunycode = /^xn--/;
-const regexNonASCII = /[^\0-\x7E]/; // non-ASCII chars
-const regexSeparators = /[\x2E\u3002\uFF0E\uFF61]/g; // RFC 3490 separators
-
-/** Error messages */
-const errors = {
-	'overflow': 'Overflow: input needs wider integers to process',
-	'not-basic': 'Illegal input >= 0x80 (not a basic code point)',
-	'invalid-input': 'Invalid input'
-};
-
-/** Convenience shortcuts */
-const baseMinusTMin = base - tMin;
-const floor = Math.floor;
-const stringFromCharCode = String.fromCharCode;
-
-/*--------------------------------------------------------------------------*/
-
-/**
- * A generic error utility function.
- * @private
- * @param {String} type The error type.
- * @returns {Error} Throws a `RangeError` with the applicable error message.
- */
-function error(type) {
-	throw new RangeError(errors[type]);
-}
-
-/**
- * A generic `Array#map` utility function.
- * @private
- * @param {Array} array The array to iterate over.
- * @param {Function} callback The function that gets called for every array
- * item.
- * @returns {Array} A new array of values returned by the callback function.
- */
-function map(array, fn) {
-	const result = [];
-	let length = array.length;
-	while (length--) {
-		result[length] = fn(array[length]);
-	}
-	return result;
-}
-
-/**
- * A simple `Array#map`-like wrapper to work with domain name strings or email
- * addresses.
- * @private
- * @param {String} domain The domain name or email address.
- * @param {Function} callback The function that gets called for every
- * character.
- * @returns {Array} A new string of characters returned by the callback
- * function.
- */
-function mapDomain(string, fn) {
-	const parts = string.split('@');
-	let result = '';
-	if (parts.length > 1) {
-		// In email addresses, only the domain name should be punycoded. Leave
-		// the local part (i.e. everything up to `@`) intact.
-		result = parts[0] + '@';
-		string = parts[1];
-	}
-	// Avoid `split(regex)` for IE8 compatibility. See #17.
-	string = string.replace(regexSeparators, '\x2E');
-	const labels = string.split('.');
-	const encoded = map(labels, fn).join('.');
-	return result + encoded;
-}
-
-/**
- * Creates an array containing the numeric code points of each Unicode
- * character in the string. While JavaScript uses UCS-2 internally,
- * this function will convert a pair of surrogate halves (each of which
- * UCS-2 exposes as separate characters) into a single code point,
- * matching UTF-16.
- * @see `punycode.ucs2.encode`
- * @see <https://mathiasbynens.be/notes/javascript-encoding>
- * @memberOf punycode.ucs2
- * @name decode
- * @param {String} string The Unicode input string (UCS-2).
- * @returns {Array} The new array of code points.
- */
-function ucs2decode(string) {
-	const output = [];
-	let counter = 0;
-	const length = string.length;
-	while (counter < length) {
-		const value = string.charCodeAt(counter++);
-		if (value >= 0xD800 && value <= 0xDBFF && counter < length) {
-			// It's a high surrogate, and there is a next character.
-			const extra = string.charCodeAt(counter++);
-			if ((extra & 0xFC00) == 0xDC00) { // Low surrogate.
-				output.push(((value & 0x3FF) << 10) + (extra & 0x3FF) + 0x10000);
-			} else {
-				// It's an unmatched surrogate; only append this code unit, in case the
-				// next code unit is the high surrogate of a surrogate pair.
-				output.push(value);
-				counter--;
-			}
-		} else {
-			output.push(value);
-		}
-	}
-	return output;
-}
-
-/**
- * Creates a string based on an array of numeric code points.
- * @see `punycode.ucs2.decode`
- * @memberOf punycode.ucs2
- * @name encode
- * @param {Array} codePoints The array of numeric code points.
- * @returns {String} The new Unicode string (UCS-2).
- */
-const ucs2encode = array => String.fromCodePoint(...array);
-
-/**
- * Converts a basic code point into a digit/integer.
- * @see `digitToBasic()`
- * @private
- * @param {Number} codePoint The basic numeric code point value.
- * @returns {Number} The numeric value of a basic code point (for use in
- * representing integers) in the range `0` to `base - 1`, or `base` if
- * the code point does not represent a value.
- */
-const basicToDigit = function(codePoint) {
-	if (codePoint - 0x30 < 0x0A) {
-		return codePoint - 0x16;
-	}
-	if (codePoint - 0x41 < 0x1A) {
-		return codePoint - 0x41;
-	}
-	if (codePoint - 0x61 < 0x1A) {
-		return codePoint - 0x61;
-	}
-	return base;
-};
-
-/**
- * Converts a digit/integer into a basic code point.
- * @see `basicToDigit()`
- * @private
- * @param {Number} digit The numeric value of a basic code point.
- * @returns {Number} The basic code point whose value (when used for
- * representing integers) is `digit`, which needs to be in the range
- * `0` to `base - 1`. If `flag` is non-zero, the uppercase form is
- * used; else, the lowercase form is used. The behavior is undefined
- * if `flag` is non-zero and `digit` has no uppercase form.
- */
-const digitToBasic = function(digit, flag) {
-	//  0..25 map to ASCII a..z or A..Z
-	// 26..35 map to ASCII 0..9
-	return digit + 22 + 75 * (digit < 26) - ((flag != 0) << 5);
-};
-
-/**
- * Bias adaptation function as per section 3.4 of RFC 3492.
- * https://tools.ietf.org/html/rfc3492#section-3.4
- * @private
- */
-const adapt = function(delta, numPoints, firstTime) {
-	let k = 0;
-	delta = firstTime ? floor(delta / damp) : delta >> 1;
-	delta += floor(delta / numPoints);
-	for (/* no initialization */; delta > baseMinusTMin * tMax >> 1; k += base) {
-		delta = floor(delta / baseMinusTMin);
-	}
-	return floor(k + (baseMinusTMin + 1) * delta / (delta + skew));
-};
-
-/**
- * Converts a Punycode string of ASCII-only symbols to a string of Unicode
- * symbols.
- * @memberOf punycode
- * @param {String} input The Punycode string of ASCII-only symbols.
- * @returns {String} The resulting string of Unicode symbols.
- */
-const decode = function(input) {
-	// Don't use UCS-2.
-	const output = [];
-	const inputLength = input.length;
-	let i = 0;
-	let n = initialN;
-	let bias = initialBias;
-
-	// Handle the basic code points: let `basic` be the number of input code
-	// points before the last delimiter, or `0` if there is none, then copy
-	// the first basic code points to the output.
-
-	let basic = input.lastIndexOf(delimiter);
-	if (basic < 0) {
-		basic = 0;
-	}
-
-	for (let j = 0; j < basic; ++j) {
-		// if it's not a basic code point
-		if (input.charCodeAt(j) >= 0x80) {
-			error('not-basic');
-		}
-		output.push(input.charCodeAt(j));
-	}
-
-	// Main decoding loop: start just after the last delimiter if any basic code
-	// points were copied; start at the beginning otherwise.
-
-	for (let index = basic > 0 ? basic + 1 : 0; index < inputLength; /* no final expression */) {
-
-		// `index` is the index of the next character to be consumed.
-		// Decode a generalized variable-length integer into `delta`,
-		// which gets added to `i`. The overflow checking is easier
-		// if we increase `i` as we go, then subtract off its starting
-		// value at the end to obtain `delta`.
-		let oldi = i;
-		for (let w = 1, k = base; /* no condition */; k += base) {
-
-			if (index >= inputLength) {
-				error('invalid-input');
-			}
-
-			const digit = basicToDigit(input.charCodeAt(index++));
-
-			if (digit >= base || digit > floor((maxInt - i) / w)) {
-				error('overflow');
-			}
-
-			i += digit * w;
-			const t = k <= bias ? tMin : (k >= bias + tMax ? tMax : k - bias);
-
-			if (digit < t) {
-				break;
-			}
-
-			const baseMinusT = base - t;
-			if (w > floor(maxInt / baseMinusT)) {
-				error('overflow');
-			}
-
-			w *= baseMinusT;
-
-		}
-
-		const out = output.length + 1;
-		bias = adapt(i - oldi, out, oldi == 0);
-
-		// `i` was supposed to wrap around from `out` to `0`,
-		// incrementing `n` each time, so we'll fix that now:
-		if (floor(i / out) > maxInt - n) {
-			error('overflow');
-		}
-
-		n += floor(i / out);
-		i %= out;
-
-		// Insert `n` at position `i` of the output.
-		output.splice(i++, 0, n);
-
-	}
-
-	return String.fromCodePoint(...output);
-};
-
-/**
- * Converts a string of Unicode symbols (e.g. a domain name label) to a
- * Punycode string of ASCII-only symbols.
- * @memberOf punycode
- * @param {String} input The string of Unicode symbols.
- * @returns {String} The resulting Punycode string of ASCII-only symbols.
- */
-const encode = function(input) {
-	const output = [];
-
-	// Convert the input in UCS-2 to an array of Unicode code points.
-	input = ucs2decode(input);
-
-	// Cache the length.
-	let inputLength = input.length;
-
-	// Initialize the state.
-	let n = initialN;
-	let delta = 0;
-	let bias = initialBias;
-
-	// Handle the basic code points.
-	for (const currentValue of input) {
-		if (currentValue < 0x80) {
-			output.push(stringFromCharCode(currentValue));
-		}
-	}
-
-	let basicLength = output.length;
-	let handledCPCount = basicLength;
-
-	// `handledCPCount` is the number of code points that have been handled;
-	// `basicLength` is the number of basic code points.
-
-	// Finish the basic string with a delimiter unless it's empty.
-	if (basicLength) {
-		output.push(delimiter);
-	}
-
-	// Main encoding loop:
-	while (handledCPCount < inputLength) {
-
-		// All non-basic code points < n have been handled already. Find the next
-		// larger one:
-		let m = maxInt;
-		for (const currentValue of input) {
-			if (currentValue >= n && currentValue < m) {
-				m = currentValue;
-			}
-		}
-
-		// Increase `delta` enough to advance the decoder's <n,i> state to <m,0>,
-		// but guard against overflow.
-		const handledCPCountPlusOne = handledCPCount + 1;
-		if (m - n > floor((maxInt - delta) / handledCPCountPlusOne)) {
-			error('overflow');
-		}
-
-		delta += (m - n) * handledCPCountPlusOne;
-		n = m;
-
-		for (const currentValue of input) {
-			if (currentValue < n && ++delta > maxInt) {
-				error('overflow');
-			}
-			if (currentValue == n) {
-				// Represent delta as a generalized variable-length integer.
-				let q = delta;
-				for (let k = base; /* no condition */; k += base) {
-					const t = k <= bias ? tMin : (k >= bias + tMax ? tMax : k - bias);
-					if (q < t) {
-						break;
-					}
-					const qMinusT = q - t;
-					const baseMinusT = base - t;
-					output.push(
-						stringFromCharCode(digitToBasic(t + qMinusT % baseMinusT, 0))
-					);
-					q = floor(qMinusT / baseMinusT);
-				}
-
-				output.push(stringFromCharCode(digitToBasic(q, 0)));
-				bias = adapt(delta, handledCPCountPlusOne, handledCPCount == basicLength);
-				delta = 0;
-				++handledCPCount;
-			}
-		}
-
-		++delta;
-		++n;
-
-	}
-	return output.join('');
-};
-
-/**
- * Converts a Punycode string representing a domain name or an email address
- * to Unicode. Only the Punycoded parts of the input will be converted, i.e.
- * it doesn't matter if you call it on a string that has already been
- * converted to Unicode.
- * @memberOf punycode
- * @param {String} input The Punycoded domain name or email address to
- * convert to Unicode.
- * @returns {String} The Unicode representation of the given Punycode
- * string.
- */
-const toUnicode = function(input) {
-	return mapDomain(input, function(string) {
-		return regexPunycode.test(string)
-			? decode(string.slice(4).toLowerCase())
-			: string;
-	});
-};
-
-/**
- * Converts a Unicode string representing a domain name or an email address to
- * Punycode. Only the non-ASCII parts of the domain name will be converted,
- * i.e. it doesn't matter if you call it with a domain that's already in
- * ASCII.
- * @memberOf punycode
- * @param {String} input The domain name or email address to convert, as a
- * Unicode string.
- * @returns {String} The Punycode representation of the given domain name or
- * email address.
- */
-const toASCII = function(input) {
-	return mapDomain(input, function(string) {
-		return regexNonASCII.test(string)
-			? 'xn--' + encode(string)
-			: string;
-	});
-};
-
-/*--------------------------------------------------------------------------*/
-
-/** Define the public API */
-const punycode = {
-	/**
-	 * A string representing the current Punycode.js version number.
-	 * @memberOf punycode
-	 * @type String
-	 */
-	'version': '2.1.0',
-	/**
-	 * An object of methods to convert from JavaScript's internal character
-	 * representation (UCS-2) to Unicode code points, and back.
-	 * @see <https://mathiasbynens.be/notes/javascript-encoding>
-	 * @memberOf punycode
-	 * @type Object
-	 */
-	'ucs2': {
-		'decode': ucs2decode,
-		'encode': ucs2encode
-	},
-	'decode': decode,
-	'encode': encode,
-	'toASCII': toASCII,
-	'toUnicode': toUnicode
-};
-
-
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (punycode);
-
-
-/***/ }),
-
 /***/ 1075:
 /***/ ((__unused_webpack_module, exports) => {
 
@@ -62500,2078 +65304,6 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 
 /***/ }),
 
-/***/ 2418:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "f3": () => (/* binding */ isSpawnedActor),
-/* harmony export */   "mu": () => (/* binding */ createInvocableActor),
-/* harmony export */   "vk": () => (/* binding */ toActorRef)
-/* harmony export */ });
-/* unused harmony exports createDeferredActor, createNullActor, isActor */
-/* harmony import */ var _virtual_tslib_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(3388);
-/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(8351);
-/* harmony import */ var _serviceScope_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(9010);
-
-
-
-
-function createNullActor(id) {
-  var _a;
-
-  return _a = {
-    id: id,
-    send: function () {
-      return void 0;
-    },
-    subscribe: function () {
-      return {
-        unsubscribe: function () {
-          return void 0;
-        }
-      };
-    },
-    getSnapshot: function () {
-      return undefined;
-    },
-    toJSON: function () {
-      return {
-        id: id
-      };
-    }
-  }, _a[_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .symbolObservable */ .L$] = function () {
-    return this;
-  }, _a;
-}
-/**
- * Creates a deferred actor that is able to be invoked given the provided
- * invocation information in its `.meta` value.
- *
- * @param invokeDefinition The meta information needed to invoke the actor.
- */
-
-function createInvocableActor(invokeDefinition, machine, context, _event) {
-  var _a;
-
-  var invokeSrc = (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .toInvokeSource */ .j)(invokeDefinition.src);
-  var serviceCreator = (_a = machine === null || machine === void 0 ? void 0 : machine.options.services) === null || _a === void 0 ? void 0 : _a[invokeSrc.type];
-  var resolvedData = invokeDefinition.data ? (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .mapContext */ .QX)(invokeDefinition.data, context, _event) : undefined;
-  var tempActor = serviceCreator ? createDeferredActor(serviceCreator, invokeDefinition.id, resolvedData) : createNullActor(invokeDefinition.id); // @ts-ignore
-
-  tempActor.meta = invokeDefinition;
-  return tempActor;
-}
-function createDeferredActor(entity, id, data) {
-  var tempActor = createNullActor(id); // @ts-ignore
-
-  tempActor.deferred = true;
-
-  if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isMachine */ .O4)(entity)) {
-    // "mute" the existing service scope so potential spawned actors within the `.initialState` stay deferred here
-    var initialState_1 = tempActor.state = (0,_serviceScope_js__WEBPACK_IMPORTED_MODULE_1__/* .provide */ .J)(undefined, function () {
-      return (data ? entity.withContext(data) : entity).initialState;
-    });
-
-    tempActor.getSnapshot = function () {
-      return initialState_1;
-    };
-  }
-
-  return tempActor;
-}
-function isActor(item) {
-  try {
-    return typeof item.send === 'function';
-  } catch (e) {
-    return false;
-  }
-}
-function isSpawnedActor(item) {
-  return isActor(item) && 'id' in item;
-} // TODO: refactor the return type, this could be written in a better way but it's best to avoid unneccessary breaking changes now
-
-function toActorRef(actorRefLike) {
-  var _a;
-
-  return (0,_virtual_tslib_js__WEBPACK_IMPORTED_MODULE_2__/* .__assign */ .pi)((_a = {
-    subscribe: function () {
-      return {
-        unsubscribe: function () {
-          return void 0;
-        }
-      };
-    },
-    id: 'anonymous',
-    getSnapshot: function () {
-      return undefined;
-    }
-  }, _a[_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .symbolObservable */ .L$] = function () {
-    return this;
-  }, _a), actorRefLike);
-}
-
-
-
-
-/***/ }),
-
-/***/ 5697:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-
-// EXPORTS
-__webpack_require__.d(__webpack_exports__, {
-  "J": () => (/* binding */ Machine),
-  "C": () => (/* binding */ createMachine)
-});
-
-// EXTERNAL MODULE: ./node_modules/xstate/es/_virtual/_tslib.js
-var _tslib = __webpack_require__(3388);
-// EXTERNAL MODULE: ./node_modules/xstate/es/utils.js
-var utils = __webpack_require__(8351);
-// EXTERNAL MODULE: ./node_modules/xstate/es/types.js
-var types = __webpack_require__(1329);
-// EXTERNAL MODULE: ./node_modules/xstate/es/State.js
-var State = __webpack_require__(4242);
-// EXTERNAL MODULE: ./node_modules/xstate/es/actionTypes.js
-var actionTypes = __webpack_require__(127);
-// EXTERNAL MODULE: ./node_modules/xstate/es/actions.js
-var es_actions = __webpack_require__(1020);
-// EXTERNAL MODULE: ./node_modules/xstate/es/environment.js
-var environment = __webpack_require__(8685);
-// EXTERNAL MODULE: ./node_modules/xstate/es/constants.js
-var constants = __webpack_require__(1231);
-// EXTERNAL MODULE: ./node_modules/xstate/es/stateUtils.js
-var stateUtils = __webpack_require__(2002);
-// EXTERNAL MODULE: ./node_modules/xstate/es/Actor.js
-var Actor = __webpack_require__(2418);
-;// CONCATENATED MODULE: ./node_modules/xstate/es/invokeUtils.js
-
-
-
-
-
-
-function toInvokeSource(src) {
-  if (typeof src === 'string') {
-    var simpleSrc = {
-      type: src
-    };
-
-    simpleSrc.toString = function () {
-      return src;
-    }; // v4 compat - TODO: remove in v5
-
-
-    return simpleSrc;
-  }
-
-  return src;
-}
-function toInvokeDefinition(invokeConfig) {
-  return (0,_tslib/* __assign */.pi)((0,_tslib/* __assign */.pi)({
-    type: actionTypes/* invoke */.dw
-  }, invokeConfig), {
-    toJSON: function () {
-      invokeConfig.onDone;
-          invokeConfig.onError;
-          var invokeDef = (0,_tslib/* __rest */._T)(invokeConfig, ["onDone", "onError"]);
-
-      return (0,_tslib/* __assign */.pi)((0,_tslib/* __assign */.pi)({}, invokeDef), {
-        type: actionTypes/* invoke */.dw,
-        src: toInvokeSource(invokeConfig.src)
-      });
-    }
-  });
-}
-
-
-
-;// CONCATENATED MODULE: ./node_modules/xstate/es/StateNode.js
-
-
-
-
-
-
-
-
-
-
-
-
-var NULL_EVENT = '';
-var STATE_IDENTIFIER = '#';
-var WILDCARD = '*';
-var EMPTY_OBJECT = {};
-
-var isStateId = function (str) {
-  return str[0] === STATE_IDENTIFIER;
-};
-
-var createDefaultOptions = function () {
-  return {
-    actions: {},
-    guards: {},
-    services: {},
-    activities: {},
-    delays: {}
-  };
-};
-
-var validateArrayifiedTransitions = function (stateNode, event, transitions) {
-  var hasNonLastUnguardedTarget = transitions.slice(0, -1).some(function (transition) {
-    return !('cond' in transition) && !('in' in transition) && ((0,utils/* isString */.HD)(transition.target) || (0,utils/* isMachine */.O4)(transition.target));
-  });
-  var eventText = event === NULL_EVENT ? 'the transient event' : "event '".concat(event, "'");
-  (0,utils/* warn */.ZK)(!hasNonLastUnguardedTarget, "One or more transitions for ".concat(eventText, " on state '").concat(stateNode.id, "' are unreachable. ") + "Make sure that the default transition is the last one defined.");
-};
-
-var StateNode =
-/*#__PURE__*/
-
-/** @class */
-function () {
-  function StateNode(
-  /**
-   * The raw config used to create the machine.
-   */
-  config, options,
-  /**
-   * The initial extended state
-   */
-  _context, // TODO: this is unsafe, but we're removing it in v5 anyway
-  _stateInfo) {
-    var _this = this;
-
-    if (_context === void 0) {
-      _context = 'context' in config ? config.context : undefined;
-    }
-
-    var _a;
-
-    this.config = config;
-    this._context = _context;
-    /**
-     * The order this state node appears. Corresponds to the implicit SCXML document order.
-     */
-
-    this.order = -1;
-    this.__xstatenode = true;
-    this.__cache = {
-      events: undefined,
-      relativeValue: new Map(),
-      initialStateValue: undefined,
-      initialState: undefined,
-      on: undefined,
-      transitions: undefined,
-      candidates: {},
-      delayedTransitions: undefined
-    };
-    this.idMap = {};
-    this.tags = [];
-    this.options = Object.assign(createDefaultOptions(), options);
-    this.parent = _stateInfo === null || _stateInfo === void 0 ? void 0 : _stateInfo.parent;
-    this.key = this.config.key || (_stateInfo === null || _stateInfo === void 0 ? void 0 : _stateInfo.key) || this.config.id || '(machine)';
-    this.machine = this.parent ? this.parent.machine : this;
-    this.path = this.parent ? this.parent.path.concat(this.key) : [];
-    this.delimiter = this.config.delimiter || (this.parent ? this.parent.delimiter : constants/* STATE_DELIMITER */.iS);
-    this.id = this.config.id || (0,_tslib/* __spreadArray */.ev)([this.machine.key], (0,_tslib/* __read */.CR)(this.path), false).join(this.delimiter);
-    this.version = this.parent ? this.parent.version : this.config.version;
-    this.type = this.config.type || (this.config.parallel ? 'parallel' : this.config.states && Object.keys(this.config.states).length ? 'compound' : this.config.history ? 'history' : 'atomic');
-    this.schema = this.parent ? this.machine.schema : (_a = this.config.schema) !== null && _a !== void 0 ? _a : {};
-    this.description = this.config.description;
-
-    if (!environment/* IS_PRODUCTION */.M) {
-      (0,utils/* warn */.ZK)(!('parallel' in this.config), "The \"parallel\" property is deprecated and will be removed in version 4.1. ".concat(this.config.parallel ? "Replace with `type: 'parallel'`" : "Use `type: '".concat(this.type, "'`"), " in the config for state node '").concat(this.id, "' instead."));
-    }
-
-    this.initial = this.config.initial;
-    this.states = this.config.states ? (0,utils/* mapValues */.Q8)(this.config.states, function (stateConfig, key) {
-      var _a;
-
-      var stateNode = new StateNode(stateConfig, {}, undefined, {
-        parent: _this,
-        key: key
-      });
-      Object.assign(_this.idMap, (0,_tslib/* __assign */.pi)((_a = {}, _a[stateNode.id] = stateNode, _a), stateNode.idMap));
-      return stateNode;
-    }) : EMPTY_OBJECT; // Document order
-
-    var order = 0;
-
-    function dfs(stateNode) {
-      var e_1, _a;
-
-      stateNode.order = order++;
-
-      try {
-        for (var _b = (0,_tslib/* __values */.XA)((0,stateUtils/* getChildren */.G)(stateNode)), _c = _b.next(); !_c.done; _c = _b.next()) {
-          var child = _c.value;
-          dfs(child);
-        }
-      } catch (e_1_1) {
-        e_1 = {
-          error: e_1_1
-        };
-      } finally {
-        try {
-          if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
-        } finally {
-          if (e_1) throw e_1.error;
-        }
-      }
-    }
-
-    dfs(this); // History config
-
-    this.history = this.config.history === true ? 'shallow' : this.config.history || false;
-    this._transient = !!this.config.always || (!this.config.on ? false : Array.isArray(this.config.on) ? this.config.on.some(function (_a) {
-      var event = _a.event;
-      return event === NULL_EVENT;
-    }) : NULL_EVENT in this.config.on);
-    this.strict = !!this.config.strict; // TODO: deprecate (entry)
-
-    this.onEntry = (0,utils/* toArray */.qo)(this.config.entry || this.config.onEntry).map(function (action) {
-      return (0,es_actions/* toActionObject */.Q8)(action);
-    }); // TODO: deprecate (exit)
-
-    this.onExit = (0,utils/* toArray */.qo)(this.config.exit || this.config.onExit).map(function (action) {
-      return (0,es_actions/* toActionObject */.Q8)(action);
-    });
-    this.meta = this.config.meta;
-    this.doneData = this.type === 'final' ? this.config.data : undefined;
-    this.invoke = (0,utils/* toArray */.qo)(this.config.invoke).map(function (invokeConfig, i) {
-      var _a, _b;
-
-      if ((0,utils/* isMachine */.O4)(invokeConfig)) {
-        var invokeId = (0,utils/* createInvokeId */.bx)(_this.id, i);
-        _this.machine.options.services = (0,_tslib/* __assign */.pi)((_a = {}, _a[invokeId] = invokeConfig, _a), _this.machine.options.services);
-        return toInvokeDefinition({
-          src: invokeId,
-          id: invokeId
-        });
-      } else if ((0,utils/* isString */.HD)(invokeConfig.src)) {
-        var invokeId = invokeConfig.id || (0,utils/* createInvokeId */.bx)(_this.id, i);
-        return toInvokeDefinition((0,_tslib/* __assign */.pi)((0,_tslib/* __assign */.pi)({}, invokeConfig), {
-          id: invokeId,
-          src: invokeConfig.src
-        }));
-      } else if ((0,utils/* isMachine */.O4)(invokeConfig.src) || (0,utils/* isFunction */.mf)(invokeConfig.src)) {
-        var invokeId = invokeConfig.id || (0,utils/* createInvokeId */.bx)(_this.id, i);
-        _this.machine.options.services = (0,_tslib/* __assign */.pi)((_b = {}, _b[invokeId] = invokeConfig.src, _b), _this.machine.options.services);
-        return toInvokeDefinition((0,_tslib/* __assign */.pi)((0,_tslib/* __assign */.pi)({
-          id: invokeId
-        }, invokeConfig), {
-          src: invokeId
-        }));
-      } else {
-        var invokeSource = invokeConfig.src;
-        return toInvokeDefinition((0,_tslib/* __assign */.pi)((0,_tslib/* __assign */.pi)({
-          id: (0,utils/* createInvokeId */.bx)(_this.id, i)
-        }, invokeConfig), {
-          src: invokeSource
-        }));
-      }
-    });
-    this.activities = (0,utils/* toArray */.qo)(this.config.activities).concat(this.invoke).map(function (activity) {
-      return (0,es_actions/* toActivityDefinition */.XA)(activity);
-    });
-    this.transition = this.transition.bind(this);
-    this.tags = (0,utils/* toArray */.qo)(this.config.tags); // TODO: this is the real fix for initialization once
-    // state node getters are deprecated
-    // if (!this.parent) {
-    //   this._init();
-    // }
-  }
-
-  StateNode.prototype._init = function () {
-    if (this.__cache.transitions) {
-      return;
-    }
-
-    (0,stateUtils/* getAllStateNodes */.ac)(this).forEach(function (stateNode) {
-      return stateNode.on;
-    });
-  };
-  /**
-   * Clones this state machine with custom options and context.
-   *
-   * @param options Options (actions, guards, activities, services) to recursively merge with the existing options.
-   * @param context Custom context (will override predefined context)
-   */
-
-
-  StateNode.prototype.withConfig = function (options, context) {
-    var _a = this.options,
-        actions = _a.actions,
-        activities = _a.activities,
-        guards = _a.guards,
-        services = _a.services,
-        delays = _a.delays;
-    return new StateNode(this.config, {
-      actions: (0,_tslib/* __assign */.pi)((0,_tslib/* __assign */.pi)({}, actions), options.actions),
-      activities: (0,_tslib/* __assign */.pi)((0,_tslib/* __assign */.pi)({}, activities), options.activities),
-      guards: (0,_tslib/* __assign */.pi)((0,_tslib/* __assign */.pi)({}, guards), options.guards),
-      services: (0,_tslib/* __assign */.pi)((0,_tslib/* __assign */.pi)({}, services), options.services),
-      delays: (0,_tslib/* __assign */.pi)((0,_tslib/* __assign */.pi)({}, delays), options.delays)
-    }, context !== null && context !== void 0 ? context : this.context);
-  };
-  /**
-   * Clones this state machine with custom context.
-   *
-   * @param context Custom context (will override predefined context, not recursive)
-   */
-
-
-  StateNode.prototype.withContext = function (context) {
-    return new StateNode(this.config, this.options, context);
-  };
-
-  Object.defineProperty(StateNode.prototype, "context", {
-    get: function () {
-      return (0,utils/* isFunction */.mf)(this._context) ? this._context() : this._context;
-    },
-    enumerable: false,
-    configurable: true
-  });
-  Object.defineProperty(StateNode.prototype, "definition", {
-    /**
-     * The well-structured state node definition.
-     */
-    get: function () {
-      return {
-        id: this.id,
-        key: this.key,
-        version: this.version,
-        context: this.context,
-        type: this.type,
-        initial: this.initial,
-        history: this.history,
-        states: (0,utils/* mapValues */.Q8)(this.states, function (state) {
-          return state.definition;
-        }),
-        on: this.on,
-        transitions: this.transitions,
-        entry: this.onEntry,
-        exit: this.onExit,
-        activities: this.activities || [],
-        meta: this.meta,
-        order: this.order || -1,
-        data: this.doneData,
-        invoke: this.invoke,
-        description: this.description,
-        tags: this.tags
-      };
-    },
-    enumerable: false,
-    configurable: true
-  });
-
-  StateNode.prototype.toJSON = function () {
-    return this.definition;
-  };
-
-  Object.defineProperty(StateNode.prototype, "on", {
-    /**
-     * The mapping of events to transitions.
-     */
-    get: function () {
-      if (this.__cache.on) {
-        return this.__cache.on;
-      }
-
-      var transitions = this.transitions;
-      return this.__cache.on = transitions.reduce(function (map, transition) {
-        map[transition.eventType] = map[transition.eventType] || [];
-        map[transition.eventType].push(transition);
-        return map;
-      }, {});
-    },
-    enumerable: false,
-    configurable: true
-  });
-  Object.defineProperty(StateNode.prototype, "after", {
-    get: function () {
-      return this.__cache.delayedTransitions || (this.__cache.delayedTransitions = this.getDelayedTransitions(), this.__cache.delayedTransitions);
-    },
-    enumerable: false,
-    configurable: true
-  });
-  Object.defineProperty(StateNode.prototype, "transitions", {
-    /**
-     * All the transitions that can be taken from this state node.
-     */
-    get: function () {
-      return this.__cache.transitions || (this.__cache.transitions = this.formatTransitions(), this.__cache.transitions);
-    },
-    enumerable: false,
-    configurable: true
-  });
-
-  StateNode.prototype.getCandidates = function (eventName) {
-    if (this.__cache.candidates[eventName]) {
-      return this.__cache.candidates[eventName];
-    }
-
-    var transient = eventName === NULL_EVENT;
-    var candidates = this.transitions.filter(function (transition) {
-      var sameEventType = transition.eventType === eventName; // null events should only match against eventless transitions
-
-      return transient ? sameEventType : sameEventType || transition.eventType === WILDCARD;
-    });
-    this.__cache.candidates[eventName] = candidates;
-    return candidates;
-  };
-  /**
-   * All delayed transitions from the config.
-   */
-
-
-  StateNode.prototype.getDelayedTransitions = function () {
-    var _this = this;
-
-    var afterConfig = this.config.after;
-
-    if (!afterConfig) {
-      return [];
-    }
-
-    var mutateEntryExit = function (delay, i) {
-      var delayRef = (0,utils/* isFunction */.mf)(delay) ? "".concat(_this.id, ":delay[").concat(i, "]") : delay;
-      var eventType = (0,es_actions/* after */.e4)(delayRef, _this.id);
-
-      _this.onEntry.push((0,es_actions/* send */.lW)(eventType, {
-        delay: delay
-      }));
-
-      _this.onExit.push((0,es_actions/* cancel */.al)(eventType));
-
-      return eventType;
-    };
-
-    var delayedTransitions = (0,utils/* isArray */.kJ)(afterConfig) ? afterConfig.map(function (transition, i) {
-      var eventType = mutateEntryExit(transition.delay, i);
-      return (0,_tslib/* __assign */.pi)((0,_tslib/* __assign */.pi)({}, transition), {
-        event: eventType
-      });
-    }) : (0,utils/* flatten */.xH)(Object.keys(afterConfig).map(function (delay, i) {
-      var configTransition = afterConfig[delay];
-      var resolvedTransition = (0,utils/* isString */.HD)(configTransition) ? {
-        target: configTransition
-      } : configTransition;
-      var resolvedDelay = !isNaN(+delay) ? +delay : delay;
-      var eventType = mutateEntryExit(resolvedDelay, i);
-      return (0,utils/* toArray */.qo)(resolvedTransition).map(function (transition) {
-        return (0,_tslib/* __assign */.pi)((0,_tslib/* __assign */.pi)({}, transition), {
-          event: eventType,
-          delay: resolvedDelay
-        });
-      });
-    }));
-    return delayedTransitions.map(function (delayedTransition) {
-      var delay = delayedTransition.delay;
-      return (0,_tslib/* __assign */.pi)((0,_tslib/* __assign */.pi)({}, _this.formatTransition(delayedTransition)), {
-        delay: delay
-      });
-    });
-  };
-  /**
-   * Returns the state nodes represented by the current state value.
-   *
-   * @param state The state value or State instance
-   */
-
-
-  StateNode.prototype.getStateNodes = function (state) {
-    var _a;
-
-    var _this = this;
-
-    if (!state) {
-      return [];
-    }
-
-    var stateValue = state instanceof State/* State */.ZM ? state.value : (0,utils/* toStateValue */.WM)(state, this.delimiter);
-
-    if ((0,utils/* isString */.HD)(stateValue)) {
-      var initialStateValue = this.getStateNode(stateValue).initial;
-      return initialStateValue !== undefined ? this.getStateNodes((_a = {}, _a[stateValue] = initialStateValue, _a)) : [this, this.states[stateValue]];
-    }
-
-    var subStateKeys = Object.keys(stateValue);
-    var subStateNodes = [this];
-    subStateNodes.push.apply(subStateNodes, (0,_tslib/* __spreadArray */.ev)([], (0,_tslib/* __read */.CR)((0,utils/* flatten */.xH)(subStateKeys.map(function (subStateKey) {
-      return _this.getStateNode(subStateKey).getStateNodes(stateValue[subStateKey]);
-    }))), false));
-    return subStateNodes;
-  };
-  /**
-   * Returns `true` if this state node explicitly handles the given event.
-   *
-   * @param event The event in question
-   */
-
-
-  StateNode.prototype.handles = function (event) {
-    var eventType = (0,utils/* getEventType */.x6)(event);
-    return this.events.includes(eventType);
-  };
-  /**
-   * Resolves the given `state` to a new `State` instance relative to this machine.
-   *
-   * This ensures that `.events` and `.nextEvents` represent the correct values.
-   *
-   * @param state The state to resolve
-   */
-
-
-  StateNode.prototype.resolveState = function (state) {
-    var stateFromConfig = state instanceof State/* State */.ZM ? state : State/* State.create */.ZM.create(state);
-    var configuration = Array.from((0,stateUtils/* getConfiguration */.P_)([], this.getStateNodes(stateFromConfig.value)));
-    return new State/* State */.ZM((0,_tslib/* __assign */.pi)((0,_tslib/* __assign */.pi)({}, stateFromConfig), {
-      value: this.resolve(stateFromConfig.value),
-      configuration: configuration,
-      done: (0,stateUtils/* isInFinalState */.Ij)(configuration, this),
-      tags: (0,stateUtils/* getTagsFromConfiguration */.Oe)(configuration),
-      machine: this.machine
-    }));
-  };
-
-  StateNode.prototype.transitionLeafNode = function (stateValue, state, _event) {
-    var stateNode = this.getStateNode(stateValue);
-    var next = stateNode.next(state, _event);
-
-    if (!next || !next.transitions.length) {
-      return this.next(state, _event);
-    }
-
-    return next;
-  };
-
-  StateNode.prototype.transitionCompoundNode = function (stateValue, state, _event) {
-    var subStateKeys = Object.keys(stateValue);
-    var stateNode = this.getStateNode(subStateKeys[0]);
-
-    var next = stateNode._transition(stateValue[subStateKeys[0]], state, _event);
-
-    if (!next || !next.transitions.length) {
-      return this.next(state, _event);
-    }
-
-    return next;
-  };
-
-  StateNode.prototype.transitionParallelNode = function (stateValue, state, _event) {
-    var e_2, _a;
-
-    var transitionMap = {};
-
-    try {
-      for (var _b = (0,_tslib/* __values */.XA)(Object.keys(stateValue)), _c = _b.next(); !_c.done; _c = _b.next()) {
-        var subStateKey = _c.value;
-        var subStateValue = stateValue[subStateKey];
-
-        if (!subStateValue) {
-          continue;
-        }
-
-        var subStateNode = this.getStateNode(subStateKey);
-
-        var next = subStateNode._transition(subStateValue, state, _event);
-
-        if (next) {
-          transitionMap[subStateKey] = next;
-        }
-      }
-    } catch (e_2_1) {
-      e_2 = {
-        error: e_2_1
-      };
-    } finally {
-      try {
-        if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
-      } finally {
-        if (e_2) throw e_2.error;
-      }
-    }
-
-    var stateTransitions = Object.keys(transitionMap).map(function (key) {
-      return transitionMap[key];
-    });
-    var enabledTransitions = (0,utils/* flatten */.xH)(stateTransitions.map(function (st) {
-      return st.transitions;
-    }));
-    var willTransition = stateTransitions.some(function (st) {
-      return st.transitions.length > 0;
-    });
-
-    if (!willTransition) {
-      return this.next(state, _event);
-    }
-
-    var entryNodes = (0,utils/* flatten */.xH)(stateTransitions.map(function (t) {
-      return t.entrySet;
-    }));
-    var configuration = (0,utils/* flatten */.xH)(Object.keys(transitionMap).map(function (key) {
-      return transitionMap[key].configuration;
-    }));
-    return {
-      transitions: enabledTransitions,
-      entrySet: entryNodes,
-      exitSet: (0,utils/* flatten */.xH)(stateTransitions.map(function (t) {
-        return t.exitSet;
-      })),
-      configuration: configuration,
-      source: state,
-      actions: (0,utils/* flatten */.xH)(Object.keys(transitionMap).map(function (key) {
-        return transitionMap[key].actions;
-      }))
-    };
-  };
-
-  StateNode.prototype._transition = function (stateValue, state, _event) {
-    // leaf node
-    if ((0,utils/* isString */.HD)(stateValue)) {
-      return this.transitionLeafNode(stateValue, state, _event);
-    } // hierarchical node
-
-
-    if (Object.keys(stateValue).length === 1) {
-      return this.transitionCompoundNode(stateValue, state, _event);
-    } // orthogonal node
-
-
-    return this.transitionParallelNode(stateValue, state, _event);
-  };
-
-  StateNode.prototype.getTransitionData = function (state, event) {
-    return this._transition(state.value, state, (0,utils/* toSCXMLEvent */.g5)(event));
-  };
-
-  StateNode.prototype.next = function (state, _event) {
-    var e_3, _a;
-
-    var _this = this;
-
-    var eventName = _event.name;
-    var actions = [];
-    var nextStateNodes = [];
-    var selectedTransition;
-
-    try {
-      for (var _b = (0,_tslib/* __values */.XA)(this.getCandidates(eventName)), _c = _b.next(); !_c.done; _c = _b.next()) {
-        var candidate = _c.value;
-        var cond = candidate.cond,
-            stateIn = candidate.in;
-        var resolvedContext = state.context;
-        var isInState = stateIn ? (0,utils/* isString */.HD)(stateIn) && isStateId(stateIn) ? // Check if in state by ID
-        state.matches((0,utils/* toStateValue */.WM)(this.getStateNodeById(stateIn).path, this.delimiter)) : // Check if in state by relative grandparent
-        (0,utils/* matchesState */.W)((0,utils/* toStateValue */.WM)(stateIn, this.delimiter), (0,utils/* path */.ET)(this.path.slice(0, -2))(state.value)) : true;
-        var guardPassed = false;
-
-        try {
-          guardPassed = !cond || (0,utils/* evaluateGuard */.vx)(this.machine, cond, resolvedContext, _event, state);
-        } catch (err) {
-          throw new Error("Unable to evaluate guard '".concat(cond.name || cond.type, "' in transition for event '").concat(eventName, "' in state node '").concat(this.id, "':\n").concat(err.message));
-        }
-
-        if (guardPassed && isInState) {
-          if (candidate.target !== undefined) {
-            nextStateNodes = candidate.target;
-          }
-
-          actions.push.apply(actions, (0,_tslib/* __spreadArray */.ev)([], (0,_tslib/* __read */.CR)(candidate.actions), false));
-          selectedTransition = candidate;
-          break;
-        }
-      }
-    } catch (e_3_1) {
-      e_3 = {
-        error: e_3_1
-      };
-    } finally {
-      try {
-        if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
-      } finally {
-        if (e_3) throw e_3.error;
-      }
-    }
-
-    if (!selectedTransition) {
-      return undefined;
-    }
-
-    if (!nextStateNodes.length) {
-      return {
-        transitions: [selectedTransition],
-        entrySet: [],
-        exitSet: [],
-        configuration: state.value ? [this] : [],
-        source: state,
-        actions: actions
-      };
-    }
-
-    var allNextStateNodes = (0,utils/* flatten */.xH)(nextStateNodes.map(function (stateNode) {
-      return _this.getRelativeStateNodes(stateNode, state.historyValue);
-    }));
-    var isInternal = !!selectedTransition.internal;
-    var reentryNodes = isInternal ? [] : (0,utils/* flatten */.xH)(allNextStateNodes.map(function (n) {
-      return _this.nodesFromChild(n);
-    }));
-    return {
-      transitions: [selectedTransition],
-      entrySet: reentryNodes,
-      exitSet: isInternal ? [] : [this],
-      configuration: allNextStateNodes,
-      source: state,
-      actions: actions
-    };
-  };
-
-  StateNode.prototype.nodesFromChild = function (childStateNode) {
-    if (childStateNode.escapes(this)) {
-      return [];
-    }
-
-    var nodes = [];
-    var marker = childStateNode;
-
-    while (marker && marker !== this) {
-      nodes.push(marker);
-      marker = marker.parent;
-    }
-
-    nodes.push(this); // inclusive
-
-    return nodes;
-  };
-  /**
-   * Whether the given state node "escapes" this state node. If the `stateNode` is equal to or the parent of
-   * this state node, it does not escape.
-   */
-
-
-  StateNode.prototype.escapes = function (stateNode) {
-    if (this === stateNode) {
-      return false;
-    }
-
-    var parent = this.parent;
-
-    while (parent) {
-      if (parent === stateNode) {
-        return false;
-      }
-
-      parent = parent.parent;
-    }
-
-    return true;
-  };
-
-  StateNode.prototype.getActions = function (transition, currentContext, _event, prevState) {
-    var e_4, _a, e_5, _b;
-
-    var prevConfig = (0,stateUtils/* getConfiguration */.P_)([], prevState ? this.getStateNodes(prevState.value) : [this]);
-    var resolvedConfig = transition.configuration.length ? (0,stateUtils/* getConfiguration */.P_)(prevConfig, transition.configuration) : prevConfig;
-
-    try {
-      for (var resolvedConfig_1 = (0,_tslib/* __values */.XA)(resolvedConfig), resolvedConfig_1_1 = resolvedConfig_1.next(); !resolvedConfig_1_1.done; resolvedConfig_1_1 = resolvedConfig_1.next()) {
-        var sn = resolvedConfig_1_1.value;
-
-        if (!(0,stateUtils/* has */.e$)(prevConfig, sn)) {
-          transition.entrySet.push(sn);
-        }
-      }
-    } catch (e_4_1) {
-      e_4 = {
-        error: e_4_1
-      };
-    } finally {
-      try {
-        if (resolvedConfig_1_1 && !resolvedConfig_1_1.done && (_a = resolvedConfig_1.return)) _a.call(resolvedConfig_1);
-      } finally {
-        if (e_4) throw e_4.error;
-      }
-    }
-
-    try {
-      for (var prevConfig_1 = (0,_tslib/* __values */.XA)(prevConfig), prevConfig_1_1 = prevConfig_1.next(); !prevConfig_1_1.done; prevConfig_1_1 = prevConfig_1.next()) {
-        var sn = prevConfig_1_1.value;
-
-        if (!(0,stateUtils/* has */.e$)(resolvedConfig, sn) || (0,stateUtils/* has */.e$)(transition.exitSet, sn.parent)) {
-          transition.exitSet.push(sn);
-        }
-      }
-    } catch (e_5_1) {
-      e_5 = {
-        error: e_5_1
-      };
-    } finally {
-      try {
-        if (prevConfig_1_1 && !prevConfig_1_1.done && (_b = prevConfig_1.return)) _b.call(prevConfig_1);
-      } finally {
-        if (e_5) throw e_5.error;
-      }
-    }
-
-    var doneEvents = (0,utils/* flatten */.xH)(transition.entrySet.map(function (sn) {
-      var events = [];
-
-      if (sn.type !== 'final') {
-        return events;
-      }
-
-      var parent = sn.parent;
-
-      if (!parent.parent) {
-        return events;
-      }
-
-      events.push((0,es_actions/* done */.aT)(sn.id, sn.doneData), // TODO: deprecate - final states should not emit done events for their own state.
-      (0,es_actions/* done */.aT)(parent.id, sn.doneData ? (0,utils/* mapContext */.QX)(sn.doneData, currentContext, _event) : undefined));
-      var grandparent = parent.parent;
-
-      if (grandparent.type === 'parallel') {
-        if ((0,stateUtils/* getChildren */.G)(grandparent).every(function (parentNode) {
-          return (0,stateUtils/* isInFinalState */.Ij)(transition.configuration, parentNode);
-        })) {
-          events.push((0,es_actions/* done */.aT)(grandparent.id));
-        }
-      }
-
-      return events;
-    }));
-    transition.exitSet.sort(function (a, b) {
-      return b.order - a.order;
-    });
-    transition.entrySet.sort(function (a, b) {
-      return a.order - b.order;
-    });
-    var entryStates = new Set(transition.entrySet);
-    var exitStates = new Set(transition.exitSet);
-
-    var _c = (0,_tslib/* __read */.CR)([(0,utils/* flatten */.xH)(Array.from(entryStates).map(function (stateNode) {
-      return (0,_tslib/* __spreadArray */.ev)((0,_tslib/* __spreadArray */.ev)([], (0,_tslib/* __read */.CR)(stateNode.activities.map(function (activity) {
-        return (0,es_actions/* start */.BL)(activity);
-      })), false), (0,_tslib/* __read */.CR)(stateNode.onEntry), false);
-    })).concat(doneEvents.map(es_actions/* raise */.OU)), (0,utils/* flatten */.xH)(Array.from(exitStates).map(function (stateNode) {
-      return (0,_tslib/* __spreadArray */.ev)((0,_tslib/* __spreadArray */.ev)([], (0,_tslib/* __read */.CR)(stateNode.onExit), false), (0,_tslib/* __read */.CR)(stateNode.activities.map(function (activity) {
-        return (0,es_actions/* stop */.sT)(activity);
-      })), false);
-    }))], 2),
-        entryActions = _c[0],
-        exitActions = _c[1];
-
-    var actions = (0,es_actions/* toActionObjects */.AE)(exitActions.concat(transition.actions).concat(entryActions), this.machine.options.actions);
-    return actions;
-  };
-  /**
-   * Determines the next state given the current `state` and sent `event`.
-   *
-   * @param state The current State instance or state value
-   * @param event The event that was sent at the current state
-   * @param context The current context (extended state) of the current state
-   */
-
-
-  StateNode.prototype.transition = function (state, event, context) {
-    if (state === void 0) {
-      state = this.initialState;
-    }
-
-    var _event = (0,utils/* toSCXMLEvent */.g5)(event);
-
-    var currentState;
-
-    if (state instanceof State/* State */.ZM) {
-      currentState = context === undefined ? state : this.resolveState(State/* State.from */.ZM.from(state, context));
-    } else {
-      var resolvedStateValue = (0,utils/* isString */.HD)(state) ? this.resolve((0,utils/* pathToStateValue */.on)(this.getResolvedPath(state))) : this.resolve(state);
-      var resolvedContext = context !== null && context !== void 0 ? context : this.machine.context;
-      currentState = this.resolveState(State/* State.from */.ZM.from(resolvedStateValue, resolvedContext));
-    }
-
-    if (!environment/* IS_PRODUCTION */.M && _event.name === WILDCARD) {
-      throw new Error("An event cannot have the wildcard type ('".concat(WILDCARD, "')"));
-    }
-
-    if (this.strict) {
-      if (!this.events.includes(_event.name) && !(0,utils/* isBuiltInEvent */.JQ)(_event.name)) {
-        throw new Error("Machine '".concat(this.id, "' does not accept event '").concat(_event.name, "'"));
-      }
-    }
-
-    var stateTransition = this._transition(currentState.value, currentState, _event) || {
-      transitions: [],
-      configuration: [],
-      entrySet: [],
-      exitSet: [],
-      source: currentState,
-      actions: []
-    };
-    var prevConfig = (0,stateUtils/* getConfiguration */.P_)([], this.getStateNodes(currentState.value));
-    var resolvedConfig = stateTransition.configuration.length ? (0,stateUtils/* getConfiguration */.P_)(prevConfig, stateTransition.configuration) : prevConfig;
-    stateTransition.configuration = (0,_tslib/* __spreadArray */.ev)([], (0,_tslib/* __read */.CR)(resolvedConfig), false);
-    return this.resolveTransition(stateTransition, currentState, currentState.context, _event);
-  };
-
-  StateNode.prototype.resolveRaisedTransition = function (state, _event, originalEvent) {
-    var _a;
-
-    var currentActions = state.actions;
-    state = this.transition(state, _event); // Save original event to state
-    // TODO: this should be the raised event! Delete in V5 (breaking)
-
-    state._event = originalEvent;
-    state.event = originalEvent.data;
-
-    (_a = state.actions).unshift.apply(_a, (0,_tslib/* __spreadArray */.ev)([], (0,_tslib/* __read */.CR)(currentActions), false));
-
-    return state;
-  };
-
-  StateNode.prototype.resolveTransition = function (stateTransition, currentState, context, _event) {
-    var e_6, _a;
-
-    var _this = this;
-
-    if (_event === void 0) {
-      _event = es_actions/* initEvent */.bf;
-    }
-
-    var configuration = stateTransition.configuration; // Transition will "apply" if:
-    // - this is the initial state (there is no current state)
-    // - OR there are transitions
-
-    var willTransition = !currentState || stateTransition.transitions.length > 0;
-    var resolvedStateValue = willTransition ? (0,stateUtils/* getValue */.NA)(this.machine, configuration) : undefined;
-    var historyValue = currentState ? currentState.historyValue ? currentState.historyValue : stateTransition.source ? this.machine.historyValue(currentState.value) : undefined : undefined;
-    var actions = this.getActions(stateTransition, context, _event, currentState);
-    var activities = currentState ? (0,_tslib/* __assign */.pi)({}, currentState.activities) : {};
-
-    try {
-      for (var actions_1 = (0,_tslib/* __values */.XA)(actions), actions_1_1 = actions_1.next(); !actions_1_1.done; actions_1_1 = actions_1.next()) {
-        var action = actions_1_1.value;
-
-        if (action.type === actionTypes/* start */.BL) {
-          activities[action.activity.id || action.activity.type] = action;
-        } else if (action.type === actionTypes/* stop */.sT) {
-          activities[action.activity.id || action.activity.type] = false;
-        }
-      }
-    } catch (e_6_1) {
-      e_6 = {
-        error: e_6_1
-      };
-    } finally {
-      try {
-        if (actions_1_1 && !actions_1_1.done && (_a = actions_1.return)) _a.call(actions_1);
-      } finally {
-        if (e_6) throw e_6.error;
-      }
-    }
-
-    var _b = (0,_tslib/* __read */.CR)((0,es_actions/* resolveActions */.yC)(this, currentState, context, _event, actions, this.machine.config.preserveActionOrder), 2),
-        resolvedActions = _b[0],
-        updatedContext = _b[1];
-
-    var _c = (0,_tslib/* __read */.CR)((0,utils/* partition */.uK)(resolvedActions, function (action) {
-      return action.type === actionTypes/* raise */.OU || action.type === actionTypes/* send */.lW && action.to === types/* SpecialTargets.Internal */.K.Internal;
-    }), 2),
-        raisedEvents = _c[0],
-        nonRaisedActions = _c[1];
-
-    var invokeActions = resolvedActions.filter(function (action) {
-      var _a;
-
-      return action.type === actionTypes/* start */.BL && ((_a = action.activity) === null || _a === void 0 ? void 0 : _a.type) === actionTypes/* invoke */.dw;
-    });
-    var children = invokeActions.reduce(function (acc, action) {
-      acc[action.activity.id] = (0,Actor/* createInvocableActor */.mu)(action.activity, _this.machine, updatedContext, _event);
-      return acc;
-    }, currentState ? (0,_tslib/* __assign */.pi)({}, currentState.children) : {});
-    var resolvedConfiguration = willTransition ? stateTransition.configuration : currentState ? currentState.configuration : [];
-    var isDone = (0,stateUtils/* isInFinalState */.Ij)(resolvedConfiguration, this);
-    var nextState = new State/* State */.ZM({
-      value: resolvedStateValue || currentState.value,
-      context: updatedContext,
-      _event: _event,
-      // Persist _sessionid between states
-      _sessionid: currentState ? currentState._sessionid : null,
-      historyValue: resolvedStateValue ? historyValue ? (0,utils/* updateHistoryValue */.yv)(historyValue, resolvedStateValue) : undefined : currentState ? currentState.historyValue : undefined,
-      history: !resolvedStateValue || stateTransition.source ? currentState : undefined,
-      actions: resolvedStateValue ? nonRaisedActions : [],
-      activities: resolvedStateValue ? activities : currentState ? currentState.activities : {},
-      events: [],
-      configuration: resolvedConfiguration,
-      transitions: stateTransition.transitions,
-      children: children,
-      done: isDone,
-      tags: currentState === null || currentState === void 0 ? void 0 : currentState.tags,
-      machine: this
-    });
-    var didUpdateContext = context !== updatedContext;
-    nextState.changed = _event.name === actionTypes/* update */.Vx || didUpdateContext; // Dispose of penultimate histories to prevent memory leaks
-
-    var history = nextState.history;
-
-    if (history) {
-      delete history.history;
-    } // There are transient transitions if the machine is not in a final state
-    // and if some of the state nodes have transient ("always") transitions.
-
-
-    var isTransient = !isDone && (this._transient || configuration.some(function (stateNode) {
-      return stateNode._transient;
-    })); // If there are no enabled transitions, check if there are transient transitions.
-    // If there are transient transitions, continue checking for more transitions
-    // because an transient transition should be triggered even if there are no
-    // enabled transitions.
-    //
-    // If we're already working on an transient transition (by checking
-    // if the event is a NULL_EVENT), then stop to prevent an infinite loop.
-    //
-    // Otherwise, if there are no enabled nor transient transitions, we are done.
-
-    if (!willTransition && (!isTransient || _event.name === NULL_EVENT)) {
-      return nextState;
-    }
-
-    var maybeNextState = nextState;
-
-    if (!isDone) {
-      if (isTransient) {
-        maybeNextState = this.resolveRaisedTransition(maybeNextState, {
-          type: actionTypes/* nullEvent */.IA
-        }, _event);
-      }
-
-      while (raisedEvents.length) {
-        var raisedEvent = raisedEvents.shift();
-        maybeNextState = this.resolveRaisedTransition(maybeNextState, raisedEvent._event, _event);
-      }
-    } // Detect if state changed
-
-
-    var changed = maybeNextState.changed || (history ? !!maybeNextState.actions.length || didUpdateContext || typeof history.value !== typeof maybeNextState.value || !(0,State/* stateValuesEqual */.j_)(maybeNextState.value, history.value) : undefined);
-    maybeNextState.changed = changed; // Preserve original history after raised events
-
-    maybeNextState.history = history;
-    maybeNextState.tags = (0,stateUtils/* getTagsFromConfiguration */.Oe)(maybeNextState.configuration);
-    return maybeNextState;
-  };
-  /**
-   * Returns the child state node from its relative `stateKey`, or throws.
-   */
-
-
-  StateNode.prototype.getStateNode = function (stateKey) {
-    if (isStateId(stateKey)) {
-      return this.machine.getStateNodeById(stateKey);
-    }
-
-    if (!this.states) {
-      throw new Error("Unable to retrieve child state '".concat(stateKey, "' from '").concat(this.id, "'; no child states exist."));
-    }
-
-    var result = this.states[stateKey];
-
-    if (!result) {
-      throw new Error("Child state '".concat(stateKey, "' does not exist on '").concat(this.id, "'"));
-    }
-
-    return result;
-  };
-  /**
-   * Returns the state node with the given `stateId`, or throws.
-   *
-   * @param stateId The state ID. The prefix "#" is removed.
-   */
-
-
-  StateNode.prototype.getStateNodeById = function (stateId) {
-    var resolvedStateId = isStateId(stateId) ? stateId.slice(STATE_IDENTIFIER.length) : stateId;
-
-    if (resolvedStateId === this.id) {
-      return this;
-    }
-
-    var stateNode = this.machine.idMap[resolvedStateId];
-
-    if (!stateNode) {
-      throw new Error("Child state node '#".concat(resolvedStateId, "' does not exist on machine '").concat(this.id, "'"));
-    }
-
-    return stateNode;
-  };
-  /**
-   * Returns the relative state node from the given `statePath`, or throws.
-   *
-   * @param statePath The string or string array relative path to the state node.
-   */
-
-
-  StateNode.prototype.getStateNodeByPath = function (statePath) {
-    if (typeof statePath === 'string' && isStateId(statePath)) {
-      try {
-        return this.getStateNodeById(statePath.slice(1));
-      } catch (e) {// try individual paths
-        // throw e;
-      }
-    }
-
-    var arrayStatePath = (0,utils/* toStatePath */.Q9)(statePath, this.delimiter).slice();
-    var currentStateNode = this;
-
-    while (arrayStatePath.length) {
-      var key = arrayStatePath.shift();
-
-      if (!key.length) {
-        break;
-      }
-
-      currentStateNode = currentStateNode.getStateNode(key);
-    }
-
-    return currentStateNode;
-  };
-  /**
-   * Resolves a partial state value with its full representation in this machine.
-   *
-   * @param stateValue The partial state value to resolve.
-   */
-
-
-  StateNode.prototype.resolve = function (stateValue) {
-    var _a;
-
-    var _this = this;
-
-    if (!stateValue) {
-      return this.initialStateValue || EMPTY_OBJECT; // TODO: type-specific properties
-    }
-
-    switch (this.type) {
-      case 'parallel':
-        return (0,utils/* mapValues */.Q8)(this.initialStateValue, function (subStateValue, subStateKey) {
-          return subStateValue ? _this.getStateNode(subStateKey).resolve(stateValue[subStateKey] || subStateValue) : EMPTY_OBJECT;
-        });
-
-      case 'compound':
-        if ((0,utils/* isString */.HD)(stateValue)) {
-          var subStateNode = this.getStateNode(stateValue);
-
-          if (subStateNode.type === 'parallel' || subStateNode.type === 'compound') {
-            return _a = {}, _a[stateValue] = subStateNode.initialStateValue, _a;
-          }
-
-          return stateValue;
-        }
-
-        if (!Object.keys(stateValue).length) {
-          return this.initialStateValue || {};
-        }
-
-        return (0,utils/* mapValues */.Q8)(stateValue, function (subStateValue, subStateKey) {
-          return subStateValue ? _this.getStateNode(subStateKey).resolve(subStateValue) : EMPTY_OBJECT;
-        });
-
-      default:
-        return stateValue || EMPTY_OBJECT;
-    }
-  };
-
-  StateNode.prototype.getResolvedPath = function (stateIdentifier) {
-    if (isStateId(stateIdentifier)) {
-      var stateNode = this.machine.idMap[stateIdentifier.slice(STATE_IDENTIFIER.length)];
-
-      if (!stateNode) {
-        throw new Error("Unable to find state node '".concat(stateIdentifier, "'"));
-      }
-
-      return stateNode.path;
-    }
-
-    return (0,utils/* toStatePath */.Q9)(stateIdentifier, this.delimiter);
-  };
-
-  Object.defineProperty(StateNode.prototype, "initialStateValue", {
-    get: function () {
-      var _a;
-
-      if (this.__cache.initialStateValue) {
-        return this.__cache.initialStateValue;
-      }
-
-      var initialStateValue;
-
-      if (this.type === 'parallel') {
-        initialStateValue = (0,utils/* mapFilterValues */.ib)(this.states, function (state) {
-          return state.initialStateValue || EMPTY_OBJECT;
-        }, function (stateNode) {
-          return !(stateNode.type === 'history');
-        });
-      } else if (this.initial !== undefined) {
-        if (!this.states[this.initial]) {
-          throw new Error("Initial state '".concat(this.initial, "' not found on '").concat(this.key, "'"));
-        }
-
-        initialStateValue = (0,stateUtils/* isLeafNode */.N9)(this.states[this.initial]) ? this.initial : (_a = {}, _a[this.initial] = this.states[this.initial].initialStateValue, _a);
-      } else {
-        // The finite state value of a machine without child states is just an empty object
-        initialStateValue = {};
-      }
-
-      this.__cache.initialStateValue = initialStateValue;
-      return this.__cache.initialStateValue;
-    },
-    enumerable: false,
-    configurable: true
-  });
-
-  StateNode.prototype.getInitialState = function (stateValue, context) {
-    this._init(); // TODO: this should be in the constructor (see note in constructor)
-
-
-    var configuration = this.getStateNodes(stateValue);
-    return this.resolveTransition({
-      configuration: configuration,
-      entrySet: configuration,
-      exitSet: [],
-      transitions: [],
-      source: undefined,
-      actions: []
-    }, undefined, context !== null && context !== void 0 ? context : this.machine.context, undefined);
-  };
-
-  Object.defineProperty(StateNode.prototype, "initialState", {
-    /**
-     * The initial State instance, which includes all actions to be executed from
-     * entering the initial state.
-     */
-    get: function () {
-      var initialStateValue = this.initialStateValue;
-
-      if (!initialStateValue) {
-        throw new Error("Cannot retrieve initial state from simple state '".concat(this.id, "'."));
-      }
-
-      return this.getInitialState(initialStateValue);
-    },
-    enumerable: false,
-    configurable: true
-  });
-  Object.defineProperty(StateNode.prototype, "target", {
-    /**
-     * The target state value of the history state node, if it exists. This represents the
-     * default state value to transition to if no history value exists yet.
-     */
-    get: function () {
-      var target;
-
-      if (this.type === 'history') {
-        var historyConfig = this.config;
-
-        if ((0,utils/* isString */.HD)(historyConfig.target)) {
-          target = isStateId(historyConfig.target) ? (0,utils/* pathToStateValue */.on)(this.machine.getStateNodeById(historyConfig.target).path.slice(this.path.length - 1)) : historyConfig.target;
-        } else {
-          target = historyConfig.target;
-        }
-      }
-
-      return target;
-    },
-    enumerable: false,
-    configurable: true
-  });
-  /**
-   * Returns the leaf nodes from a state path relative to this state node.
-   *
-   * @param relativeStateId The relative state path to retrieve the state nodes
-   * @param history The previous state to retrieve history
-   * @param resolve Whether state nodes should resolve to initial child state nodes
-   */
-
-  StateNode.prototype.getRelativeStateNodes = function (relativeStateId, historyValue, resolve) {
-    if (resolve === void 0) {
-      resolve = true;
-    }
-
-    return resolve ? relativeStateId.type === 'history' ? relativeStateId.resolveHistory(historyValue) : relativeStateId.initialStateNodes : [relativeStateId];
-  };
-
-  Object.defineProperty(StateNode.prototype, "initialStateNodes", {
-    get: function () {
-      var _this = this;
-
-      if ((0,stateUtils/* isLeafNode */.N9)(this)) {
-        return [this];
-      } // Case when state node is compound but no initial state is defined
-
-
-      if (this.type === 'compound' && !this.initial) {
-        if (!environment/* IS_PRODUCTION */.M) {
-          (0,utils/* warn */.ZK)(false, "Compound state node '".concat(this.id, "' has no initial state."));
-        }
-
-        return [this];
-      }
-
-      var initialStateNodePaths = (0,utils/* toStatePaths */.SA)(this.initialStateValue);
-      return (0,utils/* flatten */.xH)(initialStateNodePaths.map(function (initialPath) {
-        return _this.getFromRelativePath(initialPath);
-      }));
-    },
-    enumerable: false,
-    configurable: true
-  });
-  /**
-   * Retrieves state nodes from a relative path to this state node.
-   *
-   * @param relativePath The relative path from this state node
-   * @param historyValue
-   */
-
-  StateNode.prototype.getFromRelativePath = function (relativePath) {
-    if (!relativePath.length) {
-      return [this];
-    }
-
-    var _a = (0,_tslib/* __read */.CR)(relativePath),
-        stateKey = _a[0],
-        childStatePath = _a.slice(1);
-
-    if (!this.states) {
-      throw new Error("Cannot retrieve subPath '".concat(stateKey, "' from node with no states"));
-    }
-
-    var childStateNode = this.getStateNode(stateKey);
-
-    if (childStateNode.type === 'history') {
-      return childStateNode.resolveHistory();
-    }
-
-    if (!this.states[stateKey]) {
-      throw new Error("Child state '".concat(stateKey, "' does not exist on '").concat(this.id, "'"));
-    }
-
-    return this.states[stateKey].getFromRelativePath(childStatePath);
-  };
-
-  StateNode.prototype.historyValue = function (relativeStateValue) {
-    if (!Object.keys(this.states).length) {
-      return undefined;
-    }
-
-    return {
-      current: relativeStateValue || this.initialStateValue,
-      states: (0,utils/* mapFilterValues */.ib)(this.states, function (stateNode, key) {
-        if (!relativeStateValue) {
-          return stateNode.historyValue();
-        }
-
-        var subStateValue = (0,utils/* isString */.HD)(relativeStateValue) ? undefined : relativeStateValue[key];
-        return stateNode.historyValue(subStateValue || stateNode.initialStateValue);
-      }, function (stateNode) {
-        return !stateNode.history;
-      })
-    };
-  };
-  /**
-   * Resolves to the historical value(s) of the parent state node,
-   * represented by state nodes.
-   *
-   * @param historyValue
-   */
-
-
-  StateNode.prototype.resolveHistory = function (historyValue) {
-    var _this = this;
-
-    if (this.type !== 'history') {
-      return [this];
-    }
-
-    var parent = this.parent;
-
-    if (!historyValue) {
-      var historyTarget = this.target;
-      return historyTarget ? (0,utils/* flatten */.xH)((0,utils/* toStatePaths */.SA)(historyTarget).map(function (relativeChildPath) {
-        return parent.getFromRelativePath(relativeChildPath);
-      })) : parent.initialStateNodes;
-    }
-
-    var subHistoryValue = (0,utils/* nestedPath */.gk)(parent.path, 'states')(historyValue).current;
-
-    if ((0,utils/* isString */.HD)(subHistoryValue)) {
-      return [parent.getStateNode(subHistoryValue)];
-    }
-
-    return (0,utils/* flatten */.xH)((0,utils/* toStatePaths */.SA)(subHistoryValue).map(function (subStatePath) {
-      return _this.history === 'deep' ? parent.getFromRelativePath(subStatePath) : [parent.states[subStatePath[0]]];
-    }));
-  };
-
-  Object.defineProperty(StateNode.prototype, "stateIds", {
-    /**
-     * All the state node IDs of this state node and its descendant state nodes.
-     */
-    get: function () {
-      var _this = this;
-
-      var childStateIds = (0,utils/* flatten */.xH)(Object.keys(this.states).map(function (stateKey) {
-        return _this.states[stateKey].stateIds;
-      }));
-      return [this.id].concat(childStateIds);
-    },
-    enumerable: false,
-    configurable: true
-  });
-  Object.defineProperty(StateNode.prototype, "events", {
-    /**
-     * All the event types accepted by this state node and its descendants.
-     */
-    get: function () {
-      var e_7, _a, e_8, _b;
-
-      if (this.__cache.events) {
-        return this.__cache.events;
-      }
-
-      var states = this.states;
-      var events = new Set(this.ownEvents);
-
-      if (states) {
-        try {
-          for (var _c = (0,_tslib/* __values */.XA)(Object.keys(states)), _d = _c.next(); !_d.done; _d = _c.next()) {
-            var stateId = _d.value;
-            var state = states[stateId];
-
-            if (state.states) {
-              try {
-                for (var _e = (e_8 = void 0, (0,_tslib/* __values */.XA)(state.events)), _f = _e.next(); !_f.done; _f = _e.next()) {
-                  var event_1 = _f.value;
-                  events.add("".concat(event_1));
-                }
-              } catch (e_8_1) {
-                e_8 = {
-                  error: e_8_1
-                };
-              } finally {
-                try {
-                  if (_f && !_f.done && (_b = _e.return)) _b.call(_e);
-                } finally {
-                  if (e_8) throw e_8.error;
-                }
-              }
-            }
-          }
-        } catch (e_7_1) {
-          e_7 = {
-            error: e_7_1
-          };
-        } finally {
-          try {
-            if (_d && !_d.done && (_a = _c.return)) _a.call(_c);
-          } finally {
-            if (e_7) throw e_7.error;
-          }
-        }
-      }
-
-      return this.__cache.events = Array.from(events);
-    },
-    enumerable: false,
-    configurable: true
-  });
-  Object.defineProperty(StateNode.prototype, "ownEvents", {
-    /**
-     * All the events that have transitions directly from this state node.
-     *
-     * Excludes any inert events.
-     */
-    get: function () {
-      var events = new Set(this.transitions.filter(function (transition) {
-        return !(!transition.target && !transition.actions.length && transition.internal);
-      }).map(function (transition) {
-        return transition.eventType;
-      }));
-      return Array.from(events);
-    },
-    enumerable: false,
-    configurable: true
-  });
-
-  StateNode.prototype.resolveTarget = function (_target) {
-    var _this = this;
-
-    if (_target === undefined) {
-      // an undefined target signals that the state node should not transition from that state when receiving that event
-      return undefined;
-    }
-
-    return _target.map(function (target) {
-      if (!(0,utils/* isString */.HD)(target)) {
-        return target;
-      }
-
-      var isInternalTarget = target[0] === _this.delimiter; // If internal target is defined on machine,
-      // do not include machine key on target
-
-      if (isInternalTarget && !_this.parent) {
-        return _this.getStateNodeByPath(target.slice(1));
-      }
-
-      var resolvedTarget = isInternalTarget ? _this.key + target : target;
-
-      if (_this.parent) {
-        try {
-          var targetStateNode = _this.parent.getStateNodeByPath(resolvedTarget);
-
-          return targetStateNode;
-        } catch (err) {
-          throw new Error("Invalid transition definition for state node '".concat(_this.id, "':\n").concat(err.message));
-        }
-      } else {
-        return _this.getStateNodeByPath(resolvedTarget);
-      }
-    });
-  };
-
-  StateNode.prototype.formatTransition = function (transitionConfig) {
-    var _this = this;
-
-    var normalizedTarget = (0,utils/* normalizeTarget */.rg)(transitionConfig.target);
-    var internal = 'internal' in transitionConfig ? transitionConfig.internal : normalizedTarget ? normalizedTarget.some(function (_target) {
-      return (0,utils/* isString */.HD)(_target) && _target[0] === _this.delimiter;
-    }) : true;
-    var guards = this.machine.options.guards;
-    var target = this.resolveTarget(normalizedTarget);
-
-    var transition = (0,_tslib/* __assign */.pi)((0,_tslib/* __assign */.pi)({}, transitionConfig), {
-      actions: (0,es_actions/* toActionObjects */.AE)((0,utils/* toArray */.qo)(transitionConfig.actions)),
-      cond: (0,utils/* toGuard */.Qi)(transitionConfig.cond, guards),
-      target: target,
-      source: this,
-      internal: internal,
-      eventType: transitionConfig.event,
-      toJSON: function () {
-        return (0,_tslib/* __assign */.pi)((0,_tslib/* __assign */.pi)({}, transition), {
-          target: transition.target ? transition.target.map(function (t) {
-            return "#".concat(t.id);
-          }) : undefined,
-          source: "#".concat(_this.id)
-        });
-      }
-    });
-
-    return transition;
-  };
-
-  StateNode.prototype.formatTransitions = function () {
-    var e_9, _a;
-
-    var _this = this;
-
-    var onConfig;
-
-    if (!this.config.on) {
-      onConfig = [];
-    } else if (Array.isArray(this.config.on)) {
-      onConfig = this.config.on;
-    } else {
-      var _b = this.config.on,
-          _c = WILDCARD,
-          _d = _b[_c],
-          wildcardConfigs = _d === void 0 ? [] : _d,
-          strictTransitionConfigs_1 = (0,_tslib/* __rest */._T)(_b, [typeof _c === "symbol" ? _c : _c + ""]);
-
-      onConfig = (0,utils/* flatten */.xH)(Object.keys(strictTransitionConfigs_1).map(function (key) {
-        if (!environment/* IS_PRODUCTION */.M && key === NULL_EVENT) {
-          (0,utils/* warn */.ZK)(false, "Empty string transition configs (e.g., `{ on: { '': ... }}`) for transient transitions are deprecated. Specify the transition in the `{ always: ... }` property instead. " + "Please check the `on` configuration for \"#".concat(_this.id, "\"."));
-        }
-
-        var transitionConfigArray = (0,utils/* toTransitionConfigArray */.jh)(key, strictTransitionConfigs_1[key]);
-
-        if (!environment/* IS_PRODUCTION */.M) {
-          validateArrayifiedTransitions(_this, key, transitionConfigArray);
-        }
-
-        return transitionConfigArray;
-      }).concat((0,utils/* toTransitionConfigArray */.jh)(WILDCARD, wildcardConfigs)));
-    }
-
-    var eventlessConfig = this.config.always ? (0,utils/* toTransitionConfigArray */.jh)('', this.config.always) : [];
-    var doneConfig = this.config.onDone ? (0,utils/* toTransitionConfigArray */.jh)(String((0,es_actions/* done */.aT)(this.id)), this.config.onDone) : [];
-
-    if (!environment/* IS_PRODUCTION */.M) {
-      (0,utils/* warn */.ZK)(!(this.config.onDone && !this.parent), "Root nodes cannot have an \".onDone\" transition. Please check the config of \"".concat(this.id, "\"."));
-    }
-
-    var invokeConfig = (0,utils/* flatten */.xH)(this.invoke.map(function (invokeDef) {
-      var settleTransitions = [];
-
-      if (invokeDef.onDone) {
-        settleTransitions.push.apply(settleTransitions, (0,_tslib/* __spreadArray */.ev)([], (0,_tslib/* __read */.CR)((0,utils/* toTransitionConfigArray */.jh)(String((0,es_actions/* doneInvoke */.Sl)(invokeDef.id)), invokeDef.onDone)), false));
-      }
-
-      if (invokeDef.onError) {
-        settleTransitions.push.apply(settleTransitions, (0,_tslib/* __spreadArray */.ev)([], (0,_tslib/* __read */.CR)((0,utils/* toTransitionConfigArray */.jh)(String((0,es_actions/* error */.vU)(invokeDef.id)), invokeDef.onError)), false));
-      }
-
-      return settleTransitions;
-    }));
-    var delayedTransitions = this.after;
-    var formattedTransitions = (0,utils/* flatten */.xH)((0,_tslib/* __spreadArray */.ev)((0,_tslib/* __spreadArray */.ev)((0,_tslib/* __spreadArray */.ev)((0,_tslib/* __spreadArray */.ev)([], (0,_tslib/* __read */.CR)(doneConfig), false), (0,_tslib/* __read */.CR)(invokeConfig), false), (0,_tslib/* __read */.CR)(onConfig), false), (0,_tslib/* __read */.CR)(eventlessConfig), false).map(function (transitionConfig) {
-      return (0,utils/* toArray */.qo)(transitionConfig).map(function (transition) {
-        return _this.formatTransition(transition);
-      });
-    }));
-
-    try {
-      for (var delayedTransitions_1 = (0,_tslib/* __values */.XA)(delayedTransitions), delayedTransitions_1_1 = delayedTransitions_1.next(); !delayedTransitions_1_1.done; delayedTransitions_1_1 = delayedTransitions_1.next()) {
-        var delayedTransition = delayedTransitions_1_1.value;
-        formattedTransitions.push(delayedTransition);
-      }
-    } catch (e_9_1) {
-      e_9 = {
-        error: e_9_1
-      };
-    } finally {
-      try {
-        if (delayedTransitions_1_1 && !delayedTransitions_1_1.done && (_a = delayedTransitions_1.return)) _a.call(delayedTransitions_1);
-      } finally {
-        if (e_9) throw e_9.error;
-      }
-    }
-
-    return formattedTransitions;
-  };
-
-  return StateNode;
-}();
-
-
-
-;// CONCATENATED MODULE: ./node_modules/xstate/es/Machine.js
-
-
-function Machine(config, options, initialContext) {
-  if (initialContext === void 0) {
-    initialContext = config.context;
-  }
-
-  return new StateNode(config, options, initialContext);
-}
-function createMachine(config, options) {
-  return new StateNode(config, options);
-}
-
-
-
-
-/***/ }),
-
-/***/ 4242:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "TL": () => (/* binding */ isStateConfig),
-/* harmony export */   "ZM": () => (/* binding */ State),
-/* harmony export */   "j1": () => (/* binding */ bindActionToState),
-/* harmony export */   "j_": () => (/* binding */ stateValuesEqual)
-/* harmony export */ });
-/* unused harmony export isState */
-/* harmony import */ var _virtual_tslib_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(3388);
-/* harmony import */ var _constants_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(1231);
-/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(8351);
-/* harmony import */ var _stateUtils_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(2002);
-/* harmony import */ var _actions_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(1020);
-/* harmony import */ var _environment_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(8685);
-
-
-
-
-
-
-
-function stateValuesEqual(a, b) {
-  if (a === b) {
-    return true;
-  }
-
-  if (a === undefined || b === undefined) {
-    return false;
-  }
-
-  if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isString */ .HD)(a) || (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isString */ .HD)(b)) {
-    return a === b;
-  }
-
-  var aKeys = Object.keys(a);
-  var bKeys = Object.keys(b);
-  return aKeys.length === bKeys.length && aKeys.every(function (key) {
-    return stateValuesEqual(a[key], b[key]);
-  });
-}
-function isStateConfig(state) {
-  if (typeof state !== 'object' || state === null) {
-    return false;
-  }
-
-  return 'value' in state && '_event' in state;
-}
-/**
- * @deprecated Use `isStateConfig(object)` or `state instanceof State` instead.
- */
-
-var isState = (/* unused pure expression or super */ null && (isStateConfig));
-function bindActionToState(action, state) {
-  var exec = action.exec;
-
-  var boundAction = (0,_virtual_tslib_js__WEBPACK_IMPORTED_MODULE_1__/* .__assign */ .pi)((0,_virtual_tslib_js__WEBPACK_IMPORTED_MODULE_1__/* .__assign */ .pi)({}, action), {
-    exec: exec !== undefined ? function () {
-      return exec(state.context, state.event, {
-        action: action,
-        state: state,
-        _event: state._event
-      });
-    } : undefined
-  });
-
-  return boundAction;
-}
-
-var State =
-/*#__PURE__*/
-
-/** @class */
-function () {
-  /**
-   * Creates a new State instance.
-   * @param value The state value
-   * @param context The extended state
-   * @param historyValue The tree representing historical values of the state nodes
-   * @param history The previous state
-   * @param actions An array of action objects to execute as side-effects
-   * @param activities A mapping of activities and whether they are started (`true`) or stopped (`false`).
-   * @param meta
-   * @param events Internal event queue. Should be empty with run-to-completion semantics.
-   * @param configuration
-   */
-  function State(config) {
-    var _this = this;
-
-    var _a;
-
-    this.actions = [];
-    this.activities = _constants_js__WEBPACK_IMPORTED_MODULE_2__/* .EMPTY_ACTIVITY_MAP */ .qP;
-    this.meta = {};
-    this.events = [];
-    this.value = config.value;
-    this.context = config.context;
-    this._event = config._event;
-    this._sessionid = config._sessionid;
-    this.event = this._event.data;
-    this.historyValue = config.historyValue;
-    this.history = config.history;
-    this.actions = config.actions || [];
-    this.activities = config.activities || _constants_js__WEBPACK_IMPORTED_MODULE_2__/* .EMPTY_ACTIVITY_MAP */ .qP;
-    this.meta = (0,_stateUtils_js__WEBPACK_IMPORTED_MODULE_3__/* .getMeta */ .xZ)(config.configuration);
-    this.events = config.events || [];
-    this.matches = this.matches.bind(this);
-    this.toStrings = this.toStrings.bind(this);
-    this.configuration = config.configuration;
-    this.transitions = config.transitions;
-    this.children = config.children;
-    this.done = !!config.done;
-    this.tags = (_a = Array.isArray(config.tags) ? new Set(config.tags) : config.tags) !== null && _a !== void 0 ? _a : new Set();
-    this.machine = config.machine;
-    Object.defineProperty(this, 'nextEvents', {
-      get: function () {
-        return (0,_stateUtils_js__WEBPACK_IMPORTED_MODULE_3__/* .nextEvents */ .nJ)(_this.configuration);
-      }
-    });
-  }
-  /**
-   * Creates a new State instance for the given `stateValue` and `context`.
-   * @param stateValue
-   * @param context
-   */
-
-
-  State.from = function (stateValue, context) {
-    if (stateValue instanceof State) {
-      if (stateValue.context !== context) {
-        return new State({
-          value: stateValue.value,
-          context: context,
-          _event: stateValue._event,
-          _sessionid: null,
-          historyValue: stateValue.historyValue,
-          history: stateValue.history,
-          actions: [],
-          activities: stateValue.activities,
-          meta: {},
-          events: [],
-          configuration: [],
-          transitions: [],
-          children: {}
-        });
-      }
-
-      return stateValue;
-    }
-
-    var _event = _actions_js__WEBPACK_IMPORTED_MODULE_4__/* .initEvent */ .bf;
-    return new State({
-      value: stateValue,
-      context: context,
-      _event: _event,
-      _sessionid: null,
-      historyValue: undefined,
-      history: undefined,
-      actions: [],
-      activities: undefined,
-      meta: undefined,
-      events: [],
-      configuration: [],
-      transitions: [],
-      children: {}
-    });
-  };
-  /**
-   * Creates a new State instance for the given `config`.
-   * @param config The state config
-   */
-
-
-  State.create = function (config) {
-    return new State(config);
-  };
-  /**
-   * Creates a new `State` instance for the given `stateValue` and `context` with no actions (side-effects).
-   * @param stateValue
-   * @param context
-   */
-
-
-  State.inert = function (stateValue, context) {
-    if (stateValue instanceof State) {
-      if (!stateValue.actions.length) {
-        return stateValue;
-      }
-
-      var _event = _actions_js__WEBPACK_IMPORTED_MODULE_4__/* .initEvent */ .bf;
-      return new State({
-        value: stateValue.value,
-        context: context,
-        _event: _event,
-        _sessionid: null,
-        historyValue: stateValue.historyValue,
-        history: stateValue.history,
-        activities: stateValue.activities,
-        configuration: stateValue.configuration,
-        transitions: [],
-        children: {}
-      });
-    }
-
-    return State.from(stateValue, context);
-  };
-  /**
-   * Returns an array of all the string leaf state node paths.
-   * @param stateValue
-   * @param delimiter The character(s) that separate each subpath in the string state node path.
-   */
-
-
-  State.prototype.toStrings = function (stateValue, delimiter) {
-    var _this = this;
-
-    if (stateValue === void 0) {
-      stateValue = this.value;
-    }
-
-    if (delimiter === void 0) {
-      delimiter = '.';
-    }
-
-    if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isString */ .HD)(stateValue)) {
-      return [stateValue];
-    }
-
-    var valueKeys = Object.keys(stateValue);
-    return valueKeys.concat.apply(valueKeys, (0,_virtual_tslib_js__WEBPACK_IMPORTED_MODULE_1__/* .__spreadArray */ .ev)([], (0,_virtual_tslib_js__WEBPACK_IMPORTED_MODULE_1__/* .__read */ .CR)(valueKeys.map(function (key) {
-      return _this.toStrings(stateValue[key], delimiter).map(function (s) {
-        return key + delimiter + s;
-      });
-    })), false));
-  };
-
-  State.prototype.toJSON = function () {
-    var _a = this;
-        _a.configuration;
-        _a.transitions;
-        var tags = _a.tags;
-        _a.machine;
-        var jsonValues = (0,_virtual_tslib_js__WEBPACK_IMPORTED_MODULE_1__/* .__rest */ ._T)(_a, ["configuration", "transitions", "tags", "machine"]);
-
-    return (0,_virtual_tslib_js__WEBPACK_IMPORTED_MODULE_1__/* .__assign */ .pi)((0,_virtual_tslib_js__WEBPACK_IMPORTED_MODULE_1__/* .__assign */ .pi)({}, jsonValues), {
-      tags: Array.from(tags)
-    });
-  };
-
-  State.prototype.matches = function (parentStateValue) {
-    return (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .matchesState */ .W)(parentStateValue, this.value);
-  };
-  /**
-   * Whether the current state configuration has a state node with the specified `tag`.
-   * @param tag
-   */
-
-
-  State.prototype.hasTag = function (tag) {
-    return this.tags.has(tag);
-  };
-  /**
-   * Determines whether sending the `event` will cause a non-forbidden transition
-   * to be selected, even if the transitions have no actions nor
-   * change the state value.
-   *
-   * @param event The event to test
-   * @returns Whether the event will cause a transition
-   */
-
-
-  State.prototype.can = function (event) {
-    var _a;
-
-    if (_environment_js__WEBPACK_IMPORTED_MODULE_5__/* .IS_PRODUCTION */ .M) {
-      (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .warn */ .ZK)(!!this.machine, "state.can(...) used outside of a machine-created State object; this will always return false.");
-    }
-
-    var transitionData = (_a = this.machine) === null || _a === void 0 ? void 0 : _a.getTransitionData(this, event);
-    return !!(transitionData === null || transitionData === void 0 ? void 0 : transitionData.transitions.length) && // Check that at least one transition is not forbidden
-    transitionData.transitions.some(function (t) {
-      return t.target !== undefined || t.actions.length;
-    });
-  };
-
-  return State;
-}();
-
-
-
-
-/***/ }),
-
 /***/ 3388:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
@@ -65297,2033 +66029,6 @@ var TARGETLESS_KEY = '';
 /* harmony export */   "M": () => (/* binding */ IS_PRODUCTION)
 /* harmony export */ });
 var IS_PRODUCTION = "production" === 'production';
-
-
-
-
-/***/ }),
-
-/***/ 9989:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-
-// EXPORTS
-__webpack_require__.d(__webpack_exports__, {
-  "kJ": () => (/* binding */ interpret)
-});
-
-// UNUSED EXPORTS: Interpreter, InterpreterStatus, spawn
-
-// EXTERNAL MODULE: ./node_modules/xstate/es/_virtual/_tslib.js
-var _tslib = __webpack_require__(3388);
-// EXTERNAL MODULE: ./node_modules/xstate/es/types.js
-var types = __webpack_require__(1329);
-// EXTERNAL MODULE: ./node_modules/xstate/es/State.js
-var State = __webpack_require__(4242);
-// EXTERNAL MODULE: ./node_modules/xstate/es/actionTypes.js
-var actionTypes = __webpack_require__(127);
-// EXTERNAL MODULE: ./node_modules/xstate/es/actions.js
-var actions = __webpack_require__(1020);
-// EXTERNAL MODULE: ./node_modules/xstate/es/environment.js
-var environment = __webpack_require__(8685);
-// EXTERNAL MODULE: ./node_modules/xstate/es/utils.js
-var utils = __webpack_require__(8351);
-;// CONCATENATED MODULE: ./node_modules/xstate/es/scheduler.js
-
-
-var defaultOptions = {
-  deferEvents: false
-};
-
-var Scheduler =
-/*#__PURE__*/
-
-/** @class */
-function () {
-  function Scheduler(options) {
-    this.processingEvent = false;
-    this.queue = [];
-    this.initialized = false;
-    this.options = (0,_tslib/* __assign */.pi)((0,_tslib/* __assign */.pi)({}, defaultOptions), options);
-  }
-
-  Scheduler.prototype.initialize = function (callback) {
-    this.initialized = true;
-
-    if (callback) {
-      if (!this.options.deferEvents) {
-        this.schedule(callback);
-        return;
-      }
-
-      this.process(callback);
-    }
-
-    this.flushEvents();
-  };
-
-  Scheduler.prototype.schedule = function (task) {
-    if (!this.initialized || this.processingEvent) {
-      this.queue.push(task);
-      return;
-    }
-
-    if (this.queue.length !== 0) {
-      throw new Error('Event queue should be empty when it is not processing events');
-    }
-
-    this.process(task);
-    this.flushEvents();
-  };
-
-  Scheduler.prototype.clear = function () {
-    this.queue = [];
-  };
-
-  Scheduler.prototype.flushEvents = function () {
-    var nextCallback = this.queue.shift();
-
-    while (nextCallback) {
-      this.process(nextCallback);
-      nextCallback = this.queue.shift();
-    }
-  };
-
-  Scheduler.prototype.process = function (callback) {
-    this.processingEvent = true;
-
-    try {
-      callback();
-    } catch (e) {
-      // there is no use to keep the future events
-      // as the situation is not anymore the same
-      this.clear();
-      throw e;
-    } finally {
-      this.processingEvent = false;
-    }
-  };
-
-  return Scheduler;
-}();
-
-
-
-// EXTERNAL MODULE: ./node_modules/xstate/es/Actor.js
-var Actor = __webpack_require__(2418);
-// EXTERNAL MODULE: ./node_modules/xstate/es/stateUtils.js
-var stateUtils = __webpack_require__(2002);
-;// CONCATENATED MODULE: ./node_modules/xstate/es/registry.js
-var children = /*#__PURE__*/new Map();
-var sessionIdIndex = 0;
-var registry = {
-  bookId: function () {
-    return "x:".concat(sessionIdIndex++);
-  },
-  register: function (id, actor) {
-    children.set(id, actor);
-    return id;
-  },
-  get: function (id) {
-    return children.get(id);
-  },
-  free: function (id) {
-    children.delete(id);
-  }
-};
-
-
-
-;// CONCATENATED MODULE: ./node_modules/xstate/es/devTools.js
-
-
-function getGlobal() {
-  if (typeof globalThis !== 'undefined') {
-    return globalThis;
-  }
-
-  if (typeof self !== 'undefined') {
-    return self;
-  }
-
-  if (typeof window !== 'undefined') {
-    return window;
-  }
-
-  if (typeof __webpack_require__.g !== 'undefined') {
-    return __webpack_require__.g;
-  }
-
-  if (!environment/* IS_PRODUCTION */.M) {
-    console.warn('XState could not find a global object in this environment. Please let the maintainers know and raise an issue here: https://github.com/statelyai/xstate/issues');
-  }
-}
-
-function getDevTools() {
-  var global = getGlobal();
-
-  if (global && '__xstate__' in global) {
-    return global.__xstate__;
-  }
-
-  return undefined;
-}
-
-function registerService(service) {
-  if (!getGlobal()) {
-    return;
-  }
-
-  var devTools = getDevTools();
-
-  if (devTools) {
-    devTools.register(service);
-  }
-}
-
-
-
-// EXTERNAL MODULE: ./node_modules/xstate/es/serviceScope.js
-var serviceScope = __webpack_require__(9010);
-;// CONCATENATED MODULE: ./node_modules/xstate/es/behaviors.js
-
-
-
-
-/**
- * Returns an actor behavior from a reducer and its initial state.
- *
- * @param transition The pure reducer that returns the next state given the current state and event.
- * @param initialState The initial state of the reducer.
- * @returns An actor behavior
- */
-
-function fromReducer(transition, initialState) {
-  return {
-    transition: transition,
-    initialState: initialState
-  };
-}
-function fromPromise(promiseFn) {
-  var initialState = {
-    error: undefined,
-    data: undefined,
-    status: 'pending'
-  };
-  return {
-    transition: function (state, event, _a) {
-      var parent = _a.parent,
-          id = _a.id,
-          observers = _a.observers;
-
-      switch (event.type) {
-        case 'fulfill':
-          parent === null || parent === void 0 ? void 0 : parent.send(doneInvoke(id, event.data));
-          return {
-            error: undefined,
-            data: event.data,
-            status: 'fulfilled'
-          };
-
-        case 'reject':
-          parent === null || parent === void 0 ? void 0 : parent.send(error(id, event.error));
-          observers.forEach(function (observer) {
-            observer.error(event.error);
-          });
-          return {
-            error: event.error,
-            data: undefined,
-            status: 'rejected'
-          };
-
-        default:
-          return state;
-      }
-    },
-    initialState: initialState,
-    start: function (_a) {
-      var self = _a.self;
-      promiseFn().then(function (data) {
-        self.send({
-          type: 'fulfill',
-          data: data
-        });
-      }, function (reason) {
-        self.send({
-          type: 'reject',
-          error: reason
-        });
-      });
-      return initialState;
-    }
-  };
-}
-function spawnBehavior(behavior, options) {
-  if (options === void 0) {
-    options = {};
-  }
-
-  var state = behavior.initialState;
-  var observers = new Set();
-  var mailbox = [];
-  var flushing = false;
-
-  var flush = function () {
-    if (flushing) {
-      return;
-    }
-
-    flushing = true;
-
-    while (mailbox.length > 0) {
-      var event_1 = mailbox.shift();
-      state = behavior.transition(state, event_1, actorCtx);
-      observers.forEach(function (observer) {
-        return observer.next(state);
-      });
-    }
-
-    flushing = false;
-  };
-
-  var actor = (0,Actor/* toActorRef */.vk)({
-    id: options.id,
-    send: function (event) {
-      mailbox.push(event);
-      flush();
-    },
-    getSnapshot: function () {
-      return state;
-    },
-    subscribe: function (next, handleError, complete) {
-      var observer = (0,utils/* toObserver */.zM)(next, handleError, complete);
-      observers.add(observer);
-      observer.next(state);
-      return {
-        unsubscribe: function () {
-          observers.delete(observer);
-        }
-      };
-    }
-  });
-  var actorCtx = {
-    parent: options.parent,
-    self: actor,
-    id: options.id || 'anonymous',
-    observers: observers
-  };
-  state = behavior.start ? behavior.start(actorCtx) : state;
-  return actor;
-}
-
-
-
-;// CONCATENATED MODULE: ./node_modules/xstate/es/interpreter.js
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-var DEFAULT_SPAWN_OPTIONS = {
-  sync: false,
-  autoForward: false
-};
-var InterpreterStatus;
-
-(function (InterpreterStatus) {
-  InterpreterStatus[InterpreterStatus["NotStarted"] = 0] = "NotStarted";
-  InterpreterStatus[InterpreterStatus["Running"] = 1] = "Running";
-  InterpreterStatus[InterpreterStatus["Stopped"] = 2] = "Stopped";
-})(InterpreterStatus || (InterpreterStatus = {}));
-
-var Interpreter =
-/*#__PURE__*/
-
-/** @class */
-function () {
-  /**
-   * Creates a new Interpreter instance (i.e., service) for the given machine with the provided options, if any.
-   *
-   * @param machine The machine to be interpreted
-   * @param options Interpreter options
-   */
-  function Interpreter(machine, options) {
-    var _this = this;
-
-    if (options === void 0) {
-      options = Interpreter.defaultOptions;
-    }
-
-    this.machine = machine;
-    this.scheduler = new Scheduler();
-    this.delayedEventsMap = {};
-    this.listeners = new Set();
-    this.contextListeners = new Set();
-    this.stopListeners = new Set();
-    this.doneListeners = new Set();
-    this.eventListeners = new Set();
-    this.sendListeners = new Set();
-    /**
-     * Whether the service is started.
-     */
-
-    this.initialized = false;
-    this.status = InterpreterStatus.NotStarted;
-    this.children = new Map();
-    this.forwardTo = new Set();
-    /**
-     * Alias for Interpreter.prototype.start
-     */
-
-    this.init = this.start;
-    /**
-     * Sends an event to the running interpreter to trigger a transition.
-     *
-     * An array of events (batched) can be sent as well, which will send all
-     * batched events to the running interpreter. The listeners will be
-     * notified only **once** when all events are processed.
-     *
-     * @param event The event(s) to send
-     */
-
-    this.send = function (event, payload) {
-      if ((0,utils/* isArray */.kJ)(event)) {
-        _this.batch(event);
-
-        return _this.state;
-      }
-
-      var _event = (0,utils/* toSCXMLEvent */.g5)((0,utils/* toEventObject */._v)(event, payload));
-
-      if (_this.status === InterpreterStatus.Stopped) {
-        // do nothing
-        if (!environment/* IS_PRODUCTION */.M) {
-          (0,utils/* warn */.ZK)(false, "Event \"".concat(_event.name, "\" was sent to stopped service \"").concat(_this.machine.id, "\". This service has already reached its final state, and will not transition.\nEvent: ").concat(JSON.stringify(_event.data)));
-        }
-
-        return _this.state;
-      }
-
-      if (_this.status !== InterpreterStatus.Running && !_this.options.deferEvents) {
-        throw new Error("Event \"".concat(_event.name, "\" was sent to uninitialized service \"").concat(_this.machine.id // tslint:disable-next-line:max-line-length
-        , "\". Make sure .start() is called for this service, or set { deferEvents: true } in the service options.\nEvent: ").concat(JSON.stringify(_event.data)));
-      }
-
-      _this.scheduler.schedule(function () {
-        // Forward copy of event to child actors
-        _this.forward(_event);
-
-        var nextState = _this.nextState(_event);
-
-        _this.update(nextState, _event);
-      });
-
-      return _this._state; // TODO: deprecate (should return void)
-      // tslint:disable-next-line:semicolon
-    };
-
-    this.sendTo = function (event, to) {
-      var isParent = _this.parent && (to === types/* SpecialTargets.Parent */.K.Parent || _this.parent.id === to);
-      var target = isParent ? _this.parent : (0,utils/* isString */.HD)(to) ? _this.children.get(to) || registry.get(to) : (0,utils/* isActor */.Bc)(to) ? to : undefined;
-
-      if (!target) {
-        if (!isParent) {
-          throw new Error("Unable to send event to child '".concat(to, "' from service '").concat(_this.id, "'."));
-        } // tslint:disable-next-line:no-console
-
-
-        if (!environment/* IS_PRODUCTION */.M) {
-          (0,utils/* warn */.ZK)(false, "Service '".concat(_this.id, "' has no parent: unable to send event ").concat(event.type));
-        }
-
-        return;
-      }
-
-      if ('machine' in target) {
-        // Send SCXML events to machines
-        target.send((0,_tslib/* __assign */.pi)((0,_tslib/* __assign */.pi)({}, event), {
-          name: event.name === actionTypes/* error */.vU ? "".concat((0,actions/* error */.vU)(_this.id)) : event.name,
-          origin: _this.sessionId
-        }));
-      } else {
-        // Send normal events to other targets
-        target.send(event.data);
-      }
-    };
-
-    var resolvedOptions = (0,_tslib/* __assign */.pi)((0,_tslib/* __assign */.pi)({}, Interpreter.defaultOptions), options);
-
-    var clock = resolvedOptions.clock,
-        logger = resolvedOptions.logger,
-        parent = resolvedOptions.parent,
-        id = resolvedOptions.id;
-    var resolvedId = id !== undefined ? id : machine.id;
-    this.id = resolvedId;
-    this.logger = logger;
-    this.clock = clock;
-    this.parent = parent;
-    this.options = resolvedOptions;
-    this.scheduler = new Scheduler({
-      deferEvents: this.options.deferEvents
-    });
-    this.sessionId = registry.bookId();
-  }
-
-  Object.defineProperty(Interpreter.prototype, "initialState", {
-    get: function () {
-      var _this = this;
-
-      if (this._initialState) {
-        return this._initialState;
-      }
-
-      return (0,serviceScope/* provide */.J)(this, function () {
-        _this._initialState = _this.machine.initialState;
-        return _this._initialState;
-      });
-    },
-    enumerable: false,
-    configurable: true
-  });
-  Object.defineProperty(Interpreter.prototype, "state", {
-    get: function () {
-      if (!environment/* IS_PRODUCTION */.M) {
-        (0,utils/* warn */.ZK)(this.status !== InterpreterStatus.NotStarted, "Attempted to read state from uninitialized service '".concat(this.id, "'. Make sure the service is started first."));
-      }
-
-      return this._state;
-    },
-    enumerable: false,
-    configurable: true
-  });
-  /**
-   * Executes the actions of the given state, with that state's `context` and `event`.
-   *
-   * @param state The state whose actions will be executed
-   * @param actionsConfig The action implementations to use
-   */
-
-  Interpreter.prototype.execute = function (state, actionsConfig) {
-    var e_1, _a;
-
-    try {
-      for (var _b = (0,_tslib/* __values */.XA)(state.actions), _c = _b.next(); !_c.done; _c = _b.next()) {
-        var action = _c.value;
-        this.exec(action, state, actionsConfig);
-      }
-    } catch (e_1_1) {
-      e_1 = {
-        error: e_1_1
-      };
-    } finally {
-      try {
-        if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
-      } finally {
-        if (e_1) throw e_1.error;
-      }
-    }
-  };
-
-  Interpreter.prototype.update = function (state, _event) {
-    var e_2, _a, e_3, _b, e_4, _c, e_5, _d;
-
-    var _this = this; // Attach session ID to state
-
-
-    state._sessionid = this.sessionId; // Update state
-
-    this._state = state; // Execute actions
-
-    if (this.options.execute) {
-      this.execute(this.state);
-    } // Update children
-
-
-    this.children.forEach(function (child) {
-      _this.state.children[child.id] = child;
-    }); // Dev tools
-
-    if (this.devTools) {
-      this.devTools.send(_event.data, state);
-    } // Execute listeners
-
-
-    if (state.event) {
-      try {
-        for (var _e = (0,_tslib/* __values */.XA)(this.eventListeners), _f = _e.next(); !_f.done; _f = _e.next()) {
-          var listener = _f.value;
-          listener(state.event);
-        }
-      } catch (e_2_1) {
-        e_2 = {
-          error: e_2_1
-        };
-      } finally {
-        try {
-          if (_f && !_f.done && (_a = _e.return)) _a.call(_e);
-        } finally {
-          if (e_2) throw e_2.error;
-        }
-      }
-    }
-
-    try {
-      for (var _g = (0,_tslib/* __values */.XA)(this.listeners), _h = _g.next(); !_h.done; _h = _g.next()) {
-        var listener = _h.value;
-        listener(state, state.event);
-      }
-    } catch (e_3_1) {
-      e_3 = {
-        error: e_3_1
-      };
-    } finally {
-      try {
-        if (_h && !_h.done && (_b = _g.return)) _b.call(_g);
-      } finally {
-        if (e_3) throw e_3.error;
-      }
-    }
-
-    try {
-      for (var _j = (0,_tslib/* __values */.XA)(this.contextListeners), _k = _j.next(); !_k.done; _k = _j.next()) {
-        var contextListener = _k.value;
-        contextListener(this.state.context, this.state.history ? this.state.history.context : undefined);
-      }
-    } catch (e_4_1) {
-      e_4 = {
-        error: e_4_1
-      };
-    } finally {
-      try {
-        if (_k && !_k.done && (_c = _j.return)) _c.call(_j);
-      } finally {
-        if (e_4) throw e_4.error;
-      }
-    }
-
-    var isDone = (0,stateUtils/* isInFinalState */.Ij)(state.configuration || [], this.machine);
-
-    if (this.state.configuration && isDone) {
-      // get final child state node
-      var finalChildStateNode = state.configuration.find(function (sn) {
-        return sn.type === 'final' && sn.parent === _this.machine;
-      });
-      var doneData = finalChildStateNode && finalChildStateNode.doneData ? (0,utils/* mapContext */.QX)(finalChildStateNode.doneData, state.context, _event) : undefined;
-
-      try {
-        for (var _l = (0,_tslib/* __values */.XA)(this.doneListeners), _m = _l.next(); !_m.done; _m = _l.next()) {
-          var listener = _m.value;
-          listener((0,actions/* doneInvoke */.Sl)(this.id, doneData));
-        }
-      } catch (e_5_1) {
-        e_5 = {
-          error: e_5_1
-        };
-      } finally {
-        try {
-          if (_m && !_m.done && (_d = _l.return)) _d.call(_l);
-        } finally {
-          if (e_5) throw e_5.error;
-        }
-      }
-
-      this.stop();
-    }
-  };
-  /*
-   * Adds a listener that is notified whenever a state transition happens. The listener is called with
-   * the next state and the event object that caused the state transition.
-   *
-   * @param listener The state listener
-   */
-
-
-  Interpreter.prototype.onTransition = function (listener) {
-    this.listeners.add(listener); // Send current state to listener
-
-    if (this.status === InterpreterStatus.Running) {
-      listener(this.state, this.state.event);
-    }
-
-    return this;
-  };
-
-  Interpreter.prototype.subscribe = function (nextListenerOrObserver, _, // TODO: error listener
-  completeListener) {
-    var _this = this;
-
-    if (!nextListenerOrObserver) {
-      return {
-        unsubscribe: function () {
-          return void 0;
-        }
-      };
-    }
-
-    var listener;
-    var resolvedCompleteListener = completeListener;
-
-    if (typeof nextListenerOrObserver === 'function') {
-      listener = nextListenerOrObserver;
-    } else {
-      listener = nextListenerOrObserver.next.bind(nextListenerOrObserver);
-      resolvedCompleteListener = nextListenerOrObserver.complete.bind(nextListenerOrObserver);
-    }
-
-    this.listeners.add(listener); // Send current state to listener
-
-    if (this.status === InterpreterStatus.Running) {
-      listener(this.state);
-    }
-
-    if (resolvedCompleteListener) {
-      this.onDone(resolvedCompleteListener);
-    }
-
-    return {
-      unsubscribe: function () {
-        listener && _this.listeners.delete(listener);
-        resolvedCompleteListener && _this.doneListeners.delete(resolvedCompleteListener);
-      }
-    };
-  };
-  /**
-   * Adds an event listener that is notified whenever an event is sent to the running interpreter.
-   * @param listener The event listener
-   */
-
-
-  Interpreter.prototype.onEvent = function (listener) {
-    this.eventListeners.add(listener);
-    return this;
-  };
-  /**
-   * Adds an event listener that is notified whenever a `send` event occurs.
-   * @param listener The event listener
-   */
-
-
-  Interpreter.prototype.onSend = function (listener) {
-    this.sendListeners.add(listener);
-    return this;
-  };
-  /**
-   * Adds a context listener that is notified whenever the state context changes.
-   * @param listener The context listener
-   */
-
-
-  Interpreter.prototype.onChange = function (listener) {
-    this.contextListeners.add(listener);
-    return this;
-  };
-  /**
-   * Adds a listener that is notified when the machine is stopped.
-   * @param listener The listener
-   */
-
-
-  Interpreter.prototype.onStop = function (listener) {
-    this.stopListeners.add(listener);
-    return this;
-  };
-  /**
-   * Adds a state listener that is notified when the statechart has reached its final state.
-   * @param listener The state listener
-   */
-
-
-  Interpreter.prototype.onDone = function (listener) {
-    this.doneListeners.add(listener);
-    return this;
-  };
-  /**
-   * Removes a listener.
-   * @param listener The listener to remove
-   */
-
-
-  Interpreter.prototype.off = function (listener) {
-    this.listeners.delete(listener);
-    this.eventListeners.delete(listener);
-    this.sendListeners.delete(listener);
-    this.stopListeners.delete(listener);
-    this.doneListeners.delete(listener);
-    this.contextListeners.delete(listener);
-    return this;
-  };
-  /**
-   * Starts the interpreter from the given state, or the initial state.
-   * @param initialState The state to start the statechart from
-   */
-
-
-  Interpreter.prototype.start = function (initialState) {
-    var _this = this;
-
-    if (this.status === InterpreterStatus.Running) {
-      // Do not restart the service if it is already started
-      return this;
-    } // yes, it's a hack but we need the related cache to be populated for some things to work (like delayed transitions)
-    // this is usually called by `machine.getInitialState` but if we rehydrate from a state we might bypass this call
-    // we also don't want to call this method here as it resolves the full initial state which might involve calling assign actions
-    // and that could potentially lead to some unwanted side-effects (even such as creating some rogue actors)
-
-
-    this.machine._init();
-
-    registry.register(this.sessionId, this);
-    this.initialized = true;
-    this.status = InterpreterStatus.Running;
-    var resolvedState = initialState === undefined ? this.initialState : (0,serviceScope/* provide */.J)(this, function () {
-      return (0,State/* isStateConfig */.TL)(initialState) ? _this.machine.resolveState(initialState) : _this.machine.resolveState(State/* State.from */.ZM.from(initialState, _this.machine.context));
-    });
-
-    if (this.options.devTools) {
-      this.attachDev();
-    }
-
-    this.scheduler.initialize(function () {
-      _this.update(resolvedState, actions/* initEvent */.bf);
-    });
-    return this;
-  };
-  /**
-   * Stops the interpreter and unsubscribe all listeners.
-   *
-   * This will also notify the `onStop` listeners.
-   */
-
-
-  Interpreter.prototype.stop = function () {
-    var e_6, _a, e_7, _b, e_8, _c, e_9, _d, e_10, _e;
-
-    var _this = this;
-
-    try {
-      for (var _f = (0,_tslib/* __values */.XA)(this.listeners), _g = _f.next(); !_g.done; _g = _f.next()) {
-        var listener = _g.value;
-        this.listeners.delete(listener);
-      }
-    } catch (e_6_1) {
-      e_6 = {
-        error: e_6_1
-      };
-    } finally {
-      try {
-        if (_g && !_g.done && (_a = _f.return)) _a.call(_f);
-      } finally {
-        if (e_6) throw e_6.error;
-      }
-    }
-
-    try {
-      for (var _h = (0,_tslib/* __values */.XA)(this.stopListeners), _j = _h.next(); !_j.done; _j = _h.next()) {
-        var listener = _j.value; // call listener, then remove
-
-        listener();
-        this.stopListeners.delete(listener);
-      }
-    } catch (e_7_1) {
-      e_7 = {
-        error: e_7_1
-      };
-    } finally {
-      try {
-        if (_j && !_j.done && (_b = _h.return)) _b.call(_h);
-      } finally {
-        if (e_7) throw e_7.error;
-      }
-    }
-
-    try {
-      for (var _k = (0,_tslib/* __values */.XA)(this.contextListeners), _l = _k.next(); !_l.done; _l = _k.next()) {
-        var listener = _l.value;
-        this.contextListeners.delete(listener);
-      }
-    } catch (e_8_1) {
-      e_8 = {
-        error: e_8_1
-      };
-    } finally {
-      try {
-        if (_l && !_l.done && (_c = _k.return)) _c.call(_k);
-      } finally {
-        if (e_8) throw e_8.error;
-      }
-    }
-
-    try {
-      for (var _m = (0,_tslib/* __values */.XA)(this.doneListeners), _o = _m.next(); !_o.done; _o = _m.next()) {
-        var listener = _o.value;
-        this.doneListeners.delete(listener);
-      }
-    } catch (e_9_1) {
-      e_9 = {
-        error: e_9_1
-      };
-    } finally {
-      try {
-        if (_o && !_o.done && (_d = _m.return)) _d.call(_m);
-      } finally {
-        if (e_9) throw e_9.error;
-      }
-    }
-
-    if (!this.initialized) {
-      // Interpreter already stopped; do nothing
-      return this;
-    }
-
-    (0,_tslib/* __spreadArray */.ev)([], (0,_tslib/* __read */.CR)(this.state.configuration), false).sort(function (a, b) {
-      return b.order - a.order;
-    }).forEach(function (stateNode) {
-      var e_11, _a;
-
-      try {
-        for (var _b = (0,_tslib/* __values */.XA)(stateNode.definition.exit), _c = _b.next(); !_c.done; _c = _b.next()) {
-          var action = _c.value;
-
-          _this.exec(action, _this.state);
-        }
-      } catch (e_11_1) {
-        e_11 = {
-          error: e_11_1
-        };
-      } finally {
-        try {
-          if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
-        } finally {
-          if (e_11) throw e_11.error;
-        }
-      }
-    }); // Stop all children
-
-
-    this.children.forEach(function (child) {
-      if ((0,utils/* isFunction */.mf)(child.stop)) {
-        child.stop();
-      }
-    });
-
-    try {
-      // Cancel all delayed events
-      for (var _p = (0,_tslib/* __values */.XA)(Object.keys(this.delayedEventsMap)), _q = _p.next(); !_q.done; _q = _p.next()) {
-        var key = _q.value;
-        this.clock.clearTimeout(this.delayedEventsMap[key]);
-      }
-    } catch (e_10_1) {
-      e_10 = {
-        error: e_10_1
-      };
-    } finally {
-      try {
-        if (_q && !_q.done && (_e = _p.return)) _e.call(_p);
-      } finally {
-        if (e_10) throw e_10.error;
-      }
-    }
-
-    this.scheduler.clear();
-    this.initialized = false;
-    this.status = InterpreterStatus.Stopped;
-    registry.free(this.sessionId);
-    return this;
-  };
-
-  Interpreter.prototype.batch = function (events) {
-    var _this = this;
-
-    if (this.status === InterpreterStatus.NotStarted && this.options.deferEvents) {
-      // tslint:disable-next-line:no-console
-      if (!environment/* IS_PRODUCTION */.M) {
-        (0,utils/* warn */.ZK)(false, "".concat(events.length, " event(s) were sent to uninitialized service \"").concat(this.machine.id, "\" and are deferred. Make sure .start() is called for this service.\nEvent: ").concat(JSON.stringify(event)));
-      }
-    } else if (this.status !== InterpreterStatus.Running) {
-      throw new Error( // tslint:disable-next-line:max-line-length
-      "".concat(events.length, " event(s) were sent to uninitialized service \"").concat(this.machine.id, "\". Make sure .start() is called for this service, or set { deferEvents: true } in the service options."));
-    }
-
-    this.scheduler.schedule(function () {
-      var e_12, _a;
-
-      var nextState = _this.state;
-      var batchChanged = false;
-      var batchedActions = [];
-
-      var _loop_1 = function (event_1) {
-        var _event = (0,utils/* toSCXMLEvent */.g5)(event_1);
-
-        _this.forward(_event);
-
-        nextState = (0,serviceScope/* provide */.J)(_this, function () {
-          return _this.machine.transition(nextState, _event);
-        });
-        batchedActions.push.apply(batchedActions, (0,_tslib/* __spreadArray */.ev)([], (0,_tslib/* __read */.CR)(nextState.actions.map(function (a) {
-          return (0,State/* bindActionToState */.j1)(a, nextState);
-        })), false));
-        batchChanged = batchChanged || !!nextState.changed;
-      };
-
-      try {
-        for (var events_1 = (0,_tslib/* __values */.XA)(events), events_1_1 = events_1.next(); !events_1_1.done; events_1_1 = events_1.next()) {
-          var event_1 = events_1_1.value;
-
-          _loop_1(event_1);
-        }
-      } catch (e_12_1) {
-        e_12 = {
-          error: e_12_1
-        };
-      } finally {
-        try {
-          if (events_1_1 && !events_1_1.done && (_a = events_1.return)) _a.call(events_1);
-        } finally {
-          if (e_12) throw e_12.error;
-        }
-      }
-
-      nextState.changed = batchChanged;
-      nextState.actions = batchedActions;
-
-      _this.update(nextState, (0,utils/* toSCXMLEvent */.g5)(events[events.length - 1]));
-    });
-  };
-  /**
-   * Returns a send function bound to this interpreter instance.
-   *
-   * @param event The event to be sent by the sender.
-   */
-
-
-  Interpreter.prototype.sender = function (event) {
-    return this.send.bind(this, event);
-  };
-  /**
-   * Returns the next state given the interpreter's current state and the event.
-   *
-   * This is a pure method that does _not_ update the interpreter's state.
-   *
-   * @param event The event to determine the next state
-   */
-
-
-  Interpreter.prototype.nextState = function (event) {
-    var _this = this;
-
-    var _event = (0,utils/* toSCXMLEvent */.g5)(event);
-
-    if (_event.name.indexOf(actionTypes/* errorPlatform */.Mg) === 0 && !this.state.nextEvents.some(function (nextEvent) {
-      return nextEvent.indexOf(actionTypes/* errorPlatform */.Mg) === 0;
-    })) {
-      throw _event.data.data;
-    }
-
-    var nextState = (0,serviceScope/* provide */.J)(this, function () {
-      return _this.machine.transition(_this.state, _event);
-    });
-    return nextState;
-  };
-
-  Interpreter.prototype.forward = function (event) {
-    var e_13, _a;
-
-    try {
-      for (var _b = (0,_tslib/* __values */.XA)(this.forwardTo), _c = _b.next(); !_c.done; _c = _b.next()) {
-        var id = _c.value;
-        var child = this.children.get(id);
-
-        if (!child) {
-          throw new Error("Unable to forward event '".concat(event, "' from interpreter '").concat(this.id, "' to nonexistant child '").concat(id, "'."));
-        }
-
-        child.send(event);
-      }
-    } catch (e_13_1) {
-      e_13 = {
-        error: e_13_1
-      };
-    } finally {
-      try {
-        if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
-      } finally {
-        if (e_13) throw e_13.error;
-      }
-    }
-  };
-
-  Interpreter.prototype.defer = function (sendAction) {
-    var _this = this;
-
-    this.delayedEventsMap[sendAction.id] = this.clock.setTimeout(function () {
-      if (sendAction.to) {
-        _this.sendTo(sendAction._event, sendAction.to);
-      } else {
-        _this.send(sendAction._event);
-      }
-    }, sendAction.delay);
-  };
-
-  Interpreter.prototype.cancel = function (sendId) {
-    this.clock.clearTimeout(this.delayedEventsMap[sendId]);
-    delete this.delayedEventsMap[sendId];
-  };
-
-  Interpreter.prototype.exec = function (action, state, actionFunctionMap) {
-    if (actionFunctionMap === void 0) {
-      actionFunctionMap = this.machine.options.actions;
-    }
-
-    var context = state.context,
-        _event = state._event;
-    var actionOrExec = action.exec || (0,actions/* getActionFunction */.o$)(action.type, actionFunctionMap);
-    var exec = (0,utils/* isFunction */.mf)(actionOrExec) ? actionOrExec : actionOrExec ? actionOrExec.exec : action.exec;
-
-    if (exec) {
-      try {
-        return exec(context, _event.data, {
-          action: action,
-          state: this.state,
-          _event: _event
-        });
-      } catch (err) {
-        if (this.parent) {
-          this.parent.send({
-            type: 'xstate.error',
-            data: err
-          });
-        }
-
-        throw err;
-      }
-    }
-
-    switch (action.type) {
-      case actionTypes/* send */.lW:
-        var sendAction = action;
-
-        if (typeof sendAction.delay === 'number') {
-          this.defer(sendAction);
-          return;
-        } else {
-          if (sendAction.to) {
-            this.sendTo(sendAction._event, sendAction.to);
-          } else {
-            this.send(sendAction._event);
-          }
-        }
-
-        break;
-
-      case actionTypes/* cancel */.al:
-        this.cancel(action.sendId);
-        break;
-
-      case actionTypes/* start */.BL:
-        {
-          if (this.status !== InterpreterStatus.Running) {
-            return;
-          }
-
-          var activity = action.activity; // If the activity will be stopped right after it's started
-          // (such as in transient states)
-          // don't bother starting the activity.
-
-          if (!this.state.activities[activity.id || activity.type]) {
-            break;
-          } // Invoked services
-
-
-          if (activity.type === types/* ActionTypes.Invoke */.M.Invoke) {
-            var invokeSource = (0,utils/* toInvokeSource */.j)(activity.src);
-            var serviceCreator = this.machine.options.services ? this.machine.options.services[invokeSource.type] : undefined;
-            var id = activity.id,
-                data = activity.data;
-
-            if (!environment/* IS_PRODUCTION */.M) {
-              (0,utils/* warn */.ZK)(!('forward' in activity), // tslint:disable-next-line:max-line-length
-              "`forward` property is deprecated (found in invocation of '".concat(activity.src, "' in in machine '").concat(this.machine.id, "'). ") + "Please use `autoForward` instead.");
-            }
-
-            var autoForward = 'autoForward' in activity ? activity.autoForward : !!activity.forward;
-
-            if (!serviceCreator) {
-              // tslint:disable-next-line:no-console
-              if (!environment/* IS_PRODUCTION */.M) {
-                (0,utils/* warn */.ZK)(false, "No service found for invocation '".concat(activity.src, "' in machine '").concat(this.machine.id, "'."));
-              }
-
-              return;
-            }
-
-            var resolvedData = data ? (0,utils/* mapContext */.QX)(data, context, _event) : undefined;
-
-            if (typeof serviceCreator === 'string') {
-              // TODO: warn
-              return;
-            }
-
-            var source = (0,utils/* isFunction */.mf)(serviceCreator) ? serviceCreator(context, _event.data, {
-              data: resolvedData,
-              src: invokeSource,
-              meta: activity.meta
-            }) : serviceCreator;
-
-            if (!source) {
-              // TODO: warn?
-              return;
-            }
-
-            var options = void 0;
-
-            if ((0,utils/* isMachine */.O4)(source)) {
-              source = resolvedData ? source.withContext(resolvedData) : source;
-              options = {
-                autoForward: autoForward
-              };
-            }
-
-            this.spawn(source, id, options);
-          } else {
-            this.spawnActivity(activity);
-          }
-
-          break;
-        }
-
-      case actionTypes/* stop */.sT:
-        {
-          this.stopChild(action.activity.id);
-          break;
-        }
-
-      case actionTypes/* log */.cM:
-        var label = action.label,
-            value = action.value;
-
-        if (label) {
-          this.logger(label, value);
-        } else {
-          this.logger(value);
-        }
-
-        break;
-
-      default:
-        if (!environment/* IS_PRODUCTION */.M) {
-          (0,utils/* warn */.ZK)(false, "No implementation found for action type '".concat(action.type, "'"));
-        }
-
-        break;
-    }
-
-    return undefined;
-  };
-
-  Interpreter.prototype.removeChild = function (childId) {
-    var _a;
-
-    this.children.delete(childId);
-    this.forwardTo.delete(childId); // this.state might not exist at the time this is called,
-    // such as when a child is added then removed while initializing the state
-
-    (_a = this.state) === null || _a === void 0 ? true : delete _a.children[childId];
-  };
-
-  Interpreter.prototype.stopChild = function (childId) {
-    var child = this.children.get(childId);
-
-    if (!child) {
-      return;
-    }
-
-    this.removeChild(childId);
-
-    if ((0,utils/* isFunction */.mf)(child.stop)) {
-      child.stop();
-    }
-  };
-
-  Interpreter.prototype.spawn = function (entity, name, options) {
-    if ((0,utils/* isPromiseLike */.y8)(entity)) {
-      return this.spawnPromise(Promise.resolve(entity), name);
-    } else if ((0,utils/* isFunction */.mf)(entity)) {
-      return this.spawnCallback(entity, name);
-    } else if ((0,Actor/* isSpawnedActor */.f3)(entity)) {
-      return this.spawnActor(entity, name);
-    } else if ((0,utils/* isObservable */.bi)(entity)) {
-      return this.spawnObservable(entity, name);
-    } else if ((0,utils/* isMachine */.O4)(entity)) {
-      return this.spawnMachine(entity, (0,_tslib/* __assign */.pi)((0,_tslib/* __assign */.pi)({}, options), {
-        id: name
-      }));
-    } else if ((0,utils/* isBehavior */.HV)(entity)) {
-      return this.spawnBehavior(entity, name);
-    } else {
-      throw new Error("Unable to spawn entity \"".concat(name, "\" of type \"").concat(typeof entity, "\"."));
-    }
-  };
-
-  Interpreter.prototype.spawnMachine = function (machine, options) {
-    var _this = this;
-
-    if (options === void 0) {
-      options = {};
-    }
-
-    var childService = new Interpreter(machine, (0,_tslib/* __assign */.pi)((0,_tslib/* __assign */.pi)({}, this.options), {
-      parent: this,
-      id: options.id || machine.id
-    }));
-
-    var resolvedOptions = (0,_tslib/* __assign */.pi)((0,_tslib/* __assign */.pi)({}, DEFAULT_SPAWN_OPTIONS), options);
-
-    if (resolvedOptions.sync) {
-      childService.onTransition(function (state) {
-        _this.send(actionTypes/* update */.Vx, {
-          state: state,
-          id: childService.id
-        });
-      });
-    }
-
-    var actor = childService;
-    this.children.set(childService.id, actor);
-
-    if (resolvedOptions.autoForward) {
-      this.forwardTo.add(childService.id);
-    }
-
-    childService.onDone(function (doneEvent) {
-      _this.removeChild(childService.id);
-
-      _this.send((0,utils/* toSCXMLEvent */.g5)(doneEvent, {
-        origin: childService.id
-      }));
-    }).start();
-    return actor;
-  };
-
-  Interpreter.prototype.spawnBehavior = function (behavior, id) {
-    var actorRef = spawnBehavior(behavior, {
-      id: id,
-      parent: this
-    });
-    this.children.set(id, actorRef);
-    return actorRef;
-  };
-
-  Interpreter.prototype.spawnPromise = function (promise, id) {
-    var _a;
-
-    var _this = this;
-
-    var canceled = false;
-    var resolvedData;
-    promise.then(function (response) {
-      if (!canceled) {
-        resolvedData = response;
-
-        _this.removeChild(id);
-
-        _this.send((0,utils/* toSCXMLEvent */.g5)((0,actions/* doneInvoke */.Sl)(id, response), {
-          origin: id
-        }));
-      }
-    }, function (errorData) {
-      if (!canceled) {
-        _this.removeChild(id);
-
-        var errorEvent = (0,actions/* error */.vU)(id, errorData);
-
-        try {
-          // Send "error.platform.id" to this (parent).
-          _this.send((0,utils/* toSCXMLEvent */.g5)(errorEvent, {
-            origin: id
-          }));
-        } catch (error) {
-          (0,utils/* reportUnhandledExceptionOnInvocation */.v4)(errorData, error, id);
-
-          if (_this.devTools) {
-            _this.devTools.send(errorEvent, _this.state);
-          }
-
-          if (_this.machine.strict) {
-            // it would be better to always stop the state machine if unhandled
-            // exception/promise rejection happens but because we don't want to
-            // break existing code so enforce it on strict mode only especially so
-            // because documentation says that onError is optional
-            _this.stop();
-          }
-        }
-      }
-    });
-    var actor = (_a = {
-      id: id,
-      send: function () {
-        return void 0;
-      },
-      subscribe: function (next, handleError, complete) {
-        var observer = (0,utils/* toObserver */.zM)(next, handleError, complete);
-        var unsubscribed = false;
-        promise.then(function (response) {
-          if (unsubscribed) {
-            return;
-          }
-
-          observer.next(response);
-
-          if (unsubscribed) {
-            return;
-          }
-
-          observer.complete();
-        }, function (err) {
-          if (unsubscribed) {
-            return;
-          }
-
-          observer.error(err);
-        });
-        return {
-          unsubscribe: function () {
-            return unsubscribed = true;
-          }
-        };
-      },
-      stop: function () {
-        canceled = true;
-      },
-      toJSON: function () {
-        return {
-          id: id
-        };
-      },
-      getSnapshot: function () {
-        return resolvedData;
-      }
-    }, _a[utils/* symbolObservable */.L$] = function () {
-      return this;
-    }, _a);
-    this.children.set(id, actor);
-    return actor;
-  };
-
-  Interpreter.prototype.spawnCallback = function (callback, id) {
-    var _a;
-
-    var _this = this;
-
-    var canceled = false;
-    var receivers = new Set();
-    var listeners = new Set();
-    var emitted;
-
-    var receive = function (e) {
-      emitted = e;
-      listeners.forEach(function (listener) {
-        return listener(e);
-      });
-
-      if (canceled) {
-        return;
-      }
-
-      _this.send((0,utils/* toSCXMLEvent */.g5)(e, {
-        origin: id
-      }));
-    };
-
-    var callbackStop;
-
-    try {
-      callbackStop = callback(receive, function (newListener) {
-        receivers.add(newListener);
-      });
-    } catch (err) {
-      this.send((0,actions/* error */.vU)(id, err));
-    }
-
-    if ((0,utils/* isPromiseLike */.y8)(callbackStop)) {
-      // it turned out to be an async function, can't reliably check this before calling `callback`
-      // because transpiled async functions are not recognizable
-      return this.spawnPromise(callbackStop, id);
-    }
-
-    var actor = (_a = {
-      id: id,
-      send: function (event) {
-        return receivers.forEach(function (receiver) {
-          return receiver(event);
-        });
-      },
-      subscribe: function (next) {
-        var observer = (0,utils/* toObserver */.zM)(next);
-        listeners.add(observer.next);
-        return {
-          unsubscribe: function () {
-            listeners.delete(observer.next);
-          }
-        };
-      },
-      stop: function () {
-        canceled = true;
-
-        if ((0,utils/* isFunction */.mf)(callbackStop)) {
-          callbackStop();
-        }
-      },
-      toJSON: function () {
-        return {
-          id: id
-        };
-      },
-      getSnapshot: function () {
-        return emitted;
-      }
-    }, _a[utils/* symbolObservable */.L$] = function () {
-      return this;
-    }, _a);
-    this.children.set(id, actor);
-    return actor;
-  };
-
-  Interpreter.prototype.spawnObservable = function (source, id) {
-    var _a;
-
-    var _this = this;
-
-    var emitted;
-    var subscription = source.subscribe(function (value) {
-      emitted = value;
-
-      _this.send((0,utils/* toSCXMLEvent */.g5)(value, {
-        origin: id
-      }));
-    }, function (err) {
-      _this.removeChild(id);
-
-      _this.send((0,utils/* toSCXMLEvent */.g5)((0,actions/* error */.vU)(id, err), {
-        origin: id
-      }));
-    }, function () {
-      _this.removeChild(id);
-
-      _this.send((0,utils/* toSCXMLEvent */.g5)((0,actions/* doneInvoke */.Sl)(id), {
-        origin: id
-      }));
-    });
-    var actor = (_a = {
-      id: id,
-      send: function () {
-        return void 0;
-      },
-      subscribe: function (next, handleError, complete) {
-        return source.subscribe(next, handleError, complete);
-      },
-      stop: function () {
-        return subscription.unsubscribe();
-      },
-      getSnapshot: function () {
-        return emitted;
-      },
-      toJSON: function () {
-        return {
-          id: id
-        };
-      }
-    }, _a[utils/* symbolObservable */.L$] = function () {
-      return this;
-    }, _a);
-    this.children.set(id, actor);
-    return actor;
-  };
-
-  Interpreter.prototype.spawnActor = function (actor, name) {
-    this.children.set(name, actor);
-    return actor;
-  };
-
-  Interpreter.prototype.spawnActivity = function (activity) {
-    var implementation = this.machine.options && this.machine.options.activities ? this.machine.options.activities[activity.type] : undefined;
-
-    if (!implementation) {
-      if (!environment/* IS_PRODUCTION */.M) {
-        (0,utils/* warn */.ZK)(false, "No implementation found for activity '".concat(activity.type, "'"));
-      } // tslint:disable-next-line:no-console
-
-
-      return;
-    } // Start implementation
-
-
-    var dispose = implementation(this.state.context, activity);
-    this.spawnEffect(activity.id, dispose);
-  };
-
-  Interpreter.prototype.spawnEffect = function (id, dispose) {
-    var _a;
-
-    this.children.set(id, (_a = {
-      id: id,
-      send: function () {
-        return void 0;
-      },
-      subscribe: function () {
-        return {
-          unsubscribe: function () {
-            return void 0;
-          }
-        };
-      },
-      stop: dispose || undefined,
-      getSnapshot: function () {
-        return undefined;
-      },
-      toJSON: function () {
-        return {
-          id: id
-        };
-      }
-    }, _a[utils/* symbolObservable */.L$] = function () {
-      return this;
-    }, _a));
-  };
-
-  Interpreter.prototype.attachDev = function () {
-    var global = getGlobal();
-
-    if (this.options.devTools && global) {
-      if (global.__REDUX_DEVTOOLS_EXTENSION__) {
-        var devToolsOptions = typeof this.options.devTools === 'object' ? this.options.devTools : undefined;
-        this.devTools = global.__REDUX_DEVTOOLS_EXTENSION__.connect((0,_tslib/* __assign */.pi)((0,_tslib/* __assign */.pi)({
-          name: this.id,
-          autoPause: true,
-          stateSanitizer: function (state) {
-            return {
-              value: state.value,
-              context: state.context,
-              actions: state.actions
-            };
-          }
-        }, devToolsOptions), {
-          features: (0,_tslib/* __assign */.pi)({
-            jump: false,
-            skip: false
-          }, devToolsOptions ? devToolsOptions.features : undefined)
-        }), this.machine);
-        this.devTools.init(this.state);
-      } // add XState-specific dev tooling hook
-
-
-      registerService(this);
-    }
-  };
-
-  Interpreter.prototype.toJSON = function () {
-    return {
-      id: this.id
-    };
-  };
-
-  Interpreter.prototype[utils/* symbolObservable */.L$] = function () {
-    return this;
-  };
-
-  Interpreter.prototype.getSnapshot = function () {
-    if (this.status === InterpreterStatus.NotStarted) {
-      return this.initialState;
-    }
-
-    return this._state;
-  };
-  /**
-   * The default interpreter options:
-   *
-   * - `clock` uses the global `setTimeout` and `clearTimeout` functions
-   * - `logger` uses the global `console.log()` method
-   */
-
-
-  Interpreter.defaultOptions = {
-    execute: true,
-    deferEvents: true,
-    clock: {
-      setTimeout: function (fn, ms) {
-        return setTimeout(fn, ms);
-      },
-      clearTimeout: function (id) {
-        return clearTimeout(id);
-      }
-    },
-    logger: /*#__PURE__*/console.log.bind(console),
-    devTools: false
-  };
-  Interpreter.interpret = interpret;
-  return Interpreter;
-}();
-
-var resolveSpawnOptions = function (nameOrOptions) {
-  if (isString(nameOrOptions)) {
-    return __assign(__assign({}, DEFAULT_SPAWN_OPTIONS), {
-      name: nameOrOptions
-    });
-  }
-
-  return __assign(__assign(__assign({}, DEFAULT_SPAWN_OPTIONS), {
-    name: uniqueId()
-  }), nameOrOptions);
-};
-
-function spawn(entity, nameOrOptions) {
-  var resolvedOptions = resolveSpawnOptions(nameOrOptions);
-  return consume(function (service) {
-    if (!IS_PRODUCTION) {
-      var isLazyEntity = isMachine(entity) || isFunction(entity);
-      warn(!!service || isLazyEntity, "Attempted to spawn an Actor (ID: \"".concat(isMachine(entity) ? entity.id : 'undefined', "\") outside of a service. This will have no effect."));
-    }
-
-    if (service) {
-      return service.spawn(entity, resolvedOptions.name, resolvedOptions);
-    } else {
-      return createDeferredActor(entity, resolvedOptions.name);
-    }
-  });
-}
-/**
- * Creates a new Interpreter instance for the given machine with the provided options, if any.
- *
- * @param machine The machine to interpret
- * @param options Interpreter options
- */
-
-function interpret(machine, options) {
-  var interpreter = new Interpreter(machine, options);
-  return interpreter;
-}
-
-
-
-
-/***/ }),
-
-/***/ 9010:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "J": () => (/* binding */ provide)
-/* harmony export */ });
-/* unused harmony export consume */
-/**
- * Maintains a stack of the current service in scope.
- * This is used to provide the correct service to spawn().
- */
-var serviceStack = [];
-var provide = function (service, fn) {
-  serviceStack.push(service);
-  var result = fn(service);
-  serviceStack.pop();
-  return result;
-};
-var consume = function (fn) {
-  return fn(serviceStack[serviceStack.length - 1]);
-};
-
-
-
-
-/***/ }),
-
-/***/ 2002:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "G": () => (/* binding */ getChildren),
-/* harmony export */   "Ij": () => (/* binding */ isInFinalState),
-/* harmony export */   "N9": () => (/* binding */ isLeafNode),
-/* harmony export */   "NA": () => (/* binding */ getValue),
-/* harmony export */   "Oe": () => (/* binding */ getTagsFromConfiguration),
-/* harmony export */   "P_": () => (/* binding */ getConfiguration),
-/* harmony export */   "ac": () => (/* binding */ getAllStateNodes),
-/* harmony export */   "e$": () => (/* binding */ has),
-/* harmony export */   "nJ": () => (/* binding */ nextEvents),
-/* harmony export */   "xZ": () => (/* binding */ getMeta)
-/* harmony export */ });
-/* unused harmony export getAdjList */
-/* harmony import */ var _virtual_tslib_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(3388);
-/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(8351);
-
-
-
-var isLeafNode = function (stateNode) {
-  return stateNode.type === 'atomic' || stateNode.type === 'final';
-};
-function getChildren(stateNode) {
-  return Object.keys(stateNode.states).map(function (key) {
-    return stateNode.states[key];
-  });
-}
-function getAllStateNodes(stateNode) {
-  var stateNodes = [stateNode];
-
-  if (isLeafNode(stateNode)) {
-    return stateNodes;
-  }
-
-  return stateNodes.concat((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .flatten */ .xH)(getChildren(stateNode).map(getAllStateNodes)));
-}
-function getConfiguration(prevStateNodes, stateNodes) {
-  var e_1, _a, e_2, _b, e_3, _c, e_4, _d;
-
-  var prevConfiguration = new Set(prevStateNodes);
-  var prevAdjList = getAdjList(prevConfiguration);
-  var configuration = new Set(stateNodes);
-
-  try {
-    // add all ancestors
-    for (var configuration_1 = (0,_virtual_tslib_js__WEBPACK_IMPORTED_MODULE_1__/* .__values */ .XA)(configuration), configuration_1_1 = configuration_1.next(); !configuration_1_1.done; configuration_1_1 = configuration_1.next()) {
-      var s = configuration_1_1.value;
-      var m = s.parent;
-
-      while (m && !configuration.has(m)) {
-        configuration.add(m);
-        m = m.parent;
-      }
-    }
-  } catch (e_1_1) {
-    e_1 = {
-      error: e_1_1
-    };
-  } finally {
-    try {
-      if (configuration_1_1 && !configuration_1_1.done && (_a = configuration_1.return)) _a.call(configuration_1);
-    } finally {
-      if (e_1) throw e_1.error;
-    }
-  }
-
-  var adjList = getAdjList(configuration);
-
-  try {
-    // add descendants
-    for (var configuration_2 = (0,_virtual_tslib_js__WEBPACK_IMPORTED_MODULE_1__/* .__values */ .XA)(configuration), configuration_2_1 = configuration_2.next(); !configuration_2_1.done; configuration_2_1 = configuration_2.next()) {
-      var s = configuration_2_1.value; // if previously active, add existing child nodes
-
-      if (s.type === 'compound' && (!adjList.get(s) || !adjList.get(s).length)) {
-        if (prevAdjList.get(s)) {
-          prevAdjList.get(s).forEach(function (sn) {
-            return configuration.add(sn);
-          });
-        } else {
-          s.initialStateNodes.forEach(function (sn) {
-            return configuration.add(sn);
-          });
-        }
-      } else {
-        if (s.type === 'parallel') {
-          try {
-            for (var _e = (e_3 = void 0, (0,_virtual_tslib_js__WEBPACK_IMPORTED_MODULE_1__/* .__values */ .XA)(getChildren(s))), _f = _e.next(); !_f.done; _f = _e.next()) {
-              var child = _f.value;
-
-              if (child.type === 'history') {
-                continue;
-              }
-
-              if (!configuration.has(child)) {
-                configuration.add(child);
-
-                if (prevAdjList.get(child)) {
-                  prevAdjList.get(child).forEach(function (sn) {
-                    return configuration.add(sn);
-                  });
-                } else {
-                  child.initialStateNodes.forEach(function (sn) {
-                    return configuration.add(sn);
-                  });
-                }
-              }
-            }
-          } catch (e_3_1) {
-            e_3 = {
-              error: e_3_1
-            };
-          } finally {
-            try {
-              if (_f && !_f.done && (_c = _e.return)) _c.call(_e);
-            } finally {
-              if (e_3) throw e_3.error;
-            }
-          }
-        }
-      }
-    }
-  } catch (e_2_1) {
-    e_2 = {
-      error: e_2_1
-    };
-  } finally {
-    try {
-      if (configuration_2_1 && !configuration_2_1.done && (_b = configuration_2.return)) _b.call(configuration_2);
-    } finally {
-      if (e_2) throw e_2.error;
-    }
-  }
-
-  try {
-    // add all ancestors
-    for (var configuration_3 = (0,_virtual_tslib_js__WEBPACK_IMPORTED_MODULE_1__/* .__values */ .XA)(configuration), configuration_3_1 = configuration_3.next(); !configuration_3_1.done; configuration_3_1 = configuration_3.next()) {
-      var s = configuration_3_1.value;
-      var m = s.parent;
-
-      while (m && !configuration.has(m)) {
-        configuration.add(m);
-        m = m.parent;
-      }
-    }
-  } catch (e_4_1) {
-    e_4 = {
-      error: e_4_1
-    };
-  } finally {
-    try {
-      if (configuration_3_1 && !configuration_3_1.done && (_d = configuration_3.return)) _d.call(configuration_3);
-    } finally {
-      if (e_4) throw e_4.error;
-    }
-  }
-
-  return configuration;
-}
-
-function getValueFromAdj(baseNode, adjList) {
-  var childStateNodes = adjList.get(baseNode);
-
-  if (!childStateNodes) {
-    return {}; // todo: fix?
-  }
-
-  if (baseNode.type === 'compound') {
-    var childStateNode = childStateNodes[0];
-
-    if (childStateNode) {
-      if (isLeafNode(childStateNode)) {
-        return childStateNode.key;
-      }
-    } else {
-      return {};
-    }
-  }
-
-  var stateValue = {};
-  childStateNodes.forEach(function (csn) {
-    stateValue[csn.key] = getValueFromAdj(csn, adjList);
-  });
-  return stateValue;
-}
-
-function getAdjList(configuration) {
-  var e_5, _a;
-
-  var adjList = new Map();
-
-  try {
-    for (var configuration_4 = (0,_virtual_tslib_js__WEBPACK_IMPORTED_MODULE_1__/* .__values */ .XA)(configuration), configuration_4_1 = configuration_4.next(); !configuration_4_1.done; configuration_4_1 = configuration_4.next()) {
-      var s = configuration_4_1.value;
-
-      if (!adjList.has(s)) {
-        adjList.set(s, []);
-      }
-
-      if (s.parent) {
-        if (!adjList.has(s.parent)) {
-          adjList.set(s.parent, []);
-        }
-
-        adjList.get(s.parent).push(s);
-      }
-    }
-  } catch (e_5_1) {
-    e_5 = {
-      error: e_5_1
-    };
-  } finally {
-    try {
-      if (configuration_4_1 && !configuration_4_1.done && (_a = configuration_4.return)) _a.call(configuration_4);
-    } finally {
-      if (e_5) throw e_5.error;
-    }
-  }
-
-  return adjList;
-}
-function getValue(rootNode, configuration) {
-  var config = getConfiguration([rootNode], configuration);
-  return getValueFromAdj(rootNode, getAdjList(config));
-}
-function has(iterable, item) {
-  if (Array.isArray(iterable)) {
-    return iterable.some(function (member) {
-      return member === item;
-    });
-  }
-
-  if (iterable instanceof Set) {
-    return iterable.has(item);
-  }
-
-  return false; // TODO: fix
-}
-function nextEvents(configuration) {
-  return (0,_virtual_tslib_js__WEBPACK_IMPORTED_MODULE_1__/* .__spreadArray */ .ev)([], (0,_virtual_tslib_js__WEBPACK_IMPORTED_MODULE_1__/* .__read */ .CR)(new Set((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .flatten */ .xH)((0,_virtual_tslib_js__WEBPACK_IMPORTED_MODULE_1__/* .__spreadArray */ .ev)([], (0,_virtual_tslib_js__WEBPACK_IMPORTED_MODULE_1__/* .__read */ .CR)(configuration.map(function (sn) {
-    return sn.ownEvents;
-  })), false)))), false);
-}
-function isInFinalState(configuration, stateNode) {
-  if (stateNode.type === 'compound') {
-    return getChildren(stateNode).some(function (s) {
-      return s.type === 'final' && has(configuration, s);
-    });
-  }
-
-  if (stateNode.type === 'parallel') {
-    return getChildren(stateNode).every(function (sn) {
-      return isInFinalState(configuration, sn);
-    });
-  }
-
-  return false;
-}
-function getMeta(configuration) {
-  if (configuration === void 0) {
-    configuration = [];
-  }
-
-  return configuration.reduce(function (acc, stateNode) {
-    if (stateNode.meta !== undefined) {
-      acc[stateNode.id] = stateNode.meta;
-    }
-
-    return acc;
-  }, {});
-}
-function getTagsFromConfiguration(configuration) {
-  return new Set((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .flatten */ .xH)(configuration.map(function (sn) {
-    return sn.tags;
-  })));
-}
 
 
 
@@ -68100,90 +66805,6 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 
 /***/ }),
 
-/***/ 6813:
-/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Z": () => (/* binding */ _applyDecoratedDescriptor)
-/* harmony export */ });
-function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) {
-  var desc = {};
-  Object.keys(descriptor).forEach(function (key) {
-    desc[key] = descriptor[key];
-  });
-  desc.enumerable = !!desc.enumerable;
-  desc.configurable = !!desc.configurable;
-
-  if ('value' in desc || desc.initializer) {
-    desc.writable = true;
-  }
-
-  desc = decorators.slice().reverse().reduce(function (desc, decorator) {
-    return decorator(target, property, desc) || desc;
-  }, desc);
-
-  if (context && desc.initializer !== void 0) {
-    desc.value = desc.initializer ? desc.initializer.call(context) : void 0;
-    desc.initializer = undefined;
-  }
-
-  if (desc.initializer === void 0) {
-    Object.defineProperty(target, property, desc);
-    desc = null;
-  }
-
-  return desc;
-}
-
-/***/ }),
-
-/***/ 3229:
-/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Z": () => (/* binding */ _extends)
-/* harmony export */ });
-function _extends() {
-  _extends = Object.assign || function (target) {
-    for (var i = 1; i < arguments.length; i++) {
-      var source = arguments[i];
-
-      for (var key in source) {
-        if (Object.prototype.hasOwnProperty.call(source, key)) {
-          target[key] = source[key];
-        }
-      }
-    }
-
-    return target;
-  };
-
-  return _extends.apply(this, arguments);
-}
-
-/***/ }),
-
-/***/ 5497:
-/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Z": () => (/* binding */ _initializerDefineProperty)
-/* harmony export */ });
-function _initializerDefineProperty(target, property, descriptor, context) {
-  if (!descriptor) return;
-  Object.defineProperty(target, property, {
-    enumerable: descriptor.enumerable,
-    configurable: descriptor.configurable,
-    writable: descriptor.writable,
-    value: descriptor.initializer ? descriptor.initializer.call(context) : void 0
-  });
-}
-
-/***/ }),
-
 /***/ 2380:
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
@@ -68236,7 +66857,7 @@ let nanoid = (size = 21) => {
 },
 /******/ __webpack_require__ => { // webpackRuntimeModules
 /******/ var __webpack_exec__ = (moduleId) => (__webpack_require__(__webpack_require__.s = moduleId))
-/******/ __webpack_require__.O(0, [374,49], () => (__webpack_exec__(1922)));
+/******/ __webpack_require__.O(0, [374,49], () => (__webpack_exec__(5826)));
 /******/ var __webpack_exports__ = __webpack_require__.O();
 /******/ }
 ]);

@@ -27,10 +27,10 @@
         "message": "Désactivé"
     },
     "protection_level_standard_description": {
-        "message": "Bloque la plupart des traqueurs et cookies efficacement"
+        "message": "Bloque la plupart des traqueurs et cookies efficacement."
     },
     "protection_level_strict_description": {
-        "message": "Bloque tous les traqueurs et cookies, peut modifier les fonctionnalités de certains sites"
+        "message": "Bloque tous les traqueurs et cookies, peut modifier les fonctionnalités de certains sites."
     },
     "protection_level_disabled_description": {
         "message": "La navigation protégée est désactivée."
@@ -45,10 +45,10 @@
         "message": "%count% élément bloqué"
     },
     "popup_main_nbr_blocked_elements_domain": {
-        "message": "sur <b>%domain%</b>"
+        "message": "sur <b>%domain%</b>."
     },
     "popup_main_problem_disable_protection": {
-        "message": "Un problème sur ce site? Essayez de désactiver"
+        "message": "Un problème sur ce site? Essayez de désactiver."
     },
     "global_stats": {
         "message": "Vos statistiques cumulées"
@@ -72,7 +72,7 @@
         "message": "Quoi de neuf ?"
     },
     "popup_settings_help_new_link": {
-        "message": "https://qwant.com#new_link_fr"
+        "message": "https://github.com/Qwant/qwant-viprivacy#readme"
     },
     "popup_settings_help_feedback_label": {
         "message": "Partagez votre expérience"
@@ -81,7 +81,13 @@
         "message": "https://fr.surveymonkey.com/r/XPK9KHJ"
     },
     "popup_settings_telemetry_label": {
-        "message": "Aidez Qwant à améliorer l'extension en envoyant anonymement des rapports d'erreur et des statistiques d'usage"
+        "message": "Aidez Qwant à améliorer l'extension en envoyant anonymement des rapports d'erreur et des statistiques d'usage."
+    },
+    "popup_settings_telemetry_learn_more": {
+        "message": "Voir plus"
+    },
+    "popup_settings_telemetry_learn_more_link": {
+        "message": "https://github.com/Qwant/qwant-viprivacy#privacy"
     },
     "popup_stats_table_domains_label": {
         "message": "Domaines"
@@ -99,13 +105,13 @@
         "message": "Qwant est votre moteur de recherche par défaut"
     },
     "missing_permissions_default_search_engine_description": {
-        "message": "Lorsque vous lancez une recherche depuis la barre d'adresse de votre navigateur"
+        "message": "Lorsque vous lancez une recherche depuis la barre d'adresse de votre navigateur."
     },
     "missing_permissions_disabled_title": {
         "message": "La protection est désactivée"
     },
     "missing_permissions_disabled_description": {
-        "message": "Le blocage des traqueurs et cookies n'est pas activé"
+        "message": "Vos données restent confidentielles lorsque vous cherchez sur Qwant, mais le blocage des traqueurs et cookies n'est pas activé."
     },
     "missing_permissions_cta_button_popup": {
         "message": "Activer la protection"
@@ -114,7 +120,7 @@
         "message": "Retour"
     },
     "onboarding_stepper_authorize": {
-        "message": "Demander l’autorisation"
+        "message": "Demander l'autorisation"
     },
     "onboarding_stepper_finish": {
         "message": "Terminer"
@@ -123,7 +129,7 @@
         "message": "J'ai compris"
     },
     "onboarding_stepper_lets_go": {
-        "message": "C'est parti"
+        "message": "C'est parti !"
     },
     "onboarding_stepper_next_step": {
         "message": "Étape suivante"
@@ -132,13 +138,13 @@
         "message": "Naviguez protégé sur internet avec  Qwant VIPrivacy"
     },
     "onboarding_step_request_permissions_description": {
-        "message": "Qwant VIPrivacy bloque les traqueurs et refuse les cookies pour vous. Vos données personnelles seront protégées sur tous les sites lors de votre navigation. Cliquez sur \"Autoriser\" pour ouvrir la pop-up d'autorisation dans le navigateur. Si vous ignorez cette étape, vous serez redirigé vers la page précédente et Qwant VIPrivacy ne sera pas installé."
+        "message": "Qwant VIPrivacy c'est moins de cookies et les traqueurs bloqués lors de votre navigation. Vos données personnelles sont protégées sur tous les sites. Cliquez sur \"Demander l'autorisation\" pour ouvrir la fênetre dans le navigateur. Si vous ignorez cette étape, vous serez redirigé vers la page précédente et Qwant VIPrivacy ne sera pas installé."
     },
     "onboarding_step_protection_level_title": {
         "message": "Choisissez votre niveau de protection"
     },
     "onboarding_step_protection_level_description": {
-        "message": "Vous pourrez modifier votre choix à tout moment en cliquant sur l'icône Qwant VIPrivacy"
+        "message": "Vous pourrez modifier votre choix à tout moment en cliquant sur l'icône Qwant VIPrivacy."
     },
     "onboarding_step_pin_extension_title": {
         "message": "Épinglez Qwant VIPrivacy à %browser% et suivez vos statistiques en temps réel"
@@ -153,13 +159,13 @@
         "message": "Partagez votre retour d'expérience pour nous permettre d'améliorer la performance de nos fonctionnalités. C'est anonyme !"
     },
     "onboarding_step_telemetry_section_title": {
-        "message": "Partagez cette information"
+        "message": "Partagez vos statistiques d'utilisation et rapports d'erreurs"
     },
     "onboarding_step_permissions_rejected_title": {
-        "message": "Merci Qwant est votre moteur de recherche par défaut mais…"
+        "message": "Merci, Qwant est votre moteur de recherche par défaut mais…"
     },
     "onboarding_step_permissions_rejected_subtitle": {
-        "message": " Attention vous n'êtes pas complètement protégé"
+        "message": "Vous n'avez pas activé la fonctionalité bloqueur de traqueurs & cookies."
     },
     "onboarding_step_permissions_rejected_description": {
         "message": " "

@@ -11,7 +11,7 @@ import mozilla.components.concept.engine.webextension.WebExtensionRuntime
  * Feature to enable Qwant tracking protection extension
  */
 object QwantWebExtFeature {
-    private const val QWANTWEBEXT_EXTENSION_ID = "qwantprivacypilot-internal-android-beta@qwant.com"
+    private const val QWANTWEBEXT_EXTENSION_ID = "qwant-vip-android@qwant.com"
     private const val QWANTWEBEXT_EXTENSION_URL = "resource://android/assets/qwant_webext/"
 
     /**

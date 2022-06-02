@@ -1,6 +1,6 @@
 (self["webpackChunkqwant_viprivacy"] = self["webpackChunkqwant_viprivacy"] || []).push([[757],{
 
-/***/ 3282:
+/***/ 3248:
 /***/ ((__unused_webpack_module, __unused_webpack___webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -22,12 +22,19 @@ const getParams = () => {
 var messenger = __webpack_require__(7916);
 // EXTERNAL MODULE: ./Extension/src/pages/common/components/Button/index.jsx + 1 modules
 var Button = __webpack_require__(6961);
-// EXTERNAL MODULE: ./Extension/src/pages/options/OnboardingPage/components/Header/index.jsx + 2 modules
-var Header = __webpack_require__(6665);
-;// CONCATENATED MODULE: ./Extension/src/pages/blocking-pages/components/AdBlocked/assets/qwant_logo_square.png
-/* harmony default export */ const qwant_logo_square = (__webpack_require__.p + "7b899a09e86aae265fa6782d02d05d2f.png");
-// EXTERNAL MODULE: ./Extension/src/pages/popup/components/Popup/main.css
-var main = __webpack_require__(4562);
+;// CONCATENATED MODULE: ./Extension/src/pages/popup/components/MainContainer/components/QwantLogo.jsx
+
+const QwantLogo = () => /*#__PURE__*/react.createElement("svg", {
+  width: "267",
+  height: "36",
+  viewBox: "0 0 267 36",
+  xmlns: "http://www.w3.org/2000/svg"
+}, /*#__PURE__*/react.createElement("g", {
+  fill: "#050506",
+  fillRule: "evenodd"
+}, /*#__PURE__*/react.createElement("path", {
+  d: "M123.654 0h-5.544l9.822 27.897h6.238L144.005 0h-5.558l-7.246 21.958h-.286L123.655 0zm27.87 0h-5.053v27.897h5.053V0zm3.887 27.897h5.054V18.47h5.34c6.443 0 9.902-3.869 9.902-9.236 0-5.326-3.419-9.235-9.834-9.235H155.41v27.897zm5.054-13.58V4.222h4.631c3.787 0 5.463 2.043 5.463 5.012 0 2.97-1.676 5.081-5.435 5.081h-4.659zM177.67 27.923h2.388V14.621c0-3.058 2.346-5.27 5.564-5.27.63 0 1.22.107 1.435.134V7.058c-.322-.014-.871-.04-1.26-.04-2.588 0-4.8 1.394-5.632 3.473h-.175V7.326h-2.32v20.597zm12.035 0h2.4V7.326h-2.4v20.597zm1.22-24.137c.98 0 1.797-.778 1.797-1.717 0-.938-.818-1.716-1.796-1.716-.98 0-1.784.778-1.784 1.716 0 .939.805 1.717 1.784 1.717zm21.476 3.54h-2.589l-6.114 17.446h-.188l-6.115-17.446h-2.588l7.523 20.597h2.548L212.4 7.326zm7.466 21.066c3.433 0 5.525-1.904 6.383-3.727h.148v3.258h2.387V13.937c0-5.525-4.157-6.893-7.309-6.893-3.15 0-6.396 1.247-7.79 4.613l2.266.818c.75-1.77 2.615-3.285 5.591-3.285 3.125 0 4.855 1.716 4.855 4.532v.483c0 1.556-1.931 1.582-5.39 2.012-4.654.576-7.913 1.877-7.913 5.953 0 3.97 3.031 6.222 6.772 6.222zm.322-2.185c-2.695 0-4.707-1.435-4.707-3.93 0-2.494 2.039-3.54 5.525-3.969 1.69-.2 4.693-.576 5.39-1.26v2.977c0 3.38-2.4 6.182-6.208 6.182zm19.786 2.145c4.29 0 7.308-2.709 7.858-6.436h-2.414c-.55 2.628-2.709 4.25-5.444 4.25-4.037 0-6.705-3.513-6.705-8.528 0-4.988 2.749-8.421 6.705-8.421 2.936 0 4.92 1.89 5.43 4.224h2.414c-.563-3.822-3.755-6.397-7.885-6.397-5.39 0-9.065 4.48-9.065 10.674 0 6.142 3.567 10.634 9.106 10.634zm11.865 7.295c2.574 0 4.465-1.475 5.565-4.465l8.716-23.856h-2.588l-6.115 17.446h-.188l-6.114-17.446h-2.589l7.577 20.798-.751 2.092c-1.14 3.111-2.749 3.661-5.176 2.897l-.644 2.105c.483.228 1.368.43 2.307.43zM14.04 0c7.74 0 14.039 6.298 14.039 14.04 0 7.571-6.026 13.762-13.534 14.029l-.314.007h13.8l1.821 5.806H15.858l-1.82-5.803C6.298 28.078 0 21.78 0 14.039 0 6.298 6.298 0 14.04 0zm64.459 6.904v21h-4.75v-2.74a10.451 10.451 0 0 1-6.905 2.594c-5.763 0-10.452-4.656-10.452-10.378C56.392 11.657 61.081 7 66.844 7c2.645 0 5.063.98 6.905 2.593v-2.69h4.75zm-44.429 0 2.077 7.716.636 2.487.127.499.572 2.237.026.103.024.092h.056l3.114-13.134h4.711l3.065 12.84.057.241.011.053h.142l3.61-13.134h5.221l-6.923 20.988H46.12l-1.924-7.736c-.29-1.16-.773-3.81-1-5.2l-.042-.26h-.045a4.325 4.325 0 0 1-.077.429c-.118.552-.624 2.6-.98 3.993l-.055.214-2.277 8.56h-4.358L28.887 6.904h5.183zM14.04 4.749c-5.123 0-9.29 4.168-9.29 9.29 0 5.123 4.167 9.29 9.29 9.29 5.122 0 9.29-4.167 9.29-9.29 0-5.122-4.168-9.29-9.29-9.29zm52.804 7.001a5.702 5.702 0 0 0-4.04 1.657 5.557 5.557 0 0 0-1.662 3.973c0 1.5.59 2.91 1.662 3.972a5.702 5.702 0 0 0 4.04 1.657 5.702 5.702 0 0 0 4.04-1.657 5.557 5.557 0 0 0 1.663-3.972c0-1.5-.59-2.911-1.662-3.973a5.702 5.702 0 0 0-4.04-1.657zm23.563-4.632c-1.678 0-3.226.418-4.562 1.165V6.908H81.01v9.509c-.011.213-.017.43-.017.647v10.84h4.853V16.548c.221-3.152 2.467-4.594 4.562-4.594 2.724 0 4.702 2.149 4.702 5.11v10.84h4.835v-10.84c0-2.652-.931-5.124-2.623-6.961-1.773-1.925-4.228-2.985-6.914-2.985M103.347 0v6.918h-2.433v4.24h2.434v16.746h4.869V11.16h4.69v-4.24h-4.651V0h-4.908z"
+})));
 // EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js
 var injectStylesIntoStyleTag = __webpack_require__(5491);
 var injectStylesIntoStyleTag_default = /*#__PURE__*/__webpack_require__.n(injectStylesIntoStyleTag);
@@ -46,9 +53,9 @@ var insertStyleElement_default = /*#__PURE__*/__webpack_require__.n(insertStyleE
 // EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/styleTagTransform.js
 var styleTagTransform = __webpack_require__(2563);
 var styleTagTransform_default = /*#__PURE__*/__webpack_require__.n(styleTagTransform);
-// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!./node_modules/postcss-loader/dist/cjs.js!./Extension/src/pages/blocking-pages/components/AdBlocked/style.css
-var style = __webpack_require__(5140);
-;// CONCATENATED MODULE: ./Extension/src/pages/blocking-pages/components/AdBlocked/style.css
+// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!./node_modules/postcss-loader/dist/cjs.js!./Extension/src/pages/options/OnboardingPage/components/Header/styles.css
+var styles = __webpack_require__(8768);
+;// CONCATENATED MODULE: ./Extension/src/pages/options/OnboardingPage/components/Header/styles.css
 
       
       
@@ -70,7 +77,56 @@ options.setAttributes = (setAttributesWithoutAttributes_default());
 options.domAPI = (styleDomAPI_default());
 options.insertStyleElement = (insertStyleElement_default());
 
-var update = injectStylesIntoStyleTag_default()(style/* default */.Z, options);
+var update = injectStylesIntoStyleTag_default()(styles/* default */.Z, options);
+
+
+
+
+       /* harmony default export */ const Header_styles = (styles/* default */.Z && styles/* default.locals */.Z.locals ? styles/* default.locals */.Z.locals : undefined);
+
+;// CONCATENATED MODULE: ./Extension/src/pages/options/OnboardingPage/components/Header/index.jsx
+
+
+
+const Header = () => {
+  return /*#__PURE__*/react.createElement("div", {
+    className: "navbar"
+  }, /*#__PURE__*/react.createElement("div", null, /*#__PURE__*/react.createElement("a", {
+    name: "qwant-logo-link",
+    href: "https://qwant.com",
+    target: "_blank",
+    rel: "noreferrer"
+  }, /*#__PURE__*/react.createElement(QwantLogo, null))));
+};
+;// CONCATENATED MODULE: ./Extension/src/pages/blocking-pages/components/AdBlocked/assets/qwant_logo_square.png
+/* harmony default export */ const qwant_logo_square = (__webpack_require__.p + "7b899a09e86aae265fa6782d02d05d2f.png");
+// EXTERNAL MODULE: ./Extension/src/pages/popup/components/Popup/main.css
+var main = __webpack_require__(4562);
+// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!./node_modules/postcss-loader/dist/cjs.js!./Extension/src/pages/blocking-pages/components/AdBlocked/style.css
+var style = __webpack_require__(5140);
+;// CONCATENATED MODULE: ./Extension/src/pages/blocking-pages/components/AdBlocked/style.css
+
+      
+      
+      
+      
+      
+      
+      
+      
+      
+
+var style_options = {};
+
+style_options.styleTagTransform = (styleTagTransform_default());
+style_options.setAttributes = (setAttributesWithoutAttributes_default());
+
+      style_options.insert = insertBySelector_default().bind(null, "head");
+    
+style_options.domAPI = (styleDomAPI_default());
+style_options.insertStyleElement = (insertStyleElement_default());
+
+var style_update = injectStylesIntoStyleTag_default()(style/* default */.Z, style_options);
 
 
 
@@ -105,7 +161,7 @@ const AdBlocked = () => {
       url
     });
   }, [url]);
-  return /*#__PURE__*/react.createElement("div", null, /*#__PURE__*/react.createElement(Header/* Header */.h, null), /*#__PURE__*/react.createElement("div", {
+  return /*#__PURE__*/react.createElement("div", null, /*#__PURE__*/react.createElement(Header, null), /*#__PURE__*/react.createElement("div", {
     className: "wrapper"
   }, /*#__PURE__*/react.createElement("div", {
     className: "content"
@@ -169,13 +225,12 @@ adBlocked.init();
 "use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "CI": () => (/* binding */ ANTIBANNER_GROUPS_ID),
-/* harmony export */   "Qp": () => (/* binding */ NOTIFIER_TYPES),
 /* harmony export */   "XR": () => (/* binding */ TRUSTED_TAG),
 /* harmony export */   "XS": () => (/* binding */ WASTE_CHARACTERS),
 /* harmony export */   "gu": () => (/* binding */ ANTIBANNER_FILTERS_ID),
 /* harmony export */   "oK": () => (/* binding */ MESSAGE_TYPES)
 /* harmony export */ });
-/* unused harmony exports STEALTH_ACTIONS, FULLSCREEN_USER_RULES_EDITOR, FILTERING_LOG, NAVIGATION_TAGS, CUSTOM_FILTERS_GROUP_DISPLAY_NUMBER, CUSTOM_FILTERS_START_ID, SCROLLBAR_WIDTH */
+/* unused harmony exports STEALTH_ACTIONS, NOTIFIER_TYPES, FULLSCREEN_USER_RULES_EDITOR, FILTERING_LOG, NAVIGATION_TAGS, CUSTOM_FILTERS_GROUP_DISPLAY_NUMBER, CUSTOM_FILTERS_START_ID, SCROLLBAR_WIDTH */
 /**
  * Filter ids used in the code on the background page and filtering log page
  */
@@ -661,97 +716,6 @@ const Button = ({
 
 /***/ }),
 
-/***/ 6665:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-
-// EXPORTS
-__webpack_require__.d(__webpack_exports__, {
-  "h": () => (/* binding */ Header)
-});
-
-// EXTERNAL MODULE: ./node_modules/react/index.js
-var react = __webpack_require__(846);
-;// CONCATENATED MODULE: ./Extension/src/pages/popup/components/MainContainer/components/QwantLogo.jsx
-
-const QwantLogo = () => /*#__PURE__*/react.createElement("svg", {
-  width: "267",
-  height: "36",
-  viewBox: "0 0 267 36",
-  xmlns: "http://www.w3.org/2000/svg"
-}, /*#__PURE__*/react.createElement("g", {
-  fill: "#050506",
-  fillRule: "evenodd"
-}, /*#__PURE__*/react.createElement("path", {
-  d: "M123.654 0h-5.544l9.822 27.897h6.238L144.005 0h-5.558l-7.246 21.958h-.286L123.655 0zm27.87 0h-5.053v27.897h5.053V0zm3.887 27.897h5.054V18.47h5.34c6.443 0 9.902-3.869 9.902-9.236 0-5.326-3.419-9.235-9.834-9.235H155.41v27.897zm5.054-13.58V4.222h4.631c3.787 0 5.463 2.043 5.463 5.012 0 2.97-1.676 5.081-5.435 5.081h-4.659zM177.67 27.923h2.388V14.621c0-3.058 2.346-5.27 5.564-5.27.63 0 1.22.107 1.435.134V7.058c-.322-.014-.871-.04-1.26-.04-2.588 0-4.8 1.394-5.632 3.473h-.175V7.326h-2.32v20.597zm12.035 0h2.4V7.326h-2.4v20.597zm1.22-24.137c.98 0 1.797-.778 1.797-1.717 0-.938-.818-1.716-1.796-1.716-.98 0-1.784.778-1.784 1.716 0 .939.805 1.717 1.784 1.717zm21.476 3.54h-2.589l-6.114 17.446h-.188l-6.115-17.446h-2.588l7.523 20.597h2.548L212.4 7.326zm7.466 21.066c3.433 0 5.525-1.904 6.383-3.727h.148v3.258h2.387V13.937c0-5.525-4.157-6.893-7.309-6.893-3.15 0-6.396 1.247-7.79 4.613l2.266.818c.75-1.77 2.615-3.285 5.591-3.285 3.125 0 4.855 1.716 4.855 4.532v.483c0 1.556-1.931 1.582-5.39 2.012-4.654.576-7.913 1.877-7.913 5.953 0 3.97 3.031 6.222 6.772 6.222zm.322-2.185c-2.695 0-4.707-1.435-4.707-3.93 0-2.494 2.039-3.54 5.525-3.969 1.69-.2 4.693-.576 5.39-1.26v2.977c0 3.38-2.4 6.182-6.208 6.182zm19.786 2.145c4.29 0 7.308-2.709 7.858-6.436h-2.414c-.55 2.628-2.709 4.25-5.444 4.25-4.037 0-6.705-3.513-6.705-8.528 0-4.988 2.749-8.421 6.705-8.421 2.936 0 4.92 1.89 5.43 4.224h2.414c-.563-3.822-3.755-6.397-7.885-6.397-5.39 0-9.065 4.48-9.065 10.674 0 6.142 3.567 10.634 9.106 10.634zm11.865 7.295c2.574 0 4.465-1.475 5.565-4.465l8.716-23.856h-2.588l-6.115 17.446h-.188l-6.114-17.446h-2.589l7.577 20.798-.751 2.092c-1.14 3.111-2.749 3.661-5.176 2.897l-.644 2.105c.483.228 1.368.43 2.307.43zM14.04 0c7.74 0 14.039 6.298 14.039 14.04 0 7.571-6.026 13.762-13.534 14.029l-.314.007h13.8l1.821 5.806H15.858l-1.82-5.803C6.298 28.078 0 21.78 0 14.039 0 6.298 6.298 0 14.04 0zm64.459 6.904v21h-4.75v-2.74a10.451 10.451 0 0 1-6.905 2.594c-5.763 0-10.452-4.656-10.452-10.378C56.392 11.657 61.081 7 66.844 7c2.645 0 5.063.98 6.905 2.593v-2.69h4.75zm-44.429 0 2.077 7.716.636 2.487.127.499.572 2.237.026.103.024.092h.056l3.114-13.134h4.711l3.065 12.84.057.241.011.053h.142l3.61-13.134h5.221l-6.923 20.988H46.12l-1.924-7.736c-.29-1.16-.773-3.81-1-5.2l-.042-.26h-.045a4.325 4.325 0 0 1-.077.429c-.118.552-.624 2.6-.98 3.993l-.055.214-2.277 8.56h-4.358L28.887 6.904h5.183zM14.04 4.749c-5.123 0-9.29 4.168-9.29 9.29 0 5.123 4.167 9.29 9.29 9.29 5.122 0 9.29-4.167 9.29-9.29 0-5.122-4.168-9.29-9.29-9.29zm52.804 7.001a5.702 5.702 0 0 0-4.04 1.657 5.557 5.557 0 0 0-1.662 3.973c0 1.5.59 2.91 1.662 3.972a5.702 5.702 0 0 0 4.04 1.657 5.702 5.702 0 0 0 4.04-1.657 5.557 5.557 0 0 0 1.663-3.972c0-1.5-.59-2.911-1.662-3.973a5.702 5.702 0 0 0-4.04-1.657zm23.563-4.632c-1.678 0-3.226.418-4.562 1.165V6.908H81.01v9.509c-.011.213-.017.43-.017.647v10.84h4.853V16.548c.221-3.152 2.467-4.594 4.562-4.594 2.724 0 4.702 2.149 4.702 5.11v10.84h4.835v-10.84c0-2.652-.931-5.124-2.623-6.961-1.773-1.925-4.228-2.985-6.914-2.985M103.347 0v6.918h-2.433v4.24h2.434v16.746h4.869V11.16h4.69v-4.24h-4.651V0h-4.908z"
-})));
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js
-var injectStylesIntoStyleTag = __webpack_require__(5491);
-var injectStylesIntoStyleTag_default = /*#__PURE__*/__webpack_require__.n(injectStylesIntoStyleTag);
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/styleDomAPI.js
-var styleDomAPI = __webpack_require__(9532);
-var styleDomAPI_default = /*#__PURE__*/__webpack_require__.n(styleDomAPI);
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/insertBySelector.js
-var insertBySelector = __webpack_require__(8190);
-var insertBySelector_default = /*#__PURE__*/__webpack_require__.n(insertBySelector);
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js
-var setAttributesWithoutAttributes = __webpack_require__(7630);
-var setAttributesWithoutAttributes_default = /*#__PURE__*/__webpack_require__.n(setAttributesWithoutAttributes);
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/insertStyleElement.js
-var insertStyleElement = __webpack_require__(664);
-var insertStyleElement_default = /*#__PURE__*/__webpack_require__.n(insertStyleElement);
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/styleTagTransform.js
-var styleTagTransform = __webpack_require__(2563);
-var styleTagTransform_default = /*#__PURE__*/__webpack_require__.n(styleTagTransform);
-// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!./node_modules/postcss-loader/dist/cjs.js!./Extension/src/pages/options/OnboardingPage/components/Header/styles.css
-var styles = __webpack_require__(8768);
-;// CONCATENATED MODULE: ./Extension/src/pages/options/OnboardingPage/components/Header/styles.css
-
-      
-      
-      
-      
-      
-      
-      
-      
-      
-
-var options = {};
-
-options.styleTagTransform = (styleTagTransform_default());
-options.setAttributes = (setAttributesWithoutAttributes_default());
-
-      options.insert = insertBySelector_default().bind(null, "head");
-    
-options.domAPI = (styleDomAPI_default());
-options.insertStyleElement = (insertStyleElement_default());
-
-var update = injectStylesIntoStyleTag_default()(styles/* default */.Z, options);
-
-
-
-
-       /* harmony default export */ const Header_styles = (styles/* default */.Z && styles/* default.locals */.Z.locals ? styles/* default.locals */.Z.locals : undefined);
-
-;// CONCATENATED MODULE: ./Extension/src/pages/options/OnboardingPage/components/Header/index.jsx
-
-
-
-const Header = () => {
-  return /*#__PURE__*/react.createElement("div", {
-    className: "navbar"
-  }, /*#__PURE__*/react.createElement("div", null, /*#__PURE__*/react.createElement("a", {
-    name: "qwant-logo-link",
-    href: "https://qwant.com",
-    target: "_blank",
-    rel: "noreferrer"
-  }, /*#__PURE__*/react.createElement(QwantLogo, null))));
-};
-
-/***/ }),
-
 /***/ 7916:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
@@ -1188,7 +1152,7 @@ const messenger = new Messenger();
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "body {\n    margin: 0;\n    padding: 0;\n    background-color: #fffffa;\n    font-family: Helvetica, sans-serif;\n}\n\n.wrapper {\n    max-width: 690px;\n    margin: 0 auto;\n    color: var(--grey-black);\n    height: calc(100vh - 112px);\n\n}\n\n.content {\n    display: flex;\n    align-items: center;\n    flex-direction: column;\n    justify-content: center;\n    margin: 24px;\n}\n\n@media screen and (max-width: 720px) {\n\n.content {\n        justify-content: flex-start\n}\n    }\n\n.alert__buttons {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    width: 100%;\n    margin-top: 48px;\n}\n\n@media screen and (max-width: 720px) {\n\n.alert__buttons {\n        display: block;\n        margin: 0 auto\n}\n    }\n\n@media screen and (max-width: 720px) {\n\n.alert__buttons>button {\n        width: 100%\n}\n    }\n\n.alert__buttons>button:first-child {\n    margin-bottom: 12px;\n}\n\n@media screen and (min-width: 721px) {\n\n.alert__buttons>button:first-child {\n        margin-bottom: 0;\n        margin-right: 12px\n}\n    }\n\n.qwant_logo {\n    width: 30%;\n    max-width: 128px;\n    display: block;\n}\n\n@media screen and (max-width: 720px) {\n\n.qwant_logo {\n        margin-left: 24px\n}\n    }\n\n.content_text {\n    margin-top: 24px;\n    margin-bottom: 24px;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    flex-direction: column;\n}\n\n.content_text_title {\n    font-size: 36px;\n    font-weight: bold;\n    line-height: 1.22;\n    letter-spacing: 0.2px;\n    margin-bottom: 16px;\n}\n\n.content_text_description {\n    font-size: 16px;\n    font-weight: normal;\n    line-height: 1.25;\n    color: #4b5058;\n}\n\n.content_text_url {\n    font-size: 14px;\n    width: 100%;\n    padding: 8px;\n    background-color: var(--white);\n    border-radius: 8px;\n    border: 1px solid var(--border);\n    margin-bottom: 8px;\n    text-align: center;\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "body {\n    margin: 0;\n    padding: 0;\n    background-color: #fffffa;\n    font-family: Helvetica, sans-serif;\n}\n\n.wrapper {\n    max-width: 690px;\n    margin: 0 auto;\n    color: var(--grey-black);\n    height: calc(100vh - 112px);\n\n}\n\n.content {\n    display: flex;\n    align-items: center;\n    flex-direction: column;\n    justify-content: center;\n    margin: 24px;\n}\n\n@media screen and (max-width: 720px) {\n\n.content {\n        justify-content: flex-start\n}\n    }\n\n.alert__buttons {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    width: 100%;\n    margin-top: 48px;\n}\n\n@media screen and (max-width: 720px) {\n\n.alert__buttons {\n        display: block;\n        margin: 0 auto\n}\n    }\n\n@media screen and (max-width: 720px) {\n\n.alert__buttons>button {\n        width: 100%\n}\n    }\n\n.alert__buttons>button:first-child {\n    margin-bottom: 12px;\n}\n\n@media screen and (min-width: 721px) {\n\n.alert__buttons>button:first-child {\n        margin-bottom: 0;\n        margin-right: 12px\n}\n    }\n\n.qwant_logo {\n    width: 30%;\n    max-width: 128px;\n    display: block;\n}\n\n@media screen and (max-width: 720px) {\n\n.qwant_logo {\n        margin-left: 24px\n}\n    }\n\n.content_text {\n    margin-top: 24px;\n    margin-bottom: 24px;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    flex-direction: column;\n}\n\n.content_text_title {\n    font-size: 36px;\n    font-weight: bold;\n    line-height: 1.22;\n    letter-spacing: 0.2px;\n    margin-bottom: 16px;\n}\n\n.content_text_description {\n    font-size: 16px;\n    font-weight: normal;\n    line-height: 1.25;\n    color: var(--grey-darker);\n}\n\n.content_text_url {\n    font-size: 14px;\n    width: 100%;\n    padding: 8px;\n    background-color: var(--white);\n    border-radius: 8px;\n    border: 1px solid var(--border);\n    margin-bottom: 8px;\n    text-align: center;\n}", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -1211,7 +1175,7 @@ ___CSS_LOADER_EXPORT___.push([module.id, "body {\n    margin: 0;\n    padding: 0
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, ".btn_button {\n    position: relative;\n    border-radius: 8px;\n    border: none;\n    cursor: pointer;\n    overflow: hidden;\n    height: 50px;\n    padding-left: 24px;\n    padding-right: 24px;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    align-content: center;\n    transition: background 0.15s ease-in-out;\n}\n\n.btn_button:disabled {\n    cursor: progress;\n}\n\n.btn_button__loading {\n    width: var(--btn_width_loading);\n}\n\n.btn_loader {\n    width: 32px;\n    height: 32px;\n    border: 4px solid #FFF;\n    border-bottom-color: var(--blue);\n    border-radius: 50%;\n    display: inline-block;\n    box-sizing: border-box;\n    -webkit-animation: rotation 1s linear infinite;\n            animation: rotation 1s linear infinite;\n}\n\n@-webkit-keyframes rotation {\n    0% {\n        transform: rotate(0deg);\n    }\n\n    100% {\n        transform: rotate(360deg);\n    }\n}\n\n@keyframes rotation {\n    0% {\n        transform: rotate(0deg);\n    }\n\n    100% {\n        transform: rotate(360deg);\n    }\n}\n\n.default {\n    font-size: 16px;\n    line-height: 22px;\n    letter-spacing: -0.2px;\n    font-weight: bold;\n}\n\n.small {\n    font-size: 14px;\n    line-height: 1.29;\n    width: 155px;\n    height: 36px;\n    padding-left: 4px !important;\n    padding-right: 4px !important;\n}\n\n.hidden {\n    visibility: hidden;\n}\n\n.primary {\n    background-color: var(--grey-black);\n    color: var(--grey-bright);\n}\n\n.primary:hover {\n    background-color: #4B5058;\n}\n\n.secondary {\n    background: none;\n    border-radius: 8px;\n    border: solid 1px #050506;\n    color: var(--grey-black);\n}\n\n.secondary:hover {\n    background-color: #C8CBD0;\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, ".btn_button {\n    position: relative;\n    border-radius: 8px;\n    border: none;\n    cursor: pointer;\n    overflow: hidden;\n    height: 50px;\n    padding-left: 24px;\n    padding-right: 24px;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    align-content: center;\n    transition: background 0.15s ease-in-out;\n}\n\n.btn_button:disabled {\n    cursor: progress;\n}\n\n.btn_button__loading {\n    width: var(--btn_width_loading);\n}\n\n.btn_loader {\n    width: 32px;\n    height: 32px;\n    border: 4px solid #FFF;\n    border-bottom-color: var(--blue);\n    border-radius: 50%;\n    display: inline-block;\n    box-sizing: border-box;\n    -webkit-animation: rotation 1s linear infinite;\n            animation: rotation 1s linear infinite;\n}\n\n@-webkit-keyframes rotation {\n    0% {\n        transform: rotate(0deg);\n    }\n\n    100% {\n        transform: rotate(360deg);\n    }\n}\n\n@keyframes rotation {\n    0% {\n        transform: rotate(0deg);\n    }\n\n    100% {\n        transform: rotate(360deg);\n    }\n}\n\n.default {\n    font-size: 16px;\n    line-height: 22px;\n    letter-spacing: -0.2px;\n    font-weight: bold;\n}\n\n.small {\n    font-size: 14px;\n    line-height: 1.29;\n    width: 155px;\n    height: 36px;\n    padding-left: 4px !important;\n    padding-right: 4px !important;\n}\n\n.hidden {\n    visibility: hidden;\n}\n\n.primary {\n    background-color: var(--grey-black);\n    color: var(--grey-bright);\n}\n\n.primary:hover {\n    background-color: var(--grey-darker);\n}\n\n.secondary {\n    background: none;\n    border-radius: 8px;\n    border: solid 1px #050506;\n    color: var(--grey-black);\n}\n\n.secondary:hover {\n    background-color: #C8CBD0;\n}", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -1257,7 +1221,7 @@ ___CSS_LOADER_EXPORT___.push([module.id, ".navbar {\n    height: 60px;\n    padd
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, ":root {\n    --white: #ffffff;\n    --green: #85d6ad;\n    --grey-black: #0c0c0e;\n    --black: #000000;\n    --grey: #e9eaec;\n    --grey-base: #898991;\n    --grey-bright: #f5f5f7;\n    --grey-semi-darkness: #59595f;\n    --blue: #5c97ff;\n    --blue-light: #99beff;\n    --purple-light: #ded6ff;\n    --border: #676e79;\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, ":root {\n    --white: #ffffff;\n    --green: #85d6ad;\n    --grey-black: #0c0c0e;\n    --black: #000000;\n    --grey: #e9eaec;\n    --grey-base: #898991;\n    --grey-bright: #f5f5f7;\n    --grey-semi-darkness: #59595f;\n    --grey-darker: #4b5058;\n    --blue: #5c97ff;\n    --blue-light: #99beff;\n    --purple-light: #ded6ff;\n    --border: #676e79;\n}", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -4319,7 +4283,7 @@ let nanoid = (size = 21) => {
 },
 /******/ __webpack_require__ => { // webpackRuntimeModules
 /******/ var __webpack_exec__ = (moduleId) => (__webpack_require__(__webpack_require__.s = moduleId))
-/******/ __webpack_require__.O(0, [374], () => (__webpack_exec__(3282)));
+/******/ __webpack_require__.O(0, [374], () => (__webpack_exec__(3248)));
 /******/ var __webpack_exports__ = __webpack_require__.O();
 /******/ }
 ]);
