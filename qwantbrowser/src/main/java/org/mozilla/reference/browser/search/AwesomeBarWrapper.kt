@@ -14,7 +14,9 @@ import mozilla.components.compose.browser.awesomebar.AwesomeBar
 import mozilla.components.compose.browser.awesomebar.AwesomeBarDefaults
 import mozilla.components.compose.browser.awesomebar.AwesomeBarOrientation
 import mozilla.components.concept.awesomebar.AwesomeBar
+import mozilla.components.support.ktx.android.content.getColorFromAttr
 import mozilla.components.support.ktx.android.view.hideKeyboard
+import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.ext.components
 
 /**
@@ -44,10 +46,10 @@ class AwesomeBarWrapper @JvmOverloads constructor(
                 providers = providers.value,
                 orientation = AwesomeBarOrientation.BOTTOM,
                 colors = AwesomeBarDefaults.colors(
-                        background = Color(0xff222222),
-                        title = Color(0xffffffff),
-                        description = Color(0xffdddddd),
-                        autocompleteIcon = Color(0xffdddddd)
+                        background = Color(context.getColorFromAttr(R.attr.qwant_toolbar_BackgroundColor)),
+                        title = Color(context.getColorFromAttr(R.attr.qwant_toolbar_EditTextColor)),
+                        description = Color(context.getColorFromAttr(R.attr.qwant_toolbar_BackgroundColor)),
+                        autocompleteIcon = Color(context.getColorFromAttr(R.attr.qwant_toolbar_EditTextColor))
                 ),
                 onSuggestionClicked = { suggestion ->
                     suggestion.onSuggestionClicked?.invoke()

@@ -2,9 +2,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- layouts -->
     <item name="mozac_browser_toolbar_displaytoolbar" type="layout" tools:override="true">@layout/browser_toolbar_displaytoolbar</item>
-    <item name="mozac_browser_awesomebar_item_generic" type="layout" tools:override="true">@layout/browser_toolbar_autocomplete_item</item>
     <item name="mozac_ui_tabcounter_box" type="drawable" tools:override="true">@drawable/qwant_tabcounter_box</item>
-
 
     <dimen name="mozac_tab_counter_box_width_height">20dp</dimen>
 
@@ -20,4 +18,10 @@
     <dimen name="mozac_browser_menu_item_image_text_icon_padding">16dp</dimen>
     <dimen name="mozac_browser_menu_item_image_text_label_padding_start">16dp</dimen>
     <color name="mozac_browser_menu_background">@color/qwant_background</color>
+
+    <!-- Suggest item icon -->
+    <item name="mozac_ic_edit_suggestion" type="drawable" tools:override="true">@drawable/icons_system_arrow_left_up_line</item>
+
+    <!-- Not working anymore :( -->
+    <item name="mozac_browser_awesomebar_item_generic" type="layout" tools:override="true">@layout/browser_toolbar_autocomplete_item</item>
 </resources>
