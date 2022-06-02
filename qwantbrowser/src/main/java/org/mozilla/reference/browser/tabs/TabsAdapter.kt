@@ -23,7 +23,7 @@ class TabsAdapter(
         private val context: Context,
         private val selectedCallback: (tab: TabSessionState?) -> Unit
 )  : BaseAdapter() {
-    var tabs = context.components.core.store.state.tabs
+    var tabs = listOf<TabSessionState>() // context.components.core.store.state.tabs.filter { it.content.private }
 
     internal class TabListItemViewHolder(
         item_layout: View,
@@ -143,8 +143,8 @@ class TabsAdapter(
         return tabs.count()
     }
 
-    fun tabChanged() {
-        this.tabs = context.components.core.store.state.tabs
+    fun tabChanged(private: Boolean = false) {
+        this.tabs = context.components.core.store.state.tabs.filter { it.content.private == private }
         this.notifyDataSetChanged()
     }
 }

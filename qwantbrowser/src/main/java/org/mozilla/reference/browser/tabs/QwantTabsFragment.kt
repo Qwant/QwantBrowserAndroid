@@ -12,8 +12,6 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.fragment_qwant_tabs.*
 import mozilla.components.browser.state.selector.getNormalOrPrivateTabs
-import mozilla.components.concept.tabstray.Tab
-import mozilla.components.concept.tabstray.Tabs
 import mozilla.components.support.base.feature.UserInteractionHandler
 import mozilla.components.support.ktx.android.util.dpToPx
 import mozilla.components.ui.tabcounter.TabCounter
@@ -164,7 +162,7 @@ class QwantTabsFragment : Fragment(), UserInteractionHandler {
     }
 
     private fun tabsChanged() {
-        tabsAdapter?.tabChanged()
+        tabsAdapter?.tabChanged(isPrivate)
         this.updateTabCount()
     }
 
