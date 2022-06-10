@@ -63,8 +63,8 @@ public class SuggestAdapter extends RecyclerView.Adapter<SuggestAdapter.SuggestV
                     spannedText.setSpan(new ForegroundColorSpan(this.color_bold), 0, normal_start, Spannable.SPAN_INCLUSIVE_INCLUSIVE);
                     spannedText.setSpan(new StyleSpan(Typeface.BOLD), 0, normal_start, Spannable.SPAN_INCLUSIVE_INCLUSIVE);
 
-                    spannedText.setSpan(new ForegroundColorSpan(this.color_normal), normal_start, searchText.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
-                    spannedText.setSpan(new StyleSpan(Typeface.NORMAL), normal_start, searchText.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+                    spannedText.setSpan(new ForegroundColorSpan(this.color_normal), normal_start, normal_start + searchText.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+                    spannedText.setSpan(new StyleSpan(Typeface.NORMAL), normal_start, normal_start + searchText.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
 
                     spannedText.setSpan(new ForegroundColorSpan(this.color_bold), normal_start + searchText.length(), text.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
                     spannedText.setSpan(new StyleSpan(Typeface.BOLD), normal_start + searchText.length(), text.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);

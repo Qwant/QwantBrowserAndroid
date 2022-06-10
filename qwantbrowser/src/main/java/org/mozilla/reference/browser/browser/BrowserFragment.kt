@@ -57,7 +57,8 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
             .addHistoryProvider(
                 requireComponents.core.historyStorage,
                 requireComponents.useCases.sessionUseCases.loadUrl) */
-            .addClipboardProvider(requireContext(), requireComponents.useCases.sessionUseCases.loadUrl)
+            // TODO restore clipboard once module is fixed [ticket link]
+            // .addClipboardProvider(requireContext(), requireComponents.useCases.sessionUseCases.loadUrl)
 
         thumbnailsFeature.set(
                 feature = BrowserThumbnails(requireContext(),
