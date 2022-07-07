@@ -13,6 +13,9 @@ import mozilla.components.concept.engine.request.RequestInterceptor
 import org.mozilla.reference.browser.ext.components
 
 class AppRequestInterceptor(private val context: Context) : RequestInterceptor {
+    val ua = context.getString(R.string.qwant_useragent)
+    val uaExt = context.getString(R.string.qwant_useragent_ext)
+
     override fun onLoadRequest(
             engineSession: EngineSession,
             uri: String,
@@ -24,6 +27,8 @@ class AppRequestInterceptor(private val context: Context) : RequestInterceptor {
             isSubframeRequest: Boolean
     ): RequestInterceptor.InterceptionResponse? {
         if (uri.startsWith(context.getString(R.string.homepage_startwith_filter))) {
+            engineSession.settings.userAgentString = uaExt
+
             if (uri.indexOf("&qbc=1") == -1 && !uri.startsWith(context.getString(R.string.qwantmaps_result_startwith_filter))) {
                 var searchStart = uri.indexOf("&q=")
                 if (searchStart == -1) searchStart = uri.indexOf("?q=")
@@ -41,6 +46,8 @@ class AppRequestInterceptor(private val context: Context) : RequestInterceptor {
                     return RequestInterceptor.InterceptionResponse.Url(redirectUri)
                 }
             }
+        } else if (engineSession.settings.userAgentString?.endsWith(" QwantMobile/4.2") == true) {
+            engineSession.settings.userAgentString = ua
         }
         return context.components.services.appLinksInterceptor.onLoadRequest(
                 engineSession, uri, lastUri, hasUserGesture, isSameDomain, isRedirect, isDirectNavigation,
