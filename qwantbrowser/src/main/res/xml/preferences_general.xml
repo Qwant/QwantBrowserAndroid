@@ -37,11 +37,11 @@
         android:defaultValue="@string/settings_adultcontent_moderate_code"
         app:iconSpaceReserved="false"/>
 
-    <org.mozilla.reference.browser.settings.QwantPreferenceSwitch
+    <!-- <org.mozilla.reference.browser.settings.QwantPreferenceSwitch
         android:key="@string/pref_key_general_newsonhome"
         android:defaultValue="true"
         android:title="@string/settings_general_newsonhome"
-        app:iconSpaceReserved="false" />
+        app:iconSpaceReserved="false" /> -->
 
     <org.mozilla.reference.browser.settings.QwantPreferenceSwitch
         android:key="@string/pref_key_general_resultsinnewtab"
