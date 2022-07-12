@@ -50,7 +50,7 @@ class QwantUtils {
             val builder = StringBuilder()
             builder.append(context.getString(R.string.homepage_base))
             if (maps) builder.append("maps/")
-            if (music) builder.append("music/search")
+            // if (music) builder.append("music/search")
             builder.append("?client=").append(client)
                 .append("&l=").append(l?.toLowerCase(Locale.getDefault()))
                 .append("&sr=").append(sr)

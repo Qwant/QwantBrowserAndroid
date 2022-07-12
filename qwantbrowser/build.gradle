@@ -48,16 +48,19 @@ android {
             applicationIdSuffix ".debug"
             resValue 'string', 'app_client_string', 'debugandroidclient'
             resValue 'string', 'widget_client_string', 'debugandroidclient-widget'
+            resValue 'string', 'qwant_useragent_ext', ' QwantMobile/4.2 debug'
             buildConfigField "boolean", "HIDE_TOOLBAR_ON_QWANT", "false"
         }
-        release releaseTemplate >> {
+        playstore releaseTemplate >> {
             resValue 'string', 'app_client_string', 'qwantbrowser'
             resValue 'string', 'widget_client_string', 'qwantbrowser-widget'
+            resValue 'string', 'qwant_useragent_ext', ' QwantMobile/4.2'
             buildConfigField "boolean", "HIDE_TOOLBAR_ON_QWANT", "false"
         }
-        release_huawei releaseTemplate >> {
+        appgallery releaseTemplate >> {
             resValue 'string', 'app_client_string', 'brz-huawei'
             resValue 'string', 'widget_client_string', 'brz-huawei-widget'
+            resValue 'string', 'qwant_useragent_ext', ' h QwantMobile/4.2'
             buildConfigField "boolean", "HIDE_TOOLBAR_ON_QWANT", "true"
         }
     }
