@@ -48,14 +48,13 @@ class Core(private val context: Context) {
      */
     val engine: Engine by lazy {
         // val prefs = PreferenceManager.getDefaultSharedPreferences(context)
-
         val defaultSettings = DefaultSettings(
             requestInterceptor = AppRequestInterceptor(context),
             remoteDebuggingEnabled = false, // prefs.getBoolean(context.getPreferenceKey(pref_key_remote_debugging), false),
             trackingProtectionPolicy = TrackingProtectionPolicy.recommended(), // createTrackingProtectionPolicy(prefs),
             historyTrackingDelegate = HistoryDelegate(lazy { historyStorage }),
             testingModeEnabled = false,
-            userAgentString = context.getString(R.string.qwant_useragent)
+            userAgentString = context.getString(R.string.qwant_base_useragent) + context.getString(R.string.qwant_useragent_ext)
         )
         EngineProvider.createEngine(context, defaultSettings)
     }

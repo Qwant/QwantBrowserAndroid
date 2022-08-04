@@ -13,8 +13,8 @@ import mozilla.components.concept.engine.request.RequestInterceptor
 import org.mozilla.reference.browser.ext.components
 
 class AppRequestInterceptor(private val context: Context) : RequestInterceptor {
-    val ua = context.getString(R.string.qwant_useragent)
-    val uaExt = context.getString(R.string.qwant_useragent_ext)
+    val uaBase = context.getString(R.string.qwant_base_useragent)
+    val uaExt = uaBase + context.getString(R.string.qwant_useragent_ext)
 
     override fun onLoadRequest(
             engineSession: EngineSession,
@@ -47,7 +47,7 @@ class AppRequestInterceptor(private val context: Context) : RequestInterceptor {
                 }
             }
         } else if (engineSession.settings.userAgentString?.endsWith(" QwantMobile/4.2") == true) {
-            engineSession.settings.userAgentString = ua
+            engineSession.settings.userAgentString = uaBase
         }
         return context.components.services.appLinksInterceptor.onLoadRequest(
                 engineSession, uri, lastUri, hasUserGesture, isSameDomain, isRedirect, isDirectNavigation,

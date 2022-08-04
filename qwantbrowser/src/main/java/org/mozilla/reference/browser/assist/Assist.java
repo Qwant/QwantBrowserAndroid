@@ -84,7 +84,7 @@ public class Assist extends Activity {
         webview.getSettings().setBuiltInZoomControls (false);
         webview.getSettings().setDisplayZoomControls(false);
         webview.getSettings().setJavaScriptEnabled(true);
-        webview.getSettings().setUserAgentString(getString(R.string.qwant_useragent));
+        webview.getSettings().setUserAgentString(getString(R.string.qwant_base_useragent) + getString(R.string.qwant_useragent_ext));
 
         // Maps settings
         webview.getSettings().setGeolocationEnabled(true);
