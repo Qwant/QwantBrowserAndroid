@@ -350,8 +350,8 @@
     <string name="onboarding_adblockplus_more">Learn more</string>
     <string name="onboarding_anonymous_title">Welcome to Qwant, dear unknown user</string>
     <string name="onboarding_anonymous_text_top">Search in complete privacy:</string>
-    <string name="onboarding_anonymous_bullet_1">"Zero tracking of your searches "</string>
-    <string name="onboarding_anonymous_bullet_2">"Zero advertising tracking "</string>
+    <string name="onboarding_anonymous_bullet_1">Zero tracking of your searches</string>
+    <string name="onboarding_anonymous_bullet_2">Zero advertising tracking</string>
     <string name="onboarding_anonymous_bullet_3">Zero sale of your personal data</string>
     <string name="onboarding_anonymous_validate">Siguiente</string>
     <string name="onboarding_navigation_title">Surf safely on all websites</string>
