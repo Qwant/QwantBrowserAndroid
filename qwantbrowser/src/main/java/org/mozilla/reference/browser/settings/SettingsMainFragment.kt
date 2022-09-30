@@ -10,6 +10,7 @@ import android.os.Bundle
 import androidx.preference.Preference
 import androidx.preference.PreferenceManager
 import org.mozilla.reference.browser.BrowserActivity
+import org.mozilla.reference.browser.BuildConfig
 import org.mozilla.reference.browser.R
 import org.mozilla.reference.browser.ext.getPreferenceKey
 
@@ -28,7 +29,10 @@ class SettingsMainFragment: BaseSettingsFragment() {
             true
         }
         findPreference(context?.getPreferenceKey(R.string.pref_key_rate_app)).onPreferenceClickListener = Preference.OnPreferenceClickListener {
-            val intent = Intent("android.intent.action.VIEW", Uri.parse("https://play.google.com/store/apps/details?id=com.qwant.liberty"))
+            val uri =
+                if (BuildConfig.BUILD_TYPE == "appgallery") "market://details?id=com.qwant.liberty"
+                else "https://play.google.com/store/apps/details?id=com.qwant.liberty"
+            val intent = Intent("android.intent.action.VIEW", Uri.parse(uri))
             context?.startActivity(intent)
             true
         }
