@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="@color/qwant_black_v2"/>
+        </shape>
+    </item>
+
+    <item
+        android:left="8dp"
+        android:right="8dp"
+        android:top="8dp"
+        android:bottom="8dp"
+        >
+        <bitmap android:src="@drawable/brands_logos_qwant_letter_monochrome" android:tint="@color/qwant_white" />
+    </item>
+</layer-list>

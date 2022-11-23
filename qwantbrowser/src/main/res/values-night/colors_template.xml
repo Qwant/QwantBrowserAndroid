@@ -28,9 +28,11 @@
     <color name="qwant_suggest_arrow_color">@color/qwant_suggest_text_light</color>
     <color name="qwant_suggest_clipboard_text">@color/qwant_suggest_text_light</color>
 
-    <color name="qwant_searchbar_background">@color/qwant_grey_dark_v2</color>
+    <color name="qwant_widget_header">@color/qwant_grey_darker_v2</color>
+
+    <color name="qwant_searchbar_background">@color/qwant_grey_widget_v2</color>
     <color name="qwant_searchbar_text">@color/true_white</color>
-    <color name="qwant_searchbar_hint">@color/qwant_grey_500_v2</color>
+    <color name="qwant_searchbar_hint">@color/qwant_grey_widget_hint_v2</color>
 
     <!-- Privacy colors -->
     <color name="qwant_ripple_private">@color/qwant_purple</color>

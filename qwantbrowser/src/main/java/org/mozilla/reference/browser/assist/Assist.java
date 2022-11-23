@@ -212,7 +212,6 @@ public class Assist extends Activity {
         search_text.setOnFocusChangeListener((v, hasFocus) -> {
             Log.d("QWANT_BROWSER_ASSIST", "focus changed: " + hasFocus);
             if (hasFocus) {
-                search_input_layout.setBackgroundResource(R.drawable.search_bar_background_shadowed_focus);
                 if (search_text.getText().length() == 0) {
                     webview.setVisibility(View.INVISIBLE);
                     suggest_recyclerview.setVisibility(View.INVISIBLE);
@@ -220,8 +219,6 @@ public class Assist extends Activity {
                     webview.setVisibility(View.INVISIBLE);
                     suggest_recyclerview.setVisibility(View.VISIBLE);
                 }
-            } else {
-                search_input_layout.setBackgroundResource(R.drawable.search_bar_background_shadowed_unfocus);
             }
         });
 
@@ -357,9 +354,9 @@ public class Assist extends Activity {
             back_to_webview = true;
             webview.setVisibility(View.VISIBLE);
             webview.loadUrl(QwantUtils.Companion.getHomepage(getApplicationContext(),
-                    query, true, null, null, null,
-                    null, null, null, null,
-                    false, false, getString(R.string.widget_client_string)
+                query, true, null, null, null,
+                null, null, null,null, null,
+                false
             ));
             // Force hide keyboard
             InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);

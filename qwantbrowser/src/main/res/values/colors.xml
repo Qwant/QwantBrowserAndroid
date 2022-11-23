@@ -76,8 +76,10 @@
     <color name="qwant_purple_v2">#ac99ff</color>
     <color name="qwant_grey_darker_v2">#131416</color>
     <color name="qwant_grey_dark_v2">#2f3237</color>
+    <color name="qwant_grey_widget_v2">#48484a</color>
     <color name="qwant_grey_v2">#4b5058</color>
     <color name="qwant_grey_500_v2">#676e79</color>
+    <color name="qwant_grey_widget_hint_v2">#8cffffff</color>
     <color name="qwant_grey_light_v2">#a7acb4</color>
     <color name="qwant_green_light_v2">#b3e6cc</color>
     <color name="qwant_purple_light_v2">#ded6ff</color>

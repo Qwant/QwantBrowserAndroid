@@ -10,15 +10,8 @@
         android:id="@+id/widget_search_header"
         android:layout_width="match_parent"
         android:layout_height="79dp"
-        android:background="@color/qwant_blue_v2"
+        android:background="@color/qwant_widget_header"
         app:layout_constraintStart_toStartOf="parent" />
-
-    <View
-        android:id="@+id/widget_search_header_outline"
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="#050506"
-        app:layout_constraintTop_toBottomOf="@id/widget_search_header" />
 
     <LinearLayout
         android:id="@+id/widget_search_bar_layout"
@@ -26,9 +19,9 @@
         android:layout_height="54dp"
         android:layout_marginStart="12dp"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="4dp"
+        android:layout_marginEnd="12dp"
         android:paddingBottom="8dp"
-        android:background="@drawable/search_bar_background_shadowed_focus"
+        android:background="@drawable/search_bar_background_shadowed"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         app:layout_constraintRight_toRightOf="parent"
@@ -50,7 +43,7 @@
             android:layout_weight="1"
             android:background="@android:color/transparent"
             android:completionThreshold="1"
-            android:dropDownAnchor="@id/widget_search_header_outline"
+            android:dropDownAnchor="@id/widget_search_header"
             android:focusable="true"
             android:focusableInTouchMode="true"
             android:hint="@string/qwant_widget_text"
@@ -61,8 +54,7 @@
             android:paddingEnd="8dp"
             android:textColor="@color/qwant_searchbar_text"
             android:textColorHint="@color/qwant_searchbar_hint"
-            android:textSize="16sp"
-            tools:targetApi="cupcake" />
+            android:textSize="16sp" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/widget_search_bar_cross"
@@ -80,7 +72,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:paddingTop="20dp"
-        app:layout_constraintTop_toBottomOf="@id/widget_search_header_outline">
+        app:layout_constraintTop_toBottomOf="@id/widget_search_header">
 
         <TextView
             android:layout_width="match_parent"
@@ -126,7 +118,7 @@
         android:id="@+id/suggest_recyclerview"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/widget_search_header_outline"
+        app:layout_constraintTop_toBottomOf="@id/widget_search_header"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         android:background="@color/qwant_suggest_background"/>
@@ -142,5 +134,5 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/widget_search_header_outline" />
+        app:layout_constraintTop_toBottomOf="@+id/widget_search_header" />
 </androidx.constraintlayout.widget.ConstraintLayout>
