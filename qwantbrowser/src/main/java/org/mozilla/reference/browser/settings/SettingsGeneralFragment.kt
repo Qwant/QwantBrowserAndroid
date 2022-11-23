@@ -46,7 +46,6 @@ class SettingsGeneralFragment: BaseSettingsFragment() {
             true
         }
 
-
         val prefResultInNewTabs = findPreference<QwantPreferenceSwitch>(requireContext().getPreferenceKey(R.string.pref_key_general_resultsinnewtab))
         prefResultInNewTabs?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener {_, value ->
             QwantUtils.refreshQwantPages(requireContext(), results_in_new_tab = value as Boolean)
