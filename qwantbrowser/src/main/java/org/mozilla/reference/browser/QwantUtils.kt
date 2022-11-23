@@ -25,6 +25,7 @@ class QwantUtils {
                 search_region: String? = null,
                 adult_content: String? = null,
                 news_on_home: Boolean? = null,
+                favicon_on_serp: Boolean? = null,
                 results_in_new_tab: Boolean? = null,
                 dark_theme: String? = null,
                 maps: Boolean = false,
@@ -40,8 +41,9 @@ class QwantUtils {
             val r = search_language ?: prefs.getString(context.getString(R.string.pref_key_general_language_search), "en")
             val sr = search_region ?: prefs.getString(context.getString(R.string.pref_key_general_region_search), "GB")
             val s = adult_content ?: prefs.getString(context.getString(R.string.pref_key_general_adultcontent), "0")
-            // val hc = news_on_home ?: prefs.getBoolean(context.getString(R.string.pref_key_general_newsonhome), true)
+            val hc = news_on_home ?: prefs.getBoolean(context.getString(R.string.pref_key_general_newsonhome), true)
             val b = results_in_new_tab ?: prefs.getBoolean(context.getString(R.string.pref_key_general_resultsinnewtab), false)
+            val si = favicon_on_serp ?: prefs.getBoolean(context.getString(R.string.pref_key_general_favicononserp), true)
 
             var theme = dark_theme ?: prefs.getString(context.getString(R.string.pref_key_general_dark_theme), "2")
             if (theme == "2") {
@@ -61,7 +63,8 @@ class QwantUtils {
                 .append("&sr=").append(sr)
                 .append("&r=").append(r)
                 .append("&s=").append(s)
-                // .append("&hc=").append(if (hc) "1" else "0")
+                .append("&hc=").append(if (hc) "1" else "0")
+                .append("&si=").append(if (si) "1" else "0")
                 .append("&b=").append(if (b) "1" else "0")
                 .append("&theme=").append(theme)
                 // TODO
@@ -97,6 +100,7 @@ class QwantUtils {
                 search_region: String? = null,
                 adult_content: String? = null,
                 news_on_home: Boolean? = null,
+                favicon_on_serp: Boolean? = null,
                 results_in_new_tab: Boolean? = null,
                 dark_theme: String? = null
         ) {
@@ -113,6 +117,7 @@ class QwantUtils {
                         search_region = search_region,
                         adult_content = adult_content,
                         news_on_home = news_on_home,
+                        favicon_on_serp = favicon_on_serp,
                         results_in_new_tab = results_in_new_tab,
                         dark_theme = dark_theme
                     )

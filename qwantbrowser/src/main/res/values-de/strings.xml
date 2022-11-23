@@ -112,6 +112,7 @@
     <string name="settings_general_language">Sprache</string>
     <string name="settings_general_adultcontent">Filter für Erwachseneninhalte</string>
     <string name="settings_general_newsonhome">News auf Homepage</string>
+    <string name="settings_general_favicononserp">Display site icons</string>
     <string name="settings_general_dark_theme">Thema</string>
     <string name="settings_general_resultsinnewtab">Ergebnisse in neuer Registerkarte öffnen</string>
     <string name="settings_general_cleardata">Browsing-Daten zurücksetzen</string>

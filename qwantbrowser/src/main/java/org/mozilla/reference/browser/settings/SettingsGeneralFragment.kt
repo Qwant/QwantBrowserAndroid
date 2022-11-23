@@ -34,11 +34,17 @@ class SettingsGeneralFragment: BaseSettingsFragment() {
         )
         findPreference<QwantPreference>(requireContext().getPreferenceKey(R.string.pref_key_general_makedefaultbrowser))?.onPreferenceClickListener = getClickListenerForMakeDefaultBrowser()
 
-        /* val prefNewsOnHome = findPreference(context?.getPreferenceKey(R.string.pref_key_general_newsonhome))
-        prefNewsOnHome.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, value ->
+        val prefNewsOnHome = findPreference<QwantPreferenceSwitch>(requireContext().getPreferenceKey(R.string.pref_key_general_newsonhome))
+        prefNewsOnHome?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, value ->
             QwantUtils.refreshQwantPages(requireContext(), news_on_home = value as Boolean)
             true
-        } */
+        }
+
+        val prefFaviconOnSerp = findPreference<QwantPreferenceSwitch>(requireContext().getPreferenceKey(R.string.pref_key_general_favicononserp))
+        prefFaviconOnSerp?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, value ->
+            QwantUtils.refreshQwantPages(requireContext(), favicon_on_serp = value as Boolean)
+            true
+        }
 
 
         val prefResultInNewTabs = findPreference<QwantPreferenceSwitch>(requireContext().getPreferenceKey(R.string.pref_key_general_resultsinnewtab))

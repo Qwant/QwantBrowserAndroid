@@ -157,6 +157,7 @@
     <string name="settings_general_language">Language</string>
     <string name="settings_general_adultcontent">Adult content filter</string>
     <string name="settings_general_newsonhome">News on homepage</string>
+    <string name="settings_general_favicononserp">Display site icons</string>
     <string name="settings_general_dark_theme">Theme</string>
     <string name="settings_general_resultsinnewtab">Open results in new tab</string>
     <string name="settings_general_cleardata">Clear browsing data</string>
