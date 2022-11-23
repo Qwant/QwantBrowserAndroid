@@ -38,8 +38,7 @@ class AppRequestInterceptor(private val context: Context) : RequestInterceptor {
                     val searchTerms = uri.substring(searchStart + 3, searchEnd)
 
                     val isMaps = uri.startsWith(context.getString(R.string.qwantmaps_startwith_filter))
-                    val isMusic = uri.startsWith(context.getString(R.string.qwantmusic_startwith_filter))
-                    val redirectUri = QwantUtils.getHomepage(context, query = searchTerms, maps = isMaps, music = isMusic)
+                    val redirectUri = QwantUtils.getHomepage(context, query = searchTerms, maps = isMaps)
 
                     Log.d("QWANT_BROWSER_REDIRECT", "redirect $uri to $redirectUri")
 
