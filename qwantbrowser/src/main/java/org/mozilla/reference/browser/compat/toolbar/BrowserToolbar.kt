@@ -270,6 +270,10 @@ class BrowserToolbar @JvmOverloads constructor(
         display.removeBrowserAction(action)
     }
 
+    override fun removeEditActionEnd(action: Toolbar.Action) {
+        TODO("Not yet implemented")
+    }
+
     override fun removeNavigationAction(action: Toolbar.Action) {
         // TODO ???
     }
@@ -305,7 +309,11 @@ class BrowserToolbar @JvmOverloads constructor(
     /**
      * Adds an action to be displayed on the right of the URL in edit mode.
      */
-    override fun addEditAction(action: Toolbar.Action) {
+    override fun addEditActionEnd(action: Toolbar.Action) {
+        edit.addEditAction(action)
+    }
+
+    override fun addEditActionStart(action: Toolbar.Action) {
         edit.addEditAction(action)
     }
 
@@ -405,7 +413,7 @@ class BrowserToolbar @JvmOverloads constructor(
             @DrawableRes background: Int = 0,
             val padding: Padding = DEFAULT_PADDING,
             listener: () -> Unit
-    ) : Toolbar.ActionButton(imageDrawable, contentDescription, visible, background, padding, listener = listener)
+    ) : Toolbar.ActionButton(imageDrawable, contentDescription, visible, { false }, background, padding, listener = listener)
 
     /**
      * An action button with two states, selected and unselected. When the button is pressed, the

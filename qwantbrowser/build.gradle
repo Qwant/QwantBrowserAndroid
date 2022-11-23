@@ -40,7 +40,19 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = Versions.compose_version
+        kotlinCompilerExtensionVersion = Versions.compose_compiler
+    }
+
+    bundle {
+        density {
+            enableSplit true
+        }
+        abi {
+            enableSplit true
+        }
+        language {
+            enableSplit = false
+        }
     }
 
     buildTypes {
@@ -268,7 +280,7 @@ dependencies {
     implementation Deps.androidx_fragment_ktx
     implementation Deps.androidx_swiperefreshlayout
 
-    implementation 'androidx.core:core-splashscreen:1.0.0-rc01'
+    implementation 'androidx.core:core-splashscreen:1.0.0'
 
     implementation Deps.google_material
 //     implementation Deps.androidx_annotation
@@ -279,6 +291,7 @@ dependencies {
     implementation Deps.androidx_compose_ui_tooling
     implementation Deps.androidx_compose_foundation
     implementation Deps.androidx_compose_material
+    implementation "androidx.compose.compiler:compiler:1.3.2"
 
     implementation Deps.keyboardvisibilityevent
     implementation 'com.google.android.play:core-ktx:1.8.1'

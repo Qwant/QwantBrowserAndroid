@@ -4,26 +4,25 @@
 
 // Synchronized version numbers for dependencies used by (some) modules
 private object Versions {
-    const val kotlin = "1.5.10"
-    const val coroutines = "1.5.0"
+    const val kotlin = "1.6.10"
+    const val coroutines = "1.6.1"
 
     const val androidx_appcompat = "1.4.1"
     /* const val androidx_annotation = "1.1.0"
     const val androidx_loader = "1.1.0" */
     const val androidx_localbroadcastmanager = "1.0.0"
-    const val androidx_constraintlayout = "1.1.3"
-    const val androidx_preference = "1.0.0"
+    const val androidx_constraintlayout = "2.0.4"
+    const val androidx_preference = "1.1.1"
 
     const val workmanager = "2.7.1"
-    const val google_material = "1.0.0"
+    const val google_material = "1.2.1"
 
-    const val android_gradle_plugin = "7.0.0"
+    const val android_gradle_plugin = "7.2.1"
     // const val android_gradle_plugin = "3.4.1"
 
-    const val mozilla_android_components = "100.0.20220323190349" // "94.0.20210918190139"
-    // const val mozilla_android_components_old = "90.0.20210509143123"
+    const val mozilla_android_components = "107.0.20221017143148" // "100.0.20220323190349"
 
-    const val thirdparty_sentry = "1.7.10"
+    // const val thirdparty_sentry = "1.7.10"
 
     const val espresso_core = "3.1.0"
     const val espresso_version = "3.1.0"
@@ -33,13 +32,14 @@ private object Versions {
     const val tools_test_runner = "1.1.0"
     const val uiautomator = "2.2.0"
 
-    const val compose_version = "1.0.0-rc02"
+    const val compose_version = "1.2.1"
+    const val compose_compiler = "1.1.1"
 
     object AndroidX {
-        const val core = "1.2.0"
-        const val fragment_ktx = "1.3.0"
+        const val core = "1.8.0"
+        const val fragment_ktx = "1.5.1"
         const val compose = compose_version
-        const val activity_compose = "1.3.0-rc02"
+        const val activity_compose = "1.4.0"
         const val swiperefreshlayout = "1.1.0"
     }
 }
@@ -122,7 +122,7 @@ object Deps {
     const val mozilla_lib_crash = "org.mozilla.components:lib-crash:${Versions.mozilla_android_components}"
     const val mozilla_lib_push_firebase = "org.mozilla.components:lib-push-firebase:${Versions.mozilla_android_components}"
 
-    const val thirdparty_sentry = "io.sentry:sentry-android:${Versions.thirdparty_sentry}"
+    // const val thirdparty_sentry = "io.sentry:sentry-android:${Versions.thirdparty_sentry}"
 
     const val androidx_appcompat = "androidx.appcompat:appcompat:${Versions.androidx_appcompat}"
     const val androidx_core_ktx = "androidx.core:core-ktx:${Versions.AndroidX.core}"

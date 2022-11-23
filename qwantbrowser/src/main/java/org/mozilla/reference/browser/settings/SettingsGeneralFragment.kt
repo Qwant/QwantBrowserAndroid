@@ -29,10 +29,10 @@ class SettingsGeneralFragment: BaseSettingsFragment() {
         val darkThemeKeys = resources.getStringArray(R.array.dark_theme_keys)
         val darkThemeValues = resources.getStringArray(R.array.dark_theme_values)
 
-        findPreference(context?.getPreferenceKey(R.string.pref_key_general_language)).onPreferenceClickListener = this.getPreferenceLinkListener(
+        findPreference<QwantPreference>(requireContext().getPreferenceKey(R.string.pref_key_general_language))?.onPreferenceClickListener = this.getPreferenceLinkListener(
                 SettingsGeneralLanguageFragment(), "SETTINGS_GENERAL_LANGUAGE_FRAGMENT"
         )
-        findPreference(context?.getPreferenceKey(R.string.pref_key_general_makedefaultbrowser)).onPreferenceClickListener = getClickListenerForMakeDefaultBrowser()
+        findPreference<QwantPreference>(requireContext().getPreferenceKey(R.string.pref_key_general_makedefaultbrowser))?.onPreferenceClickListener = getClickListenerForMakeDefaultBrowser()
 
         /* val prefNewsOnHome = findPreference(context?.getPreferenceKey(R.string.pref_key_general_newsonhome))
         prefNewsOnHome.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, value ->
@@ -40,30 +40,31 @@ class SettingsGeneralFragment: BaseSettingsFragment() {
             true
         } */
 
-        val prefResultInNewTabs = findPreference(context?.getPreferenceKey(R.string.pref_key_general_resultsinnewtab))
-        prefResultInNewTabs.onPreferenceChangeListener = Preference.OnPreferenceChangeListener {_, value ->
+
+        val prefResultInNewTabs = findPreference<QwantPreferenceSwitch>(requireContext().getPreferenceKey(R.string.pref_key_general_resultsinnewtab))
+        prefResultInNewTabs?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener {_, value ->
             QwantUtils.refreshQwantPages(requireContext(), results_in_new_tab = value as Boolean)
             true
         }
 
-        val prefAdultContent = findPreference(context?.getPreferenceKey(R.string.pref_key_general_adultcontent)) as QwantPreferenceDropdown
-        prefAdultContent.summary = adultContentValues[adultContentKeys.indexOf(prefAdultContent.value)]
-        prefAdultContent.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, value ->
-            prefAdultContent.summary = adultContentValues[adultContentKeys.indexOf(value)]
+        val prefAdultContent = findPreference<QwantPreferenceDropdown>(requireContext().getPreferenceKey(R.string.pref_key_general_adultcontent))
+        prefAdultContent?.summary = adultContentValues[adultContentKeys.indexOf(prefAdultContent?.value)]
+        prefAdultContent?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, value ->
+            prefAdultContent?.summary = adultContentValues[adultContentKeys.indexOf(value)]
             QwantUtils.refreshQwantPages(requireContext(), adult_content = value as String)
             true
         }
 
-        val prefTheme = findPreference(context?.getPreferenceKey(R.string.pref_key_general_dark_theme)) as QwantPreferenceDropdown
-        prefTheme.summary = darkThemeValues[darkThemeKeys.indexOf(prefTheme.value)]
-        prefTheme.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, value ->
+        val prefTheme = findPreference<QwantPreferenceDropdown>(requireContext().getPreferenceKey(R.string.pref_key_general_dark_theme))
+        prefTheme?.summary = darkThemeValues[darkThemeKeys.indexOf(prefTheme?.value)]
+        prefTheme?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, value ->
             when (value) {
                 "0" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
                 "1" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
                 "2" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
             }
 
-            prefTheme.summary = darkThemeValues[darkThemeKeys.indexOf(value)]
+            prefTheme?.summary = darkThemeValues[darkThemeKeys.indexOf(value)]
             // refreshFragment()
 
             QwantUtils.refreshQwantPages(requireContext(), dark_theme = value as String)

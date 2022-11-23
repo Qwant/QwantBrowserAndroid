@@ -33,11 +33,11 @@ class PrivacySettingsFragment: BaseSettingsFragment(){
             requireComponents.core.createTrackingProtectionPolicy(privateMode = enabled)
         } */
 
-        val prefClearData = findPreference(context?.getPreferenceKey(R.string.pref_key_privacy_cleardata))
-        val prefClearDataOnClose = findPreference(context?.getPreferenceKey(R.string.pref_key_privacy_cleardata_on_close_content))
-        prefClearData.onPreferenceClickListener = getPreferenceLinkListener(ClearDataFragment(true), "SETTINGS_PRIVACY_CLEARALL_FRAGMENT")
-        prefClearDataOnClose.onPreferenceClickListener = getPreferenceLinkListener(ClearDataFragment(false), "SETTINGS_PRIVACY_CLEARALL_FRAGMENT")
-        prefClearDataOnClose.summary = getClearDataSummary()
+        val prefClearData = findPreference<QwantPreference>(requireContext().getPreferenceKey(R.string.pref_key_privacy_cleardata))
+        val prefClearDataOnClose = findPreference<QwantPreference>(requireContext().getPreferenceKey(R.string.pref_key_privacy_cleardata_on_close_content))
+        prefClearData?.onPreferenceClickListener = getPreferenceLinkListener(ClearDataFragment(true), "SETTINGS_PRIVACY_CLEARALL_FRAGMENT")
+        prefClearDataOnClose?.onPreferenceClickListener = getPreferenceLinkListener(ClearDataFragment(false), "SETTINGS_PRIVACY_CLEARALL_FRAGMENT")
+        prefClearDataOnClose?.summary = getClearDataSummary()
     }
 
     private fun getClearDataSummary() : String {

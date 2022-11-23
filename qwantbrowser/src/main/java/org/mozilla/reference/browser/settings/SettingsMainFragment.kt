@@ -21,14 +21,14 @@ class SettingsMainFragment: BaseSettingsFragment() {
     }
 
     override fun setupPreferences() {
-        findPreference(context?.getPreferenceKey(R.string.pref_key_privacy)).onPreferenceClickListener = getPreferenceLinkListener(PrivacySettingsFragment(), "SETTINGS_PRIVACY_FRAGMENT")
-        findPreference(context?.getPreferenceKey(R.string.pref_key_general)).onPreferenceClickListener = getPreferenceLinkListener(SettingsGeneralFragment(), "SETTINGS_GENERAL_FRAGMENT")
-        findPreference(context?.getPreferenceKey(R.string.pref_key_about_menu)).onPreferenceClickListener = getPreferenceLinkListener(AboutMenuFragment(), "SETTINGS_ABOUTMENU_FRAGMENT")
-        findPreference(context?.getPreferenceKey(R.string.pref_key_history)).onPreferenceClickListener = Preference.OnPreferenceClickListener {
+        findPreference<QwantPreference>(requireContext().getPreferenceKey(R.string.pref_key_privacy))?.onPreferenceClickListener = getPreferenceLinkListener(PrivacySettingsFragment(), "SETTINGS_PRIVACY_FRAGMENT")
+        findPreference<QwantPreference>(requireContext().getPreferenceKey(R.string.pref_key_general))?.onPreferenceClickListener = getPreferenceLinkListener(SettingsGeneralFragment(), "SETTINGS_GENERAL_FRAGMENT")
+        findPreference<QwantPreference>(requireContext().getPreferenceKey(R.string.pref_key_about_menu))?.onPreferenceClickListener = getPreferenceLinkListener(AboutMenuFragment(), "SETTINGS_ABOUTMENU_FRAGMENT")
+        findPreference<QwantPreference>(requireContext().getPreferenceKey(R.string.pref_key_history))?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
             (activity as BrowserActivity).showHistory()
             true
         }
-        findPreference(context?.getPreferenceKey(R.string.pref_key_rate_app)).onPreferenceClickListener = Preference.OnPreferenceClickListener {
+        findPreference<QwantPreference>(requireContext().getPreferenceKey(R.string.pref_key_rate_app))?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
             val uri =
                 if (BuildConfig.BUILD_TYPE == "appgallery") "market://details?id=com.qwant.liberty"
                 else "https://play.google.com/store/apps/details?id=com.qwant.liberty"
@@ -37,14 +37,14 @@ class SettingsMainFragment: BaseSettingsFragment() {
             true
         }
 
-        val quitAppPref = findPreference(context?.getPreferenceKey(R.string.pref_key_quit_app))
+        val quitAppPref = findPreference<QwantPreference>(requireContext().getPreferenceKey(R.string.pref_key_quit_app))
         if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean(getString(R.string.pref_key_privacy_cleardata_on_close) , false)) {
-            quitAppPref.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+            quitAppPref?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
                 (activity as BrowserActivity).quitApp()
                 true
             }
         } else {
-            quitAppPref.isVisible = false
+            quitAppPref?.isVisible = false
         }
     }
 

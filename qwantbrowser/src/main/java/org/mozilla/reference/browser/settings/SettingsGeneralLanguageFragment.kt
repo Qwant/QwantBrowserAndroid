@@ -25,16 +25,16 @@ class SettingsGeneralLanguageFragment: BaseSettingsFragment() {
         val searchKeys = resources.getStringArray(R.array.languages_search_keys)
         val searchValues = resources.getStringArray(R.array.languages_search_values)
 
-        val prefLanguageInterface = findPreference(context?.getPreferenceKey(R.string.pref_key_general_language_interface)) as QwantPreferenceDropdown
-        val prefLanguageSearch = findPreference(context?.getPreferenceKey(R.string.pref_key_general_language_search)) as QwantPreferenceDropdown
-        val prefRegionSearch = findPreference(context?.getPreferenceKey(R.string.pref_key_general_region_search)) as QwantPreferenceDropdown
+        val prefLanguageInterface = findPreference<QwantPreferenceDropdown>(requireContext().getPreferenceKey(R.string.pref_key_general_language_interface))
+        val prefLanguageSearch = findPreference<QwantPreferenceDropdown>(requireContext().getPreferenceKey(R.string.pref_key_general_language_search))
+        val prefRegionSearch = findPreference<QwantPreferenceDropdown>(requireContext().getPreferenceKey(R.string.pref_key_general_region_search))
 
-        prefLanguageInterface.summary = interfaceValues[interfaceKeys.indexOf(prefLanguageInterface.value)]
-        val languageIndex = searchKeys.indexOf(prefLanguageSearch.value)
-        prefLanguageSearch.summary = searchValues[languageIndex]
-        toggleRegionForLanguage(languageIndex, prefRegionSearch.value)
+        prefLanguageInterface?.summary = interfaceValues[interfaceKeys.indexOf(prefLanguageInterface?.value)]
+        val languageIndex = searchKeys.indexOf(prefLanguageSearch?.value)
+        prefLanguageSearch?.summary = searchValues[languageIndex]
+        toggleRegionForLanguage(languageIndex, prefRegionSearch?.value)
 
-        prefLanguageInterface.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, value ->
+        prefLanguageInterface?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, value ->
             QwantUtils.refreshQwantPages(requireContext(), interface_language = value as String)
 
             val localeStringSplit = value.split('_')
@@ -50,17 +50,17 @@ class SettingsGeneralLanguageFragment: BaseSettingsFragment() {
 
             true
         }
-        prefLanguageSearch.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, value ->
+        prefLanguageSearch?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, value ->
             val index = searchKeys.indexOf(value)
-            prefLanguageSearch.summary = searchValues[index]
+            prefLanguageSearch?.summary = searchValues[index]
             toggleRegionForLanguage(index)
 
             QwantUtils.refreshQwantPages(requireContext(), search_language = value as String)
 
             true
         }
-        prefRegionSearch.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, value ->
-            prefRegionSearch.summary = prefRegionSearch.entries[prefRegionSearch.findIndexOfValue(value as String)]
+        prefRegionSearch?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, value ->
+            prefRegionSearch?.summary = prefRegionSearch!!.entries[prefRegionSearch.findIndexOfValue(value as String)]
 
             QwantUtils.refreshQwantPages(requireContext(), search_region = value)
 
@@ -105,25 +105,25 @@ class SettingsGeneralLanguageFragment: BaseSettingsFragment() {
             val regionKeys = resources.getStringArray(arrayIdKeys)
             val regionValues = resources.getStringArray(arrayIdValues)
 
-            val prefRegionSearch = findPreference(context?.getPreferenceKey(R.string.pref_key_general_region_search)) as QwantPreferenceDropdown
-            prefRegionSearch.entries = regionKeys
-            prefRegionSearch.entryValues = regionValues
+            val prefRegionSearch = findPreference<QwantPreferenceDropdown>(requireContext().getPreferenceKey(R.string.pref_key_general_region_search))
+            prefRegionSearch?.entries = regionKeys
+            prefRegionSearch?.entryValues = regionValues
             if (regionKeys.size > 1) {
                 if (value != null) {
-                    prefRegionSearch.value = value
-                    val valueIndex = prefRegionSearch.findIndexOfValue(value)
+                    prefRegionSearch?.value = value
+                    val valueIndex = prefRegionSearch?.findIndexOfValue(value) ?: -1
                     if (valueIndex >= 0)
-                        prefRegionSearch.summary = regionKeys[prefRegionSearch.findIndexOfValue(value)]
+                        prefRegionSearch?.summary = regionKeys[prefRegionSearch!!.findIndexOfValue(value)]
                     else
-                        prefRegionSearch.summary = "probleme"
+                        prefRegionSearch?.summary = "probleme"
                 }
-                prefRegionSearch.isVisible = true
+                prefRegionSearch?.isVisible = true
             } else {
-                prefRegionSearch.value = regionValues[0]
-                prefRegionSearch.summary = regionKeys[0]
-                prefRegionSearch.isVisible = false
+                prefRegionSearch?.value = regionValues[0]
+                prefRegionSearch?.summary = regionKeys[0]
+                prefRegionSearch?.isVisible = false
             }
-            prefRegionSearch.forceNotifyChange()
+            prefRegionSearch?.forceNotifyChange()
         } else {
             Log.e("QWANT_BROWSER", "Error in language XML files")
         }

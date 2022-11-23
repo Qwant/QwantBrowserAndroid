@@ -92,7 +92,7 @@ class EditToolbar internal constructor(
     val views = EditToolbarViews(
             background = rootView.findViewById<ImageView>(R.id.mozac_browser_toolbar_background),
             icon = rootView.findViewById<ImageView>(R.id.mozac_browser_toolbar_edit_icon),
-            editActions = rootView.findViewById<ActionContainer>(R.id.mozac_browser_toolbar_edit_actions),
+            // editActions = rootView.findViewById<ActionContainer>(R.id.mozac_browser_toolbar_edit_actions),
             clear = rootView.findViewById<ImageView>(R.id.mozac_browser_toolbar_clear_view).apply {
                 setOnClickListener {
                     onClear()
@@ -239,11 +239,11 @@ class EditToolbar internal constructor(
 
     internal fun invalidateActions() {
         Log.d("QWANT_BROWSER", "edittoolbar - invalidate actions")
-        views.editActions.invalidateActions()
+        // views.editActions.invalidateActions()
     }
 
     internal fun addEditAction(action: Toolbar.Action) {
-        views.editActions.addAction(action)
+        // views.editActions.addAction(action)
     }
 
     /**
@@ -334,7 +334,7 @@ class EditToolbar internal constructor(
 class EditToolbarViews(
         val background: ImageView,
         val icon: ImageView,
-        val editActions: ActionContainer,
+        // val editActions: ActionContainer,
         val clear: ImageView,
         val url: InlineAutocompleteEditText
 )

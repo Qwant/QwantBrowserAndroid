@@ -5,9 +5,7 @@
 package org.mozilla.reference.browser.browser
 
 import android.content.res.Resources
-import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import kotlinx.android.synthetic.main.fragment_browser.*
 import kotlinx.android.synthetic.main.fragment_browser.view.*
@@ -21,7 +19,8 @@ import mozilla.components.support.base.feature.UserInteractionHandler
 import mozilla.components.support.base.feature.ViewBoundFeatureWrapper
 import mozilla.components.support.ktx.android.util.dpToPx
 import mozilla.components.support.ktx.android.view.enterToImmersiveMode
-import mozilla.components.support.ktx.android.view.exitImmersiveModeIfNeeded
+import mozilla.components.support.ktx.android.view.exitImmersiveMode
+// import mozilla.components.support.ktx.android.view.exitImmersiveModeIfNeeded
 import org.mozilla.reference.browser.BrowserActivity
 import org.mozilla.reference.browser.ext.components
 import org.mozilla.reference.browser.ext.requireComponents
@@ -111,7 +110,7 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
         } else {
             toolbar.visibility = View.VISIBLE
             swipeRefresh.setPadding(0, 56.dpToPx(Resources.getSystem().displayMetrics), 0, 0)
-            activity?.exitImmersiveModeIfNeeded()
+            if (activity?.isImmersive == true) activity?.exitImmersiveMode()
         }
     }
 

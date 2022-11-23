@@ -13,17 +13,17 @@ class AboutMenuFragment: BaseSettingsFragment() {
     }
 
      override fun setupPreferences() {
-        findPreference(context?.getPreferenceKey(R.string.pref_key_about)).onPreferenceClickListener = this.getPreferenceLinkListener(
+        findPreference<QwantPreference>(requireContext().getPreferenceKey(R.string.pref_key_about))?.onPreferenceClickListener = this.getPreferenceLinkListener(
             AboutFragment(), "SETTINGS_ABOUT_FRAGMENT"
         )
-        findPreference(context?.getPreferenceKey(R.string.pref_key_privacy_policy)).onPreferenceClickListener = Preference.OnPreferenceClickListener {
+        findPreference<QwantPreference>(requireContext().getPreferenceKey(R.string.pref_key_privacy_policy))?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
             if (context != null) {
                 requireContext().components.useCases.tabsUseCases.addTab(getString(R.string.privacy_policy_url), true)
                 settingsContainer?.closeSettings()
             }
             true
         }
-        findPreference(context?.getPreferenceKey(R.string.pref_key_license)).onPreferenceClickListener = this.getPreferenceLinkListener(
+        findPreference<QwantPreference>(requireContext().getPreferenceKey(R.string.pref_key_license))?.onPreferenceClickListener = this.getPreferenceLinkListener(
             LicenseFragment(), "SETTINGS_LICENSE_FRAGMENT"
         )
     }
