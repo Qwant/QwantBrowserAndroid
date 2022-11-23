@@ -14,6 +14,8 @@ import java.util.*
 
 class QwantUtils {
     companion object {
+        private var client: String? = null
+
         fun getHomepage(
                 context: Context,
                 query: String? = null,
@@ -30,6 +32,9 @@ class QwantUtils {
                 client: String = context.getString(R.string.app_client_string)
         ) : String {
             val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+
+            var clientTmp = getClient(context, prefs)
+            if (widget) clientTmp += "-widget"
 
             val l = interface_language ?: prefs.getString(context.getString(R.string.pref_key_general_language_interface), "en_GB")
             val r = search_language ?: prefs.getString(context.getString(R.string.pref_key_general_language_search), "en")
@@ -51,7 +56,7 @@ class QwantUtils {
             builder.append(context.getString(R.string.homepage_base))
             if (maps) builder.append("maps/")
             // if (music) builder.append("music/search")
-            builder.append("?client=").append(client)
+            builder.append("?client=").append(clientTmp)
                 .append("&l=").append(l?.toLowerCase(Locale.getDefault()))
                 .append("&sr=").append(sr)
                 .append("&r=").append(r)
@@ -68,6 +73,21 @@ class QwantUtils {
             builder.append("&qbc=1")
 
             return builder.toString()
+        }
+
+        private fun getClient(context: Context, prefs: SharedPreferences) : String? {
+            if (client == null) {
+                client = prefs.getString(context.getString(R.string.pref_key_saved_client), null)
+                if (client == null) {
+                    // No saved value. Falling back to apk definition, and save it.
+                    client = context.getString(R.string.app_client_string)
+                    prefs.edit().apply {
+                        this.putString(context.getString(R.string.pref_key_saved_client), client)
+                        this.apply()
+                    }
+                }
+            }
+            return client
         }
 
         fun refreshQwantPages(
