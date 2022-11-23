@@ -1,6 +1,6 @@
 package org.mozilla.reference.browser.browser
 
-import android.content.Context
+/* import android.content.Context
 import android.util.Log
 import androidx.preference.PreferenceManager
 import kotlinx.coroutines.CoroutineScope
@@ -73,4 +73,4 @@ class QwantRatingFeature(val context: Context, val store: BrowserStore,) : Lifec
     override fun stop() {
         urlChangedScope?.cancel()
     }
-}
+} */

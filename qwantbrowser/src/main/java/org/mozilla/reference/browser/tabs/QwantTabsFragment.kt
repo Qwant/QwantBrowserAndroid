@@ -45,6 +45,8 @@ class QwantTabsFragment : Fragment(), UserInteractionHandler {
     private var tabsList: ListView? = null
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
+        Log.d("QWANT_BROWSER_TABS", "onActivityCreated")
+
         if (activity != null) {
             applicationContext = requireActivity().applicationContext
         }
@@ -52,12 +54,16 @@ class QwantTabsFragment : Fragment(), UserInteractionHandler {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        Log.d("QWANT_BROWSER_TABS", "onCreateView")
+
         val view: View = inflater.inflate(R.layout.fragment_qwant_tabs, container, false)
         tabsList = view.findViewById(R.id.tabsList)
         return view
     }
 
     private fun refreshFragment() {
+        Log.d("QWANT_BROWSER_TABS", "refreshFragment")
+
         val fragmentManager = activity?.supportFragmentManager
         if (fragmentManager != null) {
             val currentFragment = fragmentManager.findFragmentByTag("TABS_FRAGMENT")
@@ -74,6 +80,8 @@ class QwantTabsFragment : Fragment(), UserInteractionHandler {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        Log.d("QWANT_BROWSER_TABS", "onViewCreated")
+
         super.onViewCreated(view, savedInstanceState)
         val context = requireContext()
 
@@ -127,6 +135,8 @@ class QwantTabsFragment : Fragment(), UserInteractionHandler {
     }
 
     private fun setupPrivacyUi() {
+        Log.d("QWANT_BROWSER_TABS", "setupPrivacyUi")
+
         tabsAdapter = TabsAdapter(requireContext(), ::tabSelected)
         tabsList?.adapter = tabsAdapter
 
@@ -173,6 +183,8 @@ class QwantTabsFragment : Fragment(), UserInteractionHandler {
     }
 
     private fun closeTabsTray() {
+        Log.d("QWANT_BROWSER_TABS", "closeTabsTray")
+
         context?.setTheme(if (isPrivate) R.style.ThemeQwantNoActionBarPrivacy else R.style.ThemeQwantNoActionBar)
         Log.d("QWANT_BROWSER", "Set privacy from TabsFragment:closeTabsTray")
         // qwantbar?.visibility = View.VISIBLE
@@ -184,6 +196,8 @@ class QwantTabsFragment : Fragment(), UserInteractionHandler {
     }
 
     private fun updateTabCount() {
+        Log.d("QWANT_BROWSER_TABS", "updateTabCount")
+
         reference.get()?.setCountWithAnimation(requireComponents.core.store.state.getNormalOrPrivateTabs(false).size)
         qwantbar?.updateTabCount(isPrivate)
     }

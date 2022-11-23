@@ -99,8 +99,6 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
 
         Log.d("QWANT_BROWSER_T", "darkmode: $darkmode")
 
-
-
         this.ratePushCheck()
 
         val statusbarBackground = getColorFromAttr(R.attr.qwant_systembar_background)
@@ -172,6 +170,11 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
     private fun ratePushCheck() {
         val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
 
+        val ratepushFirstOpenedKey = getString(R.string.pref_key_ratepush_first_opened_date)
+        if (prefs.getLong(ratepushFirstOpenedKey, 0) == 0L) {
+            prefs.edit().putLong(ratepushFirstOpenedKey, Calendar.getInstance().time.time).apply()
+        }
+
         if (prefs.getLong(getString(R.string.pref_key_ratepush_date), 0) == 0L) {
             val ratepushOpenedCountKey = getString(R.string.pref_key_ratepush_app_opened_count)
             val ratepushOpenedCount = prefs.getInt(ratepushOpenedCountKey, 0)
@@ -179,12 +182,6 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
             val ratepushConsecutiveDays = prefs.getInt(ratepushConsecutiveDaysKey, 0)
             val ratepushLastOpenedKey = getString(R.string.pref_key_ratepush_last_opened)
             val editor = prefs.edit()
-
-            if (ratepushOpenedCount < RATEPUSH_MIN_CONNECTION) {
-                Log.d("QWANT_BROWSER_RATING", "New app opened recorded | total: ${ratepushOpenedCount + 1}")
-                editor.putInt(ratepushOpenedCountKey, ratepushOpenedCount + 1)
-                editor.apply()
-            }
 
             if (ratepushConsecutiveDays < RATEPUSH_CONSECUTIVE_DAYS_LIMIT) {
                 val now = Calendar.getInstance()
@@ -217,6 +214,16 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
                 } else if (reset) {
                     Log.d("QWANT_BROWSER_RATING", "Consecutive days reset to 1")
                     editor.putInt(ratepushConsecutiveDaysKey, 1)
+                }
+
+                if (ratepushOpenedCount < RATEPUSH_MIN_CONNECTION) {
+                    if (increment || reset) { // new day connection, reset to 1
+                        Log.d("QWANT_BROWSER_RATING", "App opened reset to 1")
+                        editor.putInt(ratepushOpenedCountKey, 1)
+                    } else { // same day connection, increment counter
+                        Log.d("QWANT_BROWSER_RATING", "New app opened recorded | total: ${ratepushOpenedCount + 1}")
+                        editor.putInt(ratepushOpenedCountKey, ratepushOpenedCount + 1)
+                    }
                 }
 
                 editor.putLong(ratepushLastOpenedKey, now.time.time)
@@ -461,10 +468,16 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
             Log.d("QWANT_BROWSER_RATING", "rating not done yet")
             val ratepushOpenedCount = prefs.getInt(getString(R.string.pref_key_ratepush_app_opened_count), 0)
             val ratepushConsecutiveDays = prefs.getInt(getString(R.string.pref_key_ratepush_consecutive_days), 0)
-            val searchesCount = prefs.getStringSet(getString(R.string.pref_key_ratepush_searches), mutableSetOf())?.size ?: 0
+
+            val now = Calendar.getInstance().time.time
+            val ratepushFirstOpened = prefs.getLong(getString(R.string.pref_key_ratepush_first_opened_date), 0L)
+            val ratePushDaysSinceFirstOpened = (now - ratepushFirstOpened) * (1000 * 60 * 60 * 24) // ms to days
+
+            // val searchesCount = prefs.getStringSet(getString(R.string.pref_key_ratepush_searches), mutableSetOf())?.size ?: 0
             if (ratepushOpenedCount >= RATEPUSH_MIN_CONNECTION
                 && ratepushConsecutiveDays >= RATEPUSH_CONSECUTIVE_DAYS_LIMIT
-                && searchesCount >= RATEPUSH_SEARCH_LIMIT
+                // && searchesCount >= RATEPUSH_SEARCH_LIMIT
+                && ratePushDaysSinceFirstOpened > RATEPUSH_DAYS_SINCE_FIRST_LIMIT
             ) {
                 Log.d("QWANT_BROWSER_RATING", "Rating conditions OK. Launching rating API.")
 
@@ -491,6 +504,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
                 }
             } else {
                 Log.d("QWANT_BROWSER_RATING", "rating conditions not met")
+                Log.d("QWANT_BROWSER_RATING", "same day opened count: $ratepushOpenedCount - consecutive days: $ratepushConsecutiveDays - since first day: $ratePushDaysSinceFirstOpened")
                 showTabs()
             }
         } else {
@@ -685,8 +699,9 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
     companion object {
         lateinit var PACKAGE_NAME: String
 
-        const val RATEPUSH_SEARCH_LIMIT = 3
+        // const val RATEPUSH_SEARCH_LIMIT = 3
         const val RATEPUSH_CONSECUTIVE_DAYS_LIMIT = 3
         const val RATEPUSH_MIN_CONNECTION = 10
+        const val RATEPUSH_DAYS_SINCE_FIRST_LIMIT = 3
     }
 }
