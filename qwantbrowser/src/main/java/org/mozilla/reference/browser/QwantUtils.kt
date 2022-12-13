@@ -46,8 +46,6 @@ class QwantUtils {
                 theme = if ((context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES) "1" else "0"
             }
 
-            Log.d("QWANT_BROWSER", "Qwant utils theme: $theme")
-
             // val localeSplit = sr.split("_")
 
             val builder = StringBuilder()
@@ -67,9 +65,9 @@ class QwantUtils {
                 // .append("&a=").append(enableSuggest)
 
             if (BuildConfig.BUILD_TYPE == "bouygues") {
-                val firstRequest = context.getString(R.string.pref_key_first_request)
-                if (prefs.getBoolean(firstRequest, true)) {
-                    prefs.edit().putBoolean(firstRequest, false).apply()
+                val firstRequestKey = context.getString(R.string.pref_key_first_request)
+                if (prefs.getBoolean(firstRequestKey, true)) {
+                    prefs.edit().putBoolean(firstRequestKey, false).apply()
                     builder.append("&f=1")
                 }
             }
