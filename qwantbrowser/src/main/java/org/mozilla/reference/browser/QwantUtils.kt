@@ -72,6 +72,14 @@ class QwantUtils {
                 // TODO
                 // .append("&a=").append(enableSuggest)
 
+            if (BuildConfig.BUILD_TYPE == "bouygues") {
+                val firstRequest = context.getString(R.string.pref_key_first_request)
+                if (prefs.getBoolean(firstRequest, true)) {
+                    prefs.edit().putBoolean(firstRequest, false).apply()
+                    builder.append("&f=1")
+                }
+            }
+
             if (widget) builder.append("&widget=1")
             if (query != null) builder.append("&q=").append(query)
 
