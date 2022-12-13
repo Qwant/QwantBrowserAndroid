@@ -61,21 +61,23 @@ android {
         debug {
             applicationIdSuffix ".debug"
             resValue 'string', 'app_client_string', 'debugandroidclient'
-            resValue 'string', 'widget_client_string', 'debugandroidclient-widget'
             resValue 'string', 'qwant_useragent_ext', ' QwantMobile/4.2 debug'
-            buildConfigField "boolean", "HIDE_TOOLBAR_ON_QWANT", "false"
+            // buildConfigField "boolean", "HIDE_TOOLBAR_ON_QWANT", "false"
         }
         playstore releaseTemplate >> {
             resValue 'string', 'app_client_string', 'qwantbrowser'
-            resValue 'string', 'widget_client_string', 'qwantbrowser-widget'
             resValue 'string', 'qwant_useragent_ext', ' QwantMobile/4.2'
-            buildConfigField "boolean", "HIDE_TOOLBAR_ON_QWANT", "false"
+            // buildConfigField "boolean", "HIDE_TOOLBAR_ON_QWANT", "false"
         }
         appgallery releaseTemplate >> {
             resValue 'string', 'app_client_string', 'brz-huawei'
-            resValue 'string', 'widget_client_string', 'brz-huawei-widget'
             resValue 'string', 'qwant_useragent_ext', ' h QwantMobile/4.2'
-            buildConfigField "boolean", "HIDE_TOOLBAR_ON_QWANT", "true"
+            // buildConfigField "boolean", "HIDE_TOOLBAR_ON_QWANT", "true"
+        }
+        bouygues releaseTemplate >> {
+            resValue 'string', 'app_client_string', 'brz-bouygues'
+            resValue 'string', 'qwant_useragent_ext', ' b QwantMobile/4.2'
+            // buildConfigField "boolean", "HIDE_TOOLBAR_ON_QWANT", "true"
         }
     }
 

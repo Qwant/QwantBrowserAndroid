@@ -5,9 +5,7 @@ import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.util.Log
 import androidx.preference.PreferenceManager
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import mozilla.components.concept.engine.Engine
 import org.mozilla.reference.browser.ext.components
 import java.util.*
@@ -29,8 +27,12 @@ class QwantUtils {
                 results_in_new_tab: Boolean? = null,
                 dark_theme: String? = null,
                 maps: Boolean = false,
+<<<<<<< HEAD
                 // music: Boolean = false,
                 // client: String = context.getString(R.string.app_client_string)
+=======
+                music: Boolean = false
+>>>>>>> 3124ac0... Removing useless widget client
         ) : String {
             val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
