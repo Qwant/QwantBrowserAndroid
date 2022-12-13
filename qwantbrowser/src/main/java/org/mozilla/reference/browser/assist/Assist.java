@@ -354,15 +354,9 @@ public class Assist extends Activity {
             back_to_webview = true;
             webview.setVisibility(View.VISIBLE);
             webview.loadUrl(QwantUtils.Companion.getHomepage(getApplicationContext(),
-<<<<<<< HEAD
                 query, true, null, null, null,
                 null, null, null,null, null,
-                false
-=======
-                    query, true, null, null, null,
-                    null, null, null, null,
                     false, false
->>>>>>> 3124ac0... Removing useless widget client
             ));
             // Force hide keyboard
             InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);

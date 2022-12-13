@@ -15,18 +15,18 @@ class QwantUtils {
         private var client: String? = null
 
         fun getHomepage(
-                context: Context,
-                query: String? = null,
-                widget: Boolean = false,
-                interface_language: String? = null,
-                search_language: String? = null,
-                search_region: String? = null,
-                adult_content: String? = null,
-                news_on_home: Boolean? = null,
-                favicon_on_serp: Boolean? = null,
-                results_in_new_tab: Boolean? = null,
-                dark_theme: String? = null,
-                maps: Boolean = false,
+            context: Context,
+            query: String? = null,
+            widget: Boolean = false,
+            interface_language: String? = null,
+            search_language: String? = null,
+            search_region: String? = null,
+            adult_content: String? = null,
+            news_on_home: Boolean? = null,
+            favicon_on_serp: Boolean? = null,
+            results_in_new_tab: Boolean? = null,
+            dark_theme: String? = null,
+            maps: Boolean = false
         ) : String {
             val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
