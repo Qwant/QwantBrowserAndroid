@@ -30,6 +30,7 @@ import mozilla.components.browser.toolbar.display.DisplayToolbar
 // import mozilla.components.browser.toolbar.internal.ActionContainer
 import mozilla.components.concept.menu.MenuController
 import mozilla.components.concept.toolbar.Toolbar
+import mozilla.components.ui.colors.R.color as photonColors
 
 /**
  * Sub-component of the browser toolbar responsible for displaying the URL and related controls ("display mode").
@@ -169,9 +170,9 @@ class DisplayToolbar internal constructor(
             progress = rootView.findViewById<ProgressBar>(R.id.mozac_browser_toolbar_progress).apply {
                 Log.d("QWANT_BROWSER", "displaytoolbar - internal views init")
                 accessibilityDelegate = object : View.AccessibilityDelegate() {
-                    override fun onInitializeAccessibilityEvent(host: View?, event: AccessibilityEvent?) {
+                    override fun onInitializeAccessibilityEvent(host: View, event: AccessibilityEvent) {
                         super.onInitializeAccessibilityEvent(host, event)
-                        if (event?.eventType == AccessibilityEvent.TYPE_VIEW_SCROLLED) {
+                        if (event.eventType == AccessibilityEvent.TYPE_VIEW_SCROLLED) {
                             // Populate the scroll event with the current progress.
                             // See accessibility note in `updateProgress()`.
                             event.scrollY = progress
@@ -187,15 +188,15 @@ class DisplayToolbar internal constructor(
      * Customizable colors in "display mode".
      */
     var colors: Colors = Colors(
-            securityIconSecure = ContextCompat.getColor(context, R.color.photonWhite),
-            securityIconInsecure = ContextCompat.getColor(context, R.color.photonWhite),
-            emptyIcon = ContextCompat.getColor(context, R.color.photonWhite),
-            menu = ContextCompat.getColor(context, R.color.photonWhite),
+            securityIconSecure = ContextCompat.getColor(context, photonColors.photonWhite),
+            securityIconInsecure = ContextCompat.getColor(context, photonColors.photonWhite),
+            emptyIcon = ContextCompat.getColor(context, photonColors.photonWhite),
+            menu = ContextCompat.getColor(context, photonColors.photonWhite),
             hint = views.origin.hintColor,
             title = views.origin.titleColor,
             text = views.origin.textColor,
             trackingProtection = null,
-            separator = ContextCompat.getColor(context, R.color.photonGrey80),
+            separator = ContextCompat.getColor(context, photonColors.photonGrey80),
             permissionHighlights = null
     )
         set(value) {
@@ -235,7 +236,7 @@ class DisplayToolbar internal constructor(
             ),
             permissionHighlights = Icons.PermissionHighlights(
                     autoPlayBlocked =
-                    requireNotNull(getDrawable(context, R.drawable.mozac_ic_autoplay_blocked))
+                    requireNotNull(getDrawable(context, R.drawable.mozac_dot_notification))
             )
     )
         set(value) {

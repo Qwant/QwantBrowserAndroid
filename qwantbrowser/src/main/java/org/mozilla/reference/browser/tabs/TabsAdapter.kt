@@ -67,7 +67,7 @@ class TabsAdapter(
         }
 
         private fun setThumbnail(tab: TabSessionState) {
-            if (tab.content.thumbnail == null) {
+            /* if (tab.content.thumbnail == null) {
                 val thumbnailSize = 100.dpToPx(this.itemPreview.context.resources.displayMetrics)
                 thumbnailLoader.loadIntoView(
                     this.itemPreview,
@@ -75,7 +75,7 @@ class TabsAdapter(
                 )
             } else if (tab.content.thumbnail != null) {
                 this.itemPreview.setImageBitmap(tab.content.thumbnail)
-            }
+            } */
         }
 
         companion object {

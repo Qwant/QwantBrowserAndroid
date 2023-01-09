@@ -77,7 +77,7 @@ class BookmarksStorage(private var context: Context) {
             if (it.type == BookmarkItemV2.BookmarkType.BOOKMARK) {
                 if (it.url == url) return true
             } else {
-                if (it.children?.isNotEmpty()) {
+                if (it.children.isNotEmpty()) {
                     if (hasBookmark(url, it.children)) return true
                 }
             }

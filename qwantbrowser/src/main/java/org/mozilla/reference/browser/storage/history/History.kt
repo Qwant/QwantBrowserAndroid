@@ -204,7 +204,7 @@ class History(val context: Context) : HistoryStorage {
         // Not applicable.
     }
 
-    override suspend fun runMaintenance() {
+    override suspend fun runMaintenance(dbSizeLimit: UInt) {
         // Not applicable.
     }
 

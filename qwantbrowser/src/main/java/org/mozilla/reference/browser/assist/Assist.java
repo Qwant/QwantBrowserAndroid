@@ -90,7 +90,7 @@ public class Assist extends Activity {
         webview.getSettings().setGeolocationEnabled(true);
         webview.getSettings().setBuiltInZoomControls(true);
         // Local storage emulation
-        webview.getSettings().setAppCacheEnabled(true);
+        // webview.getSettings().setAppCacheEnabled(true);
         webview.getSettings().setDatabaseEnabled(true);
         webview.getSettings().setDomStorageEnabled(true);
 

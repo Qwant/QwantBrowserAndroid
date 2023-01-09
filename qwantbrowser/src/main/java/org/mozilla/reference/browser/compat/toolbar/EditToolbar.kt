@@ -14,7 +14,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import androidx.annotation.ColorInt
 import androidx.annotation.VisibleForTesting
-import androidx.annotation.VisibleForTesting.PRIVATE
+import androidx.annotation.VisibleForTesting.Companion.PRIVATE
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
@@ -24,12 +24,7 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.asCoroutineDispatcher
 import mozilla.components.browser.toolbar.AsyncFilterListener
-// import mozilla.components.browser.toolbar.BrowserToolbar
 import mozilla.components.browser.toolbar.R
-// import mozilla.components.browser.toolbar.facts.ToolbarFacts
-// import mozilla.components.browser.toolbar.facts.emitCommitFact
-// import mozilla.components.browser.toolbar.facts.emitToolbarFact
-// import mozilla.components.browser.toolbar.internal.ActionContainer
 import mozilla.components.concept.toolbar.AutocompleteDelegate
 import mozilla.components.concept.toolbar.Toolbar
 import mozilla.components.support.base.Component
@@ -40,6 +35,7 @@ import mozilla.components.support.base.log.logger.Logger
 import mozilla.components.support.ktx.android.view.showKeyboard
 import mozilla.components.ui.autocomplete.InlineAutocompleteEditText
 import java.util.concurrent.Executors
+import mozilla.components.ui.colors.R.color as photonColors
 
 private const val AUTOCOMPLETE_QUERY_THREADS = 3
 
@@ -130,7 +126,7 @@ class EditToolbar internal constructor(
      * Customizable colors in "edit mode".
      */
     var colors: Colors = Colors(
-            clear = ContextCompat.getColor(context, R.color.photonWhite),
+            clear = ContextCompat.getColor(context, photonColors.photonWhite),
             icon = null,
             hint = views.url.currentHintTextColor,
             text = views.url.currentTextColor,
