@@ -58,11 +58,11 @@
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:layout_gravity="bottom"
-        android:background="#000000"
-        mozac:findInPageQueryTextColor="#ffffff"
+        android:background="@color/qwant_searchbar_background"
+        mozac:findInPageQueryTextColor="@color/qwant_searchbar_text"
         mozac:findInPageQueryHintTextColor="#dddddd"
-        mozac:findInPageResultCountTextColor="#ff88ff"
-        mozac:findInPageButtonsTint="#ff88ff"
+        mozac:findInPageResultCountTextColor="@color/qwantbar_normal"
+        mozac:findInPageButtonsTint="@color/qwantbar_normal"
         android:visibility="gone" />
 
     <ImageView
