@@ -367,4 +367,20 @@
     <string name="onboarding_navigation_bullet_2">Moins de traqueurs, enfin libre !</string>
     <string name="onboarding_navigation_text_bottom">Découvrez-nous et faites votre première recherche !</string>
     <string name="onboarding_navigation_validate">C\'est parti !</string>
+    <string name="settings_general_tiles">Raccourcis sponsorisés sur la page d\'accueil</string>
+    <string name="settings_general_favicononserp">Afficher les icones des sites</string>
+    <string name="settings_general_custom_color">Thème</string>
+    <string name="settings_general_custom_character">Personnages</string>
+    <string name="character_random">Aléatoire</string>
+    <string name="character_doudoune">Doudoune</string>
+    <string name="character_football">Football</string>
+    <string name="character_turtleneck">Col roulé</string>
+    <string name="character_glasses">Lunettes</string>
+    <string name="character_cat">Chat</string>
+    <string name="character_balloon">Ballon</string>
+    <string name="character_none">Aucun</string>
+    <string name="custom_color_pink">Rose</string>
+    <string name="custom_color_blue">Bleu</string>
+    <string name="custom_color_green">Vert</string>
+    <string name="custom_color_purple">Violet</string>
 </resources>

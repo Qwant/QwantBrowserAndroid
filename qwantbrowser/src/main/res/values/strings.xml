@@ -157,6 +157,7 @@
     <string name="settings_general_language">Language</string>
     <string name="settings_general_adultcontent">Adult content filter</string>
     <string name="settings_general_newsonhome">News on homepage</string>
+    <string name="settings_general_tiles">Sponsored shortcuts on Homepage</string>
     <string name="settings_general_favicononserp">Display site icons</string>
     <string name="settings_general_dark_theme">Theme</string>
     <string name="settings_general_resultsinnewtab">Open results in new tab</string>
@@ -164,6 +165,22 @@
     <string name="settings_general_launchexternalapp">Open links in native app</string>
     <string name="settings_general_makedefaultbrowser">Set as default browser</string>
     <string name="settings_general_makedefaultbrowser_summary">Open all your links in the Qwant app</string>
+
+    <string name="settings_general_custom_color">Theme</string>
+    <string name="custom_color_blue">Blue</string>
+    <string name="custom_color_green">Green</string>
+    <string name="custom_color_pink">Pink</string>
+    <string name="custom_color_purple">Purple</string>
+
+    <string name="settings_general_custom_character">Characters</string>
+    <string name="character_random">Random</string>
+    <string name="character_doudoune">Doudoune</string>
+    <string name="character_football">Football</string>
+    <string name="character_turtleneck">Turtleneck</string>
+    <string name="character_glasses">Glasses</string>
+    <string name="character_cat">Cat</string>
+    <string name="character_balloon">Balloon</string>
+    <string name="character_none">None</string>
 
     <string name="settings_general_language_interface">Interface language</string>
     <string name="settings_general_language_search">Search results language</string>

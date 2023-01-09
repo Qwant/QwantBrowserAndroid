@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal" >
+
+    <ImageButton
+        android:id="@+id/theme_blue"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_margin="4dp"
+        android:scaleType="centerInside"
+        android:textColor="@color/qwant_white" />
+
+    <ImageButton
+        android:id="@+id/theme_green"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_margin="4dp"
+        android:scaleType="centerInside"
+        android:textColor="@color/qwant_white" />
+
+    <ImageButton
+        android:id="@+id/theme_pink"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_margin="4dp"
+        android:scaleType="centerInside"
+        android:textColor="@color/qwant_white" />
+
+    <ImageButton
+        android:id="@+id/theme_purple"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_margin="4dp"
+        android:scaleType="centerInside"
+        android:textColor="@color/qwant_white" />
+
+</LinearLayout>

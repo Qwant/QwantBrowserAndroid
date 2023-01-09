@@ -83,4 +83,8 @@
     <color name="qwant_grey_light_v2">#a7acb4</color>
     <color name="qwant_green_light_v2">#b3e6cc</color>
     <color name="qwant_purple_light_v2">#ded6ff</color>
+
+    <color name="qwant_purple_200">#ac99ff</color>
+    <color name="qwant_pink_100">#ffd6d7</color>
+    <color name="qwant_green_v2">#57c78f</color>
 </resources>

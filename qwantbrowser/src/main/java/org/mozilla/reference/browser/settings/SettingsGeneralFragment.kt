@@ -40,6 +40,12 @@ class SettingsGeneralFragment: BaseSettingsFragment() {
             true
         }
 
+        val prefTiles = findPreference(requireContext().getPreferenceKey(R.string.pref_key_general_tiles))
+        prefTiles?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, value ->
+            QwantUtils.refreshQwantPages(requireContext(), tiles = value as Boolean)
+            true
+        }
+
         val prefFaviconOnSerp = findPreference(requireContext().getPreferenceKey(R.string.pref_key_general_favicononserp))
         prefFaviconOnSerp?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, value ->
             QwantUtils.refreshQwantPages(requireContext(), favicon_on_serp = value as Boolean)

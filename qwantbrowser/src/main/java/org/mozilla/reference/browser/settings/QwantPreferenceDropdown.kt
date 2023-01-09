@@ -18,11 +18,11 @@ class QwantPreferenceDropdown : DropDownPreference {
     override fun onBindViewHolder(holder: PreferenceViewHolder?) {
         super.onBindViewHolder(holder)
 
+
         val titleView = holder?.findViewById(android.R.id.title) as TextView?
         val summaryView = holder?.findViewById(android.R.id.summary) as TextView?
         val iconView = holder?.findViewById(android.R.id.icon) as ImageView?
 
-        // holder?.itemView?.setBackgroundColor(context.getColorFromAttr(R.attr.qwant_color_background))
         holder?.itemView?.background = ContextCompat.getDrawable(context, R.drawable.qwant_ripple)
 
         val mainColor = context.getColorFromAttr(R.attr.qwant_color_main)

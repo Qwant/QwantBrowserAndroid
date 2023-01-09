@@ -334,4 +334,20 @@
     <string name="onboarding_navigation_bullet_2">Blocco dei tracker, finalmente gratuito !</string>
     <string name="onboarding_navigation_text_bottom">Scoprite di più su di noi e fate la vostra prima ricerca !</string>
     <string name="onboarding_navigation_validate">Andiamo !</string>
+    <string name="settings_general_custom_color">Tema</string>
+    <string name="settings_general_custom_character">Personaggi</string>
+    <string name="character_random">Casuale</string>
+    <string name="character_doudoune">Piumino</string>
+    <string name="character_football">Calcio</string>
+    <string name="character_turtleneck">Collo a dolcevita</string>
+    <string name="character_glasses">Occhiali</string>
+    <string name="character_cat">Gatto</string>
+    <string name="character_balloon">Palloncino</string>
+    <string name="character_none">No</string>
+    <string name="custom_color_pink">Rosa</string>
+    <string name="custom_color_blue">Blu</string>
+    <string name="custom_color_green">Verde</string>
+    <string name="custom_color_purple">Viola</string>
+    <string name="settings_general_favicononserp">Visualizzare le icone del sito</string>
+    <string name="settings_general_tiles">Sponsored shortcuts on Homepage</string>
 </resources>

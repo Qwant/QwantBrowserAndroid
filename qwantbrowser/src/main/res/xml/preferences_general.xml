@@ -29,6 +29,33 @@
         android:defaultValue="@string/settings_dark_theme_system_code"
         app:iconSpaceReserved="false"/>
 
+
+    <org.mozilla.reference.browser.settings.CustomColorPreference
+        android:key="@string/pref_key_general_custom_color"
+        android:defaultValue="blue"
+        android:title="Theme"
+        android:summary="Blue"
+        app:iconSpaceReserved="false" />
+
+    <org.mozilla.reference.browser.settings.CustomCharacterPreference
+        android:key="@string/pref_key_general_custom_character"
+        android:defaultValue="random"
+        android:title="Character"
+        android:summary="Aléatoire"
+        app:iconSpaceReserved="false" />
+
+    <org.mozilla.reference.browser.settings.QwantPreferenceSwitch
+        android:key="@string/pref_key_general_newsonhome"
+        android:defaultValue="true"
+        android:title="@string/settings_general_newsonhome"
+        app:iconSpaceReserved="false" />
+
+    <org.mozilla.reference.browser.settings.QwantPreferenceSwitch
+        android:key="@string/pref_key_general_tiles"
+        android:defaultValue="true"
+        android:title="@string/settings_general_tiles"
+        app:iconSpaceReserved="false" />
+
     <org.mozilla.reference.browser.settings.QwantPreferenceDropdown
         android:key="@string/pref_key_general_adultcontent"
         android:title="@string/settings_general_adultcontent"
@@ -37,11 +64,6 @@
         android:defaultValue="@string/settings_adultcontent_moderate_code"
         app:iconSpaceReserved="false"/>
 
-    <org.mozilla.reference.browser.settings.QwantPreferenceSwitch
-        android:key="@string/pref_key_general_newsonhome"
-        android:defaultValue="true"
-        android:title="@string/settings_general_newsonhome"
-        app:iconSpaceReserved="false" />
 
     <org.mozilla.reference.browser.settings.QwantPreferenceSwitch
         android:key="@string/pref_key_general_favicononserp"
@@ -61,5 +83,6 @@
         android:title="@string/settings_general_launchexternalapp"
         app:iconSpaceReserved="false" />
 
+    <!-- TODO PLAY VIDEOS ON QWANT -->
 
 </androidx.preference.PreferenceScreen>

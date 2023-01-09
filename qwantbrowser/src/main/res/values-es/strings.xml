@@ -359,4 +359,20 @@
     <string name="onboarding_navigation_bullet_2">Fewer trackers, finally free!</string>
     <string name="onboarding_navigation_text_bottom">Check us out and try your first search!</string>
     <string name="onboarding_navigation_validate">Let\'s get started!</string>
+    <string name="settings_general_custom_color">Tema</string>
+    <string name="settings_general_custom_character">Personajes</string>
+    <string name="character_random">Aleatorio</string>
+    <string name="character_doudoune">Chaqueta de pluma</string>
+    <string name="character_football">Fútbol</string>
+    <string name="character_turtleneck">Cuello alto</string>
+    <string name="character_glasses">Gafas</string>
+    <string name="character_cat">Gato</string>
+    <string name="character_balloon">Globo</string>
+    <string name="character_none">No</string>
+    <string name="custom_color_pink">Rosa</string>
+    <string name="custom_color_blue">Azul</string>
+    <string name="custom_color_green">Verde</string>
+    <string name="custom_color_purple">Violeta</string>
+    <string name="settings_general_favicononserp">Mostrar iconos del sitio</string>
+    <string name="settings_general_tiles">Sponsored shortcuts on Homepage</string>
 </resources>

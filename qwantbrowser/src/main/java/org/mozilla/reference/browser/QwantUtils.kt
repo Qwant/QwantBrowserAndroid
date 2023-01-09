@@ -26,6 +26,9 @@ class QwantUtils {
             favicon_on_serp: Boolean? = null,
             results_in_new_tab: Boolean? = null,
             dark_theme: String? = null,
+            custom_color: String? = null,
+            custom_character: String? = null,
+            tiles: Boolean? = null,
             maps: Boolean = false
         ) : String {
             val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
@@ -40,6 +43,10 @@ class QwantUtils {
             val hc = news_on_home ?: prefs.getBoolean(context.getString(R.string.pref_key_general_newsonhome), true)
             val b = results_in_new_tab ?: prefs.getBoolean(context.getString(R.string.pref_key_general_resultsinnewtab), false)
             val si = favicon_on_serp ?: prefs.getBoolean(context.getString(R.string.pref_key_general_favicononserp), true)
+
+            val c = custom_color ?: prefs.getString(context.getString(R.string.pref_key_general_custom_color), "blue")
+            val ch = custom_character ?: prefs.getString(context.getString(R.string.pref_key_general_custom_character), "random")
+            val hti = tiles ?: prefs.getBoolean(context.getString(R.string.pref_key_general_tiles), true)
 
             var theme = dark_theme ?: prefs.getString(context.getString(R.string.pref_key_general_dark_theme), "2")
             if (theme == "2") {
@@ -61,8 +68,9 @@ class QwantUtils {
                 .append("&si=").append(if (si) "1" else "0")
                 .append("&b=").append(if (b) "1" else "0")
                 .append("&theme=").append(theme)
-                // TODO
-                // .append("&a=").append(enableSuggest)
+                .append("&c=").append(c)
+                .append("&ch=").append(ch)
+                .append("&hti=").append(if (hti) "1" else "0")
 
             if (BuildConfig.BUILD_TYPE == "bouygues") {
                 val firstRequestKey = context.getString(R.string.pref_key_first_request)
@@ -104,7 +112,10 @@ class QwantUtils {
                 news_on_home: Boolean? = null,
                 favicon_on_serp: Boolean? = null,
                 results_in_new_tab: Boolean? = null,
-                dark_theme: String? = null
+                dark_theme: String? = null,
+                custom_color: String? = null,
+                custom_character: String? = null,
+                tiles: Boolean? = null
         ) {
             context.components.core.store.state.tabs.forEach {
                 if (it.content.url.startsWith(context.getString(R.string.homepage_startwith_filter))) {
@@ -121,7 +132,10 @@ class QwantUtils {
                         news_on_home = news_on_home,
                         favicon_on_serp = favicon_on_serp,
                         results_in_new_tab = results_in_new_tab,
-                        dark_theme = dark_theme
+                        dark_theme = dark_theme,
+                        custom_color = custom_color,
+                        custom_character = custom_character,
+                        tiles = tiles
                     )
                     context.components.useCases.sessionUseCases.loadUrl.invoke(reloadPage, it.id)
                 }

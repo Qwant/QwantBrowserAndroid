@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="36dp"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingVertical="4dp">
+
+    <ImageButton
+        android:id="@+id/character_random"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="@drawable/custom_character_background_selector"
+        android:scaleType="centerInside"
+        android:src="@drawable/perso_random" />
+
+    <ImageButton
+        android:layout_gravity="center"
+        android:id="@+id/character_1"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="@drawable/custom_character_background_selector"
+        android:scaleType="centerInside"
+        android:src="@drawable/perso_1" />
+
+    <ImageButton
+        android:id="@+id/character_2"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="@drawable/custom_character_background_selector"
+        android:scaleType="centerInside"
+        android:src="@drawable/perso_2"  />
+
+    <ImageButton
+        android:id="@+id/character_3"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="@drawable/custom_character_background_selector"
+        android:scaleType="centerInside"
+        android:src="@drawable/perso_3" />
+
+    <ImageButton
+        android:id="@+id/character_4"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="@drawable/custom_character_background_selector"
+        android:scaleType="centerInside"
+        android:src="@drawable/perso_4" />
+
+    <ImageButton
+        android:id="@+id/character_5"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="@drawable/custom_character_background_selector"
+        android:scaleType="centerInside"
+        android:src="@drawable/perso_5"  />
+
+    <ImageButton
+        android:id="@+id/character_6"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="@drawable/custom_character_background_selector"
+        android:scaleType="centerInside"
+        android:src="@drawable/perso_6" />
+
+    <ImageButton
+        android:id="@+id/character_none"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="@drawable/custom_character_background_selector"
+        android:scaleType="centerInside"
+        android:src="@drawable/perso_none"  />
+
+</LinearLayout>

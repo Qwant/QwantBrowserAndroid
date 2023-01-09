@@ -112,7 +112,7 @@
     <string name="settings_general_language">Sprache</string>
     <string name="settings_general_adultcontent">Filter für Erwachseneninhalte</string>
     <string name="settings_general_newsonhome">News auf Homepage</string>
-    <string name="settings_general_favicononserp">Display site icons</string>
+    <string name="settings_general_favicononserp">Website-Symbole anzeigen</string>
     <string name="settings_general_dark_theme">Thema</string>
     <string name="settings_general_resultsinnewtab">Ergebnisse in neuer Registerkarte öffnen</string>
     <string name="settings_general_cleardata">Browsing-Daten zurücksetzen</string>
@@ -360,6 +360,21 @@
     <string name="onboarding_navigation_bullet_2">Wir lehnen alle Cookies ab und machen Schluss mit aufdringlichen Bannern !</string>
     <string name="onboarding_navigation_text_bottom">Erfahren Sie mehr über uns und starten Sie Ihre sichere Websuche !</string>
     <string name="onboarding_navigation_validate">Los geht\'s !</string>
+    <string name="settings_general_custom_color">Thema</string>
+    <string name="settings_general_custom_character">Charaktere</string>
+    <string name="character_random">Zufällig</string>
+    <string name="character_doudoune">Daunenjacke</string>
+    <string name="character_football">Fußball</string>
+    <string name="character_turtleneck">Rollkragenpullover</string>
+    <string name="character_glasses">Brillen</string>
+    <string name="character_cat">Katze</string>
+    <string name="character_balloon">Ballon</string>
+    <string name="character_none">Keine</string>
+    <string name="custom_color_blue">Blau</string>
+    <string name="custom_color_green">Grün</string>
+    <string name="custom_color_pink">Rose</string>
+    <string name="custom_color_purple">Violett</string>
+    <string name="settings_general_tiles">Sponsored shortcuts on Homepage</string>
 </resources>
 
 
