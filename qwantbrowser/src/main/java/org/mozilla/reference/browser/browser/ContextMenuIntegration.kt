@@ -9,6 +9,7 @@ import android.view.View
 import androidx.fragment.app.FragmentManager
 import kotlinx.android.synthetic.main.fragment_browser.view.*
 import mozilla.components.browser.state.store.BrowserStore
+import mozilla.components.concept.engine.EngineView
 import mozilla.components.feature.contextmenu.ContextMenuCandidate
 import mozilla.components.feature.contextmenu.ContextMenuCandidate.Companion.createCopyImageLocationCandidate
 import mozilla.components.feature.contextmenu.ContextMenuCandidate.Companion.createCopyLinkCandidate
@@ -27,6 +28,7 @@ class ContextMenuIntegration(
     browserStore: BrowserStore,
     tabsUseCases: TabsUseCases,
     contextMenuUseCases: ContextMenuUseCases,
+    engineView: EngineView,
     parentView: View,
     sessionId: String? = null
 ) : LifecycleAwareFeature {

@@ -7,6 +7,7 @@ package org.mozilla.reference.browser.components
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
+import mozilla.components.browser.engine.gecko.permission.GeckoSitePermissionsStorage
 import org.mozilla.reference.browser.browser.icons.BrowserIcons
 import mozilla.components.browser.session.storage.SessionStorage
 import mozilla.components.browser.state.engine.EngineMiddleware
@@ -35,6 +36,7 @@ import mozilla.components.feature.pwa.ManifestStorage
 import mozilla.components.feature.pwa.WebAppShortcutManager
 import mozilla.components.feature.search.middleware.SearchMiddleware
 import mozilla.components.feature.search.region.RegionMiddleware
+import mozilla.components.feature.sitepermissions.OnDiskSitePermissionsStorage
 import mozilla.components.service.location.LocationService
 
 
@@ -139,6 +141,12 @@ class Core(private val context: Context) {
      * Component for managing shortcuts (both regular and PWA).
      */
     val shortcutManager by lazy { WebAppShortcutManager(context, client, ManifestStorage(context)) }
+
+
+    val geckoSitePermissionsStorage by lazy {
+        val geckoRuntime = EngineProvider.getOrCreateRuntime(context)
+        GeckoSitePermissionsStorage(geckoRuntime, OnDiskSitePermissionsStorage(context))
+    }
 
     /**
      * Constructs a [TrackingProtectionPolicy] based on current preferences.

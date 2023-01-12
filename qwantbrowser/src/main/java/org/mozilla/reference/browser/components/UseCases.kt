@@ -5,7 +5,6 @@
 package org.mozilla.reference.browser.components
 
 import android.content.Context
-// import mozilla.components.browser.session.SessionManager
 import mozilla.components.browser.state.store.BrowserStore
 import mozilla.components.concept.engine.Engine
 import mozilla.components.feature.contextmenu.ContextMenuUseCases

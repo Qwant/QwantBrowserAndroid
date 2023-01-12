@@ -4,7 +4,6 @@
 
 package org.mozilla.reference.browser.browser
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -123,6 +122,7 @@ abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler, Activit
                 requireComponents.core.store,
                 requireComponents.useCases.tabsUseCases,
                 requireComponents.useCases.contextMenuUseCases,
+                engineView,
                 view,
                 sessionId),
             owner = this,
@@ -208,6 +208,7 @@ abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler, Activit
                 context = requireContext(),
                 fragmentManager = parentFragmentManager,
                 sessionId = sessionId,
+                storage = requireComponents.core.geckoSitePermissionsStorage,
                 onNeedToRequestPermissions = { permissions ->
                     requestPermissions(permissions, REQUEST_CODE_APP_PERMISSIONS)
                 },
