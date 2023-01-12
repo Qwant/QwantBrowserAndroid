@@ -24,6 +24,8 @@ android {
         versionCode 1
         versionName Config.generateDebugVersionName()
 
+        ndk.debugSymbolLevel = 'SYMBOL_TABLE'
+
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'
     }
