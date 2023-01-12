@@ -44,12 +44,13 @@ import org.mozilla.reference.browser.settings.SettingsContainerFragment
 import org.mozilla.reference.browser.storage.bookmarks.BookmarksFragment
 import org.mozilla.reference.browser.storage.bookmarks.BookmarksStorage
 import org.mozilla.reference.browser.storage.history.HistoryFragment
-import org.mozilla.reference.browser.tabs.QwantTabsFragment
+// import org.mozilla.reference.browser.tabs.QwantTabsFragment
 import java.util.*
 import kotlin.system.exitProcess
 
 import androidx.core.view.WindowInsetsControllerCompat
 import com.google.android.play.core.review.ReviewManagerFactory
+import com.qwant.android.compose.tabs.TabsFragment
 
 /**
  * Activity that holds the [BrowserFragment].
@@ -368,7 +369,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         if (selectedTab != null) {
             val url = selectedTab.content.url
             val canGoBack = components.core.store.state.selectedTab?.content?.canGoBack ?: false
-            if (!canGoBack && selectedTab.source.equals("ACTION_VIEW")) { // TODO test that (has changed)
+            if (!canGoBack && selectedTab.source.equals("ACTION_VIEW")) {
                 // Tab has been opened from external app, so we close the app to get back to it, after closing the tab
                 components.useCases.tabsUseCases.removeTab(selectedTab.id)
                 this.finish()
@@ -398,7 +399,7 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
             is SettingsContainerFragment -> {
                 fragment.setOnSettingsClosed(this)
             }
-            is QwantTabsFragment -> {
+            is TabsFragment -> {
                 fragment.setQwantBar(qwantbar)
                 fragment.setTabsClosedCallback(::fragmentClosed)
             }
@@ -517,10 +518,10 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         val tag = "TABS_FRAGMENT"
         var tabsFragment = this.supportFragmentManager.findFragmentByTag(tag)
         if (tabsFragment == null) {
-            tabsFragment = QwantTabsFragment() // TabsTrayFragment()
+            tabsFragment = TabsFragment() // TabsTrayFragment()
         }
 
-        (tabsFragment as QwantTabsFragment).setPrivacy(components.core.store.state.selectedTab?.content?.private ?: false)
+        // (tabsFragment as QwantTabsFragment).setPrivacy(components.core.store.state.selectedTab?.content?.private ?: false)
 
         this.supportFragmentManager.beginTransaction().apply {
             replace(R.id.container, tabsFragment, tag)
@@ -557,19 +558,14 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         val isPrivate = components.core.store.state.selectedTab?.content?.private ?: false
         setTheme(if (isPrivate) R.style.ThemeQwantNoActionBarPrivacy else R.style.ThemeQwantNoActionBar)
 
-        var browserFragment = this.supportFragmentManager.findFragmentByTag("BROWSER_FRAGMENT")
-        if (browserFragment == null) {
-            browserFragment = BrowserFragment.create()
-        }
-
-        (browserFragment as BrowserFragment).closeAwesomeBarIfOpen()
-
         this.supportFragmentManager.beginTransaction().apply {
-            replace(R.id.container, browserFragment, "BROWSER_FRAGMENT")
+            replace(R.id.container, BrowserFragment.create(), "BROWSER_FRAGMENT")
             addToBackStack("BROWSER_FRAGMENT")
             commit()
         }
+
         this.supportFragmentManager.executePendingTransactions()
+
         qwantbar.setPrivacyModeFromBrowser()
         qwantbar.visibility = View.VISIBLE
     }
