@@ -1,12 +1,12 @@
 ! Title: Web Annoyances Ultralist
-! Last Modified: 08:58 2022-04-08
+! Last Modified: 15:03 2023-01-09
 ! Expires: 2 Days (Update Frequency)
-! Description: Block annoying web elements and reclaim lost screen real estate. Web Annoyances Ultralist includes the following sublists - Ad Placeholders, Cookie Filters, Floating Filters (CSS Style Modifying & Companion Filters), Generic Filters, Modal Filters, Newsletter Filters, & Social Filters.
+! Description: Block annoying web elements and reclaim lost screen real estate. Web Annoyances Ultralist includes the following sublists - Ad Placeholders, Cookie Filters, Floating Filters (CSS Style Modifying & Companion Filters), Generic Filters, Modal Filters, Newsletter Filters, & Social Filters. 
 ! Homepage: https://github.com/yourduskquibbles/webannoyances
 ! Discord: https://discord.me/yourduskquibbles
 ! Issues: https://github.com/yourduskquibbles/webannoyances/issues
 ! License: https://creativecommons.org/licenses/by-sa/4.0
-! Copyright: Â© 2016-2022 by yourduskquibbles
+! Copyright: © 2016-2023 by yourduskquibbles
 ! Works Best With: uBlock Origin or AdGuard
 
 ! Start Web Annoyances Ultralist
@@ -416,9 +416,6 @@ fablesofaesop.com###prvcypop_372
 failory.com###magnify-widget-container
 fairygodboss.com##.fixedBottom
 familycircle.com,parents.com,bhg.com##.topContainer
-fansided.com###FsTopNav
-fansided.com###breaking
-fansided.com##.fixed-article-nav
 fanucamerica.com###myBtn
 fark.com##.new_to_fark_p
 fark.com##.top_right_container
@@ -1155,8 +1152,6 @@ thefirearmblog.com##.pushcrew-chrome-style-notification-safari.pushcrew-chrome-s
 thefiscaltimes.com###message
 thefly.com###fixed_footer
 theforeignchallenge.com##.menu-container.sticky-menu
-thefreedictionary.com###OccupSlider
-thefreedictionary.com###ez5
 thehackernews.com###firebox
 theheartysoul.com##.text-center.dfp_stucky_footer
 thehindubusinessline.com##.bl-budget-2019.col-md-12

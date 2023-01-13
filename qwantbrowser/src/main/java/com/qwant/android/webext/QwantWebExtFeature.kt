@@ -13,6 +13,7 @@ import mozilla.components.concept.engine.webextension.WebExtensionRuntime
 object QwantWebExtFeature {
     private const val QWANTWEBEXT_EXTENSION_ID = "qwant-vip-android@qwant.com"
     private const val QWANTWEBEXT_EXTENSION_URL = "resource://android/assets/qwant_webext/"
+    private const val QWANTWEBEXT_LAST_VERSION = "7.3.0.2"
 
     /**
      * Installs the web extension in the runtime through the WebExtensionRuntime install method
@@ -23,7 +24,7 @@ object QwantWebExtFeature {
             var extensionFound = false
             list.forEach { ext ->
                 Log.d("QWANT_BROWSER_EXTENSION", "Extension found: ${ext.id} - ${ext.getMetadata()}")
-                if (ext.id == QWANTWEBEXT_EXTENSION_ID) {
+                if (ext.id == QWANTWEBEXT_EXTENSION_ID && ext.getMetadata()?.version == QWANTWEBEXT_LAST_VERSION) {
                     extensionFound = true
                     /* Log.d("QWANT_BROWSER_EXTENSION", "Qwant Extension found: should try updating")
                     runtime.updateWebExtension(ext,

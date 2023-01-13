@@ -98,6 +98,14 @@ __webpack_require__.d(__webpack_exports__, {
 
 // EXTERNAL MODULE: ./node_modules/react/index.js
 var react = __webpack_require__(5506);
+// EXTERNAL MODULE: ./node_modules/@qwant/qwant-ponents/src/Stack/Stack.js + 1 modules
+var Stack = __webpack_require__(1981);
+// EXTERNAL MODULE: ./node_modules/@qwant/qwant-ponents/src/Text/Text.jsx + 2 modules
+var Text = __webpack_require__(3352);
+// EXTERNAL MODULE: ./node_modules/@qwant/qwant-ponents/src/Flex/Flex.js + 1 modules
+var Flex = __webpack_require__(8478);
+// EXTERNAL MODULE: ./node_modules/react-icons/ri/index.esm.js
+var index_esm = __webpack_require__(8665);
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/extends.js
 var esm_extends = __webpack_require__(5058);
 // EXTERNAL MODULE: ./node_modules/classnames/index.js
@@ -106,14 +114,6 @@ var classnames_default = /*#__PURE__*/__webpack_require__.n(classnames);
 // EXTERNAL MODULE: ./node_modules/prop-types/index.js
 var prop_types = __webpack_require__(1527);
 var prop_types_default = /*#__PURE__*/__webpack_require__.n(prop_types);
-// EXTERNAL MODULE: ./node_modules/@qwant/qwant-ponents/src/Flex/Flex.js + 1 modules
-var Flex = __webpack_require__(8478);
-// EXTERNAL MODULE: ./node_modules/react-icons/ri/index.esm.js
-var index_esm = __webpack_require__(8665);
-// EXTERNAL MODULE: ./node_modules/@qwant/qwant-ponents/src/Stack/Stack.js + 1 modules
-var Stack = __webpack_require__(1981);
-// EXTERNAL MODULE: ./node_modules/@qwant/qwant-ponents/src/Text/Text.jsx + 2 modules
-var Text = __webpack_require__(3352);
 // EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js
 var injectStylesIntoStyleTag = __webpack_require__(825);
 var injectStylesIntoStyleTag_default = /*#__PURE__*/__webpack_require__.n(injectStylesIntoStyleTag);
@@ -232,17 +232,15 @@ var messenger = __webpack_require__(6451);
 var ThinCard = __webpack_require__(2141);
 ;// CONCATENATED MODULE: ./Extension/src/pages/popup/components/AboutView/illustration-info.svg
 var _defs, _g;
-
 function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
-
-
 
 var SvgIllustrationInfo = function SvgIllustrationInfo(props) {
   return /*#__PURE__*/React.createElement("svg", _extends({
     width: 336,
     height: 160,
     xmlns: "http://www.w3.org/2000/svg",
-    xmlnsXlink: "http://www.w3.org/1999/xlink"
+    xmlnsXlink: "http://www.w3.org/1999/xlink",
+    role: "img"
   }, props), _defs || (_defs = /*#__PURE__*/React.createElement("defs", null, /*#__PURE__*/React.createElement("rect", {
     id: "illustration-info_svg__a",
     x: 96,
@@ -570,7 +568,6 @@ var SvgIllustrationInfo = function SvgIllustrationInfo(props) {
     strokeWidth: 2
   }))));
 };
-
 
 /* harmony default export */ const illustration_info = ("/illustration-info.de28da11.svg");
 // EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[6].use[1]!./node_modules/postcss-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js!./Extension/src/pages/popup/components/AboutView/AboutView.module.scss

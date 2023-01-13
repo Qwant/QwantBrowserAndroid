@@ -1,90 +1,6 @@
 "use strict";
 (self["webpackChunkqwant_viprivacy"] = self["webpackChunkqwant_viprivacy"] || []).push([[992],{
 
-/***/ 2141:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-
-// EXPORTS
-__webpack_require__.d(__webpack_exports__, {
-  "S": () => (/* binding */ ThinCard)
-});
-
-// EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/extends.js
-var esm_extends = __webpack_require__(5058);
-// EXTERNAL MODULE: ./node_modules/@qwant/qwant-ponents/src/Card/Card.jsx + 3 modules
-var Card = __webpack_require__(3809);
-// EXTERNAL MODULE: ./node_modules/classnames/index.js
-var classnames = __webpack_require__(1613);
-var classnames_default = /*#__PURE__*/__webpack_require__.n(classnames);
-// EXTERNAL MODULE: ./node_modules/react/index.js
-var react = __webpack_require__(5506);
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js
-var injectStylesIntoStyleTag = __webpack_require__(825);
-var injectStylesIntoStyleTag_default = /*#__PURE__*/__webpack_require__.n(injectStylesIntoStyleTag);
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/styleDomAPI.js
-var styleDomAPI = __webpack_require__(1450);
-var styleDomAPI_default = /*#__PURE__*/__webpack_require__.n(styleDomAPI);
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/insertBySelector.js
-var insertBySelector = __webpack_require__(9383);
-var insertBySelector_default = /*#__PURE__*/__webpack_require__.n(insertBySelector);
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js
-var setAttributesWithoutAttributes = __webpack_require__(874);
-var setAttributesWithoutAttributes_default = /*#__PURE__*/__webpack_require__.n(setAttributesWithoutAttributes);
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/insertStyleElement.js
-var insertStyleElement = __webpack_require__(6395);
-var insertStyleElement_default = /*#__PURE__*/__webpack_require__.n(insertStyleElement);
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/styleTagTransform.js
-var styleTagTransform = __webpack_require__(3405);
-var styleTagTransform_default = /*#__PURE__*/__webpack_require__.n(styleTagTransform);
-// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[6].use[1]!./node_modules/postcss-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js!./Extension/src/pages/common/components/ThinCard/ThinCard.module.scss
-var ThinCard_module = __webpack_require__(6307);
-;// CONCATENATED MODULE: ./Extension/src/pages/common/components/ThinCard/ThinCard.module.scss
-
-      
-      
-      
-      
-      
-      
-      
-      
-      
-
-var options = {};
-
-options.styleTagTransform = (styleTagTransform_default());
-options.setAttributes = (setAttributesWithoutAttributes_default());
-
-      options.insert = insertBySelector_default().bind(null, "head");
-    
-options.domAPI = (styleDomAPI_default());
-options.insertStyleElement = (insertStyleElement_default());
-
-var update = injectStylesIntoStyleTag_default()(ThinCard_module/* default */.Z, options);
-
-
-
-
-       /* harmony default export */ const ThinCard_ThinCard_module = (ThinCard_module/* default */.Z && ThinCard_module/* default.locals */.Z.locals ? ThinCard_module/* default.locals */.Z.locals : undefined);
-
-;// CONCATENATED MODULE: ./Extension/src/pages/common/components/ThinCard/ThinCard.jsx
-
-
-
-
-
-function ThinCard({
-  className,
-  ...props
-}) {
-  return /*#__PURE__*/react.createElement(Card/* Card */.Z, (0,esm_extends/* default */.Z)({}, props, {
-    className: classnames_default()(ThinCard_ThinCard_module.ThinCard, className)
-  }));
-}
-
-/***/ }),
-
 /***/ 2992:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
@@ -118,17 +34,15 @@ var Table = __webpack_require__(2208);
 var Tile = __webpack_require__(3404);
 ;// CONCATENATED MODULE: ./Extension/src/pages/popup/components/TabStatsView/empty-stats.svg
 var _defs, _g;
-
 function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
-
-
 
 var SvgEmptyStats = function SvgEmptyStats(props) {
   return /*#__PURE__*/React.createElement("svg", _extends({
     width: 336,
     height: 160,
     xmlns: "http://www.w3.org/2000/svg",
-    xmlnsXlink: "http://www.w3.org/1999/xlink"
+    xmlnsXlink: "http://www.w3.org/1999/xlink",
+    role: "img"
   }, props), _defs || (_defs = /*#__PURE__*/React.createElement("defs", null, /*#__PURE__*/React.createElement("rect", {
     id: "empty-stats_svg__a",
     x: 96,
@@ -401,21 +315,18 @@ var SvgEmptyStats = function SvgEmptyStats(props) {
   }))));
 };
 
-
 /* harmony default export */ const empty_stats = ("/empty-stats.bd8ece6e.svg");
 ;// CONCATENATED MODULE: ./Extension/src/pages/popup/components/TabStatsView/empty-stats-mobile.svg
 var empty_stats_mobile_defs, empty_stats_mobile_g;
-
 function empty_stats_mobile_extends() { empty_stats_mobile_extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return empty_stats_mobile_extends.apply(this, arguments); }
-
-
 
 var SvgEmptyStatsMobile = function SvgEmptyStatsMobile(props) {
   return /*#__PURE__*/React.createElement("svg", empty_stats_mobile_extends({
     width: 336,
     height: 160,
     xmlns: "http://www.w3.org/2000/svg",
-    xmlnsXlink: "http://www.w3.org/1999/xlink"
+    xmlnsXlink: "http://www.w3.org/1999/xlink",
+    role: "img"
   }, props), empty_stats_mobile_defs || (empty_stats_mobile_defs = /*#__PURE__*/React.createElement("defs", null, /*#__PURE__*/React.createElement("path", {
     d: "M96 0h144v80c0 39.765-32.235 72-72 72s-72-32.235-72-72V0z",
     id: "empty-stats-mobile_svg__a"
@@ -533,7 +444,6 @@ var SvgEmptyStatsMobile = function SvgEmptyStatsMobile(props) {
     strokeLinecap: "round"
   }))));
 };
-
 
 /* harmony default export */ const empty_stats_mobile = ("/empty-stats-mobile.199cd2fb.svg");
 // EXTERNAL MODULE: ./Extension/src/pages/popup/helpers/index.js
@@ -768,204 +678,6 @@ const Table = ({
 
 /***/ }),
 
-/***/ 3404:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-
-// EXPORTS
-__webpack_require__.d(__webpack_exports__, {
-  "n": () => (/* binding */ Tile)
-});
-
-// EXTERNAL MODULE: ./node_modules/classnames/index.js
-var classnames = __webpack_require__(1613);
-var classnames_default = /*#__PURE__*/__webpack_require__.n(classnames);
-// EXTERNAL MODULE: ./node_modules/react/index.js
-var react = __webpack_require__(5506);
-// EXTERNAL MODULE: ./node_modules/@qwant/qwant-ponents/src/Box/Box.js + 1 modules
-var Box = __webpack_require__(5845);
-// EXTERNAL MODULE: ./node_modules/@qwant/qwant-ponents/src/Text/Text.jsx + 2 modules
-var Text = __webpack_require__(3352);
-// EXTERNAL MODULE: ./Extension/src/pages/common/components/ThinCard/ThinCard.jsx + 1 modules
-var ThinCard = __webpack_require__(2141);
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js
-var injectStylesIntoStyleTag = __webpack_require__(825);
-var injectStylesIntoStyleTag_default = /*#__PURE__*/__webpack_require__.n(injectStylesIntoStyleTag);
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/styleDomAPI.js
-var styleDomAPI = __webpack_require__(1450);
-var styleDomAPI_default = /*#__PURE__*/__webpack_require__.n(styleDomAPI);
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/insertBySelector.js
-var insertBySelector = __webpack_require__(9383);
-var insertBySelector_default = /*#__PURE__*/__webpack_require__.n(insertBySelector);
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js
-var setAttributesWithoutAttributes = __webpack_require__(874);
-var setAttributesWithoutAttributes_default = /*#__PURE__*/__webpack_require__.n(setAttributesWithoutAttributes);
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/insertStyleElement.js
-var insertStyleElement = __webpack_require__(6395);
-var insertStyleElement_default = /*#__PURE__*/__webpack_require__.n(insertStyleElement);
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/styleTagTransform.js
-var styleTagTransform = __webpack_require__(3405);
-var styleTagTransform_default = /*#__PURE__*/__webpack_require__.n(styleTagTransform);
-// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[6].use[1]!./node_modules/postcss-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js!./Extension/src/pages/popup/components/shared/Tile/Tile.module.scss
-var Tile_module = __webpack_require__(5807);
-;// CONCATENATED MODULE: ./Extension/src/pages/popup/components/shared/Tile/Tile.module.scss
-
-      
-      
-      
-      
-      
-      
-      
-      
-      
-
-var options = {};
-
-options.styleTagTransform = (styleTagTransform_default());
-options.setAttributes = (setAttributesWithoutAttributes_default());
-
-      options.insert = insertBySelector_default().bind(null, "head");
-    
-options.domAPI = (styleDomAPI_default());
-options.insertStyleElement = (insertStyleElement_default());
-
-var update = injectStylesIntoStyleTag_default()(Tile_module/* default */.Z, options);
-
-
-
-
-       /* harmony default export */ const Tile_Tile_module = (Tile_module/* default */.Z && Tile_module/* default.locals */.Z.locals ? Tile_module/* default.locals */.Z.locals : undefined);
-
-;// CONCATENATED MODULE: ./Extension/src/pages/popup/components/shared/Tile/Tile.jsx
-
-
-
-
-
-const Tile = ({
-  asCard = false,
-  tight = false,
-  color = 'green',
-  icon: IconComponent,
-  value,
-  label
-}) => {
-  const purpleColor = asCard ? '100' : '200';
-  const colorVariation = color === 'purple' ? purpleColor : '300';
-  const Wrapper = asCard ? ThinCard/* ThinCard */.S : Box/* Box */.x;
-  const style = {
-    color: `var(--${color}-${colorVariation})`
-  };
-
-  if (!asCard) {
-    style.background = `var(--${color}-100)`;
-  }
-
-  return /*#__PURE__*/react.createElement(Wrapper, {
-    style: style,
-    p: "s",
-    className: classnames_default()(Tile_Tile_module.Tile, {
-      [Tile_Tile_module.Tight]: tight
-    })
-  }, /*#__PURE__*/react.createElement(IconComponent, null), /*#__PURE__*/react.createElement("div", null, /*#__PURE__*/react.createElement(Text/* Text */.xv, {
-    typo: "caption-1",
-    color: "primary"
-  }, label), /*#__PURE__*/react.createElement(Text/* Text */.xv, {
-    typo: "body-1",
-    color: "primary",
-    bold: true
-  }, value)));
-};
-
-/***/ }),
-
-/***/ 6449:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "ah": () => (/* binding */ formatAnnoyanceTime),
-/* harmony export */   "nz": () => (/* binding */ openTabHandler),
-/* harmony export */   "o6": () => (/* binding */ isWebURL),
-/* harmony export */   "w8": () => (/* binding */ formatCounter)
-/* harmony export */ });
-/* harmony import */ var _src_background_extension_api_browser__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9186);
-
-const isWebURL = url => {
-  if (!url) return false;
-  const regex = new RegExp(/^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([-.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/);
-  return regex.test(url);
-};
-const formatAnnoyanceTime = totalBlocked => {
-  const millisecondsPerItem = 50;
-  const estimatedMillisecondsSaved = totalBlocked * millisecondsPerItem || 0;
-  const hours = estimatedMillisecondsSaved < 1000 * 60 * 60 * 24;
-  const minutes = estimatedMillisecondsSaved < 1000 * 60 * 60;
-  const seconds = estimatedMillisecondsSaved < 1000 * 60;
-  let counter;
-  let text;
-
-  if (seconds) {
-    counter = Math.ceil(estimatedMillisecondsSaved / 1000);
-    text = 's';
-  } else if (minutes) {
-    counter = Math.ceil(estimatedMillisecondsSaved / 1000 / 60);
-    text = 'min';
-  } else if (hours) {
-    counter = +(estimatedMillisecondsSaved / 1000 / 60 / 60).toFixed(1);
-    text = 'h';
-  } else {
-    counter = +(estimatedMillisecondsSaved / 1000 / 60 / 60 / 24).toFixed(2) * 24;
-    text = 'h';
-  }
-
-  return `${Math.ceil(counter)} ${text}`;
-};
-const formatCounter = (number = 0) => {
-  return new Intl.NumberFormat('fr', {
-    style: 'decimal',
-    notation: 'compact',
-    compactDisplay: 'short'
-  }).format(number);
-};
-const openTabHandler = url => e => {
-  e.preventDefault();
-  _src_background_extension_api_browser__WEBPACK_IMPORTED_MODULE_0__/* .browser.tabs.create */ .X.tabs.create({
-    url,
-    active: true
-  });
-  setTimeout(() => {
-    window.close();
-  }, 1);
-};
-
-/***/ }),
-
-/***/ 6307:
-/***/ ((module, __webpack_exports__, __webpack_require__) => {
-
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Z": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var _node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1091);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(4090);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
-// Imports
-
-
-var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
-// Module
-___CSS_LOADER_EXPORT___.push([module.id, ".ThinCard-module__ThinCard___PL4Zd{border:1px solid var(--grey-200) !important}", "",{"version":3,"sources":["webpack://./Extension/src/pages/common/components/ThinCard/ThinCard.module.scss"],"names":[],"mappings":"AAAA,mCAAU,2CAA2C","sourcesContent":[".ThinCard{border:1px solid var(--grey-200) !important}"],"sourceRoot":""}]);
-// Exports
-___CSS_LOADER_EXPORT___.locals = {
-	"ThinCard": "ThinCard-module__ThinCard___PL4Zd"
-};
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
-
-
-/***/ }),
-
 /***/ 9165:
 /***/ ((module, __webpack_exports__, __webpack_require__) => {
 
@@ -1010,32 +722,6 @@ ___CSS_LOADER_EXPORT___.push([module.id, ".Table-module__Table___YERaH{border-sp
 // Exports
 ___CSS_LOADER_EXPORT___.locals = {
 	"Table": "Table-module__Table___YERaH"
-};
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
-
-
-/***/ }),
-
-/***/ 5807:
-/***/ ((module, __webpack_exports__, __webpack_require__) => {
-
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Z": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var _node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1091);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(4090);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
-// Imports
-
-
-var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
-// Module
-___CSS_LOADER_EXPORT___.push([module.id, ".Tile-module__Tile___SFZyB{display:grid;grid-template-columns:28px 1fr;align-items:center;border-radius:8px;grid-gap:var(--spacing-xs);gap:var(--spacing-xs);width:100%}.Tile-module__Tight___JhvXU{grid-template-columns:23px 1fr}.Tile-module__Tile___SFZyB svg,.Tile-module__Tile___SFZyB img{width:28px;height:28px}", "",{"version":3,"sources":["webpack://./Extension/src/pages/popup/components/shared/Tile/Tile.module.scss"],"names":[],"mappings":"AAAA,2BAAM,YAAY,CAAC,8BAA8B,CAAC,kBAAkB,CAAC,iBAAiB,CAAC,0BAAqB,CAArB,qBAAqB,CAAC,UAAU,CAAC,4BAAO,8BAA8B,CAAC,8DAAoB,UAAU,CAAC,WAAW","sourcesContent":[".Tile{display:grid;grid-template-columns:28px 1fr;align-items:center;border-radius:8px;gap:var(--spacing-xs);width:100%}.Tight{grid-template-columns:23px 1fr}.Tile svg,.Tile img{width:28px;height:28px}"],"sourceRoot":""}]);
-// Exports
-___CSS_LOADER_EXPORT___.locals = {
-	"Tile": "Tile-module__Tile___SFZyB",
-	"Tight": "Tile-module__Tight___JhvXU"
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

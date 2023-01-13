@@ -1,7 +1,7 @@
 "use strict";
 (self["webpackChunkqwant_viprivacy"] = self["webpackChunkqwant_viprivacy"] || []).push([[49],{
 
-/***/ 1056:
+/***/ 193:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
@@ -1313,7 +1313,7 @@ function allowStateChangesEnd(prev) {
 var _Symbol$toPrimitive;
 var CREATE = "create";
 _Symbol$toPrimitive = Symbol.toPrimitive;
-var ObservableValue = /*#__PURE__*/function (_Atom, _Symbol$toPrimitive2) {
+var ObservableValue = /*#__PURE__*/function (_Atom) {
   _inheritsLoose(ObservableValue, _Atom);
 
   function ObservableValue(value, enhancer, name_, notifySpy, equals) {
@@ -1453,12 +1453,12 @@ var ObservableValue = /*#__PURE__*/function (_Atom, _Symbol$toPrimitive2) {
     return toPrimitive(this.get());
   };
 
-  _proto[_Symbol$toPrimitive2] = function () {
+  _proto[_Symbol$toPrimitive] = function () {
     return this.valueOf();
   };
 
   return ObservableValue;
-}(Atom, _Symbol$toPrimitive);
+}(Atom);
 var isObservableValue = /*#__PURE__*/(/* unused pure expression or super */ null && (createInstanceofPredicate("ObservableValue", ObservableValue)));
 
 var _Symbol$toPrimitive$1;
@@ -1483,7 +1483,7 @@ var _Symbol$toPrimitive$1;
  */
 
 _Symbol$toPrimitive$1 = Symbol.toPrimitive;
-var ComputedValue = /*#__PURE__*/function (_Symbol$toPrimitive2) {
+var ComputedValue = /*#__PURE__*/function () {
   // nodes we are looking at. Our value depends on these nodes
   // during tracking it's an array with new observed observers
   // to check for cycles
@@ -1732,12 +1732,12 @@ var ComputedValue = /*#__PURE__*/function (_Symbol$toPrimitive2) {
     return toPrimitive(this.get());
   };
 
-  _proto[_Symbol$toPrimitive2] = function () {
+  _proto[_Symbol$toPrimitive$1] = function () {
     return this.valueOf();
   };
 
   return ComputedValue;
-}(_Symbol$toPrimitive$1);
+}();
 var isComputedValue = /*#__PURE__*/createInstanceofPredicate("ComputedValue", ComputedValue);
 
 var IDerivationState_;
@@ -4310,7 +4310,7 @@ var DELETE = "delete"; // just extend Map? See also https://gist.github.com/nest
 
 _Symbol$iterator = Symbol.iterator;
 _Symbol$toStringTag = Symbol.toStringTag;
-var ObservableMap = /*#__PURE__*/function (_Symbol$iterator2, _Symbol$toStringTag2) {
+var ObservableMap = /*#__PURE__*/function () {
   // hasMap, not hashMap >-).
   function ObservableMap(initialData, enhancer_, name_) {
     var _this = this;
@@ -4582,7 +4582,7 @@ var ObservableMap = /*#__PURE__*/function (_Symbol$iterator2, _Symbol$toStringTa
     });
   };
 
-  _proto[_Symbol$iterator2] = function () {
+  _proto[_Symbol$iterator] = function () {
     return this.entries();
   };
 
@@ -4772,14 +4772,14 @@ var ObservableMap = /*#__PURE__*/function (_Symbol$iterator2, _Symbol$toStringTa
       return this.data_.size;
     }
   }, {
-    key: _Symbol$toStringTag2,
+    key: _Symbol$toStringTag,
     get: function get() {
       return "Map";
     }
   }]);
 
   return ObservableMap;
-}(_Symbol$iterator, _Symbol$toStringTag); // eslint-disable-next-line
+}(); // eslint-disable-next-line
 
 var isObservableMap = /*#__PURE__*/createInstanceofPredicate("ObservableMap", ObservableMap);
 
@@ -4805,7 +4805,7 @@ var _Symbol$iterator$1, _Symbol$toStringTag$1;
 var ObservableSetMarker = {};
 _Symbol$iterator$1 = Symbol.iterator;
 _Symbol$toStringTag$1 = Symbol.toStringTag;
-var ObservableSet = /*#__PURE__*/function (_Symbol$iterator2, _Symbol$toStringTag2) {
+var ObservableSet = /*#__PURE__*/function () {
   function ObservableSet(initialData, enhancer, name_) {
     if (enhancer === void 0) {
       enhancer = deepEnhancer;
@@ -5056,7 +5056,7 @@ var ObservableSet = /*#__PURE__*/function (_Symbol$iterator2, _Symbol$toStringTa
     return "[object ObservableSet]";
   };
 
-  _proto[_Symbol$iterator2] = function () {
+  _proto[_Symbol$iterator$1] = function () {
     return this.values();
   };
 
@@ -5067,14 +5067,14 @@ var ObservableSet = /*#__PURE__*/function (_Symbol$iterator2, _Symbol$toStringTa
       return this.data_.size;
     }
   }, {
-    key: _Symbol$toStringTag2,
+    key: _Symbol$toStringTag$1,
     get: function get() {
       return "Set";
     }
   }]);
 
   return ObservableSet;
-}(_Symbol$iterator$1, _Symbol$toStringTag$1); // eslint-disable-next-line
+}(); // eslint-disable-next-line
 
 var isObservableSet = /*#__PURE__*/createInstanceofPredicate("ObservableSet", ObservableSet);
 
@@ -5759,11 +5759,13 @@ function assertAnnotable(adm, annotation, key) {
   if (false) { var requestedAnnotationType, currentAnnotationType, fieldName; }
 }
 
+var ENTRY_0 = /*#__PURE__*/createArrayEntryDescriptor(0);
 /**
  * This array buffer contains two lists of properties, so that all arrays
  * can recycle their property definitions, which significantly improves performance of creating
  * properties on the fly.
  */
+
 
 var OBSERVABLE_ARRAY_BUFFER_SIZE = 0; // Typescript workaround to make sure ObservableArray extends Array
 
@@ -5808,6 +5810,12 @@ var LegacyObservableArray = /*#__PURE__*/function (_StubArray, _Symbol$toStringT
       _this.spliceWithArray(0, 0, initialValues);
 
       allowStateChangesEnd(prev);
+    }
+
+    {
+      // Seems that Safari won't use numeric prototype setter untill any * numeric property is
+      // defined on the instance. After that it works fine, even if this property is deleted.
+      Object.defineProperty(_assertThisInitialized(_this), "0", ENTRY_0);
     }
 
     return _this;
@@ -6199,7 +6207,7 @@ function isAnnotation(thing) {
  * (c) Michel Weststrate 2015 - 2020
  * MIT Licensed
  *
- * Welcome to the mobx sources! To get an global overview of how MobX internally works,
+ * Welcome to the mobx sources! To get a global overview of how MobX internally works,
  * this is a good place to start:
  * https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254#.xvbh6qd74
  *
@@ -6239,6 +6247,6 @@ if (typeof __MOBX_DEVTOOLS_GLOBAL_HOOK__ === "object") {
 },
 /******/ __webpack_require__ => { // webpackRuntimeModules
 /******/ var __webpack_exec__ = (moduleId) => (__webpack_require__(__webpack_require__.s = moduleId))
-/******/ var __webpack_exports__ = (__webpack_exec__(1056));
+/******/ var __webpack_exports__ = (__webpack_exec__(193));
 /******/ }
 ]);

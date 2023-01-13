@@ -318,8 +318,8 @@
       "groupId": 1,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_101.txt",
       "trustLevel": "low",
-      "version": "2.0.88.77",
-      "timeUpdated": "2022-05-24T05:00:26+0000",
+      "version": "2.0.98.27",
+      "timeUpdated": "2023-01-13T01:00:25+0000",
       "languages": [],
       "tags": [
         1
@@ -336,8 +336,8 @@
       "groupId": 7,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_102.txt",
       "trustLevel": "high",
-      "version": "2.0.5.4",
-      "timeUpdated": "2022-05-19T13:00:27+0000",
+      "version": "2.0.5.55",
+      "timeUpdated": "2023-01-12T05:00:27+0000",
       "languages": [],
       "tags": [
         1,
@@ -356,8 +356,8 @@
       "groupId": 7,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_103.txt",
       "trustLevel": "high",
-      "version": "2.0.0.32",
-      "timeUpdated": "2021-06-13T09:00:26+0000",
+      "version": "2.0.0.33",
+      "timeUpdated": "2022-06-13T09:00:34+0000",
       "languages": [
         "bg"
       ],
@@ -373,14 +373,14 @@
       "name": "EasyList China",
       "description": "Additional filter list for websites in Chinese. Already included in AdGuard Chinese filter.",
       "timeAdded": "2014-06-30T07:56:55+0000",
-      "homepage": "http://abpchina.org/forum/",
+      "homepage": "https://github.com/easylist/easylistchina",
       "expires": 345600,
       "displayNumber": 2,
       "groupId": 7,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_104.txt",
       "trustLevel": "high",
-      "version": "2.1.8.29",
-      "timeUpdated": "2022-05-24T05:00:31+0000",
+      "version": "2.1.18.81",
+      "timeUpdated": "2023-01-13T01:00:30+0000",
       "languages": [],
       "tags": [
         1,
@@ -399,8 +399,8 @@
       "groupId": 7,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_105.txt",
       "trustLevel": "high",
-      "version": "2.0.2.19",
-      "timeUpdated": "2022-04-27T21:00:38+0000",
+      "version": "2.0.2.30",
+      "timeUpdated": "2022-12-22T21:42:23+0000",
       "languages": [
         "cs",
         "sk"
@@ -424,8 +424,8 @@
       "groupId": 7,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_106.txt",
       "trustLevel": "low",
-      "version": "2.1.8.26",
-      "timeUpdated": "2022-05-24T05:00:32+0000",
+      "version": "2.1.21.24",
+      "timeUpdated": "2023-01-13T01:00:31+0000",
       "languages": [],
       "tags": [
         1,
@@ -444,8 +444,8 @@
       "groupId": 7,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_107.txt",
       "trustLevel": "low",
-      "version": "2.0.8.14",
-      "timeUpdated": "2022-05-23T17:00:31+0000",
+      "version": "2.0.9.55",
+      "timeUpdated": "2023-01-12T17:00:39+0000",
       "languages": [],
       "tags": [
         1,
@@ -464,8 +464,8 @@
       "groupId": 7,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_108.txt",
       "trustLevel": "high",
-      "version": "2.0.3.85",
-      "timeUpdated": "2022-04-25T17:00:31+0000",
+      "version": "2.0.3.97",
+      "timeUpdated": "2022-12-26T17:00:36+0000",
       "languages": [
         "he"
       ],
@@ -487,8 +487,8 @@
       "groupId": 7,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_109.txt",
       "trustLevel": "high",
-      "version": "2.1.8.28",
-      "timeUpdated": "2022-05-24T05:00:36+0000",
+      "version": "2.1.21.26",
+      "timeUpdated": "2023-01-13T01:00:36+0000",
       "languages": [
         "it"
       ],
@@ -510,8 +510,8 @@
       "groupId": 7,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_110.txt",
       "trustLevel": "high",
-      "version": "2.0.2.18",
-      "timeUpdated": "2022-05-16T13:00:38+0000",
+      "version": "2.0.2.37",
+      "timeUpdated": "2022-12-25T13:00:33+0000",
       "languages": [
         "lt"
       ],
@@ -527,14 +527,14 @@
       "name": "Latvian List",
       "description": "Additional filter list for websites in Latvian.",
       "timeAdded": "2014-06-30T07:56:55+0000",
-      "homepage": "https://notabug.org/latvian-list/adblock-latvian",
+      "homepage": "https://github.com/Latvian-List/adblock-latvian",
       "expires": 345600,
       "displayNumber": 2,
       "groupId": 7,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_111.txt",
       "trustLevel": "high",
-      "version": "2.0.0.48",
-      "timeUpdated": "2022-04-04T13:00:32+0000",
+      "version": "2.0.0.55",
+      "timeUpdated": "2022-08-04T09:00:52+0000",
       "languages": [
         "lv"
       ],
@@ -556,8 +556,8 @@
       "groupId": 7,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_112.txt",
       "trustLevel": "high",
-      "version": "2.1.8.27",
-      "timeUpdated": "2022-05-24T05:00:38+0000",
+      "version": "2.1.21.25",
+      "timeUpdated": "2023-01-13T01:00:37+0000",
       "languages": [
         "ar"
       ],
@@ -579,8 +579,8 @@
       "groupId": 7,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_113.txt",
       "trustLevel": "low",
-      "version": "2.1.8.26",
-      "timeUpdated": "2022-05-24T05:00:40+0000",
+      "version": "2.1.21.24",
+      "timeUpdated": "2023-01-13T01:00:40+0000",
       "languages": [],
       "tags": [
         1,
@@ -599,8 +599,8 @@
       "groupId": 7,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_114.txt",
       "trustLevel": "low",
-      "version": "2.0.0.95",
-      "timeUpdated": "2022-04-21T21:00:48+0000",
+      "version": "2.0.1.5",
+      "timeUpdated": "2023-01-06T09:00:46+0000",
       "languages": [],
       "tags": [
         1,
@@ -619,8 +619,8 @@
       "groupId": 2,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_118.txt",
       "trustLevel": "low",
-      "version": "2.0.91.32",
-      "timeUpdated": "2022-05-24T05:00:42+0000",
+      "version": "2.1.2.12",
+      "timeUpdated": "2023-01-13T01:00:43+0000",
       "languages": [],
       "tags": [
         2
@@ -637,8 +637,8 @@
       "groupId": 7,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_119.txt",
       "trustLevel": "high",
-      "version": "2.0.0.11",
-      "timeUpdated": "2021-12-23T17:00:43+0000",
+      "version": "2.0.0.13",
+      "timeUpdated": "2022-11-21T17:00:48+0000",
       "languages": [],
       "tags": [
         1,
@@ -657,8 +657,8 @@
       "groupId": 7,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_120.txt",
       "trustLevel": "high",
-      "version": "2.0.10.89",
-      "timeUpdated": "2022-05-23T21:00:52+0000",
+      "version": "2.0.12.82",
+      "timeUpdated": "2023-01-13T01:00:45+0000",
       "languages": [
         "id"
       ],
@@ -679,8 +679,8 @@
       "groupId": 7,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_121.txt",
       "trustLevel": "low",
-      "version": "2.0.0.77",
-      "timeUpdated": "2021-10-08T13:00:49+0000",
+      "version": "2.0.0.78",
+      "timeUpdated": "2022-11-19T13:00:45+0000",
       "languages": [],
       "tags": [
         1,
@@ -695,12 +695,12 @@
       "timeAdded": "2014-06-30T07:56:55+0000",
       "homepage": "https://easylist.to/",
       "expires": 345600,
-      "displayNumber": 2,
+      "displayNumber": 100,
       "groupId": 4,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_122.txt",
       "trustLevel": "low",
-      "version": "2.0.88.66",
-      "timeUpdated": "2022-05-24T05:00:53+0000",
+      "version": "2.0.98.52",
+      "timeUpdated": "2023-01-13T01:00:57+0000",
       "languages": [],
       "tags": [
         5,
@@ -718,8 +718,8 @@
       "groupId": 3,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_123.txt",
       "trustLevel": "low",
-      "version": "2.0.88.68",
-      "timeUpdated": "2022-05-24T05:00:56+0000",
+      "version": "2.0.99.44",
+      "timeUpdated": "2023-01-13T01:01:00+0000",
       "languages": [],
       "tags": [
         3,
@@ -733,12 +733,12 @@
       "timeAdded": "2019-06-11T10:27:09+0000",
       "homepage": "https://github.com/yourduskquibbles/webannoyances/",
       "expires": 345600,
-      "displayNumber": 2,
+      "displayNumber": 100,
       "groupId": 4,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_201.txt",
       "trustLevel": "high",
-      "version": "1.0.8.58",
-      "timeUpdated": "2022-04-08T17:00:54+0000",
+      "version": "1.0.8.68",
+      "timeUpdated": "2023-01-10T01:01:08+0000",
       "languages": [],
       "tags": [
         5
@@ -755,8 +755,8 @@
       "groupId": 7,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_202.txt",
       "trustLevel": "high",
-      "version": "2.0.0.2",
-      "timeUpdated": "2022-05-16T21:01:07+0000",
+      "version": "2.0.0.9",
+      "timeUpdated": "2022-11-18T17:01:11+0000",
       "languages": [
         "th"
       ],
@@ -777,8 +777,8 @@
       "groupId": 7,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_203.txt",
       "trustLevel": "high",
-      "version": "2.0.1.71",
-      "timeUpdated": "2022-03-31T17:01:05+0000",
+      "version": "2.0.2.21",
+      "timeUpdated": "2023-01-10T13:01:22+0000",
       "languages": [
         "hu"
       ],
@@ -800,8 +800,8 @@
       "groupId": 2,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_204.txt",
       "trustLevel": "low",
-      "version": "2.0.9.78",
-      "timeUpdated": "2022-05-24T01:00:56+0000",
+      "version": "2.0.10.73",
+      "timeUpdated": "2023-01-12T05:01:08+0000",
       "languages": [],
       "tags": [
         2
@@ -818,8 +818,8 @@
       "groupId": 7,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_206.txt",
       "trustLevel": "low",
-      "version": "2.0.1.34",
-      "timeUpdated": "2022-05-16T01:01:00+0000",
+      "version": "2.0.1.53",
+      "timeUpdated": "2023-01-01T05:01:11+0000",
       "languages": [],
       "tags": [
         1,
@@ -837,8 +837,8 @@
       "groupId": 4,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_207.txt",
       "trustLevel": "low",
-      "version": "2.1.8.27",
-      "timeUpdated": "2022-05-24T05:01:04+0000",
+      "version": "2.1.21.25",
+      "timeUpdated": "2023-01-13T01:01:09+0000",
       "languages": [],
       "tags": [
         50
@@ -855,11 +855,31 @@
       "groupId": 5,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_208.txt",
       "trustLevel": "low",
-      "version": "2.0.84.8",
-      "timeUpdated": "2022-05-24T01:01:00+0000",
+      "version": "2.0.87.71",
+      "timeUpdated": "2022-12-14T13:01:12+0000",
       "languages": [],
       "tags": [
         4
+      ]
+    },
+    {
+      "filterId": 209,
+      "name": "ADgk Mobile China list",
+      "description": "Filter for Chinese mobile sites.",
+      "timeAdded": "2022-07-21T07:17:05+0000",
+      "homepage": "https://github.com/banbendalao/ADgk",
+      "expires": 345600,
+      "displayNumber": 100,
+      "groupId": 7,
+      "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_209.txt",
+      "trustLevel": "low",
+      "version": "2.0.0.13",
+      "timeUpdated": "2022-11-07T17:01:11+0000",
+      "languages": [],
+      "tags": [
+        1,
+        31,
+        19
       ]
     },
     {
@@ -873,8 +893,8 @@
       "groupId": 7,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_212.txt",
       "trustLevel": "low",
-      "version": "2.1.7.52",
-      "timeUpdated": "2022-05-24T05:01:06+0000",
+      "version": "2.1.20.50",
+      "timeUpdated": "2023-01-13T01:01:12+0000",
       "languages": [],
       "tags": [
         2,
@@ -892,8 +912,8 @@
       "groupId": 7,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_214.txt",
       "trustLevel": "high",
-      "version": "2.0.16.52",
-      "timeUpdated": "2022-05-23T05:01:03+0000",
+      "version": "2.0.20.2",
+      "timeUpdated": "2023-01-12T09:01:22+0000",
       "languages": [
         "vi"
       ],
@@ -914,8 +934,8 @@
       "groupId": 2,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_215.txt",
       "trustLevel": "low",
-      "version": "2.0.4.58",
-      "timeUpdated": "2022-05-07T09:01:07+0000",
+      "version": "2.0.4.64",
+      "timeUpdated": "2022-09-30T05:16:29+0000",
       "languages": [],
       "tags": [
         2
@@ -932,8 +952,8 @@
       "groupId": 7,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_216.txt",
       "trustLevel": "high",
-      "version": "2.0.14.45",
-      "timeUpdated": "2022-05-20T21:01:19+0000",
+      "version": "2.0.14.79",
+      "timeUpdated": "2023-01-10T13:01:33+0000",
       "languages": [
         "pl"
       ],
@@ -954,8 +974,8 @@
       "groupId": 7,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_217.txt",
       "trustLevel": "high",
-      "version": "2.0.4.79",
-      "timeUpdated": "2022-05-23T01:01:08+0000",
+      "version": "2.0.4.87",
+      "timeUpdated": "2023-01-10T01:01:23+0000",
       "languages": [],
       "tags": [
         6,
@@ -973,32 +993,15 @@
       "groupId": 7,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_218.txt",
       "trustLevel": "low",
-      "version": "2.0.3.47",
-      "timeUpdated": "2022-05-16T13:01:14+0000",
-      "languages": [],
+      "version": "2.0.3.50",
+      "timeUpdated": "2022-12-04T21:01:37+0000",
+      "languages": [
+        "et"
+      ],
       "tags": [
+        10,
         1,
         53
-      ]
-    },
-    {
-      "filterId": 219,
-      "name": "ChinaList+EasyList",
-      "description": "Adblocking list for China. Note that it does not actually include EasyList.",
-      "timeAdded": "2014-06-30T07:56:55+0000",
-      "homepage": "https://www.adtchrome.com/",
-      "expires": 345600,
-      "displayNumber": 100,
-      "groupId": 7,
-      "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_219.txt",
-      "trustLevel": "low",
-      "version": "2.0.22.13",
-      "timeUpdated": "2022-04-28T09:01:37+0000",
-      "languages": [],
-      "tags": [
-        1,
-        9,
-        31
       ]
     },
     {
@@ -1012,8 +1015,8 @@
       "groupId": 7,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_220.txt",
       "trustLevel": "low",
-      "version": "2.0.4.71",
-      "timeUpdated": "2022-05-20T09:01:26+0000",
+      "version": "2.0.5.10",
+      "timeUpdated": "2023-01-09T05:01:23+0000",
       "languages": [],
       "tags": [
         5,
@@ -1031,50 +1034,12 @@
       "groupId": 7,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_221.txt",
       "trustLevel": "high",
-      "version": "2.0.4.52",
-      "timeUpdated": "2022-05-23T01:01:17+0000",
+      "version": "2.0.4.58",
+      "timeUpdated": "2023-01-10T01:01:28+0000",
       "languages": [],
       "tags": [
         3,
         41
-      ]
-    },
-    {
-      "filterId": 222,
-      "name": "Adblock-Persian list",
-      "description": "Persian ad blocking filter list.",
-      "timeAdded": "2014-06-30T07:56:55+0000",
-      "homepage": "https://ideone.com/K452p",
-      "expires": 345600,
-      "displayNumber": 2,
-      "groupId": 7,
-      "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_222.txt",
-      "trustLevel": "low",
-      "version": "2.0.0.34",
-      "timeUpdated": "2021-08-13T17:01:22+0000",
-      "languages": [],
-      "tags": [
-        1,
-        54
-      ]
-    },
-    {
-      "filterId": 223,
-      "name": "Fanboy's Swedish",
-      "description": "Filter list for websites in Swedish.",
-      "timeAdded": "2014-06-30T07:56:55+0000",
-      "homepage": "https://www.fanboy.co.nz/",
-      "expires": 345600,
-      "displayNumber": 2,
-      "groupId": 7,
-      "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_223.txt",
-      "trustLevel": "low",
-      "version": "2.0.0.25",
-      "timeUpdated": "2020-10-13T12:45:24+0000",
-      "languages": [],
-      "tags": [
-        1,
-        55
       ]
     },
     {
@@ -1088,31 +1053,12 @@
       "groupId": 2,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_225.txt",
       "trustLevel": "low",
-      "version": "2.0.0.28",
-      "timeUpdated": "2020-04-03T01:01:55+0000",
+      "version": "2.0.0.72",
+      "timeUpdated": "2023-01-12T21:02:00+0000",
       "languages": [],
       "tags": [
         2,
         45
-      ]
-    },
-    {
-      "filterId": 226,
-      "name": "Fanboy's Vietnamese",
-      "description": "Filter list for websites in Vietnamese.",
-      "timeAdded": "2014-06-30T07:56:55+0000",
-      "homepage": "https://www.fanboy.co.nz/",
-      "expires": 345600,
-      "displayNumber": 2,
-      "groupId": 7,
-      "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_226.txt",
-      "trustLevel": "low",
-      "version": "2.0.0.25",
-      "timeUpdated": "2020-04-03T01:01:55+0000",
-      "languages": [],
-      "tags": [
-        1,
-        52
       ]
     },
     {
@@ -1126,8 +1072,8 @@
       "groupId": 7,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_227.txt",
       "trustLevel": "high",
-      "version": "2.0.7.35",
-      "timeUpdated": "2022-05-23T21:01:33+0000",
+      "version": "2.0.12.66",
+      "timeUpdated": "2023-01-12T17:01:38+0000",
       "languages": [
         "ko"
       ],
@@ -1149,8 +1095,8 @@
       "groupId": 7,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_228.txt",
       "trustLevel": "high",
-      "version": "2.0.1.65",
-      "timeUpdated": "2022-04-28T09:01:45+0000",
+      "version": "2.0.2.10",
+      "timeUpdated": "2023-01-10T01:01:31+0000",
       "languages": [],
       "tags": [
         1,
@@ -1164,35 +1110,15 @@
       "timeAdded": "2014-06-30T07:56:55+0000",
       "homepage": "https://www.i-dont-care-about-cookies.eu/",
       "expires": 345600,
-      "displayNumber": 4,
+      "displayNumber": 100,
       "groupId": 4,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_229.txt",
       "trustLevel": "low",
-      "version": "2.0.2.89",
-      "timeUpdated": "2022-05-23T09:01:41+0000",
+      "version": "2.0.3.79",
+      "timeUpdated": "2023-01-12T13:01:39+0000",
       "languages": [],
       "tags": [
         6
-      ]
-    },
-    {
-      "filterId": 230,
-      "name": "Fanboy's Spanish/Portuguese",
-      "description": "Filter list for websites in Spanish and Portuguese",
-      "timeAdded": "2014-06-30T07:56:55+0000",
-      "homepage": "https://www.fanboy.co.nz/",
-      "expires": 345600,
-      "displayNumber": 2,
-      "groupId": 7,
-      "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_230.txt",
-      "trustLevel": "low",
-      "version": "2.0.0.27",
-      "timeUpdated": "2020-10-13T12:45:38+0000",
-      "languages": [],
-      "tags": [
-        1,
-        17,
-        18
       ]
     },
     {
@@ -1206,8 +1132,8 @@
       "groupId": 7,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_231.txt",
       "trustLevel": "low",
-      "version": "2.1.8.28",
-      "timeUpdated": "2022-05-24T05:01:30+0000",
+      "version": "2.1.21.26",
+      "timeUpdated": "2023-01-13T01:01:33+0000",
       "languages": [],
       "tags": [
         1,
@@ -1226,8 +1152,8 @@
       "groupId": 7,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_232.txt",
       "trustLevel": "low",
-      "version": "2.0.28.17",
-      "timeUpdated": "2022-05-23T21:01:44+0000",
+      "version": "2.0.37.22",
+      "timeUpdated": "2023-01-12T21:02:17+0000",
       "languages": [],
       "tags": [
         4,
@@ -1245,8 +1171,8 @@
       "groupId": 7,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_233.txt",
       "trustLevel": "high",
-      "version": "2.0.7.68",
-      "timeUpdated": "2022-05-24T01:01:28+0000",
+      "version": "2.0.9.37",
+      "timeUpdated": "2023-01-10T17:01:45+0000",
       "languages": [
         "fi"
       ],
@@ -1267,8 +1193,8 @@
       "groupId": 7,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_234.txt",
       "trustLevel": "low",
-      "version": "2.0.0.62",
-      "timeUpdated": "2022-02-16T17:01:41+0000",
+      "version": "2.0.0.69",
+      "timeUpdated": "2022-12-05T09:01:43+0000",
       "languages": [],
       "tags": [
         45,
@@ -1279,19 +1205,22 @@
     },
     {
       "filterId": 235,
-      "name": "Iranian filter",
-      "description": "Ad blocking rules for Iranian/Persian websites.",
-      "timeAdded": "2014-06-30T07:56:55+0000",
-      "homepage": "https://github.com/farrokhi/adblock-iran",
+      "name": "Persian Blocker",
+      "description": "Filter list for blocking ads and trackers on websites in Persian.",
+      "timeAdded": "2022-06-14T16:28:16+0000",
+      "homepage": "https://github.com/MasterKia/PersianBlocker/",
       "expires": 345600,
       "displayNumber": 2,
       "groupId": 7,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_235.txt",
       "trustLevel": "high",
-      "version": "2.0.1.12",
-      "timeUpdated": "2021-12-18T13:02:39+0000",
-      "languages": [],
+      "version": "2.0.1.98",
+      "timeUpdated": "2023-01-11T09:01:54+0000",
+      "languages": [
+        "fa"
+      ],
       "tags": [
+        10,
         1,
         54
       ]
@@ -1306,9 +1235,9 @@
       "displayNumber": 2,
       "groupId": 7,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_236.txt",
-      "trustLevel": "low",
-      "version": "2.0.1.15",
-      "timeUpdated": "2022-05-20T09:01:45+0000",
+      "trustLevel": "high",
+      "version": "2.0.1.82",
+      "timeUpdated": "2023-01-01T17:01:48+0000",
       "languages": [],
       "tags": [
         1,
@@ -1326,8 +1255,8 @@
       "groupId": 7,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_237.txt",
       "trustLevel": "high",
-      "version": "1.0.23.62",
-      "timeUpdated": "2022-05-23T17:01:37+0000",
+      "version": "1.0.26.42",
+      "timeUpdated": "2023-01-12T21:02:25+0000",
       "languages": [],
       "tags": [
         41,
@@ -1345,8 +1274,8 @@
       "groupId": 7,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_238.txt",
       "trustLevel": "high",
-      "version": "2.0.3.51",
-      "timeUpdated": "2022-02-16T17:01:46+0000",
+      "version": "2.0.3.52",
+      "timeUpdated": "2022-06-27T13:02:03+0000",
       "languages": [
         "pl"
       ],
@@ -1367,8 +1296,8 @@
       "groupId": 2,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_239.txt",
       "trustLevel": "low",
-      "version": "2.0.2.30",
-      "timeUpdated": "2021-03-24T13:06:17+0000",
+      "version": "2.0.2.61",
+      "timeUpdated": "2023-01-13T01:01:48+0000",
       "languages": [],
       "tags": [
         2,
@@ -1382,12 +1311,12 @@
       "timeAdded": "2014-06-30T07:56:55+0000",
       "homepage": "https://easylist.to/",
       "expires": 345600,
-      "displayNumber": 5,
+      "displayNumber": 100,
       "groupId": 4,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_241.txt",
       "trustLevel": "high",
-      "version": "2.0.93.57",
-      "timeUpdated": "2022-05-24T05:01:44+0000",
+      "version": "2.1.6.56",
+      "timeUpdated": "2023-01-13T01:01:52+0000",
       "languages": [],
       "tags": [
         6
@@ -1404,8 +1333,8 @@
       "groupId": 5,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_242.txt",
       "trustLevel": "low",
-      "version": "1.0.2.27",
-      "timeUpdated": "2022-03-11T01:01:32+0000",
+      "version": "1.0.2.35",
+      "timeUpdated": "2022-09-04T21:02:05+0000",
       "languages": [],
       "tags": [
         4
@@ -1422,8 +1351,8 @@
       "groupId": 7,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_243.txt",
       "trustLevel": "high",
-      "version": "2.0.13.37",
-      "timeUpdated": "2022-05-23T09:01:59+0000",
+      "version": "2.0.14.97",
+      "timeUpdated": "2023-01-12T21:02:32+0000",
       "languages": [
         "sv"
       ],
@@ -1447,8 +1376,8 @@
       "groupId": 7,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_244.txt",
       "trustLevel": "high",
-      "version": "2.0.8.68",
-      "timeUpdated": "2022-05-22T13:01:44+0000",
+      "version": "2.0.9.21",
+      "timeUpdated": "2023-01-12T13:02:04+0000",
       "languages": [],
       "tags": [
         1,
@@ -1485,8 +1414,8 @@
       "groupId": 7,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_246.txt",
       "trustLevel": "low",
-      "version": "2.1.4.34",
-      "timeUpdated": "2022-05-24T05:01:49+0000",
+      "version": "2.1.17.32",
+      "timeUpdated": "2023-01-13T01:01:58+0000",
       "languages": [],
       "tags": [
         1,
@@ -1505,8 +1434,8 @@
       "groupId": 7,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_247.txt",
       "trustLevel": "high",
-      "version": "2.0.2.87",
-      "timeUpdated": "2022-05-22T13:01:46+0000",
+      "version": "2.0.3.8",
+      "timeUpdated": "2023-01-10T01:02:01+0000",
       "languages": [],
       "tags": [
         41,
@@ -1525,8 +1454,8 @@
       "groupId": 7,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_249.txt",
       "trustLevel": "high",
-      "version": "2.0.6.25",
-      "timeUpdated": "2022-05-22T21:02:02+0000",
+      "version": "2.0.6.59",
+      "timeUpdated": "2022-12-28T09:02:09+0000",
       "languages": [
         "no",
         "da",
@@ -1550,12 +1479,12 @@
       "timeAdded": "2021-03-08T20:08:48+0000",
       "homepage": "https://github.com/DandelionSprout/adfilt",
       "expires": 345600,
-      "displayNumber": 250,
+      "displayNumber": 100,
       "groupId": 4,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_250.txt",
       "trustLevel": "high",
-      "version": "2.0.5.17",
-      "timeUpdated": "2022-05-23T13:02:02+0000",
+      "version": "2.0.8.0",
+      "timeUpdated": "2023-01-12T21:02:45+0000",
       "languages": [],
       "tags": [
         5,
@@ -1578,8 +1507,8 @@
         "ext_android_cb"
       ],
       "trustLevel": "low",
-      "version": "2.0.3.20",
-      "timeUpdated": "2022-05-23T13:02:03+0000",
+      "version": "2.0.4.60",
+      "timeUpdated": "2023-01-11T01:02:03+0000",
       "languages": [],
       "tags": [
         2
@@ -1596,8 +1525,8 @@
       "groupId": 7,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_252.txt",
       "trustLevel": "high",
-      "version": "2.0.0.2",
-      "timeUpdated": "2022-03-27T09:01:53+0000",
+      "version": "2.0.0.7",
+      "timeUpdated": "2023-01-02T21:02:28+0000",
       "languages": [],
       "tags": [
         1,
@@ -1616,8 +1545,8 @@
       "groupId": 7,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_253.txt",
       "trustLevel": "low",
-      "version": "2.0.1.59",
-      "timeUpdated": "2022-05-24T05:01:57+0000",
+      "version": "2.0.14.57",
+      "timeUpdated": "2023-01-13T01:02:10+0000",
       "languages": [],
       "tags": [
         1,
@@ -1635,8 +1564,8 @@
       "groupId": 6,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_10.txt",
       "trustLevel": "full",
-      "version": "2.0.1.72",
-      "timeUpdated": "2022-05-20T11:30:17+0000",
+      "version": "2.0.1.94",
+      "timeUpdated": "2023-01-01T12:30:17+0000",
       "languages": [],
       "tags": []
     },
@@ -1651,8 +1580,8 @@
       "groupId": 1,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_11.txt",
       "trustLevel": "full",
-      "version": "2.0.29.86",
-      "timeUpdated": "2022-05-23T16:30:23+0000",
+      "version": "2.0.36.51",
+      "timeUpdated": "2023-01-13T07:30:25+0000",
       "languages": [],
       "tags": [
         1,
@@ -1673,8 +1602,8 @@
       "groupId": 7,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_13.txt",
       "trustLevel": "full",
-      "version": "2.0.34.69",
-      "timeUpdated": "2022-05-23T15:30:26+0000",
+      "version": "2.0.40.58",
+      "timeUpdated": "2023-01-12T13:02:28+0000",
       "languages": [
         "tr"
       ],
@@ -1688,7 +1617,7 @@
     {
       "filterId": 14,
       "name": "AdGuard Annoyances filter",
-      "description": "Blocks irritating elements on web pages including cookie notices, third-party widgets and in-page pop-ups.",
+      "description": "Blocks irritating elements on web pages including cookie notices, third-party widgets and in-page pop-ups. Contains the following AdGuard filters: Cookie Notices, Popups, Mobile App Banners, Other Annoyances and Widgets.",
       "timeAdded": "2014-06-30T07:56:55+0000",
       "homepage": "https://kb.adguard.com/general/adguard-ad-filters",
       "expires": 345600,
@@ -1696,8 +1625,8 @@
       "groupId": 4,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_14.txt",
       "trustLevel": "full",
-      "version": "2.1.20.37",
-      "timeUpdated": "2022-05-24T06:30:38+0000",
+      "version": "2.1.45.90",
+      "timeUpdated": "2023-01-13T08:30:41+0000",
       "languages": [],
       "tags": [
         5,
@@ -1716,8 +1645,8 @@
       "groupId": 6,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_15.txt",
       "trustLevel": "full",
-      "version": "2.0.34.42",
-      "timeUpdated": "2022-05-24T06:30:39+0000",
+      "version": "2.0.44.22",
+      "timeUpdated": "2023-01-13T06:30:44+0000",
       "languages": [],
       "tags": [
         45,
@@ -1745,8 +1674,8 @@
       "groupId": 7,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_16.txt",
       "trustLevel": "full",
-      "version": "2.0.33.31",
-      "timeUpdated": "2022-05-24T06:30:45+0000",
+      "version": "2.0.37.4",
+      "timeUpdated": "2023-01-12T15:30:59+0000",
       "languages": [
         "fr"
       ],
@@ -1774,11 +1703,49 @@
         "ext_android_cb"
       ],
       "trustLevel": "full",
-      "version": "2.0.2.57",
-      "timeUpdated": "2022-05-19T10:30:49+0000",
+      "version": "2.0.4.10",
+      "timeUpdated": "2023-01-12T09:30:57+0000",
       "languages": [],
       "tags": [
         2
+      ]
+    },
+    {
+      "filterId": 18,
+      "name": "AdGuard Cookie Notices filter",
+      "description": "Blocks cookie notices on web pages.",
+      "timeAdded": "2022-07-07T07:53:39+0000",
+      "homepage": "https://kb.adguard.com/general/adguard-ad-filters",
+      "expires": 345600,
+      "displayNumber": 2,
+      "groupId": 4,
+      "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_18.txt",
+      "trustLevel": "full",
+      "version": "2.0.6.75",
+      "timeUpdated": "2023-01-13T08:30:52+0000",
+      "languages": [],
+      "tags": [
+        5,
+        11
+      ]
+    },
+    {
+      "filterId": 19,
+      "name": "AdGuard Popups filter",
+      "description": "Blocks all kinds of pop-ups that are not necessary for websites' operation.",
+      "timeAdded": "2022-07-07T07:53:39+0000",
+      "homepage": "https://kb.adguard.com/general/adguard-ad-filters",
+      "expires": 345600,
+      "displayNumber": 2,
+      "groupId": 4,
+      "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_19.txt",
+      "trustLevel": "full",
+      "version": "2.0.6.76",
+      "timeUpdated": "2023-01-13T08:30:54+0000",
+      "languages": [],
+      "tags": [
+        5,
+        11
       ]
     },
     {
@@ -1792,8 +1759,8 @@
       "groupId": 7,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_1.txt",
       "trustLevel": "full",
-      "version": "2.0.68.92",
-      "timeUpdated": "2022-05-24T06:30:53+0000",
+      "version": "2.0.76.95",
+      "timeUpdated": "2023-01-13T07:31:06+0000",
       "languages": [
         "ru"
       ],
@@ -1801,6 +1768,44 @@
         1,
         8,
         10,
+        11
+      ]
+    },
+    {
+      "filterId": 20,
+      "name": "AdGuard Mobile App Banners filter",
+      "description": "Blocks irritating banners that promote mobile apps of websites.",
+      "timeAdded": "2022-07-07T07:53:39+0000",
+      "homepage": "https://kb.adguard.com/general/adguard-ad-filters",
+      "expires": 345600,
+      "displayNumber": 2,
+      "groupId": 4,
+      "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_20.txt",
+      "trustLevel": "full",
+      "version": "2.0.3.13",
+      "timeUpdated": "2023-01-12T18:31:03+0000",
+      "languages": [],
+      "tags": [
+        5,
+        11
+      ]
+    },
+    {
+      "filterId": 21,
+      "name": "AdGuard Other Annoyances filter",
+      "description": "Blocks irritating elements on web pages that do not fall under the popular categories of annoyances.",
+      "timeAdded": "2022-07-07T07:53:39+0000",
+      "homepage": "https://kb.adguard.com/general/adguard-ad-filters",
+      "expires": 345600,
+      "displayNumber": 2,
+      "groupId": 4,
+      "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_21.txt",
+      "trustLevel": "full",
+      "version": "2.0.4.39",
+      "timeUpdated": "2023-01-12T17:03:32+0000",
+      "languages": [],
+      "tags": [
+        5,
         11
       ]
     },
@@ -1815,8 +1820,8 @@
       "groupId": 7,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_224.txt",
       "trustLevel": "full",
-      "version": "2.0.56.36",
-      "timeUpdated": "2022-05-24T06:30:59+0000",
+      "version": "2.0.77.78",
+      "timeUpdated": "2023-01-13T08:31:12+0000",
       "languages": [
         "zh"
       ],
@@ -1825,6 +1830,25 @@
         10,
         11,
         31
+      ]
+    },
+    {
+      "filterId": 22,
+      "name": "AdGuard Widgets filter",
+      "description": "Blocks annoying third-party widgets: online assistants, live support chats, etc.",
+      "timeAdded": "2022-07-07T07:53:39+0000",
+      "homepage": "https://kb.adguard.com/general/adguard-ad-filters",
+      "expires": 345600,
+      "displayNumber": 2,
+      "groupId": 4,
+      "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_22.txt",
+      "trustLevel": "full",
+      "version": "2.0.1.98",
+      "timeUpdated": "2023-01-07T14:31:17+0000",
+      "languages": [],
+      "tags": [
+        5,
+        11
       ]
     },
     {
@@ -1838,8 +1862,8 @@
       "groupId": 1,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_2.txt",
       "trustLevel": "full",
-      "version": "2.2.31.87",
-      "timeUpdated": "2022-05-24T06:31:19+0000",
+      "version": "2.2.63.93",
+      "timeUpdated": "2023-01-13T08:31:34+0000",
       "languages": [],
       "tags": [
         10,
@@ -1859,8 +1883,8 @@
       "groupId": 2,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_3.txt",
       "trustLevel": "full",
-      "version": "2.0.40.13",
-      "timeUpdated": "2022-05-23T18:31:24+0000",
+      "version": "2.0.50.38",
+      "timeUpdated": "2023-01-13T08:31:40+0000",
       "languages": [],
       "tags": [
         2,
@@ -1878,8 +1902,8 @@
       "groupId": 3,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_4.txt",
       "trustLevel": "full",
-      "version": "2.0.62.25",
-      "timeUpdated": "2022-05-23T17:31:29+0000",
+      "version": "2.0.76.86",
+      "timeUpdated": "2023-01-13T08:31:47+0000",
       "languages": [],
       "tags": [
         3,
@@ -1897,8 +1921,8 @@
       "groupId": 6,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_5.txt",
       "trustLevel": "full",
-      "version": "2.0.1.1",
-      "timeUpdated": "2022-05-23T11:31:36+0000",
+      "version": "2.0.1.3",
+      "timeUpdated": "2022-08-24T07:31:42+0000",
       "languages": [],
       "tags": [
         45
@@ -1915,8 +1939,8 @@
       "groupId": 7,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_6.txt",
       "trustLevel": "full",
-      "version": "2.0.27.16",
-      "timeUpdated": "2022-05-23T15:31:41+0000",
+      "version": "2.0.31.84",
+      "timeUpdated": "2023-01-12T16:32:51+0000",
       "languages": [
         "de"
       ],
@@ -1938,8 +1962,8 @@
       "groupId": 7,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_7.txt",
       "trustLevel": "full",
-      "version": "2.0.20.4",
-      "timeUpdated": "2022-05-23T15:31:45+0000",
+      "version": "2.0.30.96",
+      "timeUpdated": "2023-01-12T16:32:56+0000",
       "languages": [
         "ja"
       ],
@@ -1960,8 +1984,8 @@
       "groupId": 7,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_8.txt",
       "trustLevel": "full",
-      "version": "2.0.3.81",
-      "timeUpdated": "2022-05-23T15:31:49+0000",
+      "version": "2.0.4.33",
+      "timeUpdated": "2022-12-31T16:32:04+0000",
       "languages": [
         "nl"
       ],
@@ -1984,8 +2008,8 @@
       "groupId": 7,
       "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_9.txt",
       "trustLevel": "full",
-      "version": "2.0.13.96",
-      "timeUpdated": "2022-05-23T15:31:52+0000",
+      "version": "2.0.16.45",
+      "timeUpdated": "2023-01-12T18:32:15+0000",
       "languages": [
         "es",
         "pt"
@@ -1996,6 +2020,177 @@
         17,
         18
       ]
+    },
+    {
+      "filterId": 900,
+      "name": "Qwant agressif blocking filter",
+      "description": "Custom domains blocklist by qwant for agressif category",
+      "timeAdded": "2023-01-13T00:00:12.923Z",
+      "homepage": "https://qwant.com",
+      "expires": 7,
+      "displayNumber": 6,
+      "groupId": 6,
+      "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_900.txt",
+      "trustLevel": "full",
+      "version": "2023.01.13",
+      "timeUpdated": "2023-01-13T00:00:12.923Z",
+      "languages": [
+        "fr",
+        "en"
+      ],
+      "tags": []
+    },
+    {
+      "filterId": 901,
+      "name": "Qwant cryptojacking blocking filter",
+      "description": "Custom domains blocklist by qwant for cryptojacking category",
+      "timeAdded": "2023-01-13T00:00:14.129Z",
+      "homepage": "https://qwant.com",
+      "expires": 7,
+      "displayNumber": 6,
+      "groupId": 6,
+      "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_901.txt",
+      "trustLevel": "full",
+      "version": "2023.01.13",
+      "timeUpdated": "2023-01-13T00:00:14.129Z",
+      "languages": [
+        "fr",
+        "en"
+      ],
+      "tags": []
+    },
+    {
+      "filterId": 902,
+      "name": "Qwant dangerous blocking filter",
+      "description": "Custom domains blocklist by qwant for dangerous category",
+      "timeAdded": "2023-01-13T00:00:14.933Z",
+      "homepage": "https://qwant.com",
+      "expires": 7,
+      "displayNumber": 6,
+      "groupId": 6,
+      "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_902.txt",
+      "trustLevel": "full",
+      "version": "2023.01.13",
+      "timeUpdated": "2023-01-13T00:00:14.933Z",
+      "languages": [
+        "fr",
+        "en"
+      ],
+      "tags": []
+    },
+    {
+      "filterId": 903,
+      "name": "Qwant drogue blocking filter",
+      "description": "Custom domains blocklist by qwant for drogue category",
+      "timeAdded": "2023-01-13T00:00:15.261Z",
+      "homepage": "https://qwant.com",
+      "expires": 7,
+      "displayNumber": 6,
+      "groupId": 6,
+      "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_903.txt",
+      "trustLevel": "full",
+      "version": "2023.01.13",
+      "timeUpdated": "2023-01-13T00:00:15.261Z",
+      "languages": [
+        "fr",
+        "en"
+      ],
+      "tags": []
+    },
+    {
+      "filterId": 904,
+      "name": "Qwant hacking blocking filter",
+      "description": "Custom domains blocklist by qwant for hacking category",
+      "timeAdded": "2023-01-13T00:00:15.673Z",
+      "homepage": "https://qwant.com",
+      "expires": 7,
+      "displayNumber": 6,
+      "groupId": 6,
+      "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_904.txt",
+      "trustLevel": "full",
+      "version": "2023.01.13",
+      "timeUpdated": "2023-01-13T00:00:15.673Z",
+      "languages": [
+        "fr",
+        "en"
+      ],
+      "tags": []
+    },
+    {
+      "filterId": 905,
+      "name": "Qwant malware blocking filter",
+      "description": "Custom domains blocklist by qwant for malware category",
+      "timeAdded": "2023-01-13T00:00:16.535Z",
+      "homepage": "https://qwant.com",
+      "expires": 7,
+      "displayNumber": 6,
+      "groupId": 6,
+      "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_905.txt",
+      "trustLevel": "full",
+      "version": "2023.01.13",
+      "timeUpdated": "2023-01-13T00:00:16.535Z",
+      "languages": [
+        "fr",
+        "en"
+      ],
+      "tags": []
+    },
+    {
+      "filterId": 906,
+      "name": "Qwant phishing blocking filter",
+      "description": "Custom domains blocklist by qwant for phishing category",
+      "timeAdded": "2023-01-13T00:00:17.445Z",
+      "homepage": "https://qwant.com",
+      "expires": 7,
+      "displayNumber": 6,
+      "groupId": 6,
+      "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_906.txt",
+      "trustLevel": "full",
+      "version": "2023.01.13",
+      "timeUpdated": "2023-01-13T00:00:17.445Z",
+      "languages": [
+        "fr",
+        "en"
+      ],
+      "tags": []
+    },
+    {
+      "filterId": 907,
+      "name": "Qwant stalkerware blocking filter",
+      "description": "Custom domains blocklist by qwant for stalkerware category",
+      "timeAdded": "2023-01-13T00:00:17.911Z",
+      "homepage": "https://qwant.com",
+      "expires": 7,
+      "displayNumber": 6,
+      "groupId": 6,
+      "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_907.txt",
+      "trustLevel": "full",
+      "version": "2023.01.13",
+      "timeUpdated": "2023-01-13T00:00:17.911Z",
+      "languages": [
+        "fr",
+        "en"
+      ],
+      "tags": []
+    },
+    {
+      "filterId": 908,
+      "name": "Qwant warez blocking filter",
+      "description": "Custom domains blocklist by qwant for warez category",
+      "timeAdded": "2023-01-13T00:00:18.576Z",
+      "homepage": "https://qwant.com",
+      "expires": 7,
+      "displayNumber": 6,
+      "groupId": 6,
+      "subscriptionUrl": "https://f.qwant.com/tracking-protection/firefox_filter_908.txt",
+      "trustLevel": "full",
+      "version": "2023.01.13",
+      "timeUpdated": "2023-01-13T00:00:18.576Z",
+      "languages": [
+        "fr",
+        "en"
+      ],
+      "tags": []
     }
   ]
 }

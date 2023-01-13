@@ -1,7 +1,7 @@
 "use strict";
 (self["webpackChunkqwant_viprivacy"] = self["webpackChunkqwant_viprivacy"] || []).push([[981],{
 
-/***/ 3388:
+/***/ 3440:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
@@ -93,7 +93,7 @@ function __spreadArray(to, from, pack) {
 
 /***/ }),
 
-/***/ 127:
+/***/ 9740:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
@@ -114,7 +114,7 @@ function __spreadArray(to, from, pack) {
 /* harmony export */   "vU": () => (/* binding */ error)
 /* harmony export */ });
 /* unused harmony exports after, doneState, errorExecution */
-/* harmony import */ var _types_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1329);
+/* harmony import */ var _types_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(7492);
 
 
 var start = _types_js__WEBPACK_IMPORTED_MODULE_0__/* .ActionTypes.Start */ .M.Start;
@@ -141,7 +141,7 @@ var pure = _types_js__WEBPACK_IMPORTED_MODULE_0__/* .ActionTypes.Pure */ .M.Pure
 
 /***/ }),
 
-/***/ 1020:
+/***/ 6248:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
@@ -166,11 +166,11 @@ var pure = _types_js__WEBPACK_IMPORTED_MODULE_0__/* .ActionTypes.Pure */ .M.Pure
 /* harmony export */   "yC": () => (/* binding */ resolveActions)
 /* harmony export */ });
 /* unused harmony exports choose, escalate, isActionObject, log, pure, resolveLog, resolveRaise, resolveSend, resolveStop, respond, sendTo */
-/* harmony import */ var _virtual_tslib_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(3388);
-/* harmony import */ var _types_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(1329);
-/* harmony import */ var _actionTypes_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(127);
-/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(8351);
-/* harmony import */ var _environment_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(8685);
+/* harmony import */ var _virtual_tslib_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(3440);
+/* harmony import */ var _types_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(7492);
+/* harmony import */ var _actionTypes_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(9740);
+/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(6657);
+/* harmony import */ var _environment_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(3700);
 
 
 
@@ -549,6 +549,26 @@ function pure(getActions) {
  */
 
 function forwardTo(target, options) {
+  if (!_environment_js__WEBPACK_IMPORTED_MODULE_4__/* .IS_PRODUCTION */ .M && (!target || typeof target === 'function')) {
+    var originalTarget_1 = target;
+
+    target = function () {
+      var args = [];
+
+      for (var _i = 0; _i < arguments.length; _i++) {
+        args[_i] = arguments[_i];
+      }
+
+      var resolvedTarget = typeof originalTarget_1 === 'function' ? originalTarget_1.apply(void 0, (0,_virtual_tslib_js__WEBPACK_IMPORTED_MODULE_2__/* .__spreadArray */ .ev)([], (0,_virtual_tslib_js__WEBPACK_IMPORTED_MODULE_2__/* .__read */ .CR)(args), false)) : originalTarget_1;
+
+      if (!resolvedTarget) {
+        throw new Error("Attempted to forward event to undefined actor. This risks an infinite loop in the sender.");
+      }
+
+      return resolvedTarget;
+    };
+  }
+
   return send(function (_, event) {
     return event;
   }, (0,_virtual_tslib_js__WEBPACK_IMPORTED_MODULE_2__/* .__assign */ .pi)((0,_virtual_tslib_js__WEBPACK_IMPORTED_MODULE_2__/* .__assign */ .pi)({}, options), {
@@ -579,25 +599,60 @@ function choose(conds) {
     conds: conds
   };
 }
-function resolveActions(machine, currentState, currentContext, _event, actions, preserveActionOrder) {
+
+var pluckAssigns = function (actionBlocks) {
+  var e_1, _a;
+
+  var assignActions = [];
+
+  try {
+    for (var actionBlocks_1 = (0,_virtual_tslib_js__WEBPACK_IMPORTED_MODULE_2__/* .__values */ .XA)(actionBlocks), actionBlocks_1_1 = actionBlocks_1.next(); !actionBlocks_1_1.done; actionBlocks_1_1 = actionBlocks_1.next()) {
+      var block = actionBlocks_1_1.value;
+      var i = 0;
+
+      while (i < block.length) {
+        if (block[i].type === _actionTypes_js__WEBPACK_IMPORTED_MODULE_1__/* .assign */ .f0) {
+          assignActions.push(block[i]);
+          block.splice(i, 1);
+          continue;
+        }
+
+        i++;
+      }
+    }
+  } catch (e_1_1) {
+    e_1 = {
+      error: e_1_1
+    };
+  } finally {
+    try {
+      if (actionBlocks_1_1 && !actionBlocks_1_1.done && (_a = actionBlocks_1.return)) _a.call(actionBlocks_1);
+    } finally {
+      if (e_1) throw e_1.error;
+    }
+  }
+
+  return assignActions;
+};
+
+function resolveActions(machine, currentState, currentContext, _event, actionBlocks, predictableExec, preserveActionOrder) {
   if (preserveActionOrder === void 0) {
     preserveActionOrder = false;
   }
 
-  var _a = (0,_virtual_tslib_js__WEBPACK_IMPORTED_MODULE_2__/* .__read */ .CR)(preserveActionOrder ? [[], actions] : (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .partition */ .uK)(actions, function (action) {
-    return action.type === _actionTypes_js__WEBPACK_IMPORTED_MODULE_1__/* .assign */ .f0;
-  }), 2),
-      assignActions = _a[0],
-      otherActions = _a[1];
-
+  var assignActions = preserveActionOrder ? [] : pluckAssigns(actionBlocks);
   var updatedContext = assignActions.length ? (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .updateContext */ .dt)(currentContext, _event, assignActions, currentState) : currentContext;
   var preservedContexts = preserveActionOrder ? [currentContext] : undefined;
-  var resolvedActions = (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .flatten */ .xH)(otherActions.map(function (actionObject) {
+  var deferredToBlockEnd = [];
+
+  function handleAction(actionObject) {
     var _a;
 
     switch (actionObject.type) {
       case _actionTypes_js__WEBPACK_IMPORTED_MODULE_1__/* .raise */ .OU:
-        return resolveRaise(actionObject);
+        {
+          return resolveRaise(actionObject);
+        }
 
       case _actionTypes_js__WEBPACK_IMPORTED_MODULE_1__/* .send */ .lW:
         var sendAction = resolveSend(actionObject, updatedContext, _event, machine.options.delays); // TODO: fix ActionTypes.Init
@@ -608,24 +663,32 @@ function resolveActions(machine, currentState, currentContext, _event, actions, 
           "No delay reference for delay expression '".concat(actionObject.delay, "' was found on machine '").concat(machine.id, "'"));
         }
 
+        if (predictableExec && sendAction.to !== _types_js__WEBPACK_IMPORTED_MODULE_3__/* .SpecialTargets.Internal */ .K.Internal) {
+          deferredToBlockEnd.push(sendAction);
+        }
+
         return sendAction;
 
       case _actionTypes_js__WEBPACK_IMPORTED_MODULE_1__/* .log */ .cM:
-        return resolveLog(actionObject, updatedContext, _event);
+        {
+          var resolved = resolveLog(actionObject, updatedContext, _event);
+          predictableExec === null || predictableExec === void 0 ? void 0 : predictableExec(resolved, updatedContext, _event);
+          return resolved;
+        }
 
       case _actionTypes_js__WEBPACK_IMPORTED_MODULE_1__/* .choose */ .RN:
         {
           var chooseAction = actionObject;
           var matchedActions = (_a = chooseAction.conds.find(function (condition) {
             var guard = (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .toGuard */ .Qi)(condition.cond, machine.options.guards);
-            return !guard || (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .evaluateGuard */ .vx)(machine, guard, updatedContext, _event, currentState);
+            return !guard || (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .evaluateGuard */ .vx)(machine, guard, updatedContext, _event, !predictableExec ? currentState : undefined);
           })) === null || _a === void 0 ? void 0 : _a.actions;
 
           if (!matchedActions) {
             return [];
           }
 
-          var _b = (0,_virtual_tslib_js__WEBPACK_IMPORTED_MODULE_2__/* .__read */ .CR)(resolveActions(machine, currentState, updatedContext, _event, toActionObjects((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .toArray */ .qo)(matchedActions), machine.options.actions), preserveActionOrder), 2),
+          var _b = (0,_virtual_tslib_js__WEBPACK_IMPORTED_MODULE_2__/* .__read */ .CR)(resolveActions(machine, currentState, updatedContext, _event, [toActionObjects((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .toArray */ .qo)(matchedActions), machine.options.actions)], predictableExec, preserveActionOrder), 2),
               resolvedActionsFromChoose = _b[0],
               resolvedContextFromChoose = _b[1];
 
@@ -642,7 +705,7 @@ function resolveActions(machine, currentState, currentContext, _event, actions, 
             return [];
           }
 
-          var _c = (0,_virtual_tslib_js__WEBPACK_IMPORTED_MODULE_2__/* .__read */ .CR)(resolveActions(machine, currentState, updatedContext, _event, toActionObjects((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .toArray */ .qo)(matchedActions), machine.options.actions), preserveActionOrder), 2),
+          var _c = (0,_virtual_tslib_js__WEBPACK_IMPORTED_MODULE_2__/* .__read */ .CR)(resolveActions(machine, currentState, updatedContext, _event, [toActionObjects((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .toArray */ .qo)(matchedActions), machine.options.actions)], predictableExec, preserveActionOrder), 2),
               resolvedActionsFromPure = _c[0],
               resolvedContext = _c[1];
 
@@ -653,12 +716,14 @@ function resolveActions(machine, currentState, currentContext, _event, actions, 
 
       case _actionTypes_js__WEBPACK_IMPORTED_MODULE_1__/* .stop */ .sT:
         {
-          return resolveStop(actionObject, updatedContext, _event);
+          var resolved = resolveStop(actionObject, updatedContext, _event);
+          predictableExec === null || predictableExec === void 0 ? void 0 : predictableExec(resolved, currentContext, _event);
+          return resolved;
         }
 
       case _actionTypes_js__WEBPACK_IMPORTED_MODULE_1__/* .assign */ .f0:
         {
-          updatedContext = (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .updateContext */ .dt)(updatedContext, _event, [actionObject], currentState);
+          updatedContext = (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .updateContext */ .dt)(updatedContext, _event, [actionObject], !predictableExec ? currentState : undefined);
           preservedContexts === null || preservedContexts === void 0 ? void 0 : preservedContexts.push(updatedContext);
           break;
         }
@@ -667,7 +732,9 @@ function resolveActions(machine, currentState, currentContext, _event, actions, 
         var resolvedActionObject = toActionObject(actionObject, machine.options.actions);
         var exec_1 = resolvedActionObject.exec;
 
-        if (exec_1 && preservedContexts) {
+        if (predictableExec) {
+          predictableExec(resolvedActionObject, updatedContext, _event);
+        } else if (exec_1 && preservedContexts) {
           var contextIndex_1 = preservedContexts.length - 1;
           resolvedActionObject = (0,_virtual_tslib_js__WEBPACK_IMPORTED_MODULE_2__/* .__assign */ .pi)((0,_virtual_tslib_js__WEBPACK_IMPORTED_MODULE_2__/* .__assign */ .pi)({}, resolvedActionObject), {
             exec: function (_ctx) {
@@ -684,9 +751,42 @@ function resolveActions(machine, currentState, currentContext, _event, actions, 
 
         return resolvedActionObject;
     }
-  }).filter(function (a) {
-    return !!a;
-  }));
+  }
+
+  function processBlock(block) {
+    var e_2, _a;
+
+    var resolvedActions = [];
+
+    try {
+      for (var block_1 = (0,_virtual_tslib_js__WEBPACK_IMPORTED_MODULE_2__/* .__values */ .XA)(block), block_1_1 = block_1.next(); !block_1_1.done; block_1_1 = block_1.next()) {
+        var action = block_1_1.value;
+        var resolved = handleAction(action);
+
+        if (resolved) {
+          resolvedActions = resolvedActions.concat(resolved);
+        }
+      }
+    } catch (e_2_1) {
+      e_2 = {
+        error: e_2_1
+      };
+    } finally {
+      try {
+        if (block_1_1 && !block_1_1.done && (_a = block_1.return)) _a.call(block_1);
+      } finally {
+        if (e_2) throw e_2.error;
+      }
+    }
+
+    deferredToBlockEnd.forEach(function (action) {
+      predictableExec(action, updatedContext, _event);
+    });
+    deferredToBlockEnd.length = 0;
+    return resolvedActions;
+  }
+
+  var resolvedActions = (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .flatten */ .xH)(actionBlocks.map(processBlock));
   return [resolvedActions, updatedContext];
 }
 
@@ -695,7 +795,7 @@ function resolveActions(machine, currentState, currentContext, _event, actions, 
 
 /***/ }),
 
-/***/ 1231:
+/***/ 1013:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
@@ -714,7 +814,7 @@ var TARGETLESS_KEY = '';
 
 /***/ }),
 
-/***/ 8685:
+/***/ 3700:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
@@ -727,11 +827,11 @@ var IS_PRODUCTION = "production" === 'production';
 
 /***/ }),
 
-/***/ 7572:
+/***/ 2873:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 /* unused harmony exports assign, doneInvoke, forwardTo, send, sendParent, sendUpdate */
-/* harmony import */ var _actions_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1020);
+/* harmony import */ var _actions_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(6248);
 
 
 
@@ -759,7 +859,7 @@ var assign = _actions_js__WEBPACK_IMPORTED_MODULE_0__/* .assign */ .f0,
 
 /***/ }),
 
-/***/ 1329:
+/***/ 7492:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
@@ -803,7 +903,7 @@ var SpecialTargets;
 
 /***/ }),
 
-/***/ 8351:
+/***/ 6657:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
@@ -846,9 +946,9 @@ var SpecialTargets;
 /* harmony export */   "zM": () => (/* binding */ toObserver)
 /* harmony export */ });
 /* unused harmony exports getActionType, interopSymbols, isStateLike, keys, pathsToStateValue, toArrayStrict, uniqueId, updateHistoryStates */
-/* harmony import */ var _virtual_tslib_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(3388);
-/* harmony import */ var _constants_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1231);
-/* harmony import */ var _environment_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(8685);
+/* harmony import */ var _virtual_tslib_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(3440);
+/* harmony import */ var _constants_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1013);
+/* harmony import */ var _environment_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(3700);
 
 
 
@@ -1456,18 +1556,14 @@ function toInvokeSource(src) {
   return src;
 }
 function toObserver(nextHandler, errorHandler, completionHandler) {
-  if (typeof nextHandler === 'object') {
-    return nextHandler;
-  }
+  var noop = function () {};
 
-  var noop = function () {
-    return void 0;
-  };
-
+  var isObserver = typeof nextHandler === 'object';
+  var self = isObserver ? nextHandler : null;
   return {
-    next: nextHandler,
-    error: errorHandler || noop,
-    complete: completionHandler || noop
+    next: ((isObserver ? nextHandler.next : nextHandler) || noop).bind(self),
+    error: ((isObserver ? nextHandler.error : errorHandler) || noop).bind(self),
+    complete: ((isObserver ? nextHandler.complete : completionHandler) || noop).bind(self)
   };
 }
 function createInvokeId(stateNodeId, index) {
@@ -1482,6 +1578,6 @@ function createInvokeId(stateNodeId, index) {
 },
 /******/ __webpack_require__ => { // webpackRuntimeModules
 /******/ var __webpack_exec__ = (moduleId) => (__webpack_require__(__webpack_require__.s = moduleId))
-/******/ var __webpack_exports__ = (__webpack_exec__(7572));
+/******/ var __webpack_exports__ = (__webpack_exec__(2873));
 /******/ }
 ]);
