@@ -591,14 +591,8 @@ open class BrowserActivity : AppCompatActivity(), SettingsContainerFragment.OnSe
         val isPrivate = components.core.store.state.selectedTab?.content?.private ?: false
         setTheme(if (isPrivate) R.style.ThemeQwantNoActionBarPrivacy else R.style.ThemeQwantNoActionBar)
 
-        var settingsFragment = this.supportFragmentManager.findFragmentByTag("SETTINGS_FRAGMENT")
-        if (settingsFragment == null) {
-            settingsFragment = SettingsContainerFragment.create()
-        } else {
-            settingsFragment.arguments?.clear()
-        }
         this.supportFragmentManager.beginTransaction().apply {
-            replace(R.id.container, settingsFragment, "SETTINGS_FRAGMENT")
+            replace(R.id.container, SettingsContainerFragment.create(), "SETTINGS_FRAGMENT")
             commit()
         }
         this.supportFragmentManager.executePendingTransactions()

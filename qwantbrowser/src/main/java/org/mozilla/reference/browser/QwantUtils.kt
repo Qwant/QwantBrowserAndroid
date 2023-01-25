@@ -33,8 +33,8 @@ class QwantUtils {
         ) : String {
             val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
-            var clientTmp = getClient(context, prefs)
-            if (widget) clientTmp += "-widget"
+            var client = getClient(context, prefs)
+            if (widget) client += "-widget"
 
             val l = interface_language ?: prefs.getString(context.getString(R.string.pref_key_general_language_interface), "en_GB")
             val r = search_language ?: prefs.getString(context.getString(R.string.pref_key_general_language_search), "en")
@@ -59,7 +59,7 @@ class QwantUtils {
             builder.append(context.getString(R.string.homepage_base))
             if (maps) builder.append("maps/")
             // if (music) builder.append("music/search")
-            builder.append("?client=").append(clientTmp)
+            builder.append("?client=").append(client)
                 .append("&l=").append(l?.toLowerCase(Locale.getDefault()))
                 .append("&sr=").append(sr)
                 .append("&r=").append(r)

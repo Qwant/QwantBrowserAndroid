@@ -59,9 +59,9 @@
     <string name="pref_key_ratepush_app_opened_count" translatable="false">pref_key_ratepush_app_opened_count</string>
     <string name="pref_key_ratepush_searches" translatable="false">pref_key_ratepush_search_count</string>
     <string name="pref_key_ratepush_date" translatable="false">pref_key_ratepush_date</string>
+    <string name="pref_key_ratepush_first_opened_date" translatable="false">pref_key_ratepush_first_opened_date</string>
 
     <string name="pref_key_saved_client" translatable="false">pref_key_saved_client</string>
-    <string name="pref_key_ratepush_first_opened_date" translatable="false">pref_key_ratepush_first_opened_date</string>
 
     <string name="pref_key_first_request" translatable="false">pref_key_first_request</string>
 </resources>
