@@ -1,9 +1,7 @@
 
 # Qwant Browser Changelog
 
-[English](https://github.com/Qwant/QwantBrowserAndroid/blob/main/CHANGELOG.md)
-[German](https://github.com/Qwant/QwantBrowserAndroid/blob/main/CHANGELOG_de.md)
-[Italian](https://github.com/Qwant/QwantBrowserAndroid/blob/main/CHANGELOG_it.md)
+[English](CHANGELOG.md)  --  [German](CHANGELOG_de.md)  --  [Italian](CHANGELOG_it.md)
 
 ### 4.3
 
