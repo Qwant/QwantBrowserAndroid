@@ -27,7 +27,7 @@ fun TabList(
     val tabs = store.observeAsComposableState { state -> state.tabs }
 
     val filteredTabs by remember(private) {
-        derivedStateOf { tabs.value?.filter { it.content.private == private } ?: emptyList() }
+        derivedStateOf { tabs.value?.filter { it.content.private == private }?.reversed() ?: emptyList() }
     }
 
     LazyVerticalGrid(
