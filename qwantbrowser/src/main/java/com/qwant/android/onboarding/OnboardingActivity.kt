@@ -32,7 +32,7 @@ class OnboardingActivity : AppCompatActivity() {
     var currentPage = OnboardingPage.ANONYMOUS
     var shouldShowNavigationOnResume = false
 
-    lateinit var defaultBrowserLauncher: ActivityResultLauncher<Intent>
+    // lateinit var defaultBrowserLauncher: ActivityResultLauncher<Intent>
 
     lateinit var layout: ConstraintLayout
     lateinit var image: ImageView
@@ -49,15 +49,6 @@ class OnboardingActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.onboarding_layout)
 
-        defaultBrowserLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            if (it.resultCode == Activity.RESULT_OK) {
-                Log.d("QWANT_BROWSER_ONBOARD", "Default browser changed")
-            } else {
-                Log.d("QWANT_BROWSER_ONBOARD", "Default browser change ignored")
-            }
-            initOnboardingForNavigation()
-        }
-
         layout = findViewById(R.id.onboarding_layout)
         image = findViewById(R.id.onboarding_image)
         title = findViewById(R.id.onboarding_title)
@@ -68,6 +59,17 @@ class OnboardingActivity : AppCompatActivity() {
         textBottom = findViewById(R.id.onboarding_text_bottom)
         buttonValidate = findViewById(R.id.onboarding_validate)
         buttonMore = findViewById(R.id.onboarding_more)
+
+        /* defaultBrowserLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            Log.e("QWANT_BROWSER_ONBOARD", "Default browser launcher")
+            if (it.resultCode == Activity.RESULT_OK) {
+                Log.d("QWANT_BROWSER_ONBOARD", "Default browser changed")
+            } else {
+                Log.d("QWANT_BROWSER_ONBOARD", "Default browser change ignored")
+            }
+            Log.e("QWANT_BROWSER_ONBOARD", "Default browser launcher changing page")
+            initOnboardingForNavigation()
+        } */
 
         this.initOnboardingForAnonymous()
     }
@@ -92,25 +94,33 @@ class OnboardingActivity : AppCompatActivity() {
         }
         textBottom.visibility = View.GONE
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        if (false /* Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q */) {
+            Log.e("QWANT_BROWSER_ONBOARD", "Showing popup selection")
             // Showing default browser popup
-            buttonValidate.apply {
+            /* buttonValidate.apply {
                 visibility = View.VISIBLE
                 text = getString(R.string.onboarding_anonymous_validate)
                 setOnClickListener {
+                    Log.e("QWANT_BROWSER_ONBOARD", "popup launch")
                     val roleManager = context.getSystemService(RoleManager::class.java)
                     val isRoleAvailable = roleManager?.isRoleAvailable(RoleManager.ROLE_BROWSER) ?: false
                     if (isRoleAvailable) {
+                        Log.e("QWANT_BROWSER_ONBOARD", "role available")
                         val isRoleHeld = roleManager.isRoleHeld(RoleManager.ROLE_BROWSER)
                         if (!isRoleHeld) {
+                            Log.e("QWANT_BROWSER_ONBOARD", "role held")
+                            Log.e("QWANT_BROWSER_ONBOARD", "Launch default browser intent")
                             val intent = roleManager.createRequestRoleIntent(RoleManager.ROLE_BROWSER)
                             defaultBrowserLauncher.launch(intent)
+                            Log.e("QWANT_BROWSER_ONBOARD", "intent launched")
                         } else initOnboardingForNavigation()
                     } else initOnboardingForNavigation()
                 }
             }
-            buttonMore.visibility = View.GONE
+            buttonMore.visibility = View.GONE */
         } else {
+            Log.e("QWANT_BROWSER_ONBOARD", "fallback to default settings view for default browser")
+
             // Sending to default browser system settings (or skip)
             buttonValidate.apply {
                 visibility = View.VISIBLE
@@ -137,11 +147,19 @@ class OnboardingActivity : AppCompatActivity() {
     }
 
     fun initOnboardingForNavigation() {
+        Log.e("QWANT_BROWSER_ONBOARD", "init onboarding for nav")
+
         currentPage = OnboardingPage.NAVIGATION
+
+        Log.e("QWANT_BROWSER_ONBOARD", "init onboarding for nav a")
 
         layout.setBackgroundColor(ResourcesCompat.getColor(resources, R.color.qwant_green_light_v2, theme))
 
+        Log.e("QWANT_BROWSER_ONBOARD", "init onboarding for nav b")
+
         image.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.onboarding_navigation_2_x))
+
+        Log.e("QWANT_BROWSER_ONBOARD", "init onboarding for nav c")
 
         title.text = getString(R.string.onboarding_navigation_title)
         textTop.visibility = View.GONE
@@ -152,6 +170,8 @@ class OnboardingActivity : AppCompatActivity() {
             text = getString(R.string.onboarding_navigation_text_bottom)
             visibility = View.VISIBLE
         }
+
+        Log.e("QWANT_BROWSER_ONBOARD", "init onboarding for nav d")
 
         buttonValidate.apply {
             visibility = View.VISIBLE
@@ -170,6 +190,8 @@ class OnboardingActivity : AppCompatActivity() {
     }
 
     override fun onResume() {
+        Log.e("QWANT_BROWSER_ONBOARD", "onboarding resumed")
+
         if (shouldShowNavigationOnResume || currentPage == OnboardingPage.NAVIGATION) {
             shouldShowNavigationOnResume = false
             initOnboardingForNavigation()
@@ -178,11 +200,13 @@ class OnboardingActivity : AppCompatActivity() {
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
+        Log.e("QWANT_BROWSER_ONBOARD", "onboarding saveInstanceState")
         outState.putInt("onboarding_page", currentPage.ordinal)
         super.onSaveInstanceState(outState)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        Log.e("QWANT_BROWSER_ONBOARD", "onboarding restoreInstanceState")
         super.onRestoreInstanceState(savedInstanceState)
         val page = savedInstanceState.getInt("onboarding_page", OnboardingPage.ANONYMOUS.ordinal)
         if (page == OnboardingPage.NAVIGATION.ordinal) {
