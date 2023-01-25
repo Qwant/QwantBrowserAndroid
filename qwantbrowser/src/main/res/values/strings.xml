@@ -207,6 +207,7 @@
     <string name="homepage_base" translatable="false">https://www.qwant.com/</string>
     <string name="homepage_startwith_filter" translatable="false">https://www.qwant.com/</string>
     <string name="qwantmaps_startwith_filter" translatable="false">https://www.qwant.com/maps/</string>
+    <string name="qwantflight_startwith_filter" translatable="false">https://www.qwant.com/flight/</string>
     <string name="qwantmaps_result_startwith_filter" translatable="false">https://www.qwant.com/maps/place/</string>
     <string name="qwantmusic_startwith_filter" translatable="false">https://legacy.qwant.com/music/</string>
 

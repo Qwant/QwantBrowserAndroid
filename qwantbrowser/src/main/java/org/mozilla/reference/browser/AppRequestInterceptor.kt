@@ -26,7 +26,8 @@ class AppRequestInterceptor(private val context: Context) : RequestInterceptor {
             isDirectNavigation: Boolean,
             isSubframeRequest: Boolean
     ): RequestInterceptor.InterceptionResponse? {
-        if (uri.startsWith(context.getString(R.string.homepage_startwith_filter))) {
+        val isFlight = uri.startsWith(context.getString(R.string.qwantflight_startwith_filter))
+        if (uri.startsWith(context.getString(R.string.homepage_startwith_filter)) && !isFlight) {
             engineSession.settings.userAgentString = uaExt
 
             if (uri.indexOf("&qbc=1") == -1 && !uri.startsWith(context.getString(R.string.qwantmaps_result_startwith_filter))) {
