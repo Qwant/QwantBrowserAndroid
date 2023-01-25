@@ -105,14 +105,15 @@ class BookmarksStorage(private var context: Context) {
     }
 
     private fun doRestoreOldOld() {
+        var fileInputStream: FileInputStream? = null
+        var objectInputStream: ObjectInputStream? = null
+
         try {
-            val f = File(QWANT_BOOKMARKS_FILENAME)
-            if (f.exists() && f.canRead()) {
-                val fileInputStream = FileInputStream(f) // : FileInputStream = context.openFileInput(QWANT_BOOKMARKS_FILENAME)
-                val objectInputStream = ObjectInputStream(fileInputStream)
+            val file: File = context.getFileStreamPath(QWANT_BOOKMARKS_FILENAME)
+            if (file.exists()) {
+                fileInputStream = context.openFileInput(QWANT_BOOKMARKS_FILENAME)
+                objectInputStream = ObjectInputStream(fileInputStream)
                 val oldBookmarks: ArrayList<BookmarkItem> = objectInputStream.readObject() as ArrayList<BookmarkItem>
-                objectInputStream.close()
-                fileInputStream.close()
 
                 oldBookmarks.forEach {
                     this.bookmarksList.add(BookmarkItemV2(BookmarkItemV2.BookmarkType.BOOKMARK, it.title, it.url))
@@ -123,6 +124,9 @@ class BookmarksStorage(private var context: Context) {
             } else {
                 Log.w("QWANT_BROWSER", "no bookmarks to restore")
             }
+        } catch (e: FileNotFoundException) {
+            Log.e("QWANT_BROWSER", "Failed reading history file: File not found: " + e.message)
+            // e.printStackTrace()
         } catch (e: IOException) {
             Log.e("QWANT_BROWSER", "Failed reading bookmarks file: IO exception: " + e.message)
             e.printStackTrace()
@@ -132,18 +136,22 @@ class BookmarksStorage(private var context: Context) {
         } catch (e: Exception) {
             Log.e("QWANT_BROWSER", "Failed reading bookmarks file: " + e.message)
             e.printStackTrace()
+        } finally {
+            objectInputStream?.close()
+            fileInputStream?.close()
         }
     }
 
     private fun doRestoreOld() {
+        var fileInputStream: FileInputStream? = null
+        var objectInputStream: ObjectInputStream? = null
+
         try {
-            val f = File(QWANT_BOOKMARKS_FILENAME)
-            if (f.exists() && f.canRead()) {
-                val fileInputStream = FileInputStream(f) // : FileInputStream = context.openFileInput(QWANT_BOOKMARKS_FILENAME)
-                val objectInputStream = ObjectInputStream(fileInputStream)
+            val file: File = context.getFileStreamPath(QWANT_BOOKMARKS_FILENAME)
+            if (file.exists()) {
+                fileInputStream = context.openFileInput(QWANT_BOOKMARKS_FILENAME)
+                objectInputStream = ObjectInputStream(fileInputStream)
                 val oldBookmarks: ArrayList<BookmarkItemV1> = objectInputStream.readObject() as ArrayList<BookmarkItemV1>
-                objectInputStream.close()
-                fileInputStream.close()
 
                 oldBookmarks.forEach {
                     this.bookmarksList.add(BookmarkItemV2(BookmarkItemV2.BookmarkType.BOOKMARK, it.title, it.url))
@@ -154,6 +162,9 @@ class BookmarksStorage(private var context: Context) {
             } else {
                 Log.w("QWANT_BROWSER", "no bookmarks to restore")
             }
+        } catch (e: FileNotFoundException) {
+            Log.e("QWANT_BROWSER", "Failed reading history file: File not found: " + e.message)
+            // e.printStackTrace()
         } catch (e: IOException) {
             Log.e("QWANT_BROWSER", "Failed reading bookmarks file: IO exception: " + e.message)
             e.printStackTrace()
@@ -163,28 +174,34 @@ class BookmarksStorage(private var context: Context) {
         } catch (e: Exception) {
             Log.e("QWANT_BROWSER", "Failed reading bookmarks file: " + e.message)
             e.printStackTrace()
+        } finally {
+            objectInputStream?.close()
+            fileInputStream?.close()
         }
     }
 
     private fun doRestore() {
+        var fileInputStream: FileInputStream? = null
+        var objectInputStream: ObjectInputStream? = null
+
         try {
             val file: File = context.getFileStreamPath(QWANT_BOOKMARKS_FILENAME)
             if (file.exists()) {
-                val fileInputStream = context.openFileInput(QWANT_BOOKMARKS_FILENAME) // FileInputStream(f)
-                val objectInputStream = ObjectInputStream(fileInputStream)
+                fileInputStream = context.openFileInput(QWANT_BOOKMARKS_FILENAME) // FileInputStream(f)
+                objectInputStream = ObjectInputStream(fileInputStream)
                 this.bookmarksList = objectInputStream.readObject() as ArrayList<BookmarkItemV2>
 
                 // reload parents, ignored in serialization else we would go infinite recursion
                 this.bookmarksList.filter { it.type == BookmarkItemV2.BookmarkType.FOLDER }.forEach {
                     restoreBookmarksParents(it)
                 }
-
-                objectInputStream.close()
-                fileInputStream.close()
                 this.emitOnChange()
             } else {
                 Log.w("QWANT_BROWSER" ,"No bookmarks yet")
             }
+        } catch (e: FileNotFoundException) {
+            Log.e("QWANT_BROWSER", "Failed reading history file: File not found: " + e.message)
+            // e.printStackTrace()
         } catch (e: IOException) {
             Log.e("QWANT_BROWSER", "Failed reading bookmarks file: IO exception: " + e.message)
             e.printStackTrace()
@@ -194,6 +211,9 @@ class BookmarksStorage(private var context: Context) {
         } catch (e: Exception) {
             Log.e("QWANT_BROWSER", "Failed reading bookmarks file: " + e.message)
             e.printStackTrace()
+        } finally {
+            objectInputStream?.close()
+            fileInputStream?.close()
         }
     }
 

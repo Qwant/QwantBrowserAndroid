@@ -248,23 +248,33 @@ class History(val context: Context) : HistoryStorage {
     }
 
     fun restore() {
+        var fileInputStream: FileInputStream? = null
+        var objectInputStream: ObjectInputStream? = null
+
         try {
-            val fileInputStream: FileInputStream = context.openFileInput(QWANT_HISTORY_FILENAME)
-            val objectInputStream = ObjectInputStream(fileInputStream)
-            this.pages = objectInputStream.readObject() as HashMap<String, MutableList<Visit>>
-            this.pageMeta = objectInputStream.readObject() as HashMap<String, PageObservation>
-            objectInputStream.close()
-            fileInputStream.close()
-            Log.d("QWANT_BROWSER", "history restored: ${pages.size} pages / ${pageMeta.size} metas")
+            val file: File = context.getFileStreamPath(QWANT_HISTORY_FILENAME)
+            if (file.exists()) {
+                fileInputStream = context.openFileInput(QWANT_HISTORY_FILENAME)
+                objectInputStream = ObjectInputStream(fileInputStream)
+                this.pages = objectInputStream.readObject() as HashMap<String, MutableList<Visit>>
+                this.pageMeta = objectInputStream.readObject() as HashMap<String, PageObservation>
+                Log.d("QWANT_BROWSER", "history restored: ${pages.size} pages / ${pageMeta.size} metas")
+            }
+        } catch (e: FileNotFoundException) {
+            Log.e("QWANT_BROWSER", "Failed reading history file: File not found: " + e.message)
+            // e.printStackTrace()
         } catch (e: IOException) {
             Log.e("QWANT_BROWSER", "Failed reading history file: IO exception: " + e.message)
-            e.printStackTrace()
+            // e.printStackTrace()
         } catch (e: ClassNotFoundException) {
             Log.e("QWANT_BROWSER", "Failed reading history file: Class not found: " + e.message)
-            e.printStackTrace()
+            // e.printStackTrace()
         } catch (e: Exception) {
             Log.e("QWANT_BROWSER", "Failed reading history file: " + e.message)
-            e.printStackTrace()
+            // e.printStackTrace()
+        } finally {
+            objectInputStream?.close()
+            fileInputStream?.close()
         }
     }
 
